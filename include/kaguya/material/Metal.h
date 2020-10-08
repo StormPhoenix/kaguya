@@ -7,21 +7,32 @@
 
 #include <kaguya/material/Material.h>
 #include <kaguya/math/Math.hpp>
+#include <kaguya/math/ScatterPdf.h>
 
 namespace kaguya {
     namespace material {
 
+        using kaguya::math::ScatterPdf;
+
         class Metal : public Material {
         public:
-            Metal(const Vector3 &albedo, double fuzzy);
+            Metal();
 
-            bool scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, double pdf) override;
+            Metal(const Vector3 &albedo, double fuzzy = 0);
+
+            virtual bool scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, float &pdf) override;
+
+            virtual Vector3 brdf(const HitRecord &hitRecord, const Vector3 &scatterDirection) override;
+
+            virtual double scatterPDF(const Ray &hitRay, const HitRecord &hitRecord, const Ray &scatterRay) override;
 
         private:
             // 反射率
             Vector3 _albedo;
             // 毛玻璃效果系数
             double _fuzzy;
+            // 散射分布函数
+            std::shared_ptr<ScatterPdf> _pdf = nullptr;
         };
 
     }

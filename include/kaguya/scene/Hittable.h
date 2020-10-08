@@ -52,7 +52,7 @@ namespace kaguya {
             void setOutwardNormal(const Vector3 &outwardNormal, const Vector3 &hitDirection) {
                 direction = hitDirection;
                 isFrontFace = DOT(outwardNormal, direction) < 0;
-                normal = isFrontFace ? outwardNormal : -outwardNormal;
+                normal = isFrontFace ? NORMALIZE(outwardNormal) : -NORMALIZE(outwardNormal);
             }
         } HitRecord;
 

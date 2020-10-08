@@ -44,10 +44,10 @@ namespace kaguya {
                             // 散射光线的 pdf
                             float scatterPdf = material->scatterPDF(ray, hitRecord, scatteredRay);
                             // 计算余弦
-                            float cosine = DOT(NORMALIZE(scatteredRay.getDirection()), NORMALIZE(hitRecord.normal));
+//                            float cosine = abs(DOT(NORMALIZE(scatteredRay.getDirection()), NORMALIZE(hitRecord.normal)));
                             // 获取材质 brdf，计算渲染结果
                             Vector3 shaderColor = material->brdf(hitRecord, scatteredRay.getDirection()) *
-                                                  scatterPdf * shader(scatteredRay, scene, depth + 1) * cosine /
+                                                  scatterPdf * shader(scatteredRay, scene, depth + 1) /* * cosine*/ /
                                                   samplePdf;
                             return material->emitted(hitRecord.u, hitRecord.v) + shaderColor;
                         } else {
@@ -104,7 +104,10 @@ namespace kaguya {
         }
 
         Vector3 PathTracer::background(const Ray &ray) {
-            return Vector3(1.0, 1.0, 1.0);
+            // TODO 临时设计背景色
+            Vector3 dir = NORMALIZE(ray.getDirection());
+            float t = 0.5 * (dir.y + 1.0);
+            return float(1.0 - t) * Vector3(1.0, 1.0, 1.0) + t * Vector3(0.5, 0.7, 1.0);
         }
 
         void PathTracer::writeShaderColor(const Vector3 &color) {

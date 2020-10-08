@@ -52,6 +52,8 @@ namespace kaguya {
                     Vector3 outwardNormal = hitRecord.point - _transformedCenter;
                     hitRecord.setOutwardNormal(outwardNormal, ray.getDirection());
                     return true;
+                } else {
+                    return false;
                 }
             } else {
                 // no root

@@ -5,21 +5,33 @@
 #ifndef KAGUYA_DIELECTRIC_H
 #define KAGUYA_DIELECTRIC_H
 
+#include <kaguya/math/ScatterPdf.h>
 #include <kaguya/material/Material.h>
+#include <kaguya/material/Texture.h>
 
 namespace kaguya {
     namespace material {
 
+        using kaguya::math::ScatterPdf;
+
         class Dielectric : public Material {
         public:
-            Dielectric(double refractionFactor);
+            Dielectric(std::shared_ptr<Texture> albedo);
 
-            bool scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, double pdf) override;
+            Dielectric(std::shared_ptr<Texture> albedo, double refractiveIndex);
 
-            double brdf(const HitRecord &hitRecord);
+            virtual bool scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, float &pdf) override;
+
+            virtual Vector3 brdf(const HitRecord &hitRecord, const Vector3 &scatterDirection) override;
+
+            virtual double scatterPDF(const Ray &hitRay, const HitRecord &hitRecord, const Ray &scatterRay) override;
 
         private:
-            double _refractionFactor;
+            double _refractiveIndex;
+
+            std::shared_ptr<Texture> _albedo = nullptr;
+
+            std::shared_ptr<ScatterPdf> _pdf = nullptr;
         };
 
     }
