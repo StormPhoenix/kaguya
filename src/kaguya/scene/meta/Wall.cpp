@@ -7,7 +7,7 @@
 namespace kaguya {
     namespace scene {
 
-        Wall::Wall(float width, float height, std::shared_ptr<Material> material,
+        Wall::Wall(double width, double height, std::shared_ptr<Material> material,
                    std::shared_ptr<Matrix4> transformMatrix)
                 : _width(width), _height(height),
                   _material(material),
@@ -70,7 +70,7 @@ namespace kaguya {
             Vector3 equationResult = transformedA - eye;
             Vector3 ans = INVERSE(equationParam) * equationResult;
             double step = ans[2];
-            float alpha = 1 - ans[0] - ans[1];
+            double alpha = 1 - ans[0] - ans[1];
 
             // 检查射线范围
             if (step < stepMax && step > stepMin) {
@@ -118,8 +118,8 @@ namespace kaguya {
             Vector3 transformedLeftTop = _transformMatrix != nullptr ?
                                          (*_transformMatrix) * Vector4(_leftTop, 1.0f) : _leftTop;
 
-            Vector3 horizontal = (transformedRightBottom - transformedLeftBottom) * float(u);
-            Vector3 vertical = (transformedLeftTop - transformedLeftBottom) * float(v);
+            Vector3 horizontal = (transformedRightBottom - transformedLeftBottom) * u;
+            Vector3 vertical = (transformedLeftTop - transformedLeftBottom) * v;
 
             pdf = 1.0 / (LENGTH(transformedRightBottom - transformedLeftBottom) *
                          LENGTH(transformedLeftTop - transformedLeftBottom));
@@ -146,7 +146,7 @@ namespace kaguya {
             }
         }
 
-        ZXWall::ZXWall(float z0, float z1, float x0, float x1, float y, bool upward,
+        ZXWall::ZXWall(double z0, double z1, double x0, double x1, double y, bool upward,
                        std::shared_ptr<Material> material) {
             _y = y;
             _z0 = z0;
@@ -167,8 +167,8 @@ namespace kaguya {
                          double stepMin, double stepMax) {
             double step = (_y - ray.getOrigin().y) / ray.getDirection().y;
             if (step >= stepMin && step <= stepMax) {
-                float z = ray.getOrigin().z + step * ray.getDirection().z;
-                float x = ray.getOrigin().x + step * ray.getDirection().x;
+                double z = ray.getOrigin().z + step * ray.getDirection().z;
+                double x = ray.getOrigin().x + step * ray.getDirection().x;
 
                 if (checkRange(z, _z0, _z1) && checkRange(x, _x0, _x1)) {
                     hitRecord.material = _material;
@@ -213,7 +213,7 @@ namespace kaguya {
             _aabb = AABB({_x0, _y - 0.0001, _z0}, {_x1, _y + 0.0001, _z1});
         }
 
-        YZWall::YZWall(float y0, float y1, float z0, float z1, float x, bool rightward,
+        YZWall::YZWall(double y0, double y1, double z0, double z1, double x, bool rightward,
                        std::shared_ptr<Material> material) {
             _x = x;
             _y0 = y0;
@@ -234,8 +234,8 @@ namespace kaguya {
                          double stepMin, double stepMax) {
             double step = (_x - ray.getOrigin().x) / ray.getDirection().x;
             if (step >= stepMin && step <= stepMax) {
-                float z = ray.getOrigin().z + step * ray.getDirection().z;
-                float y = ray.getOrigin().y + step * ray.getDirection().y;
+                double z = ray.getOrigin().z + step * ray.getDirection().z;
+                double y = ray.getOrigin().y + step * ray.getDirection().y;
 
                 if (checkRange(z, _z0, _z1) && checkRange(y, _y0, _y1)) {
                     hitRecord.material = _material;
@@ -280,7 +280,7 @@ namespace kaguya {
             }
         }
 
-        XYWall::XYWall(float x0, float x1, float y0, float y1, float z, bool frontward,
+        XYWall::XYWall(double x0, double x1, double y0, double y1, double z, bool frontward,
                        std::shared_ptr<Material> material) {
             _z = z;
             _x0 = x0;
@@ -290,9 +290,9 @@ namespace kaguya {
             _material = material;
 
             if (frontward) {
-                _normal = {0, 0, 1};
-            } else {
                 _normal = {0, 0, -1};
+            } else {
+                _normal = {0, 0, 1};
             }
             buildBoundingBox();
         }
@@ -301,8 +301,8 @@ namespace kaguya {
                          double stepMin, double stepMax) {
             double step = (_z - ray.getOrigin().z) / ray.getDirection().z;
             if (step >= stepMin && step <= stepMax) {
-                float x = ray.getOrigin().x + step * ray.getDirection().x;
-                float y = ray.getOrigin().y + step * ray.getDirection().y;
+                double x = ray.getOrigin().x + step * ray.getDirection().x;
+                double y = ray.getOrigin().y + step * ray.getDirection().y;
 
                 if (checkRange(x, _x0, _x1) && checkRange(y, _y0, _y1)) {
                     hitRecord.material = _material;

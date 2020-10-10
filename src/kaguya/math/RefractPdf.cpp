@@ -7,13 +7,13 @@
 namespace kaguya {
     namespace math {
 
-        RefractPdf::RefractPdf(float refractiveIndex) : _refractiveIndex(refractiveIndex) {}
+        RefractPdf::RefractPdf(double refractiveIndex) : _refractiveIndex(refractiveIndex) {}
 
         Vector3 RefractPdf::random(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) {
             Vector3 normalizedInDir = NORMALIZE(inDir);
 
-            float cosine = DOT(normalizedInDir, NORMALIZE(normal));
-            float refraction;
+            double cosine = DOT(normalizedInDir, NORMALIZE(normal));
+            double refraction;
             Vector3 refractNormal;
 
             // 计算折射比例，并保证后续计算用到的法线是与 inDir 在同一侧的
@@ -28,7 +28,7 @@ namespace kaguya {
             }
 
             // 判断是否发生全反射
-            float sine = sqrt(1 - pow(abs(cosine), 2));
+            double sine = sqrt(1 - pow(abs(cosine), 2));
             if (refraction * sine > 1) {
                 // 全反射
                 samplePdf = 1.0f;
@@ -53,8 +53,8 @@ namespace kaguya {
             Vector3 normalizedOutDir = NORMALIZE(outDir);
 
             // 计算折射比例
-            float cosine = DOT(normalizedInDir, NORMALIZE(normal));
-            float refraction;
+            double cosine = DOT(normalizedInDir, NORMALIZE(normal));
+            double refraction;
             Vector3 refractNormal;
             if (cosine < 0) {
                 //  外部入射
@@ -66,7 +66,7 @@ namespace kaguya {
                 refractNormal = -normal;
             }
 
-            float sine = sqrt(1 - pow(abs(cosine), 2));
+            double sine = sqrt(1 - pow(abs(cosine), 2));
             if (refraction * sine > 1) {
                 // 全反射
                 Vector3 reflectDir = reflect(normalizedInDir, refractNormal);

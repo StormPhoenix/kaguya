@@ -26,7 +26,7 @@ namespace kaguya {
         }
 
         const Vector3 Ray::at(double step) const {
-            return _origin + glm::vec3(_direction.x * step, _direction.y * step, _direction.z * step);
+            return _origin + Vector3(_direction.x * step, _direction.y * step, _direction.z * step);
         }
     }
 }

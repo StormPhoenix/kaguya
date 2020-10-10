@@ -61,7 +61,7 @@ namespace kaguya {
             Vector3 equationResult = transformedA - eye;
             Vector3 ans = INVERSE(equationParam) * equationResult;
             double step = ans[2];
-            float alpha = 1 - ans[0] - ans[1];
+            double alpha = 1 - ans[0] - ans[1];
 
             // 检查射线范围、击中点是否在三角形内部
             if (step < stepMax &&

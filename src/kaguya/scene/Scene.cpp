@@ -12,6 +12,7 @@
 #include <kaguya/material/Metal.h>
 #include <kaguya/material/Emitter.h>
 #include <kaguya/material/ConstantTexture.h>
+#include <kaguya/Config.h>
 
 namespace kaguya {
     namespace scene {
@@ -38,7 +39,9 @@ namespace kaguya {
                     Vector3(255.0 / 255, 192.0 / 255, 203.0 / 255));
 
             std::shared_ptr<Texture> lightAlbedo = std::make_shared<ConstantTexture>(
-                    Vector3(15, 15, 15));
+                    Vector3(double(249.0) / 255.0 * 12, double(222.0) / 255.0 * 12, double(180.0) / 255.0 * 12));
+
+            // 255 222 99
 
             // lambertian materials
             std::shared_ptr<Material> lambertLeft = std::make_shared<Lambertian>(red);
@@ -63,12 +66,13 @@ namespace kaguya {
                                                                            lambertFront);
 
             std::shared_ptr<Hittable> glassSphere = std::make_shared<Sphere>(Vector3(125, -169, 0), 80, glass);
+//            std::shared_ptr<Hittable> glassSphere = std::make_shared<Sphere>(Vector3(75, 0, 0), 80, metal);
 
-            std::shared_ptr<Hittable> metalSphere = std::make_shared<Sphere>(Vector3(-125, -149, -100), 100, metal);
+            std::shared_ptr<Hittable> metalSphere = std::make_shared<Sphere>(Vector3(-125, -149, 100), 100, metal);
 
             // light
             std::shared_ptr<ObjectSampler> lightWall = std::make_shared<ZXWall>(-100, 100, -100, 100, 248, false,
-                                                                         nullptr);
+                                                                                nullptr);
             std::shared_ptr<Light> light = std::make_shared<Light>(lightMaterial, lightWall);
             _light = light;
 
@@ -96,10 +100,8 @@ namespace kaguya {
             auto eye = Vector3(0.0, 0.0, 700);
             auto dir = Vector3(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir);
-//            camera->setResolutionWidth(200);
-//            camera->setResolutionHeight(200);
-//            camera->setResolutionWidth(1000);
-//            camera->setResolutionHeight(1000);
+            camera->setResolutionWidth(Config::resolutionWidth);
+            camera->setResolutionHeight(Config::resolutionHeight);
             _camera = camera;
         }
 

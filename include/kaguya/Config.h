@@ -18,6 +18,15 @@ namespace kaguya {
 
     class Config {
     public:
+        // 每像素采样次数
+        static int samplePerPixel;
+        // 对光源采样概率
+        static double sampleLightProb;
+        // 相机宽度分辨率
+        static int resolutionWidth;
+        // 相机高度分辨率
+        static int resolutionHeight;
+
         static std::shared_ptr<Camera> buildCamera() {
             // TODO load config file
             return std::make_shared<Camera>();
@@ -26,7 +35,13 @@ namespace kaguya {
         // TODO 测试
         static std::shared_ptr<Scene> testBuildTwoScene() {
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-//            scene->testBuildTwoSphere();
+            scene->testBuildTwoSphere();
+            return scene;
+        }
+
+        // TODO 测试
+        static std::shared_ptr<Scene> testBuildCornelBox() {
+            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
             scene->testBuildCornelBox();
             return scene;
         }

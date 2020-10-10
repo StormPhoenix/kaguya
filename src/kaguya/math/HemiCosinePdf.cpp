@@ -19,16 +19,16 @@ namespace kaguya {
             // sampleY = sin^2(theta)
             double sampleY = uniformSample();
             // x = sin(theta) * cos(fi)
-            float x = sqrt(sampleY) * cos(2 * PI * sampleX);
+            double x = sqrt(sampleY) * cos(2 * PI * sampleX);
             // y = cos(theta)
-            float y = sqrt(1 - sampleY);
-            // z = - sin(theta) * sin(fi)
-            float z = -sqrt(sampleY) * sin(2 * PI * sampleX);
+            double y = sqrt(1 - sampleY);
+            // z = sin(theta) * sin(fi)
+            double z = sqrt(sampleY) * sin(2 * PI * sampleX);
 
             // 构造关于法线的切线空间
             Vector3 tanY = NORMALIZE(normal);
-            Vector3 tanZ = CROSS(NORMALIZE(inDir), tanY);
-            Vector3 tanX = CROSS(tanY, tanZ);
+            Vector3 tanZ = NORMALIZE(CROSS(NORMALIZE(inDir), tanY));
+            Vector3 tanX = NORMALIZE(CROSS(tanY, tanZ));
             Vector3 sample = NORMALIZE(x * tanX + y * tanY + z * tanZ);
             samplePdf = pdf(inDir, normal, sample);
             return sample;

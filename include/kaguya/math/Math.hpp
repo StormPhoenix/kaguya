@@ -12,15 +12,15 @@
 #include <functional>
 #include <random>
 
-using Vector2 = glm::vec2;
-using Vector3 = glm::vec3;
-using Vector4 = glm::vec4;
-using Matrix4 = glm::mat4;
+using Vector2 = glm::dvec2;
+using Vector3 = glm::dvec3;
+using Vector4 = glm::dvec4;
+using Matrix4 = glm::dmat4;
 
 const double infinity = std::numeric_limits<double>::infinity();
 const double PI = 3.1415926535897932385;
 const double EPSILON = 10e-6f;
-const float REFRACTION_INDEX_WATER = 1.0f;
+const double REFRACTION_INDEX_WATER = 1.0f;
 
 #define ROTATE(matrix, radius, axis) glm::rotate(matrix, glm::radians(radius), axis)
 #define TRANSLATE(matrix, offset) glm::translate(matrix, offset)
@@ -71,9 +71,9 @@ inline Vector3 reflect(const Vector3 &v, const Vector3 &normal) {
     return v - 2 * DOT(v, NORMALIZE(normal)) * normal;
 }
 
-inline Vector3 refract(const Vector3 &v, const Vector3 &normal, float refraction) {
+inline Vector3 refract(const Vector3 &v, const Vector3 &normal, double refraction) {
     Vector3 perpendicularToNormal = refraction * (v + (DOT(-v, normal)) * normal);
-    Vector3 parallelToNormal = float(sqrt(1 - pow(LENGTH(perpendicularToNormal), 2))) * -normal;
+    Vector3 parallelToNormal = sqrt(1 - pow(LENGTH(perpendicularToNormal), 2)) * -normal;
     return perpendicularToNormal + parallelToNormal;
 }
 

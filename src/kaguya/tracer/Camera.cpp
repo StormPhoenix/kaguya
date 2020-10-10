@@ -21,7 +21,7 @@ namespace kaguya {
             buildCameraCoordinate(fov, aspect);
         }
 
-        Ray Camera::sendRay(float u, float v) {
+        Ray Camera::sendRay(double u, double v) {
             Vector3 samplePoint =
                     _leftBottomCorner + 2 * _halfWindowWidth * u * _right + 2 * _halfWindowHeight * v * _up;
             Vector3 dir = NORMALIZE(samplePoint - _eye);
@@ -55,7 +55,7 @@ namespace kaguya {
             _up = NORMALIZE(CROSS(_right, _front));
 
             // 默认焦距为 10
-            float focal = 10;
+            double focal = 10;
             _halfWindowHeight = tan(DEGREES_TO_RADIANS(fov / 2)) * focal;
             _halfWindowWidth = _halfWindowHeight * aspect;
             _leftBottomCorner = _eye + focal * _front - _halfWindowWidth * _right - _halfWindowHeight * _up;

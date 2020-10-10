@@ -12,7 +12,7 @@ namespace kaguya {
 
         class RefractPdf : public ScatterPdf {
         public:
-            RefractPdf(float refractiveIndex);
+            RefractPdf(double refractiveIndex);
 
             virtual double pdf(const Vector3 &inDir, const Vector3 &normal, const Vector3 &outDir) override;
 

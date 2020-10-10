@@ -21,8 +21,10 @@ namespace kaguya {
         }
 
         void PathTracer::init() {
-            _scene = Config::testBuildTwoScene();
+            _scene = Config::testBuildCornelBox();
             _camera = _scene->getCamera();
+            _samplePerPixel = Config::samplePerPixel;
+            _sampleLightProb = Config::sampleLightProb;
         }
 
         Vector3 PathTracer::shader(const Ray &ray, Scene &scene, int depth) {
@@ -47,7 +49,7 @@ namespace kaguya {
                         if (!material->isSpecular() &&
                             sampleFromLights(scene, hitRecord.point, scatterRay, samplePdf)) {
                             // 对光源采样
-                            float scatterPdf = material->scatterPDF(ray, hitRecord, scatterRay);
+                            double scatterPdf = material->scatterPDF(ray, hitRecord, scatterRay);
                             samplePdf = _sampleLightProb * samplePdf + (1 - _sampleLightProb) * scatterPdf;
 
                             Vector3 brdf = material->brdf(hitRecord, scatterRay.getDirection());
@@ -58,7 +60,7 @@ namespace kaguya {
                         } else if (material->scatter(ray, hitRecord, scatterRay, samplePdf)) {
                             // 不对光源采样，自由散射
                             // 散射光线的 pdf
-                            float scatterPdf = material->scatterPDF(ray, hitRecord, scatterRay);
+                            double scatterPdf = material->scatterPDF(ray, hitRecord, scatterRay);
 
                             // TODO 区分反射种类
                             if (!material->isSpecular()) {
@@ -92,7 +94,7 @@ namespace kaguya {
 
         Vector3 PathTracer::computeShaderColor(double scatterPdf, double samplePdf, Vector3 brdf, Ray &scatterRay,
                                                kaguya::Scene &scene, int depth) {
-            return brdf * float(scatterPdf) * shader(scatterRay, scene, depth) / float(samplePdf);
+            return brdf * scatterPdf * shader(scatterRay, scene, depth) / samplePdf;
         }
 
         bool PathTracer::sampleFromLights(Scene &scene, Vector3 sampleObject, Ray &sampleLightRay,
@@ -169,6 +171,7 @@ namespace kaguya {
                 // TODO delete
                 std::cout << "P3\n" << cameraWidth << " " << cameraHeight << "\n255\n";
 
+                double sampleWeight = 1.0 / _samplePerPixel;
                 // 遍历相机成像图案上每个像素
                 for (int row = cameraHeight - 1; row >= 0; row--) {
 
@@ -178,6 +181,12 @@ namespace kaguya {
 
                     for (int col = 0; col < cameraWidth; col++) {
                         Vector3 ans = {0, 0, 0};
+
+                        if (col == 458 && row == (cameraHeight - 451 - 1)) {
+                            int a = 0;
+                            a++;
+                        }
+
                         // 做 _samplePerPixel 次采样
                         for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
 
@@ -191,7 +200,7 @@ namespace kaguya {
                             Ray sampleRay = _camera->sendRay(u, v);
                             ans += shader(sampleRay, *_scene, 0);
                         }
-                        ans /= _samplePerPixel;
+                        ans *= sampleWeight;
                         // TODO 写入渲染结果，用更好的方式写入
                         writeShaderColor(ans);
                     }
@@ -203,9 +212,17 @@ namespace kaguya {
             // TODO 临时设计背景色
             return Vector3(0.0f, 0.0f, 0.0f);
 
+            /*
+            if (ray.getDirection().z < 0) {
+                return Vector3(0.0f, 0.0f, 0.0f);
+            } else {
+                return Vector3(1.0f, 1.0f, 1.0f);
+            }
+
             Vector3 dir = NORMALIZE(ray.getDirection());
-            float t = 0.5 * (dir.y + 1.0);
-            return float(1.0 - t) * Vector3(1.0, 1.0, 1.0) + t * Vector3(0.5, 0.7, 1.0);
+            double t = 0.5 * (dir.y + 1.0);
+            return (1.0 - t) * Vector3(1.0, 1.0, 1.0) + t * Vector3(0.5, 0.7, 1.0);
+             */
         }
 
         void PathTracer::writeShaderColor(const Vector3 &color) {

@@ -1,1 +1,9 @@
+# Project
 /cmake-build-debug
+/output
+
+# IDE
+/.idea
+
+# Mac
+*.DS_Store

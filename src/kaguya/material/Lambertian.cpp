@@ -13,8 +13,8 @@ namespace kaguya {
         using kaguya::math::HemiUniformPdf;
 
         Lambertian::Lambertian(std::shared_ptr<Texture> albedo) : _albedo(albedo) {
-//            _pdf = std::make_shared<HemiCosinePdf>();
-            _pdf = std::make_shared<HemiUniformPdf>();
+            _pdf = std::make_shared<HemiCosinePdf>();
+//            _pdf = std::make_shared<HemiUniformPdf>();
         }
 
         double Lambertian::scatterPDF(const Ray &hitRay, const HitRecord &hitRecord, const Ray &scatterRay) {

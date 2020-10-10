@@ -19,7 +19,7 @@ namespace kaguya {
             Wall() {}
 
             // XY 上的二维片面
-            Wall(float width, float height, std::shared_ptr<Material> material,
+            Wall(double width, double height, std::shared_ptr<Material> material,
                  std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
             virtual bool hit(const Ray &ray, HitRecord &hitRecord, double stepMin, double stepMax) override;
@@ -67,7 +67,7 @@ namespace kaguya {
              * @param upward
              * @param material
              */
-            ZXWall(float z0, float z1, float x0, float x1, float y, bool upward, std::shared_ptr<Material> material);
+            ZXWall(double z0, double z1, double x0, double x1, double y, bool upward, std::shared_ptr<Material> material);
 
             virtual void buildBoundingBox() override;
 
@@ -78,11 +78,11 @@ namespace kaguya {
             virtual double samplePointPdf(Vector3 &point) override;
 
         protected:
-            float _y;
-            float _z0;
-            float _z1;
-            float _x0;
-            float _x1;
+            double _y;
+            double _z0;
+            double _z1;
+            double _x0;
+            double _x1;
         };
 
         class YZWall : public Wall {
@@ -97,7 +97,7 @@ namespace kaguya {
              * @param rightward
              * @param material
              */
-            YZWall(float y0, float y1, float z0, float z1, float x, bool rightward, std::shared_ptr<Material> material);
+            YZWall(double y0, double y1, double z0, double z1, double x, bool rightward, std::shared_ptr<Material> material);
 
             virtual void buildBoundingBox() override;
 
@@ -108,11 +108,11 @@ namespace kaguya {
             virtual double samplePointPdf(Vector3 &point) override;
 
         protected:
-            float _x;
-            float _y0;
-            float _y1;
-            float _z0;
-            float _z1;
+            double _x;
+            double _y0;
+            double _y1;
+            double _z0;
+            double _z1;
         };
 
         class XYWall : public Wall {
@@ -127,7 +127,7 @@ namespace kaguya {
              * @param frontward
              * @param material
              */
-            XYWall(float x0, float x1, float y0, float y1, float z, bool frontward, std::shared_ptr<Material> material);
+            XYWall(double x0, double x1, double y0, double y1, double z, bool frontward, std::shared_ptr<Material> material);
 
             virtual void buildBoundingBox() override;
 
@@ -138,11 +138,11 @@ namespace kaguya {
             virtual double samplePointPdf(Vector3 &point) override;
 
         protected:
-            float _z;
-            float _x0;
-            float _x1;
-            float _y0;
-            float _y1;
+            double _z;
+            double _x0;
+            double _x1;
+            double _y0;
+            double _y1;
         };
     }
 }

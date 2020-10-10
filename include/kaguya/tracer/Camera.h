@@ -43,7 +43,7 @@ namespace kaguya {
              * @param v
              * @return
              */
-            Ray sendRay(float u, float v);
+            Ray sendRay(double u, double v);
 
             /**
              * 获得相机成像宽度
@@ -76,8 +76,8 @@ namespace kaguya {
             Vector3 _up;
             Vector3 _leftBottomCorner;
             // 相机成像平面大小
-            float _halfWindowHeight;
-            float _halfWindowWidth;
+            double _halfWindowHeight;
+            double _halfWindowWidth;
         };
 
     }
