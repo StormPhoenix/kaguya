@@ -17,9 +17,20 @@ namespace kaguya {
             _pdf = std::make_shared<RefractPdf>(refractiveIndex);
         }
 
-        bool Dielectric::scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, float &pdf) {
+        bool Dielectric::isSpecular() {
+            return true;
+        }
+
+        bool Dielectric::scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, double &pdf) {
             scatteredRay.setOrigin(hitRecord.point);
-            scatteredRay.setDirection(_pdf->random(ray.getDirection(), hitRecord.normal, pdf));
+            if (hitRecord.isFrontFace) {
+                // 外表面射入
+                scatteredRay.setDirection(_pdf->random(ray.getDirection(), hitRecord.normal, pdf));
+            } else {
+                // 内部射入
+                scatteredRay.setDirection(_pdf->random(ray.getDirection(), -hitRecord.normal, pdf));
+            }
+
             return true;
         }
 
@@ -28,7 +39,13 @@ namespace kaguya {
         }
 
         double Dielectric::scatterPDF(const Ray &hitRay, const HitRecord &hitRecord, const Ray &scatterRay) {
-            return _pdf->pdf(hitRay.getDirection(), hitRecord.normal, scatterRay.getDirection());
+            if (hitRecord.isFrontFace) {
+                // 外表面射入
+                return _pdf->pdf(hitRay.getDirection(), hitRecord.normal, scatterRay.getDirection());
+            } else {
+                // 内部射入
+                return _pdf->pdf(hitRay.getDirection(), -hitRecord.normal, scatterRay.getDirection());
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ namespace kaguya {
 
             double scatterPDF(const Ray &hitRay, const HitRecord &hitRecord, const Ray &scatterRay) override;
 
-            bool scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, float &pdf) override;
+            bool scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, double &pdf) override;
 
             Vector3 brdf(const HitRecord &hitRecord, const Vector3 &scatterDirection) override;
 

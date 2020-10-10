@@ -8,6 +8,7 @@
 #include <memory>
 
 #include <kaguya/scene/Scene.h>
+#include <kaguya/tracer/Tracer.h>
 #include <kaguya/tracer/Camera.h>
 
 namespace kaguya {
@@ -15,14 +16,24 @@ namespace kaguya {
 
         using kaguya::scene::Scene;
 
-        class PathTracer {
+        class PathTracer : public Tracer {
         public:
             PathTracer();
 
-            void run();
+            virtual void run() override;
 
         private:
             void init();
+
+            /**
+             * 对光源采样
+             * @param scene 场景
+             * @param sampleObject 从 sampleObject 发射采样光线
+             * @param sampleLightRay 采样光线
+             * @param sampleLightPdf 采样光线概率
+             * @return 是否采样成功
+             */
+            bool sampleFromLights(Scene &scene, Vector3 sampleObject, Ray &sampleLightRay, double &sampleLightPdf);
 
             /**
              * 具体渲染代码，CPU版本
@@ -32,6 +43,19 @@ namespace kaguya {
              * @return 渲染结果
              */
             Vector3 shader(const Ray &ray, Scene &scene, int depth);
+
+            /**
+             * 渲染公式
+             * @param scatterPdf 散射概率
+             * @param samplePdf 采样概率
+             * @param brdf bidirectional reflectance distribution function
+             * @param scatterRay 散射光线
+             * @param scene 场景
+             * @param depth 迭代深度
+             * @return
+             */
+            Vector3 computeShaderColor(double scatterPdf, double samplePdf,
+                                       Vector3 brdf, Ray &scatterRay, Scene &scene, int depth);
 
             /**
              * 获取背景颜色，这里可以用来设置背景贴图
@@ -51,10 +75,13 @@ namespace kaguya {
             std::shared_ptr<Camera> _camera = nullptr;
             // 场景
             std::shared_ptr<Scene> _scene = nullptr;
+            // TODO 以下参数写入配置文件
             // 最大采样深度
             int _maxDepth = 50;
             // 每个像素采样次数
-            int _samplePerPixel = 50;
+            int _samplePerPixel = 300;
+            // 对光源采样概率
+            double _sampleLightProb = 0.2;
         };
     }
 }

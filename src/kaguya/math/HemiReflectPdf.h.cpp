@@ -19,7 +19,7 @@ namespace kaguya {
             }
         }
 
-        Vector3 HemiReflectPdf::random(const Vector3 &inDir, const Vector3 &normal, float &samplePdf) {
+        Vector3 HemiReflectPdf::random(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) {
             samplePdf = 1.0f;
             return reflect(inDir, normal);
         }

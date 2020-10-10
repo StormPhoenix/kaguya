@@ -6,6 +6,7 @@
 #define KAGUYA_WALL_H
 
 #include <kaguya/scene/Hittable.h>
+#include <kaguya/scene/ObjectSampler.h>
 #include <kaguya/scene/accumulation/AABB.h>
 
 namespace kaguya {
@@ -13,7 +14,7 @@ namespace kaguya {
 
         using kaguya::scene::acc::AABB;
 
-        class Wall : public Hittable {
+        class Wall : public ObjectSampler {
         public:
             Wall() {}
 
@@ -24,6 +25,14 @@ namespace kaguya {
             virtual bool hit(const Ray &ray, HitRecord &hitRecord, double stepMin, double stepMax) override;
 
             virtual const AABB &boundingBox() const override;
+
+            virtual Vector3 samplePoint(double &pdf, Vector3 &normal) override;
+
+            virtual double samplePointPdf(Vector3 &point) override;
+
+            const Vector3 &getNormal() {
+                return _normal;
+            }
 
         protected:
             /**
@@ -46,7 +55,6 @@ namespace kaguya {
             AABB _aabb;
         };
 
-
         class ZXWall : public Wall {
         public:
             /**
@@ -64,6 +72,10 @@ namespace kaguya {
             virtual void buildBoundingBox() override;
 
             virtual bool hit(const Ray &ray, HitRecord &hitRecord, double stepMin, double stepMax) override;
+
+            virtual Vector3 samplePoint(double &pdf, Vector3 &normal) override;
+
+            virtual double samplePointPdf(Vector3 &point) override;
 
         protected:
             float _y;
@@ -91,6 +103,10 @@ namespace kaguya {
 
             virtual bool hit(const Ray &ray, HitRecord &hitRecord, double stepMin, double stepMax) override;
 
+            virtual Vector3 samplePoint(double &pdf, Vector3 &normal) override;
+
+            virtual double samplePointPdf(Vector3 &point) override;
+
         protected:
             float _x;
             float _y0;
@@ -116,6 +132,10 @@ namespace kaguya {
             virtual void buildBoundingBox() override;
 
             virtual bool hit(const Ray &ray, HitRecord &hitRecord, double stepMin, double stepMax) override;
+
+            virtual Vector3 samplePoint(double &pdf, Vector3 &normal) override;
+
+            virtual double samplePointPdf(Vector3 &point) override;
 
         protected:
             float _z;

@@ -12,9 +12,9 @@ namespace kaguya {
 
         class HemiReflectPdf : public ScatterPdf {
         public:
-            virtual double pdf(const Vector3 &inDir, const Vector3 &normal, const Vector3 &outDir);
+            virtual double pdf(const Vector3 &inDir, const Vector3 &normal, const Vector3 &outDir) override;
 
-            virtual Vector3 random(const Vector3 &inDir, const Vector3 &normal, float &samplePdf);
+            virtual Vector3 random(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) override;
         };
 
     }

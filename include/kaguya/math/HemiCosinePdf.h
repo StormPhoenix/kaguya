@@ -12,7 +12,7 @@ namespace kaguya {
 
         class HemiCosinePdf : public ScatterPdf {
         public:
-            Vector3 random(const Vector3 &inDir, const Vector3 &normal, float &samplePdf) override;
+            Vector3 random(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) override;
 
             double pdf(const Vector3 &inDir, const Vector3 &normal, const Vector3 &outDir) override;
 

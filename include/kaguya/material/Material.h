@@ -28,7 +28,7 @@ namespace kaguya {
              * @param pdf scatteredRay 散射方向的采样概率
              * @return 是否发生散射
              */
-            virtual bool scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, float &pdf) = 0;
+            virtual bool scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, double &pdf) = 0;
 
             /**
              * 材质处理入射光、散射光之间能量传递的反射率
@@ -49,7 +49,19 @@ namespace kaguya {
                 return 0;
             }
 
+            /**
+             * TODO delete
+             * @return
+             */
             virtual bool isLight() {
+                return false;
+            }
+
+            /**
+             * 是否具有反光、折射属性
+             * @return
+             */
+            virtual bool isSpecular() {
                 return false;
             }
 

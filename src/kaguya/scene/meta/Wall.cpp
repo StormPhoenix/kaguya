@@ -90,6 +90,7 @@ namespace kaguya {
                     hitRecord.u = offsetX / _width;
                     hitRecord.v = offsetY / _height;
                     hitRecord.material = _material;
+                    hitRecord.id = getId();
                     return true;
                 } else {
                     return false;
@@ -101,6 +102,48 @@ namespace kaguya {
 
         const AABB &Wall::boundingBox() const {
             return _aabb;
+        }
+
+        Vector3 Wall::samplePoint(double &pdf, Vector3 &normal) {
+            // 随机采样坐标
+            double u = uniformSample();
+            double v = uniformSample();
+
+            Vector3 transformedLeftBottom = _transformMatrix != nullptr ?
+                                            (*_transformMatrix) * Vector4(_leftBottom, 1.0f) : _leftBottom;
+
+            Vector3 transformedRightBottom = _transformMatrix != nullptr ?
+                                             (*_transformMatrix) * Vector4(_rightBottom, 1.0f) : _rightBottom;
+
+            Vector3 transformedLeftTop = _transformMatrix != nullptr ?
+                                         (*_transformMatrix) * Vector4(_leftTop, 1.0f) : _leftTop;
+
+            Vector3 horizontal = (transformedRightBottom - transformedLeftBottom) * float(u);
+            Vector3 vertical = (transformedLeftTop - transformedLeftBottom) * float(v);
+
+            pdf = 1.0 / (LENGTH(transformedRightBottom - transformedLeftBottom) *
+                         LENGTH(transformedLeftTop - transformedLeftBottom));
+            normal = NORMALIZE((*_transformMatrix) * Vector4(_normal, 0.0f));
+            return transformedLeftBottom + horizontal + vertical;
+        }
+
+        double Wall::samplePointPdf(Vector3 &point) {
+            Vector3 transformedPoint =
+                    _transformMatrix != nullptr ? INVERSE((*_transformMatrix)) * Vector4(point, 1.0f) : point;
+            if (transformedPoint.z - 0 <= EPSILON &&
+                transformedPoint.x > -_width / 2 && transformedPoint.x < _width / 2 &&
+                transformedPoint.y > -_height / 2 && transformedPoint.y < _height / 2) {
+                Vector3 transformedLeftBottom = (*_transformMatrix) * Vector4(_leftBottom, 1.0);
+                Vector3 transformedRightBottom = (*_transformMatrix) * Vector4(_rightBottom, 1.0);
+                Vector3 transformedLeftTop = (*_transformMatrix) * Vector4(_leftTop, 1.0);
+
+                double transformedWidth = LENGTH(transformedRightBottom - transformedLeftBottom);
+                double transformedHeight = LENGTH(transformedLeftTop - transformedLeftBottom);
+
+                return 1.0 / (transformedWidth * transformedHeight);
+            } else {
+                return 0;
+            }
         }
 
         ZXWall::ZXWall(float z0, float z1, float x0, float x1, float y, bool upward,
@@ -129,6 +172,7 @@ namespace kaguya {
 
                 if (checkRange(z, _z0, _z1) && checkRange(x, _x0, _x1)) {
                     hitRecord.material = _material;
+                    hitRecord.id = getId();
                     hitRecord.point = ray.at(step);
                     hitRecord.step = step;
                     hitRecord.setOutwardNormal(_normal, ray.getDirection());
@@ -140,6 +184,28 @@ namespace kaguya {
                 }
             } else {
                 return false;
+            }
+        }
+
+        Vector3 ZXWall::samplePoint(double &pdf, Vector3 &normal) {
+            double u = uniformSample();
+            double v = uniformSample();
+
+            double width = abs(_x1 - _x0);
+            double height = abs(_z1 - _z0);
+
+            pdf = 1 / (width * height);
+            normal = _normal;
+            return {_x0 + width * u, _y, _z0 + height * v};
+        }
+
+        double ZXWall::samplePointPdf(Vector3 &point) {
+            if (point.y - _y < EPSILON &&
+                point.x > _x0 && point.x < _x1 &&
+                point.z > _z0 && point.z < _z1) {
+                return 1.0 / (abs(_z0 - _z1) * abs(_x0 - _x1));
+            } else {
+                return 0;
             }
         }
 
@@ -173,6 +239,7 @@ namespace kaguya {
 
                 if (checkRange(z, _z0, _z1) && checkRange(y, _y0, _y1)) {
                     hitRecord.material = _material;
+                    hitRecord.id = getId();
                     hitRecord.point = ray.at(step);
                     hitRecord.step = step;
                     hitRecord.setOutwardNormal(_normal, ray.getDirection());
@@ -189,6 +256,28 @@ namespace kaguya {
 
         void YZWall::buildBoundingBox() {
             _aabb = AABB({_x - 0.0001, _y0, _z0}, {_x + 0.0001, _y1, _z1});
+        }
+
+        Vector3 YZWall::samplePoint(double &pdf, Vector3 &normal) {
+            double u = uniformSample();
+            double v = uniformSample();
+
+            double width = abs(_z1 - _z0);
+            double height = abs(_y1 - _y0);
+
+            pdf = 1 / (width * height);
+            normal = _normal;
+            return {_x, _y0 + v * height, _z0 + width * u};
+        }
+
+        double YZWall::samplePointPdf(Vector3 &point) {
+            if (point.x - _x < EPSILON &&
+                point.y > _y0 && point.x < _y1 &&
+                point.z > _z0 && point.z < _z1) {
+                return 1.0 / (abs(_z0 - _z1) * abs(_y0 - _y1));
+            } else {
+                return 0;
+            }
         }
 
         XYWall::XYWall(float x0, float x1, float y0, float y1, float z, bool frontward,
@@ -217,6 +306,7 @@ namespace kaguya {
 
                 if (checkRange(x, _x0, _x1) && checkRange(y, _y0, _y1)) {
                     hitRecord.material = _material;
+                    hitRecord.id = getId();
                     hitRecord.point = ray.at(step);
                     hitRecord.step = step;
                     hitRecord.setOutwardNormal(_normal, ray.getDirection());
@@ -233,6 +323,28 @@ namespace kaguya {
 
         void XYWall::buildBoundingBox() {
             _aabb = AABB({_x0, _y0, _z - 0.0001}, {_x1, _y1, _z + 0.0001});
+        }
+
+        Vector3 XYWall::samplePoint(double &pdf, Vector3 &normal) {
+            double u = uniformSample();
+            double v = uniformSample();
+
+            double width = abs(_x1 - _x0);
+            double height = abs(_y1 - _y0);
+
+            pdf = 1 / (width * height);
+            normal = _normal;
+            return {_x0 + width * u, _y0 + v * height, _z};
+        }
+
+        double XYWall::samplePointPdf(Vector3 &point) {
+            if (point.x - _z < EPSILON &&
+                point.y > _y0 && point.x < _y1 &&
+                point.x > _x0 && point.z < _x1) {
+                return 1.0 / (abs(_x0 - _x1) * abs(_y0 - _y1));
+            } else {
+                return 0;
+            }
         }
     }
 }

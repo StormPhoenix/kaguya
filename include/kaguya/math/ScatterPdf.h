@@ -31,7 +31,7 @@ namespace kaguya {
              * @param samplePdf 采样概率
              * @return
              */
-            virtual Vector3 random(const Vector3 &inDir, const Vector3 &normal, float &samplePdf) = 0;
+            virtual Vector3 random(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) = 0;
         };
     }
 }

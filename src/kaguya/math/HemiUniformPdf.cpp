@@ -12,7 +12,7 @@ namespace kaguya {
             return cosine < 0 ? 0 : 1 / (2 * PI);
         }
 
-        Vector3 HemiUniformPdf::random(const Vector3 &inDir, const Vector3 &normal, float &samplePdf) {
+        Vector3 HemiUniformPdf::random(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) {
             // fi = 2 * Pi * sampleX
             double sampleX = uniformSample();
             // sampleY = 1 - cos(theta)

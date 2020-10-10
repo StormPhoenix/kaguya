@@ -79,6 +79,7 @@ namespace kaguya {
                 hitRecord.u = DOT(factor, Vector3(_uvA.x, _uvB.x, _uvC.x));
                 hitRecord.v = DOT(factor, Vector3(_uvA.y, _uvB.y, _uvC.y));
                 hitRecord.material = _material;
+                hitRecord.id = getId();
                 return true;
             } else {
                 return false;

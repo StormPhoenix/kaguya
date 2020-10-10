@@ -9,7 +9,7 @@ namespace kaguya {
 
         RefractPdf::RefractPdf(float refractiveIndex) : _refractiveIndex(refractiveIndex) {}
 
-        Vector3 RefractPdf::random(const Vector3 &inDir, const Vector3 &normal, float &samplePdf) {
+        Vector3 RefractPdf::random(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) {
             Vector3 normalizedInDir = NORMALIZE(inDir);
 
             float cosine = DOT(normalizedInDir, NORMALIZE(normal));
@@ -27,7 +27,7 @@ namespace kaguya {
                 refractNormal = -NORMALIZE(normal);
             }
 
-            // 判断是否发射全反射
+            // 判断是否发生全反射
             float sine = sqrt(1 - pow(abs(cosine), 2));
             if (refraction * sine > 1) {
                 // 全反射

@@ -20,7 +20,9 @@ namespace kaguya {
 
             Dielectric(std::shared_ptr<Texture> albedo, double refractiveIndex);
 
-            virtual bool scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, float &pdf) override;
+            virtual bool isSpecular() override;
+
+            virtual bool scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, double &pdf) override;
 
             virtual Vector3 brdf(const HitRecord &hitRecord, const Vector3 &scatterDirection) override;
 

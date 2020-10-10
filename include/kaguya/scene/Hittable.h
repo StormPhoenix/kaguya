@@ -43,6 +43,8 @@ namespace kaguya {
             // 击中点纹理坐标
             double u;
             double v;
+            // 击中物体的 ID
+            long long id = -1;
 
             /**
              * 设置击中位置处的法线
@@ -73,6 +75,24 @@ namespace kaguya {
              * @return
              */
             virtual const AABB &boundingBox() const = 0;
+
+            /**
+             * 获取物体的 ID
+             * @return
+             */
+            virtual const long long getId() const {
+                return _id;
+            }
+
+            /**
+             * 设置物体的 ID
+             */
+            virtual void setId(long long id) {
+                _id = id;
+            }
+
+        protected:
+            long long _id = -1;
         };
 
     }

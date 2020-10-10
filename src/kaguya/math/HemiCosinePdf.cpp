@@ -13,7 +13,7 @@ namespace kaguya {
             return cosine < 0 ? 0 : cosine / PI;
         }
 
-        Vector3 HemiCosinePdf::random(const Vector3 &inDir, const Vector3 &normal, float &samplePdf) {
+        Vector3 HemiCosinePdf::random(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) {
             // fi = 2 * Pi * sampleX
             double sampleX = uniformSample();
             // sampleY = sin^2(theta)

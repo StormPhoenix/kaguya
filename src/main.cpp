@@ -23,10 +23,5 @@ int main() {
     PathTracer pathTracer = PathTracer();
     pathTracer.run();
 
-//    RefractPdf *pdf = new RefractPdf(1.5);
-//    float samplePdf;
-//    Vector3 sampledDir = pdf->random({1.0f, -1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, samplePdf);
-
-    std::cout << "Hello, World!" << std::endl;
     return 0;
 }

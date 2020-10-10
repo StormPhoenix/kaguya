@@ -26,7 +26,8 @@ namespace kaguya {
         // TODO 测试
         static std::shared_ptr<Scene> testBuildTwoScene() {
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-            scene->testBuildTwoSphere();
+//            scene->testBuildTwoSphere();
+            scene->testBuildCornelBox();
             return scene;
         }
     };
