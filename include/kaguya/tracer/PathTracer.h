@@ -68,7 +68,7 @@ namespace kaguya {
              * 输出渲染结果
              * @param color
              */
-            void writeShaderColor(const Vector3 &color);
+            void writeShaderColor(const Vector3 &color, int row, int col);
 
         private:
             // 相机
@@ -82,6 +82,8 @@ namespace kaguya {
             int _samplePerPixel = 300;
             // 对光源采样概率
             double _sampleLightProb = 0.2;
+            // 渲染结果位图
+            int *_bitmap = nullptr;
         };
     }
 }

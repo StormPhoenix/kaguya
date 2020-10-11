@@ -9,6 +9,8 @@
 #include <kaguya/material/Material.h>
 #include <iostream>
 
+#include <omp.h>
+
 namespace kaguya {
     namespace tracer {
 
@@ -21,7 +23,7 @@ namespace kaguya {
         }
 
         void PathTracer::init() {
-            _scene = Config::testBuildCornelBox();
+            _scene = Config::testBuildScene();
             _camera = _scene->getCamera();
             _samplePerPixel = Config::samplePerPixel;
             _sampleLightProb = Config::sampleLightProb;
@@ -168,24 +170,17 @@ namespace kaguya {
                 int cameraWidth = _camera->getResolutionWidth();
                 int cameraHeight = _camera->getResolutionHeight();
 
-                // TODO delete
-                std::cout << "P3\n" << cameraWidth << " " << cameraHeight << "\n255\n";
+                // TODO 将 bitmap 封装到写入策略模式
+                _bitmap = (int *) malloc(cameraHeight * cameraWidth * 3 * sizeof(unsigned int));
 
                 double sampleWeight = 1.0 / _samplePerPixel;
                 // 遍历相机成像图案上每个像素
+                // 已完成扫描的行数
+                int finishedLine = 0;
+#pragma omp parallel for num_threads(4)
                 for (int row = cameraHeight - 1; row >= 0; row--) {
-
-                    // TODO delete
-                    std::cerr << "\rScanlines remaining: " << row << "  " << std::flush;
-
-
                     for (int col = 0; col < cameraWidth; col++) {
                         Vector3 ans = {0, 0, 0};
-
-                        if (col == 458 && row == (cameraHeight - 451 - 1)) {
-                            int a = 0;
-                            a++;
-                        }
 
                         // 做 _samplePerPixel 次采样
                         for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
@@ -202,9 +197,29 @@ namespace kaguya {
                         }
                         ans *= sampleWeight;
                         // TODO 写入渲染结果，用更好的方式写入
-                        writeShaderColor(ans);
+                        writeShaderColor(ans, row, col);
+                    }
+                    finishedLine++;
+                    // TODO delete
+                    std::cerr << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "
+                              << std::flush;
+                }
+
+                // TODO delete
+                std::cout << "P3\n" << cameraWidth << " " << cameraHeight << "\n255\n";
+                // TODO 更改成写入替换策略
+                for (int row = cameraHeight - 1; row >= 0; row--) {
+                    for (int col = 0; col < cameraWidth; col++) {
+                        int offset = (row * _camera->getResolutionWidth() + col) * 3;
+                        // Write the translated [0,255] value of each color component.
+                        std::cout << *(_bitmap + offset) << ' '
+                                  << *(_bitmap + offset + 1) << ' '
+                                  << *(_bitmap + offset + 2) << '\n';
                     }
                 }
+
+                delete[] _bitmap;
+                _bitmap = nullptr;
             }
         }
 
@@ -225,15 +240,18 @@ namespace kaguya {
              */
         }
 
-        void PathTracer::writeShaderColor(const Vector3 &color) {
+        void PathTracer::writeShaderColor(const Vector3 &color, int row, int col) {
+            assert(_bitmap != nullptr && _camera != nullptr);
+
             auto r = sqrt(color.x);
             auto g = sqrt(color.y);
             auto b = sqrt(color.z);
 
-            // Write the translated [0,255] value of each color component.
-            std::cout << static_cast<int>(256 * clamp(r, 0.0, 0.999)) << ' '
-                      << static_cast<int>(256 * clamp(g, 0.0, 0.999)) << ' '
-                      << static_cast<int>(256 * clamp(b, 0.0, 0.999)) << '\n';
+            int offset = (row * _camera->getResolutionWidth() + col) * 3;
+
+            *(_bitmap + offset) = static_cast<int>(256 * clamp(r, 0.0, 0.999));
+            *(_bitmap + offset + 1) = static_cast<int>(256 * clamp(g, 0.0, 0.999));
+            *(_bitmap + offset + 2) = static_cast<int>(256 * clamp(b, 0.0, 0.999));
         }
 
     }

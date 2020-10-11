@@ -16,6 +16,8 @@ namespace kaguya {
 
             class BVH : public Hittable {
             public:
+                BVH() {}
+
                 BVH(std::shared_ptr<Hittable> object);
 
                 BVH(std::vector<std::shared_ptr<Hittable>> &objects);
@@ -26,18 +28,19 @@ namespace kaguya {
 
                 bool hit(const Ray &ray, HitRecord &hitRecord, double stepMin, double stepMax) override;
 
-            private:
+            protected:
                 /**
                  * 构建 BVH 树
                  */
                 void build(std::vector<std::shared_ptr<Hittable>> &objects, size_t start, size_t end);
 
+            private:
                 /**
                  * 合并包围盒
                  * @param leftBox
                  * @param rightBox
                  */
-                void surroundingBox(const AABB &leftBox, const AABB &rightBox);
+                void mergeBoundingBox(const AABB &leftBox, const AABB &rightBox);
 
             protected:
                 // 左子树
@@ -46,6 +49,8 @@ namespace kaguya {
                 std::shared_ptr<Hittable> _right = nullptr;
                 // 包围盒
                 AABB _aabb;
+                // BVH 构建完毕标志
+                bool _isValid = false;
             };
 
         }

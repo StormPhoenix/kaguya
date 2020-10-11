@@ -24,6 +24,7 @@ const double REFRACTION_INDEX_WATER = 1.0f;
 
 #define ROTATE(matrix, radius, axis) glm::rotate(matrix, glm::radians(radius), axis)
 #define TRANSLATE(matrix, offset) glm::translate(matrix, offset)
+#define SCALE(matrix, factor) glm::scale(matrix, factor)
 #define DETERMINANT(x) glm::determinant(x)
 #define DOT(x, y) glm::dot(x, y)
 #define NORMALIZE(x) glm::normalize(x)

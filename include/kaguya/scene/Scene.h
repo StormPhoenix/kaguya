@@ -30,6 +30,11 @@ namespace kaguya {
              */
             void testBuildCornelBox();
 
+            /**
+             * 构建 Cornel box，加载 bunny 模型
+             */
+            void testBuildCornelBoxWithBunny();
+
             bool hit(const Ray &ray, HitRecord &hitRecord);
 
             std::shared_ptr<Hittable> getWorld() {

@@ -7,22 +7,35 @@
 namespace kaguya {
     namespace scene {
 
+        Triangle::Triangle(const Vertex &a, const Vertex &b, const Vertex &c,
+                           std::shared_ptr<Material> material, std::shared_ptr<Matrix4> transformMatrix)
+                : _position1(a.position), _position2(b.position), _position3(c.position),
+                  _normal1(a.normal), _normal2(b.normal), _normal3(c.normal),
+                  _uv1(Vector2(a.u, a.v)), _uv2(Vector2(b.u, b.v)), _uv3(Vector2(c.u, c.v)),
+                  _material(material), _transformMatrix(transformMatrix) {
+            init();
+        }
+
         Triangle::Triangle(const Vector3 &a, const Vector3 &b, const Vector3 &c, const Vector3 &normal1,
                            const Vector3 &normal2, const Vector3 &normal3, const Vector2 &uv1, const Vector2 &uv2,
                            const Vector2 &uv3, std::shared_ptr<Material> material,
                            std::shared_ptr<Matrix4> transformMatrix)
-                : _a(a), _b(b), _c(c),
-                  _normalA(normal1), _normalB(normal2), _normalC(normal3),
-                  _uvA(uv1), _uvB(uv2), _uvC(uv3),
+                : _position1(a), _position2(b), _position3(c),
+                  _normal1(normal1), _normal2(normal2), _normal3(normal3),
+                  _uv1(uv1), _uv2(uv2), _uv3(uv3),
                   _material(material), _transformMatrix(transformMatrix) {
 
+            init();
+        }
+
+        void Triangle::init() {
             // 创建 AABB
             Vector3 transformedA = _transformMatrix != nullptr ?
-                                   (*_transformMatrix) * Vector4(_a, 1.0f) : _a;
+                                   (*_transformMatrix) * Vector4(_position1, 1.0f) : _position1;
             Vector3 transformedB = _transformMatrix != nullptr ?
-                                   (*_transformMatrix) * Vector4(_b, 1.0f) : _b;
+                                   (*_transformMatrix) * Vector4(_position2, 1.0f) : _position2;
             Vector3 transformedC = _transformMatrix != nullptr ?
-                                   (*_transformMatrix) * Vector4(_c, 1.0f) : _c;
+                                   (*_transformMatrix) * Vector4(_position3, 1.0f) : _position3;
 
             double minX = std::min(std::min(transformedA[0], transformedB[0]), transformedC[0]) - 0.0001;
             double minY = std::min(std::min(transformedA[1], transformedB[1]), transformedC[1]) - 0.0001;
@@ -39,15 +52,15 @@ namespace kaguya {
                            double stepMin, double stepMax) {
 
             Vector3 transformedA = _transformMatrix != nullptr ?
-                                   (*_transformMatrix) * Vector4(_a, 1.0f) : _a;
+                                   (*_transformMatrix) * Vector4(_position1, 1.0f) : _position1;
             Vector3 transformedB = _transformMatrix != nullptr ?
-                                   (*_transformMatrix) * Vector4(_b, 1.0f) : _b;
+                                   (*_transformMatrix) * Vector4(_position2, 1.0f) : _position2;
             Vector3 transformedC = _transformMatrix != nullptr ?
-                                   (*_transformMatrix) * Vector4(_c, 1.0f) : _c;
+                                   (*_transformMatrix) * Vector4(_position3, 1.0f) : _position3;
 
-            Vector3 transformedNormalA = (*_transformMatrix) * Vector4(_normalA, 0.0f);
-            Vector3 transformedNormalB = (*_transformMatrix) * Vector4(_normalB, 0.0f);
-            Vector3 transformedNormalC = (*_transformMatrix) * Vector4(_normalC, 0.0f);
+            Vector3 transformedNormalA = (*_transformMatrix) * Vector4(_normal1, 0.0f);
+            Vector3 transformedNormalB = (*_transformMatrix) * Vector4(_normal2, 0.0f);
+            Vector3 transformedNormalC = (*_transformMatrix) * Vector4(_normal3, 0.0f);
 
             const Vector3 &dir = ray.getDirection();
             const Vector3 &eye = Vector3(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
@@ -76,8 +89,8 @@ namespace kaguya {
                 hitRecord.point = ray.at(hitRecord.step);
                 Vector3 normal = alpha * transformedNormalA + ans[0] * transformedNormalB + ans[1] * transformedNormalC;
                 hitRecord.setOutwardNormal(normal, dir);
-                hitRecord.u = DOT(factor, Vector3(_uvA.x, _uvB.x, _uvC.x));
-                hitRecord.v = DOT(factor, Vector3(_uvA.y, _uvB.y, _uvC.y));
+                hitRecord.u = DOT(factor, Vector3(_uv1.x, _uv2.x, _uv3.x));
+                hitRecord.v = DOT(factor, Vector3(_uv1.y, _uv2.y, _uv3.y));
                 hitRecord.material = _material;
                 hitRecord.id = getId();
                 return true;

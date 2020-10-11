@@ -41,6 +41,9 @@ namespace kaguya {
 
             bool BVH::hit(const Ray &ray, HitRecord &hitRecord,
                           double stepMin, double stepMax) {
+                // 在 hit 之前，BVH 必须已经构建完毕
+                assert(_isValid);
+
                 if (_aabb.hit(ray, stepMin, stepMax)) {
                     bool leftHit = _left->hit(ray, hitRecord, stepMin, stepMax);
                     bool rightHit = _right->hit(ray, hitRecord, stepMin, leftHit ? hitRecord.step : stepMax);
@@ -78,10 +81,11 @@ namespace kaguya {
 
                 const AABB &leftAABB = _left->boundingBox();
                 const AABB &rightAABB = _right->boundingBox();
-                surroundingBox(leftAABB, rightAABB);
+                mergeBoundingBox(leftAABB, rightAABB);
+                _isValid = true;
             }
 
-            void BVH::surroundingBox(const AABB &leftBox, const AABB &rightBox) {
+            void BVH::mergeBoundingBox(const AABB &leftBox, const AABB &rightBox) {
                 Vector3 small(std::min(leftBox.min().x, rightBox.min().x),
                               std::min(leftBox.min().y, rightBox.min().y),
                               std::min(leftBox.min().z, rightBox.min().z));

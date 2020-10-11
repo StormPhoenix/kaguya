@@ -3,6 +3,7 @@
 //#include <kaguya/tracer/Camera.h>
 #include <kaguya/Config.h>
 #include <kaguya/scene/Scene.h>
+#include <kaguya/scene/meta/Vertex.h>
 #include <kaguya/tracer/PathTracer.h>
 
 //#include <kaguya/math/Math.hpp>
@@ -10,6 +11,7 @@
 
 //using namespace kaguya::scene;
 
+#include <kaguya/utils/ObjLoader.h>
 #include <kaguya/math/RefractPdf.h>
 
 int main() {
@@ -19,9 +21,13 @@ int main() {
     using kaguya::Config;
     using kaguya::scene::Scene;
     using kaguya::math::RefractPdf;
+    using kaguya::utils::ObjLoader;
+    using kaguya::scene::Vertex;
 
     PathTracer pathTracer = PathTracer();
     pathTracer.run();
+
+//    std::vector<Vertex> vertexes = ObjLoader::loadModel("./resource/objects/bunny.obj");
 
     return 0;
 }
