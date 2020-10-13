@@ -71,3 +71,7 @@
     结果收敛。 
     
 - 编译 PBRT，对 SamplerIntegrator::Render() 做 debug
+
+## 效果图
+
+![image](https://github.com/StormPhoenix/kaguya/blob/master/image/bunny_lambertian.png)
