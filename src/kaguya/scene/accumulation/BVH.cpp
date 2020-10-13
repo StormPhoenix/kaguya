@@ -8,38 +8,38 @@ namespace kaguya {
     namespace scene {
         namespace acc {
 
-            inline bool compareBox(const std::shared_ptr<Hittable> a, const std::shared_ptr<Hittable> b, int axis) {
+            inline bool compareBox(const std::shared_ptr<Shape> a, const std::shared_ptr<Shape> b, int axis) {
                 AABB boxA = a->boundingBox();
                 AABB boxB = b->boundingBox();
 
                 return boxA.min()[axis] < boxB.min()[axis];
             }
 
-            bool compareX(const std::shared_ptr<Hittable> a, const std::shared_ptr<Hittable> b) {
+            bool compareX(const std::shared_ptr<Shape> a, const std::shared_ptr<Shape> b) {
                 return compareBox(a, b, 0);
             }
 
-            bool compareY(const std::shared_ptr<Hittable> a, const std::shared_ptr<Hittable> b) {
+            bool compareY(const std::shared_ptr<Shape> a, const std::shared_ptr<Shape> b) {
                 return compareBox(a, b, 1);
             }
 
-            bool compareZ(const std::shared_ptr<Hittable> a, const std::shared_ptr<Hittable> b) {
+            bool compareZ(const std::shared_ptr<Shape> a, const std::shared_ptr<Shape> b) {
                 return compareBox(a, b, 2);
             }
 
-            BVH::BVH(std::shared_ptr<Hittable> object) {
-                std::vector<std::shared_ptr<Hittable>> objects;
+            BVH::BVH(std::shared_ptr<Shape> object) {
+                std::vector<std::shared_ptr<Shape>> objects;
                 objects.push_back(object);
                 build(objects, 0, 1);
             }
 
-            BVH::BVH(std::vector<std::shared_ptr<Hittable>> &objects) : BVH(objects, 0, objects.size()) {}
+            BVH::BVH(std::vector<std::shared_ptr<Shape>> &objects) : BVH(objects, 0, objects.size()) {}
 
-            BVH::BVH(std::vector<std::shared_ptr<Hittable>> &objects, size_t start, size_t end) {
+            BVH::BVH(std::vector<std::shared_ptr<Shape>> &objects, size_t start, size_t end) {
                 build(objects, start, end);
             }
 
-            bool BVH::hit(const Ray &ray, HitRecord &hitRecord,
+            bool BVH::hit(const Ray &ray, Interaction &hitRecord,
                           double stepMin, double stepMax) {
                 // 在 hit 之前，BVH 必须已经构建完毕
                 assert(_isValid);
@@ -53,7 +53,7 @@ namespace kaguya {
                 }
             }
 
-            void BVH::build(std::vector<std::shared_ptr<Hittable>> &objects,
+            void BVH::build(std::vector<std::shared_ptr<Shape>> &objects,
                             size_t start, size_t end) {
                 // 采用最简单的平均分配法
                 int axis = randomInt(0, 2);

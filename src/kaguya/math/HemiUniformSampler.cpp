@@ -2,28 +2,27 @@
 // Created by Storm Phoenix on 2020/10/1.
 //
 
-#include <kaguya/math/HemiCosinePdf.h>
+#include <kaguya/math/HemiUniformSampler.h>
 
 namespace kaguya {
     namespace math {
-
-        double HemiCosinePdf::pdf(const Vector3 &inDir, const Vector3 &normal, const Vector3 &outDir) {
+        double HemiUniformSampler::pdf(const Vector3 &inDir, const Vector3 &normal, const Vector3 &outDir) {
             double cosine = DOT(NORMALIZE(normal), NORMALIZE(outDir));
-            // p(direction)  = cos(theta) / Pi
-            return cosine < 0 ? 0 : cosine / PI;
+            // p(direction) = 1 / (2 * Pi)
+            return cosine < 0 ? 0 : 1 / (2 * PI);
         }
 
-        Vector3 HemiCosinePdf::random(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) {
+        Vector3 HemiUniformSampler::sample(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) {
             // fi = 2 * Pi * sampleX
             double sampleX = uniformSample();
-            // sampleY = sin^2(theta)
+            // sampleY = 1 - cos(theta)
             double sampleY = uniformSample();
             // x = sin(theta) * cos(fi)
-            double x = sqrt(sampleY) * cos(2 * PI * sampleX);
+            double x = sqrt(1 - pow(1 - sampleY, 2)) * cos(2 * PI * sampleX);
             // y = cos(theta)
-            double y = sqrt(1 - sampleY);
+            double y = 1 - sampleY;
             // z = sin(theta) * sin(fi)
-            double z = sqrt(sampleY) * sin(2 * PI * sampleX);
+            double z = sqrt(1 - pow(1 - sampleY, 2)) * sin(2 * PI * sampleX);
 
             // 构造关于法线的切线空间
             Vector3 tanY = NORMALIZE(normal);

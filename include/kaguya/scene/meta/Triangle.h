@@ -6,7 +6,7 @@
 
 #include <kaguya/material/Material.h>
 #include <kaguya/math/Math.hpp>
-#include <kaguya/scene/Hittable.h>
+#include <kaguya/scene/Shape.h>
 #include <kaguya/scene/meta/Vertex.h>
 #include <kaguya/scene/accumulation/AABB.h>
 
@@ -19,7 +19,7 @@ namespace kaguya {
         using kaguya::scene::acc::AABB;
 
         // 三角形数据
-        class Triangle : public Hittable {
+        class Triangle : public Shape {
         public:
             Triangle(const Vertex &a, const Vertex &b, const Vertex &c,
                      std::shared_ptr<Material> material, std::shared_ptr<Matrix4> transformMatrix = nullptr);
@@ -29,7 +29,7 @@ namespace kaguya {
                      const Vector2 &uv1, const Vector2 &uv2, const Vector2 &uv3,
                      std::shared_ptr<Material> material, std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
-            bool hit(const Ray &ray, HitRecord &hitRecord, double stepMin, double stepMax);
+            bool hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax);
 
             const AABB &boundingBox() const;
 
@@ -44,9 +44,21 @@ namespace kaguya {
             const Vector3 _position1;
             const Vector3 _position2;
             const Vector3 _position3;
+
+            // world space 中的顶点坐标
+            Vector3 _transformedPosition1;
+            Vector3 _transformedPosition2;
+            Vector3 _transformedPosition3;
+
             const Vector3 _normal1;
             const Vector3 _normal2;
             const Vector3 _normal3;
+
+            // world space 中的法线坐标
+             Vector3 _transformedNormal1;
+             Vector3 _transformedNormal2;
+             Vector3 _transformedNormal3;
+
             const Vector2 _uv1;
             const Vector2 _uv2;
             const Vector2 _uv3;

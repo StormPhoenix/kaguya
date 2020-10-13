@@ -7,7 +7,7 @@
 
 #include <kaguya/scene/accumulation/AABB.h>
 #include <kaguya/math/Math.hpp>
-#include <kaguya/scene/Hittable.h>
+#include <kaguya/scene/Shape.h>
 #include <memory>
 
 namespace kaguya {
@@ -15,7 +15,7 @@ namespace kaguya {
 
         using kaguya::scene::acc::AABB;
 
-        class Sphere : public Hittable {
+        class Sphere : public Shape {
         public:
 
             /**
@@ -29,7 +29,7 @@ namespace kaguya {
             Sphere(const Vector3 &center, double radius, std::shared_ptr<Material> material, bool outward = true,
                    std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
-            bool hit(const Ray &ray, HitRecord &hitRecord, double stepMin, double stepMax) override;
+            bool hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
 
             const AABB &boundingBox() const override;
 

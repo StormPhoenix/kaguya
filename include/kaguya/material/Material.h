@@ -7,13 +7,13 @@
 
 #include <kaguya/math/Math.hpp>
 #include <kaguya/tracer/Ray.h>
-#include <kaguya/scene/Hittable.h>
+#include <kaguya/scene/Shape.h>
 
 namespace kaguya {
     namespace material {
 
         using kaguya::tracer::Ray;
-        using kaguya::scene::HitRecord;
+        using kaguya::scene::Interaction;
 
         /**
          * 物体材质
@@ -28,7 +28,7 @@ namespace kaguya {
              * @param pdf scatteredRay 散射方向的采样概率
              * @return 是否发生散射
              */
-            virtual bool scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, double &pdf) = 0;
+            virtual bool scatter(const Ray &ray, const Interaction &hitRecord, Ray &scatteredRay, double &pdf) = 0;
 
             /**
              * 材质处理入射光、散射光之间能量传递的反射率
@@ -36,7 +36,7 @@ namespace kaguya {
              * @param scatterDirection
              * @return 反射率
              */
-            virtual Vector3 brdf(const HitRecord &hitRecord, const Vector3 &scatterDirection) = 0;
+            virtual Vector3 brdf(const Interaction &hitRecord, const Vector3 &scatterDirection) = 0;
 
             /**
              * 材质表面散射方向分布 PDF
@@ -45,7 +45,7 @@ namespace kaguya {
              * @param scatterRay
              * @return 分布概率密度
              */
-            virtual double scatterPDF(const Ray &hitRay, const HitRecord &hitRecord, const Ray &scatterRay) {
+            virtual double scatterPDF(const Ray &hitRay, const Interaction &hitRecord, const Ray &scatterRay) {
                 return 0;
             }
 

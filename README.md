@@ -21,8 +21,23 @@
 - 射线从内部击中金属球
     Debug：击中金属球的射线，其 step 非常小，且起始位置就在金属球表面，击中点也是次位置附近。（float 类型导致精度损失，用 double 即可）
 
+- Triangle 内部的法线变换是不对的 (采用 inverse transpose 对法线做变换)
+
+## TODO
+- Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法
+
 ## 未解决的问题
 
+- bunny 金属材质下非常不平滑，但是按道理讲，Normal 是进行插值过了的
+    > DEBUG：设置成 Lambertian 表面做插值
+
+- bunny 透明材质出现黑块，且整体偏暗；光源面积缩小一倍，提高光源亮度，整个场景变成暗色，出现大量白色燥点；
+    参考 (知乎-文刀秋二)[https://www.zhihu.com/question/48961286/answer/113580178]
+
+- Triangle 优化 Triangle 内部的矩阵变换效率（提前做变换）
+    > Triangle 中的 Vertex / Normal 坐标向 World Space 的变换提前做好。不同于其他 Shape 将 Ray 转化到 Object Space
+    > 的方法，Triangle 需要做大量 hit 操作，频繁对 Ray 进行变换会损失效率
+    > 这也提醒自己最好将其他 Shape 的 Transformation 修改成对 Ray 的变换
 - Bitmap 的写入策略替换
 
 - OpenMP 到底是什么？应该如何配置
@@ -30,7 +45,8 @@
 - 条带
     图像中心出现十字条带(修改切线空间后消失，不清楚是不是这个原因)
 
-- Shadow Ray
+- Shadow Ray 
+   - 先阅读 PBRT 中的 Path Tracing 部分再说
    - Dielectric 材质，采用自带 PDF 散射
    - 非 Dielectric
         - 单光源
@@ -45,7 +61,7 @@
 
 - 添加多种光的类型
 
-- 添加 Model 类型
+- 俄罗斯轮盘赌不只适用于判断何时处理不继续递归问题。还可以根据 BRDF 函数，取消掉一部分 Shadow Ray
 
 - RGB 类型 -> Spectrum 类型
     评估 Light Unit 的指标

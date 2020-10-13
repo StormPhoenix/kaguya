@@ -5,26 +5,30 @@
 #ifndef KAGUYA_LIGHT_H
 #define KAGUYA_LIGHT_H
 
-#include <kaguya/scene/ObjectSampler.h>
-#include <kaguya/math/ObjectHitPdf.h>
+#include <kaguya/scene/ShapeSampler.h>
 #include <kaguya/material/Emitter.h>
 
 namespace kaguya {
     namespace scene {
 
         using kaguya::material::Emitter;
-        using kaguya::math::ObjectHitPdf;
 
-        class Light : public ObjectSampler {
+        class Light : public ShapeSampler {
         public:
             Light(std::shared_ptr<Emitter> emitter,
-                  std::shared_ptr<ObjectSampler> objectSampler);
+                  std::shared_ptr<ShapeSampler> objectSampler);
 
-            virtual Vector3 samplePoint(double &pdf, Vector3 &normal) override;
+            virtual double area() override;
 
-            virtual double samplePointPdf(Vector3 &point) override;
+            virtual Interaction sample() override;
 
-            virtual bool hit(const Ray &ray, HitRecord &hitRecord, double stepMin, double stepMax) override;
+            virtual double pdf(Interaction &point) override;
+
+            virtual Interaction sample(const Interaction &eye) override;
+
+            virtual double pdf(const Interaction &eye, const Vector3 &dir) override;
+
+            virtual bool hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
 
             virtual const AABB &boundingBox() const override;
 
@@ -36,10 +40,9 @@ namespace kaguya {
              * 从 point 出发，向 Object 发射采样射线
              * @param point
              * @param sampleRay 计算得到的采样射线
-             * @param samplePdf 计算得得到的采样射线的 PDF
              * @return
              */
-            virtual void sampleRay(const Vector3 &point, Ray &sampleRay, double &samplePdf);
+            virtual void sampleRay(const Vector3 &point, Ray &sampleRay);
 
             /**
              * 计算采样射线的 PDF
@@ -49,9 +52,11 @@ namespace kaguya {
             virtual double rayPdf(const Ray &sampleRay);
 
         protected:
+            /**
+             * 发光材质
+             */
             std::shared_ptr<Emitter> _emitter = nullptr;
-            std::shared_ptr<ObjectSampler> _objectSampler = nullptr;
-            std::shared_ptr<ObjectHitPdf> _objectHitPdf = nullptr;
+            std::shared_ptr<ShapeSampler> _objectSampler = nullptr;
         };
 
     }

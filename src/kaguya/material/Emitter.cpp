@@ -12,15 +12,15 @@ namespace kaguya {
 
         Emitter::Emitter(std::shared_ptr<Texture> albedo) : _albedo(albedo) {}
 
-        bool Emitter::scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, double &pdf) {
+        bool Emitter::scatter(const Ray &ray, const Interaction &hitRecord, Ray &scatteredRay, double &pdf) {
             return false;
         }
 
-        Vector3 Emitter::brdf(const HitRecord &hitRecord, const Vector3 &scatterDirection) {
+        Vector3 Emitter::brdf(const Interaction &hitRecord, const Vector3 &scatterDirection) {
             return {0.0f, 0.0f, 0.0f};
         }
 
-        double Emitter::scatterPDF(const Ray &hitRay, const HitRecord &hitRecord, const Ray &scatterRay) {
+        double Emitter::scatterPDF(const Ray &hitRay, const Interaction &hitRecord, const Ray &scatterRay) {
             return 0;
         }
 

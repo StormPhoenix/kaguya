@@ -30,48 +30,68 @@ namespace kaguya {
 
         void Triangle::init() {
             // 创建 AABB
-            Vector3 transformedA = _transformMatrix != nullptr ?
-                                   (*_transformMatrix) * Vector4(_position1, 1.0f) : _position1;
-            Vector3 transformedB = _transformMatrix != nullptr ?
-                                   (*_transformMatrix) * Vector4(_position2, 1.0f) : _position2;
-            Vector3 transformedC = _transformMatrix != nullptr ?
-                                   (*_transformMatrix) * Vector4(_position3, 1.0f) : _position3;
+            _transformedPosition1 = _transformMatrix != nullptr ?
+                                    (*_transformMatrix) * Vector4(_position1, 1.0f) : _position1;
+            _transformedPosition2 = _transformMatrix != nullptr ?
+                                    (*_transformMatrix) * Vector4(_position2, 1.0f) : _position2;
+            _transformedPosition3 = _transformMatrix != nullptr ?
+                                    (*_transformMatrix) * Vector4(_position3, 1.0f) : _position3;
 
-            double minX = std::min(std::min(transformedA[0], transformedB[0]), transformedC[0]) - 0.0001;
-            double minY = std::min(std::min(transformedA[1], transformedB[1]), transformedC[1]) - 0.0001;
-            double minZ = std::min(std::min(transformedA[2], transformedB[2]), transformedC[2]) - 0.0001;
+            // 计算变换后的法线，参考 https://blog.csdn.net/lawest/article/details/98328127
+            _transformedNormal1 = NORMALIZE(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal1, 0.0f));
+            _transformedNormal2 = NORMALIZE(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal2, 0.0f));
+            _transformedNormal3 = NORMALIZE(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal3, 0.0f));
 
-            double maxX = std::max(std::max(transformedA[0], transformedB[0]), transformedC[0]) + 0.0001;
-            double maxY = std::max(std::max(transformedA[1], transformedB[1]), transformedC[1]) + 0.0001;
-            double maxZ = std::max(std::max(transformedA[2], transformedB[2]), transformedC[2]) + 0.0001;
+
+            double minX =
+                    std::min(
+                            std::min(_transformedPosition1[0], _transformedPosition2[0]),
+                            _transformedPosition3[0]
+                    ) - 0.0001;
+            double minY =
+                    std::min(
+                            std::min(_transformedPosition1[1], _transformedPosition2[1]),
+                            _transformedPosition3[1]
+                    ) - 0.0001;
+            double minZ =
+                    std::min(
+                            std::min(_transformedPosition1[2], _transformedPosition2[2]),
+                            _transformedPosition3[2]
+                    ) - 0.0001;
+
+            double maxX =
+                    std::max(
+                            std::max(_transformedPosition1[0], _transformedPosition2[0]),
+                            _transformedPosition3[0]
+                    ) + 0.0001;
+            double maxY =
+                    std::max(
+                            std::max(_transformedPosition1[1], _transformedPosition2[1]),
+                            _transformedPosition3[1]
+                    ) + 0.0001;
+            double maxZ =
+                    std::max(
+                            std::max(_transformedPosition1[2], _transformedPosition2[2]),
+                            _transformedPosition3[2]
+                    ) + 0.0001;
 
             _aabb = AABB(Vector3(minX, minY, minZ), Vector3(maxX, maxY, maxZ));
         }
 
-        bool Triangle::hit(const Ray &ray, HitRecord &hitRecord,
+        bool Triangle::hit(const Ray &ray, Interaction &hitRecord,
                            double stepMin, double stepMax) {
-
-            Vector3 transformedA = _transformMatrix != nullptr ?
-                                   (*_transformMatrix) * Vector4(_position1, 1.0f) : _position1;
-            Vector3 transformedB = _transformMatrix != nullptr ?
-                                   (*_transformMatrix) * Vector4(_position2, 1.0f) : _position2;
-            Vector3 transformedC = _transformMatrix != nullptr ?
-                                   (*_transformMatrix) * Vector4(_position3, 1.0f) : _position3;
-
-            Vector3 transformedNormalA = (*_transformMatrix) * Vector4(_normal1, 0.0f);
-            Vector3 transformedNormalB = (*_transformMatrix) * Vector4(_normal2, 0.0f);
-            Vector3 transformedNormalC = (*_transformMatrix) * Vector4(_normal3, 0.0f);
 
             const Vector3 &dir = ray.getDirection();
             const Vector3 &eye = Vector3(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
-            glm::mat3 equationParam(glm::vec3(transformedA - transformedB), glm::vec3(transformedA - transformedC),
-                                    dir);
+            Matrix3 equationParam(Vector3(_transformedPosition1 - _transformedPosition2),
+                                  Vector3(_transformedPosition1 - _transformedPosition3),
+                                  dir);
 
             if (abs(DETERMINANT(equationParam)) < EPSILON) {
                 return false;
             }
 
-            Vector3 equationResult = transformedA - eye;
+            Vector3 equationResult = _transformedPosition1 - eye;
             Vector3 ans = INVERSE(equationParam) * equationResult;
             double step = ans[2];
             double alpha = 1 - ans[0] - ans[1];
@@ -87,7 +107,10 @@ namespace kaguya {
 
                 hitRecord.step = step;
                 hitRecord.point = ray.at(hitRecord.step);
-                Vector3 normal = alpha * transformedNormalA + ans[0] * transformedNormalB + ans[1] * transformedNormalC;
+
+                Vector3 normal = alpha * _transformedNormal1 +
+                                 ans[0] * _transformedNormal2 +
+                                 ans[1] * _transformedNormal3;
                 hitRecord.setOutwardNormal(normal, dir);
                 hitRecord.u = DOT(factor, Vector3(_uv1.x, _uv2.x, _uv3.x));
                 hitRecord.v = DOT(factor, Vector3(_uv1.y, _uv2.y, _uv3.y));

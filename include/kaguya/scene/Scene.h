@@ -5,7 +5,7 @@
 #ifndef KAGUYA_SCENE_H
 #define KAGUYA_SCENE_H
 
-#include <kaguya/scene/Hittable.h>
+#include <kaguya/scene/Shape.h>
 #include <kaguya/tracer/Camera.h>
 #include <kaguya/scene/meta/Light.h>
 #include <memory>
@@ -35,9 +35,9 @@ namespace kaguya {
              */
             void testBuildCornelBoxWithBunny();
 
-            bool hit(const Ray &ray, HitRecord &hitRecord);
+            bool hit(const Ray &ray, Interaction &hitRecord);
 
-            std::shared_ptr<Hittable> getWorld() {
+            std::shared_ptr<Shape> getWorld() {
                 return _world;
             }
 
@@ -55,7 +55,7 @@ namespace kaguya {
 
         protected:
             // scene objects
-            std::shared_ptr<Hittable> _world = nullptr;
+            std::shared_ptr<Shape> _world = nullptr;
             // camera
             std::shared_ptr<Camera> _camera = nullptr;
             // TODO 单个光源 用于测试

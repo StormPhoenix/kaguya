@@ -7,6 +7,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
 #include <math.h>
 
 #include <functional>
@@ -15,7 +16,8 @@
 using Vector2 = glm::dvec2;
 using Vector3 = glm::dvec3;
 using Vector4 = glm::dvec4;
-using Matrix4 = glm::dmat4;
+using Matrix4 = glm::dmat4x4;
+using Matrix3 = glm::dmat3x3;
 
 const double infinity = std::numeric_limits<double>::infinity();
 const double PI = 3.1415926535897932385;
@@ -25,12 +27,13 @@ const double REFRACTION_INDEX_WATER = 1.0f;
 #define ROTATE(matrix, radius, axis) glm::rotate(matrix, glm::radians(radius), axis)
 #define TRANSLATE(matrix, offset) glm::translate(matrix, offset)
 #define SCALE(matrix, factor) glm::scale(matrix, factor)
+#define INVERSE(matrix) glm::inverse(matrix)
+#define INVERSE_TRANSPOSE(matrix) glm::inverseTranspose(matrix)
 #define DETERMINANT(x) glm::determinant(x)
 #define DOT(x, y) glm::dot(x, y)
 #define NORMALIZE(x) glm::normalize(x)
 #define LENGTH(x) glm::length(x)
 #define CROSS(x, y) glm::cross(x, y)
-#define INVERSE(x) glm::inverse(x)
 
 inline double degreesToRadians(double degrees) {
     return degrees * PI / 180;

@@ -3,28 +3,16 @@
 //
 
 #include <kaguya/scene/meta/Light.h>
-#include <kaguya/math/ObjectHitPdf.h>
 
 namespace kaguya {
     namespace scene {
 
-        using kaguya::math::ObjectHitPdf;
-
-        Light::Light(std::shared_ptr<Emitter> emitter, std::shared_ptr<ObjectSampler> objectSampler)
+        Light::Light(std::shared_ptr<Emitter> emitter, std::shared_ptr<ShapeSampler> objectSampler)
                 : _emitter(emitter), _objectSampler(objectSampler) {
             assert(_emitter != nullptr && _objectSampler != nullptr);
-            _objectHitPdf = std::make_shared<ObjectHitPdf>(_objectSampler);
         }
 
-        Vector3 Light::samplePoint(double &pdf, Vector3 &normal) {
-            return _objectSampler->samplePoint(pdf, normal);
-        }
-
-        double Light::samplePointPdf(Vector3 &point) {
-            return _objectSampler->samplePointPdf(point);
-        }
-
-        bool Light::hit(const kaguya::tracer::Ray &ray, kaguya::scene::HitRecord &hitRecord,
+        bool Light::hit(const kaguya::tracer::Ray &ray, kaguya::scene::Interaction &hitRecord,
                         double stepMin, double stepMax) {
             bool isHit = _objectSampler->hit(ray, hitRecord, stepMin, stepMax);
             if (isHit) {
@@ -46,12 +34,38 @@ namespace kaguya {
             _objectSampler->setId(id);
         }
 
-        void Light::sampleRay(const Vector3 &point, kaguya::tracer::Ray &sampleRay, double &samplePdf) {
-            _objectHitPdf->sampleRay(point, sampleRay, samplePdf);
+        double Light::area() {
+            return _objectSampler->area();
         }
 
-        double Light::rayPdf(const kaguya::tracer::Ray &sampleRay) {
-            return _objectHitPdf->pdf(sampleRay);
+        Interaction Light::sample() {
+            return _objectSampler->sample();
+        }
+
+        double Light::pdf(kaguya::scene::Interaction &point) {
+            return _objectSampler->pdf(point);
+        }
+
+        Interaction Light::sample(const kaguya::scene::Interaction &eye) {
+            return _objectSampler->sample(eye);
+        }
+
+        double Light::pdf(const kaguya::scene::Interaction &eye, const Vector3 &dir) {
+            return _objectSampler->pdf(eye, dir);
+        }
+
+        void Light::sampleRay(const Vector3 &point, Ray &sampleRay) {
+            Interaction eye;
+            eye.point = point;
+            Interaction intersection = sample(eye);
+            sampleRay.setOrigin(point);
+            sampleRay.setDirection(NORMALIZE(intersection.point - point));
+        }
+
+        double Light::rayPdf(const Ray &sampleRay) {
+            Interaction eye;
+            eye.point = sampleRay.getOrigin();
+            return pdf(eye, NORMALIZE(sampleRay.getDirection()));
         }
     }
 }

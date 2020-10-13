@@ -2,17 +2,17 @@
 // Created by Storm Phoenix on 2020/9/30.
 //
 
-#ifndef KAGUYA_SCATTERPDF_H
-#define KAGUYA_SCATTERPDF_H
+#ifndef KAGUYA_SCATTERSAMPLER_H
+#define KAGUYA_SCATTERSAMPLER_H
 
 #include <kaguya/math/Math.hpp>
 
 namespace kaguya {
     namespace math {
         /**
-         * 三维空间概率密度函数，用于生成三维向量
+         * 针对入射光线，采样其反射光线以及计算反射光线的 pdf
          */
-        class ScatterPdf {
+        class ScatterSampler {
         public:
             /**
              * 计算 outDir 方向的光线的采样概率
@@ -31,9 +31,9 @@ namespace kaguya {
              * @param samplePdf 采样概率
              * @return
              */
-            virtual Vector3 random(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) = 0;
+            virtual Vector3 sample(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) = 0;
         };
     }
 }
 
-#endif //KAGUYA_SCATTERPDF_H
+#endif //KAGUYA_SCATTERSAMPLER_H

@@ -16,9 +16,9 @@ namespace kaguya {
         public:
             DiffuseLight(std::shared_ptr<Texture> light);
 
-            bool scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, double pdf) override;
+            bool scatter(const Ray &ray, const Interaction &hitRecord, Ray &scatteredRay, double pdf) override;
 
-            double brdf(const HitRecord &hitRecord);
+            double brdf(const Interaction &hitRecord);
 
             Vector3 emitted(double u, double v);
 

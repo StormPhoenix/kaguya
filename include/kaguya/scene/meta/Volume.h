@@ -5,12 +5,12 @@
 #ifndef KAGUYA_VOLUME_H
 #define KAGUYA_VOLUME_H
 
-#include <kaguya/scene/Hittable.h>
+#include <kaguya/scene/Shape.h>
 
 namespace kaguya {
     namespace scene {
 
-        class Volume : public Hittable {
+        class Volume : public Shape {
         public:
             /**
              * 烟雾体

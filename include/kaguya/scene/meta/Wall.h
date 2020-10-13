@@ -5,8 +5,8 @@
 #ifndef KAGUYA_WALL_H
 #define KAGUYA_WALL_H
 
-#include <kaguya/scene/Hittable.h>
-#include <kaguya/scene/ObjectSampler.h>
+#include <kaguya/scene/Shape.h>
+#include <kaguya/scene/ShapeSampler.h>
 #include <kaguya/scene/accumulation/AABB.h>
 
 namespace kaguya {
@@ -14,7 +14,7 @@ namespace kaguya {
 
         using kaguya::scene::acc::AABB;
 
-        class Wall : public ObjectSampler {
+        class Wall : public ShapeSampler {
         public:
             Wall() {}
 
@@ -22,23 +22,21 @@ namespace kaguya {
             Wall(double width, double height, std::shared_ptr<Material> material,
                  std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
-            virtual bool hit(const Ray &ray, HitRecord &hitRecord, double stepMin, double stepMax) override;
+            virtual bool hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
 
             virtual const AABB &boundingBox() const override;
 
-            virtual Vector3 samplePoint(double &pdf, Vector3 &normal) override;
+            virtual double area() override;
 
-            virtual double samplePointPdf(Vector3 &point) override;
+            virtual Interaction sample() override;
 
-            const Vector3 &getNormal() {
-                return _normal;
-            }
+            virtual double pdf(Interaction &point) override;
 
         protected:
             /**
              * build bounding box
              */
-            virtual void buildBoundingBox();
+            virtual void init();
 
         private:
             double _width;
@@ -47,12 +45,20 @@ namespace kaguya {
             Vector3 _leftTop;
             Vector3 _rightBottom;
             Vector3 _rightTop;
+
+            Vector3 _transformedLeftBottom;
+            Vector3 _transformedRightBottom;
+            Vector3 _transformedRightTop;
+            Vector3 _transformedLeftTop;
+            Vector3 _transformedNormal;
+
             std::shared_ptr<Matrix4> _transformMatrix = nullptr;
 
         protected:
             std::shared_ptr<Material> _material = nullptr;
             Vector3 _normal;
             AABB _aabb;
+            double _area;
         };
 
         class ZXWall : public Wall {
@@ -67,15 +73,18 @@ namespace kaguya {
              * @param upward
              * @param material
              */
-            ZXWall(double z0, double z1, double x0, double x1, double y, bool upward, std::shared_ptr<Material> material);
+            ZXWall(double z0, double z1, double x0, double x1, double y, bool upward,
+                   std::shared_ptr<Material> material);
 
-            virtual void buildBoundingBox() override;
+            virtual void init() override;
 
-            virtual bool hit(const Ray &ray, HitRecord &hitRecord, double stepMin, double stepMax) override;
+            virtual bool hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
 
-            virtual Vector3 samplePoint(double &pdf, Vector3 &normal) override;
+            virtual double area() override;
 
-            virtual double samplePointPdf(Vector3 &point) override;
+            virtual Interaction sample() override;
+
+            virtual double pdf(Interaction &point) override;
 
         protected:
             double _y;
@@ -97,15 +106,18 @@ namespace kaguya {
              * @param rightward
              * @param material
              */
-            YZWall(double y0, double y1, double z0, double z1, double x, bool rightward, std::shared_ptr<Material> material);
+            YZWall(double y0, double y1, double z0, double z1, double x, bool rightward,
+                   std::shared_ptr<Material> material);
 
-            virtual void buildBoundingBox() override;
+            virtual void init() override;
 
-            virtual bool hit(const Ray &ray, HitRecord &hitRecord, double stepMin, double stepMax) override;
+            virtual bool hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
 
-            virtual Vector3 samplePoint(double &pdf, Vector3 &normal) override;
+            virtual double area() override;
 
-            virtual double samplePointPdf(Vector3 &point) override;
+            virtual Interaction sample() override;
+
+            virtual double pdf(Interaction &point) override;
 
         protected:
             double _x;
@@ -127,15 +139,18 @@ namespace kaguya {
              * @param frontward
              * @param material
              */
-            XYWall(double x0, double x1, double y0, double y1, double z, bool frontward, std::shared_ptr<Material> material);
+            XYWall(double x0, double x1, double y0, double y1, double z, bool frontward,
+                   std::shared_ptr<Material> material);
 
-            virtual void buildBoundingBox() override;
+            virtual void init() override;
 
-            virtual bool hit(const Ray &ray, HitRecord &hitRecord, double stepMin, double stepMax) override;
+            virtual bool hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
 
-            virtual Vector3 samplePoint(double &pdf, Vector3 &normal) override;
+            virtual double area() override;
 
-            virtual double samplePointPdf(Vector3 &point) override;
+            virtual Interaction sample() override;
+
+            virtual double pdf(Interaction &point) override;
 
         protected:
             double _z;

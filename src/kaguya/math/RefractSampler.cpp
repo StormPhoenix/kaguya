@@ -2,14 +2,14 @@
 // Created by Storm Phoenix on 2020/10/8.
 //
 
-#include <kaguya/math/RefractPdf.h>
+#include <kaguya/math/RefractSampler.h>
 
 namespace kaguya {
     namespace math {
 
-        RefractPdf::RefractPdf(double refractiveIndex) : _refractiveIndex(refractiveIndex) {}
+        RefractSampler::RefractSampler(double refractiveIndex) : _refractiveIndex(refractiveIndex) {}
 
-        Vector3 RefractPdf::random(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) {
+        Vector3 RefractSampler::sample(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) {
             Vector3 normalizedInDir = NORMALIZE(inDir);
 
             double cosine = DOT(normalizedInDir, NORMALIZE(normal));
@@ -32,14 +32,14 @@ namespace kaguya {
             if (refraction * sine > 1) {
                 // 全反射
                 samplePdf = 1.0f;
-                return reflect(normalizedInDir, refractNormal);
+                return NORMALIZE(reflect(normalizedInDir, refractNormal));
             } else {
                 // 计算反射概率
-                double reflectProb = schlick(abs(cosine), refraction);
+                double reflectProb = std::max(schlick(abs(cosine), refraction), 0.0);
                 if (uniformSample() < reflectProb) {
                     // 反射
                     samplePdf = reflectProb;
-                    return reflect(normalizedInDir, refractNormal);
+                    return NORMALIZE(reflect(normalizedInDir, refractNormal));
                 } else {
                     // 折射
                     samplePdf = 1.0 - reflectProb;
@@ -48,7 +48,7 @@ namespace kaguya {
             }
         }
 
-        double RefractPdf::pdf(const Vector3 &inDir, const Vector3 &normal, const Vector3 &outDir) {
+        double RefractSampler::pdf(const Vector3 &inDir, const Vector3 &normal, const Vector3 &outDir) {
             Vector3 normalizedInDir = NORMALIZE(inDir);
             Vector3 normalizedOutDir = NORMALIZE(outDir);
 
@@ -80,7 +80,7 @@ namespace kaguya {
                 }
             } else {
                 // 计算反射概率
-                double reflectProb = schlick(abs(cosine), refraction);
+                double reflectProb = std::max(schlick(abs(cosine), refraction), 0.0);
 
                 // 计算反射光线
                 Vector3 reflectDir = reflect(normalizedInDir, refractNormal);

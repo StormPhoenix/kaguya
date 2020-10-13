@@ -70,6 +70,14 @@ namespace kaguya {
              */
             void writeShaderColor(const Vector3 &color, int row, int col);
 
+            /**
+             * 渲染结果写入 buffer
+             * @param color
+             * @param row
+             * @param col
+             */
+            void writeBuffer(const Vector3 &color, int row, int col);
+
         private:
             // 相机
             std::shared_ptr<Camera> _camera = nullptr;
@@ -77,7 +85,7 @@ namespace kaguya {
             std::shared_ptr<Scene> _scene = nullptr;
             // TODO 以下参数写入配置文件
             // 最大采样深度
-            int _maxDepth = 50;
+            int _maxDepth = 100;
             // 每个像素采样次数
             int _samplePerPixel = 300;
             // 对光源采样概率

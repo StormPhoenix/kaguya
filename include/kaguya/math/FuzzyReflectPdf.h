@@ -5,12 +5,12 @@
 #ifndef KAGUYA_FUZZYREFLECTPDF_H
 #define KAGUYA_FUZZYREFLECTPDF_H
 
-#include <kaguya/math/ScatterPdf.h>
+#include <kaguya/math/ScatterSampler.h>
 
 namespace kaguya {
     namespace math {
 
-        class FuzzyReflectPdf : public ScatterPdf {
+        class FuzzyReflectPdf : public ScatterSampler {
         public:
             /**
              * 按照 fuzzy 角度计算 outDirt 的 pdf

@@ -5,7 +5,7 @@
 #ifndef KAGUYA_TRIANGLEMESH_H
 #define KAGUYA_TRIANGLEMESH_H
 
-#include <kaguya/scene/Hittable.h>
+#include <kaguya/scene/Shape.h>
 #include <kaguya/scene/meta/Vertex.h>
 #include <kaguya/scene/accumulation/BVH.h>
 
@@ -31,7 +31,7 @@ namespace kaguya {
 
         private:
             std::vector<Vertex> &_vertices;
-            std::vector<std::shared_ptr<Hittable>> _triangles;
+            std::vector<std::shared_ptr<Shape>> _triangles;
             std::shared_ptr<Material> _material = nullptr;
             std::shared_ptr<Matrix4> _transformMatrix = nullptr;
         };

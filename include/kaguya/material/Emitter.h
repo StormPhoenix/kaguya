@@ -17,11 +17,11 @@ namespace kaguya {
 
             Emitter(std::shared_ptr<Texture> albedo);
 
-            virtual bool scatter(const Ray &ray, const HitRecord &hitRecord, Ray &scatteredRay, double &pdf) override;
+            virtual bool scatter(const Ray &ray, const Interaction &hitRecord, Ray &scatteredRay, double &pdf) override;
 
-            virtual Vector3 brdf(const HitRecord &hitRecord, const Vector3 &scatterDirection) override;
+            virtual Vector3 brdf(const Interaction &hitRecord, const Vector3 &scatterDirection) override;
 
-            virtual double scatterPDF(const Ray &hitRay, const HitRecord &hitRecord, const Ray &scatterRay) override;
+            virtual double scatterPDF(const Ray &hitRay, const Interaction &hitRecord, const Ray &scatterRay) override;
 
             /**
              * TODO delete

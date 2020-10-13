@@ -5,12 +5,9 @@
 #include <kaguya/Config.h>
 
 namespace kaguya {
-    // 每像素采样次数
+    int Config::maxScatterDepth = 50;
     int Config::samplePerPixel = 50;
-    // 对光源采样概率
     double Config::sampleLightProb = 0.3f;
-    // 相机宽度分辨率
-    int Config::resolutionWidth = 2000;
-    // 相机高度分辨率
-    int Config::resolutionHeight = 2000;
+    int Config::resolutionWidth = 500;
+    int Config::resolutionHeight = 500;
 }

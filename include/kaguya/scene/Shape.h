@@ -2,8 +2,8 @@
 // Created by Storm Phoenix on 2020/9/29.
 //
 
-#ifndef KAGUYA_HITTABLE_H
-#define KAGUYA_HITTABLE_H
+#ifndef KAGUYA_SHAPE_H
+#define KAGUYA_SHAPE_H
 
 #include <kaguya/math/Math.hpp>
 #include <kaguya/scene/accumulation/AABB.h>
@@ -27,7 +27,10 @@ namespace kaguya {
         using kaguya::scene::acc::AABB;
         using kaguya::tracer::Ray;
 
-        typedef struct HitRecord {
+        /**
+         * Ray 与 Hittable 的交点记录
+         */
+        typedef struct Interaction {
             // 击中光线方向
             Vector3 direction;
             // 击中点
@@ -56,9 +59,9 @@ namespace kaguya {
                 isFrontFace = DOT(outwardNormal, direction) < 0;
                 normal = isFrontFace ? NORMALIZE(outwardNormal) : -NORMALIZE(outwardNormal);
             }
-        } HitRecord;
+        } Interaction;
 
-        class Hittable {
+        class Shape {
         public:
             /**
              * 击中判定
@@ -68,7 +71,7 @@ namespace kaguya {
              * @param stepMax 射线步长最大值
              * @return
              */
-            virtual bool hit(const Ray &ray, HitRecord &hitRecord, double stepMin, double stepMax) = 0;
+            virtual bool hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) = 0;
 
             /**
              * 计算 AxisAlignBoundingBox
@@ -98,4 +101,4 @@ namespace kaguya {
     }
 }
 
-#endif //KAGUYA_HITTABLE_H
+#endif //KAGUYA_SHAPE_H

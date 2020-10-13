@@ -12,7 +12,7 @@
 //using namespace kaguya::scene;
 
 #include <kaguya/utils/ObjLoader.h>
-#include <kaguya/math/RefractPdf.h>
+#include <kaguya/math/RefractSampler.h>
 
 int main() {
     using kaguya::tracer::PathTracer;
@@ -20,7 +20,7 @@ int main() {
     using kaguya::tracer::Ray;
     using kaguya::Config;
     using kaguya::scene::Scene;
-    using kaguya::math::RefractPdf;
+    using kaguya::math::RefractSampler;
     using kaguya::utils::ObjLoader;
     using kaguya::scene::Vertex;
 

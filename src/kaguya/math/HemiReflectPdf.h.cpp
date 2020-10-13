@@ -2,12 +2,12 @@
 // Created by Storm Phoenix on 2020/10/8.
 //
 
-#include <kaguya/math/HemiReflectPdf.h>
+#include <kaguya/math/HemiReflectSampler.h>
 
 namespace kaguya {
     namespace math {
 
-        double HemiReflectPdf::pdf(const Vector3 &inDir, const Vector3 &normal, const Vector3 &outDir) {
+        double HemiReflectSampler::pdf(const Vector3 &inDir, const Vector3 &normal, const Vector3 &outDir) {
             Vector3 reflectDir = reflect(inDir, normal);
 
             if (abs(outDir.x - reflectDir.x) < EPSILON &&
@@ -19,7 +19,7 @@ namespace kaguya {
             }
         }
 
-        Vector3 HemiReflectPdf::random(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) {
+        Vector3 HemiReflectSampler::sample(const Vector3 &inDir, const Vector3 &normal, double &samplePdf) {
             samplePdf = 1.0f;
             return reflect(inDir, normal);
         }

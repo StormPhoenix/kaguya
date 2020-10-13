@@ -5,12 +5,12 @@
 #ifndef KAGUYA_PRECISEREFLECTPDF_H
 #define KAGUYA_PRECISEREFLECTPDF_H
 
-#include "ScatterPdf.h"
+#include "ScatterSampler.h"
 
 namespace kaguya {
     namespace math {
 
-        class PreciseReflectPdf : public ScatterPdf {
+        class PreciseReflectPdf : public ScatterSampler {
         public:
             /**
              * pdf 默认为 1

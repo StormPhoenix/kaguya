@@ -2,9 +2,9 @@
 // Created by Storm Phoenix on 2020/10/7.
 //
 
+#include <kaguya/scene/Scene.h>
 #include <kaguya/Config.h>
 #include <kaguya/scene/accumulation/BVH.h>
-#include <kaguya/scene/Scene.h>
 #include <kaguya/scene/meta/Sphere.h>
 #include <kaguya/scene/meta/Wall.h>
 #include <kaguya/scene/meta/Light.h>
@@ -40,8 +40,8 @@ namespace kaguya {
             std::shared_ptr<Texture> pink = std::make_shared<ConstantTexture>(
                     Vector3(255.0 / 255, 192.0 / 255, 203.0 / 255));
 
-            std::shared_ptr<Texture> lightAlbedo = std::make_shared<ConstantTexture>(
-                    Vector3(double(249.0) / 255.0 * 12, double(222.0) / 255.0 * 12, double(180.0) / 255.0 * 12));
+            std::shared_ptr<Texture> lightIntensity = std::make_shared<ConstantTexture>(
+                    Vector3(double(249.0) / 255.0 * 15, double(222.0) / 255.0 * 15, double(180.0) / 255.0 * 15));
 
             // 255 222 99
 
@@ -51,30 +51,31 @@ namespace kaguya {
             std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Emitter> lightMaterial = std::make_shared<Emitter>(lightAlbedo);
+            std::shared_ptr<Emitter> lightMaterial = std::make_shared<Emitter>(lightIntensity);
             std::shared_ptr<Material> glass = std::make_shared<Dielectric>(white, 1.5);
             std::shared_ptr<Material> metal = std::make_shared<Metal>();
 
             // walls
-            std::shared_ptr<Hittable> leftWall = std::make_shared<YZWall>(-250, 250, -250, 250, -250, true,
-                                                                          lambertLeft);
-            std::shared_ptr<Hittable> rightWall = std::make_shared<YZWall>(-250, 250, -250, 250, 250, false,
-                                                                           lambertRight);
-            std::shared_ptr<Hittable> bottomWall = std::make_shared<ZXWall>(-250, 250, -250, 250, -250, true,
-                                                                            lambertBottom);
-            std::shared_ptr<Hittable> topWall = std::make_shared<ZXWall>(-250, 250, -250, 250, 250, false,
-                                                                         lambertTop);
-            std::shared_ptr<Hittable> frontWall = std::make_shared<XYWall>(-250, 250, -250, 250, -250, false,
-                                                                           lambertFront);
+            std::shared_ptr<Shape> leftWall = std::make_shared<YZWall>(-250, 250, -250, 250, -250, true,
+                                                                       lambertLeft);
+            std::shared_ptr<Shape> rightWall = std::make_shared<YZWall>(-250, 250, -250, 250, 250, false,
+                                                                        lambertRight);
+            std::shared_ptr<Shape> bottomWall = std::make_shared<ZXWall>(-250, 250, -250, 250, -250, true,
+                                                                         lambertBottom);
+            std::shared_ptr<Shape> topWall = std::make_shared<ZXWall>(-250, 250, -250, 250, 250, false,
+                                                                      lambertTop);
+            std::shared_ptr<Shape> frontWall = std::make_shared<XYWall>(-250, 250, -250, 250, -250, false,
+                                                                        lambertFront);
 
-            std::shared_ptr<Hittable> glassSphere = std::make_shared<Sphere>(Vector3(125, -169, 0), 80, glass);
-//            std::shared_ptr<Hittable> glassSphere = std::make_shared<Sphere>(Vector3(75, 0, 0), 80, metal);
+            std::shared_ptr<Shape> glassSphere = std::make_shared<Sphere>(Vector3(125, -169, 0), 80, glass);
+//            std::shared_ptr<Shape> glassSphere = std::make_shared<Sphere>(Vector3(75, 0, 0), 80, metal);
 
-            std::shared_ptr<Hittable> metalSphere = std::make_shared<Sphere>(Vector3(-125, -149, 100), 100, metal);
+            std::shared_ptr<Shape> metalSphere = std::make_shared<Sphere>(Vector3(-125, -149, 100), 100, metal);
 
             // light
-            std::shared_ptr<ObjectSampler> lightWall = std::make_shared<ZXWall>(-100, 100, -100, 100, 248, false,
-                                                                                nullptr);
+            std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(-100, 100, -100, 100, 248, false,
+                                                                               nullptr);
+
             std::shared_ptr<Light> light = std::make_shared<Light>(lightMaterial, lightWall);
             _light = light;
 
@@ -82,15 +83,17 @@ namespace kaguya {
             std::vector<Vertex> bunnyVertexes = kaguya::utils::ObjLoader::loadModel("./resource/objects/bunny.obj");
 
             std::shared_ptr<Matrix4> transformMatrix = std::make_shared<Matrix4>(1.0f);
-            double scale = 400.0;
+            double scale = 490.0;
             *transformMatrix = TRANSLATE(*transformMatrix, Vector3(-scale / 2, -scale / 2, -scale / 2));
             *transformMatrix = SCALE(*transformMatrix, Vector3(scale, scale, scale));
-            std::shared_ptr<Hittable> bunny = std::static_pointer_cast<Hittable>(
-                    std::make_shared<TriangleMesh>(bunnyVertexes, metal, transformMatrix));
+            std::shared_ptr<Shape> bunny = std::static_pointer_cast<Shape>(
+                    std::make_shared<TriangleMesh>(bunnyVertexes, lambertTop, transformMatrix));
+//                    std::make_shared<TriangleMesh>(bunnyVertexes, glass, transformMatrix));
+//                    std::make_shared<TriangleMesh>(bunnyVertexes, metal, transformMatrix));
 
 
             // objects
-            std::vector<std::shared_ptr<Hittable>> objects;
+            std::vector<std::shared_ptr<Shape>> objects;
             objects.push_back(leftWall);
             objects.push_back(rightWall);
             objects.push_back(bottomWall);
@@ -98,8 +101,6 @@ namespace kaguya {
             objects.push_back(frontWall);
             objects.push_back(light);
             objects.push_back(bunny);
-//            objects.push_back(glassSphere);
-//            objects.push_back(metalSphere);
 
             // 给所有 object 赋予 id
             for (long long id = 0; id < objects.size(); id++) {
@@ -107,7 +108,7 @@ namespace kaguya {
             }
 
             // scene
-            std::shared_ptr<Hittable> bvh = std::make_shared<BVH>(objects);
+            std::shared_ptr<Shape> bvh = std::make_shared<BVH>(objects);
             _world = bvh;
 
             // build camera
@@ -138,7 +139,7 @@ namespace kaguya {
                     Vector3(255.0 / 255, 192.0 / 255, 203.0 / 255));
 
             std::shared_ptr<Texture> lightAlbedo = std::make_shared<ConstantTexture>(
-                    Vector3(double(249.0) / 255.0 * 12, double(222.0) / 255.0 * 12, double(180.0) / 255.0 * 12));
+                    Vector3(double(249.0) / 255.0 * 15, double(222.0) / 255.0 * 15, double(180.0) / 255.0 * 15));
 
             // 255 222 99
 
@@ -153,30 +154,30 @@ namespace kaguya {
             std::shared_ptr<Material> metal = std::make_shared<Metal>();
 
             // walls
-            std::shared_ptr<Hittable> leftWall = std::make_shared<YZWall>(-250, 250, -250, 250, -250, true,
-                                                                          lambertLeft);
-            std::shared_ptr<Hittable> rightWall = std::make_shared<YZWall>(-250, 250, -250, 250, 250, false,
-                                                                           lambertRight);
-            std::shared_ptr<Hittable> bottomWall = std::make_shared<ZXWall>(-250, 250, -250, 250, -250, true,
-                                                                            lambertBottom);
-            std::shared_ptr<Hittable> topWall = std::make_shared<ZXWall>(-250, 250, -250, 250, 250, false,
-                                                                         lambertTop);
-            std::shared_ptr<Hittable> frontWall = std::make_shared<XYWall>(-250, 250, -250, 250, -250, false,
-                                                                           lambertFront);
+            std::shared_ptr<Shape> leftWall = std::make_shared<YZWall>(-250, 250, -250, 250, -250, true,
+                                                                       lambertLeft);
+            std::shared_ptr<Shape> rightWall = std::make_shared<YZWall>(-250, 250, -250, 250, 250, false,
+                                                                        lambertRight);
+            std::shared_ptr<Shape> bottomWall = std::make_shared<ZXWall>(-250, 250, -250, 250, -250, true,
+                                                                         lambertBottom);
+            std::shared_ptr<Shape> topWall = std::make_shared<ZXWall>(-250, 250, -250, 250, 250, false,
+                                                                      lambertTop);
+            std::shared_ptr<Shape> frontWall = std::make_shared<XYWall>(-250, 250, -250, 250, -250, false,
+                                                                        lambertFront);
 
-            std::shared_ptr<Hittable> glassSphere = std::make_shared<Sphere>(Vector3(125, -169, 0), 80, glass);
-//            std::shared_ptr<Hittable> glassSphere = std::make_shared<Sphere>(Vector3(75, 0, 0), 80, metal);
+            std::shared_ptr<Shape> glassSphere = std::make_shared<Sphere>(Vector3(125, -169, 0), 80, glass);
+//            std::shared_ptr<Shape> glassSphere = std::make_shared<Sphere>(Vector3(75, 0, 0), 80, metal);
 
-            std::shared_ptr<Hittable> metalSphere = std::make_shared<Sphere>(Vector3(-125, -149, 100), 100, metal);
+            std::shared_ptr<Shape> metalSphere = std::make_shared<Sphere>(Vector3(-125, -149, 100), 100, metal);
 
             // light
-            std::shared_ptr<ObjectSampler> lightWall = std::make_shared<ZXWall>(-100, 100, -100, 100, 248, false,
-                                                                                nullptr);
+            std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(-100, 100, -100, 100, 248, false,
+                                                                               nullptr);
             std::shared_ptr<Light> light = std::make_shared<Light>(lightMaterial, lightWall);
             _light = light;
 
             // objects
-            std::vector<std::shared_ptr<Hittable>> objects;
+            std::vector<std::shared_ptr<Shape>> objects;
             objects.push_back(leftWall);
             objects.push_back(rightWall);
             objects.push_back(bottomWall);
@@ -192,7 +193,7 @@ namespace kaguya {
             }
 
             // scene
-            std::shared_ptr<Hittable> bvh = std::make_shared<BVH>(objects);
+            std::shared_ptr<Shape> bvh = std::make_shared<BVH>(objects);
             _world = bvh;
 
             // build camera
@@ -222,18 +223,18 @@ namespace kaguya {
             std::shared_ptr<Material> dielectric1 = std::make_shared<Dielectric>(albedo0, 1.5);
 
             // spheres
-            std::shared_ptr<Hittable> sphere1 = std::make_shared<Sphere>(Vector3(0, 40, 0), 39, dielectric1);
-            std::shared_ptr<Hittable> sphere3 = std::make_shared<Sphere>(Vector3(0, 40, 0), 25, lambertian2);
-            std::shared_ptr<Hittable> sphere2 = std::make_shared<Sphere>(Vector3(0, -1000, 0), 1000, lambertian1);
-            std::shared_ptr<Hittable> sphere4 = std::make_shared<Sphere>(Vector3(80, 40, -80), 30, metal1);
+            std::shared_ptr<Shape> sphere1 = std::make_shared<Sphere>(Vector3(0, 40, 0), 39, dielectric1);
+            std::shared_ptr<Shape> sphere3 = std::make_shared<Sphere>(Vector3(0, 40, 0), 25, lambertian2);
+            std::shared_ptr<Shape> sphere2 = std::make_shared<Sphere>(Vector3(0, -1000, 0), 1000, lambertian1);
+            std::shared_ptr<Shape> sphere4 = std::make_shared<Sphere>(Vector3(80, 40, -80), 30, metal1);
 
             // objects
-            std::vector<std::shared_ptr<Hittable>> objects;
+            std::vector<std::shared_ptr<Shape>> objects;
             objects.push_back(sphere1);
             objects.push_back(sphere2);
             objects.push_back(sphere3);
             objects.push_back(sphere4);
-            std::shared_ptr<Hittable> bvh = std::make_shared<BVH>(objects);
+            std::shared_ptr<Shape> bvh = std::make_shared<BVH>(objects);
 
             // scene
             _world = bvh;
@@ -245,7 +246,7 @@ namespace kaguya {
         }
 
 
-        bool Scene::hit(const Ray &ray, HitRecord &hitRecord) {
+        bool Scene::hit(const Ray &ray, Interaction &hitRecord) {
             return _world->hit(ray, hitRecord, 0.001, infinity);
         }
     }

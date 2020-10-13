@@ -4,7 +4,7 @@
 
 #include <kaguya/Config.h>
 #include <kaguya/tracer/PathTracer.h>
-#include <kaguya/scene/Hittable.h>
+#include <kaguya/scene/Shape.h>
 #include <kaguya/scene/meta/Light.h>
 #include <kaguya/material/Material.h>
 #include <iostream>
@@ -14,7 +14,7 @@
 namespace kaguya {
     namespace tracer {
 
-        using kaguya::scene::HitRecord;
+        using kaguya::scene::Interaction;
         using kaguya::scene::Light;
         using kaguya::material::Material;
 
@@ -27,6 +27,7 @@ namespace kaguya {
             _camera = _scene->getCamera();
             _samplePerPixel = Config::samplePerPixel;
             _sampleLightProb = Config::sampleLightProb;
+            _maxDepth = Config::maxScatterDepth;
         }
 
         Vector3 PathTracer::shader(const Ray &ray, Scene &scene, int depth) {
@@ -34,7 +35,7 @@ namespace kaguya {
             // TODO 添加对光源采样；对光源采样需要计算两个 pdf
 
             if (depth < _maxDepth) {
-                HitRecord hitRecord;
+                Interaction hitRecord;
                 if (scene.hit(ray, hitRecord)) {
                     // 击中，检查击中材质
                     std::shared_ptr<Material> material = hitRecord.material;
@@ -113,7 +114,8 @@ namespace kaguya {
                 double shadowRayPdf;
                 // 构造虚拟 shadow ray
                 Ray shadowRay;
-                light->sampleRay(shadowRayOrigin, shadowRay, shadowRayPdf);
+                light->sampleRay(shadowRayOrigin, shadowRay);
+                shadowRayPdf = light->rayPdf(shadowRay);
 
                 sampleLightRay = shadowRay;
                 sampleLightPdf = shadowRayPdf;
@@ -135,7 +137,7 @@ namespace kaguya {
                     Vector3 shadowRayDir;
                     // shadow ray 投射的密度
                     double shadowRayPdf;
-                    if (light->sampleRay(shadowRayOrigin, shadowRayDir, shadowRayPdf)) {
+                    if (light->sample(shadowRayOrigin, shadowRayDir, shadowRayPdf)) {
                         // 构造虚拟 shadow ray
                         Ray shadowRay = Ray(shadowRayOrigin, shadowRayDir);
                         // shadow ray 击中记录
@@ -188,9 +190,6 @@ namespace kaguya {
                             auto u = (col + uniformSample()) / cameraWidth;
                             auto v = (row + uniformSample()) / cameraHeight;
 
-//                            float u = float(col) / cameraWidth;
-//                            float v = float(row) / cameraHeight;
-
                             // 发射采样光线，开始渲染
                             Ray sampleRay = _camera->sendRay(u, v);
                             ans += shader(sampleRay, *_scene, 0);
@@ -199,6 +198,7 @@ namespace kaguya {
                         // TODO 写入渲染结果，用更好的方式写入
                         writeShaderColor(ans, row, col);
                     }
+#pragma omp critical
                     finishedLine++;
                     // TODO delete
                     std::cerr << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "

@@ -18,37 +18,53 @@ namespace kaguya {
             _rightTop = {width / 2, height / 2, 0.0f};
             _normal = {0.0f, 0.0f, 1.0f};
 
-            buildBoundingBox();
+            init();
         }
 
-        void Wall::buildBoundingBox() {
-            Vector3 transformedA = _transformMatrix != nullptr ?
-                                   (*_transformMatrix) * Vector4(_leftBottom, 1.0f) : _leftBottom;
-            Vector3 transformedB = _transformMatrix != nullptr ?
-                                   (*_transformMatrix) * Vector4(_rightBottom, 1.0f) : _rightBottom;
-            Vector3 transformedC = _transformMatrix != nullptr ?
+        void Wall::init() {
+            // build bounding box
+            _transformedLeftBottom = _transformMatrix != nullptr ?
+                                     (*_transformMatrix) * Vector4(_leftBottom, 1.0f) : _leftBottom;
+            _transformedRightBottom = _transformMatrix != nullptr ?
+                                      (*_transformMatrix) * Vector4(_rightBottom, 1.0f) : _rightBottom;
+            _transformedRightTop = _transformMatrix != nullptr ?
                                    (*_transformMatrix) * Vector4(_rightTop, 1.0f) : _rightTop;
-            Vector3 transformedD = _transformMatrix != nullptr ?
-                                   (*_transformMatrix) * Vector4(_leftTop, 1.0f) : _leftTop;
+            _transformedLeftTop = _transformMatrix != nullptr ?
+                                  (*_transformMatrix) * Vector4(_leftTop, 1.0f) : _leftTop;
 
-            double minX = std::min(std::min(std::min(transformedA[0], transformedB[0]), transformedC[0]),
-                                   transformedD[0]) - 0.0001;
-            double minY = std::min(std::min(std::min(transformedA[1], transformedB[1]), transformedC[1]),
-                                   transformedD[1]) - 0.0001;
-            double minZ = std::min(std::min(std::min(transformedA[2], transformedB[2]), transformedC[2]),
-                                   transformedD[2]) - 0.0001;
+            _transformedNormal = _transformMatrix != nullptr ?
+                                 NORMALIZE(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal, 0.0f)) :
+                                 _normal;
 
-            double maxX = std::max(std::max(std::max(transformedA[0], transformedB[0]), transformedC[0]),
-                                   transformedD[0]) + 0.0001;
-            double maxY = std::max(std::max(std::max(transformedA[1], transformedB[1]), transformedC[1]),
-                                   transformedD[1]) + 0.0001;
-            double maxZ = std::max(std::max(std::max(transformedA[2], transformedB[2]), transformedC[2]),
-                                   transformedD[2]) + 0.0001;
+            double minX = std::min(
+                    std::min(std::min(_transformedLeftBottom[0], _transformedRightBottom[0]), _transformedRightTop[0]),
+                    _transformedLeftTop[0]) - 0.0001;
+            double minY = std::min(
+                    std::min(std::min(_transformedLeftBottom[1], _transformedRightBottom[1]), _transformedRightTop[1]),
+                    _transformedLeftTop[1]) - 0.0001;
+            double minZ = std::min(
+                    std::min(std::min(_transformedLeftBottom[2], _transformedRightBottom[2]), _transformedRightTop[2]),
+                    _transformedLeftTop[2]) - 0.0001;
+
+            double maxX = std::max(
+                    std::max(std::max(_transformedLeftBottom[0], _transformedRightBottom[0]), _transformedRightTop[0]),
+                    _transformedLeftTop[0]) + 0.0001;
+            double maxY = std::max(
+                    std::max(std::max(_transformedLeftBottom[1], _transformedRightBottom[1]), _transformedRightTop[1]),
+                    _transformedLeftTop[1]) + 0.0001;
+            double maxZ = std::max(
+                    std::max(std::max(_transformedLeftBottom[2], _transformedRightBottom[2]), _transformedRightTop[2]),
+                    _transformedLeftTop[2]) + 0.0001;
 
             _aabb = AABB(Vector3(minX, minY, minZ), Vector3(maxX, maxY, maxZ));
+
+            // 计算面积
+            double transformedWidth = LENGTH(_transformedRightBottom - _transformedLeftBottom);
+            double transformedHeight = LENGTH(_transformedLeftTop - _transformedLeftBottom);
+            _area = (transformedWidth * transformedHeight);
         }
 
-        bool Wall::hit(const Ray &ray, HitRecord &hitRecord,
+        bool Wall::hit(const Ray &ray, Interaction &hitRecord,
                        double stepMin, double stepMax) {
             // 仿照三角形平面求直线交点解法
             Vector3 transformedA = _transformMatrix != nullptr ?
@@ -104,43 +120,32 @@ namespace kaguya {
             return _aabb;
         }
 
-        Vector3 Wall::samplePoint(double &pdf, Vector3 &normal) {
+        double Wall::area() {
+            return _area;
+        }
+
+        Interaction Wall::sample() {
             // 随机采样坐标
             double u = uniformSample();
             double v = uniformSample();
 
-            Vector3 transformedLeftBottom = _transformMatrix != nullptr ?
-                                            (*_transformMatrix) * Vector4(_leftBottom, 1.0f) : _leftBottom;
+            Vector3 horizontal = (_transformedRightBottom - _transformedLeftBottom) * u;
+            Vector3 vertical = (_transformedLeftTop - _transformedLeftBottom) * v;
 
-            Vector3 transformedRightBottom = _transformMatrix != nullptr ?
-                                             (*_transformMatrix) * Vector4(_rightBottom, 1.0f) : _rightBottom;
-
-            Vector3 transformedLeftTop = _transformMatrix != nullptr ?
-                                         (*_transformMatrix) * Vector4(_leftTop, 1.0f) : _leftTop;
-
-            Vector3 horizontal = (transformedRightBottom - transformedLeftBottom) * u;
-            Vector3 vertical = (transformedLeftTop - transformedLeftBottom) * v;
-
-            pdf = 1.0 / (LENGTH(transformedRightBottom - transformedLeftBottom) *
-                         LENGTH(transformedLeftTop - transformedLeftBottom));
-            normal = NORMALIZE((*_transformMatrix) * Vector4(_normal, 0.0f));
-            return transformedLeftBottom + horizontal + vertical;
+            Interaction samplePoint;
+            samplePoint.point = _transformedLeftBottom + horizontal + vertical;
+            samplePoint.normal = _transformedNormal;
+            return samplePoint;
         }
 
-        double Wall::samplePointPdf(Vector3 &point) {
-            Vector3 transformedPoint =
-                    _transformMatrix != nullptr ? INVERSE((*_transformMatrix)) * Vector4(point, 1.0f) : point;
+        double Wall::pdf(Interaction &point) {
+            Vector3 transformedPoint = _transformMatrix != nullptr ?
+                                       INVERSE((*_transformMatrix)) * Vector4(point.point, 1.0f)
+                                                                   : point.point;
             if (transformedPoint.z - 0 <= EPSILON &&
                 transformedPoint.x > -_width / 2 && transformedPoint.x < _width / 2 &&
                 transformedPoint.y > -_height / 2 && transformedPoint.y < _height / 2) {
-                Vector3 transformedLeftBottom = (*_transformMatrix) * Vector4(_leftBottom, 1.0);
-                Vector3 transformedRightBottom = (*_transformMatrix) * Vector4(_rightBottom, 1.0);
-                Vector3 transformedLeftTop = (*_transformMatrix) * Vector4(_leftTop, 1.0);
-
-                double transformedWidth = LENGTH(transformedRightBottom - transformedLeftBottom);
-                double transformedHeight = LENGTH(transformedLeftTop - transformedLeftBottom);
-
-                return 1.0 / (transformedWidth * transformedHeight);
+                return 1.0 / area();
             } else {
                 return 0;
             }
@@ -160,10 +165,10 @@ namespace kaguya {
             } else {
                 _normal = {0, -1, 0};
             }
-            buildBoundingBox();
+            init();
         }
 
-        bool ZXWall::hit(const Ray &ray, HitRecord &hitRecord,
+        bool ZXWall::hit(const Ray &ray, Interaction &hitRecord,
                          double stepMin, double stepMax) {
             double step = (_y - ray.getOrigin().y) / ray.getDirection().y;
             if (step >= stepMin && step <= stepMax) {
@@ -187,29 +192,37 @@ namespace kaguya {
             }
         }
 
-        Vector3 ZXWall::samplePoint(double &pdf, Vector3 &normal) {
+        double ZXWall::area() {
+            double width = abs(_x1 - _x0);
+            double height = abs(_z1 - _z0);
+            return width * height;
+        }
+
+        Interaction ZXWall::sample() {
             double u = uniformSample();
             double v = uniformSample();
 
             double width = abs(_x1 - _x0);
             double height = abs(_z1 - _z0);
 
-            pdf = 1 / (width * height);
-            normal = _normal;
-            return {_x0 + width * u, _y, _z0 + height * v};
+            Interaction interaction;
+            interaction.point = {_x0 + width * u, _y, _z0 + height * v};
+            interaction.normal = _normal;
+            return interaction;
         }
 
-        double ZXWall::samplePointPdf(Vector3 &point) {
-            if (point.y - _y < EPSILON &&
-                point.x > _x0 && point.x < _x1 &&
-                point.z > _z0 && point.z < _z1) {
-                return 1.0 / (abs(_z0 - _z1) * abs(_x0 - _x1));
+        double ZXWall::pdf(Interaction &point) {
+            Vector3 samplePoint = point.point;
+            if (samplePoint.y - _y < EPSILON &&
+                samplePoint.x > _x0 && samplePoint.x < _x1 &&
+                samplePoint.z > _z0 && samplePoint.z < _z1) {
+                return 1.0 / area();
             } else {
                 return 0;
             }
         }
 
-        void ZXWall::buildBoundingBox() {
+        void ZXWall::init() {
             _aabb = AABB({_x0, _y - 0.0001, _z0}, {_x1, _y + 0.0001, _z1});
         }
 
@@ -227,10 +240,10 @@ namespace kaguya {
             } else {
                 _normal = {-1, 0, 0};
             }
-            buildBoundingBox();
+            init();
         }
 
-        bool YZWall::hit(const Ray &ray, HitRecord &hitRecord,
+        bool YZWall::hit(const Ray &ray, Interaction &hitRecord,
                          double stepMin, double stepMax) {
             double step = (_x - ray.getOrigin().x) / ray.getDirection().x;
             if (step >= stepMin && step <= stepMax) {
@@ -254,27 +267,35 @@ namespace kaguya {
             }
         }
 
-        void YZWall::buildBoundingBox() {
+        void YZWall::init() {
             _aabb = AABB({_x - 0.0001, _y0, _z0}, {_x + 0.0001, _y1, _z1});
         }
 
-        Vector3 YZWall::samplePoint(double &pdf, Vector3 &normal) {
+        double YZWall::area() {
+            double width = abs(_z1 - _z0);
+            double height = abs(_y1 - _y0);
+            return width * height;
+        }
+
+        Interaction YZWall::sample() {
             double u = uniformSample();
             double v = uniformSample();
 
             double width = abs(_z1 - _z0);
             double height = abs(_y1 - _y0);
 
-            pdf = 1 / (width * height);
-            normal = _normal;
-            return {_x, _y0 + v * height, _z0 + width * u};
+            Interaction interaction;
+            interaction.point = {_x, _y0 + v * height, _z0 + width * u};
+            interaction.normal = _normal;
+            return interaction;
         }
 
-        double YZWall::samplePointPdf(Vector3 &point) {
-            if (point.x - _x < EPSILON &&
-                point.y > _y0 && point.x < _y1 &&
-                point.z > _z0 && point.z < _z1) {
-                return 1.0 / (abs(_z0 - _z1) * abs(_y0 - _y1));
+        double YZWall::pdf(Interaction &point) {
+            Vector3 samplePoint = point.point;
+            if (samplePoint.y - _x < EPSILON &&
+                samplePoint.x > _y0 && samplePoint.x < _y1 &&
+                samplePoint.z > _z0 && samplePoint.z < _z1) {
+                return 1.0 / area();
             } else {
                 return 0;
             }
@@ -294,10 +315,10 @@ namespace kaguya {
             } else {
                 _normal = {0, 0, 1};
             }
-            buildBoundingBox();
+            init();
         }
 
-        bool XYWall::hit(const Ray &ray, HitRecord &hitRecord,
+        bool XYWall::hit(const Ray &ray, Interaction &hitRecord,
                          double stepMin, double stepMax) {
             double step = (_z - ray.getOrigin().z) / ray.getDirection().z;
             if (step >= stepMin && step <= stepMax) {
@@ -321,30 +342,39 @@ namespace kaguya {
             }
         }
 
-        void XYWall::buildBoundingBox() {
+        void XYWall::init() {
             _aabb = AABB({_x0, _y0, _z - 0.0001}, {_x1, _y1, _z + 0.0001});
         }
 
-        Vector3 XYWall::samplePoint(double &pdf, Vector3 &normal) {
+        double XYWall::area() {
+            double width = abs(_x1 - _x0);
+            double height = abs(_y1 - _y0);
+            return width * height;
+        }
+
+        Interaction XYWall::sample() {
             double u = uniformSample();
             double v = uniformSample();
 
             double width = abs(_x1 - _x0);
             double height = abs(_y1 - _y0);
 
-            pdf = 1 / (width * height);
-            normal = _normal;
-            return {_x0 + width * u, _y0 + v * height, _z};
+            Interaction interaction;
+            interaction.point = {_x0 + width * u, _y0 + v * height, _z};
+            interaction.normal = _normal;
+            return interaction;
         }
 
-        double XYWall::samplePointPdf(Vector3 &point) {
-            if (point.x - _z < EPSILON &&
-                point.y > _y0 && point.x < _y1 &&
-                point.x > _x0 && point.z < _x1) {
-                return 1.0 / (abs(_x0 - _x1) * abs(_y0 - _y1));
+        double XYWall::pdf(Interaction &point) {
+            Vector3 samplePoint = point.point;
+            if (samplePoint.x - _z < EPSILON &&
+                samplePoint.y > _y0 && samplePoint.x < _y1 &&
+                samplePoint.x > _x0 && samplePoint.z < _x1) {
+                return 1.0 / area();
             } else {
                 return 0;
             }
         }
+
     }
 }
