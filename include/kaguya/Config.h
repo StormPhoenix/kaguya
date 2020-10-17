@@ -7,7 +7,7 @@
 
 #include <kaguya/scene/Shape.h>
 #include <kaguya/scene/Scene.h>
-#include <kaguya/tracer/Camera.h>
+#include <kaguya/scene/Camera.h>
 #include <memory>
 
 namespace kaguya {
@@ -32,13 +32,6 @@ namespace kaguya {
         static std::shared_ptr<Camera> buildCamera() {
             // TODO load config file
             return std::make_shared<Camera>();
-        }
-
-        // TODO 测试
-        static std::shared_ptr<Scene> testBuildTwoScene() {
-            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-            scene->testBuildTwoSphere();
-            return scene;
         }
 
         // TODO 测试

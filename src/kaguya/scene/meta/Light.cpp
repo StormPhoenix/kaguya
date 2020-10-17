@@ -12,9 +12,9 @@ namespace kaguya {
             assert(_emitter != nullptr && _objectSampler != nullptr);
         }
 
-        bool Light::hit(const kaguya::tracer::Ray &ray, kaguya::scene::Interaction &hitRecord,
-                        double stepMin, double stepMax) {
-            bool isHit = _objectSampler->hit(ray, hitRecord, stepMin, stepMax);
+        bool Light::insect(const kaguya::tracer::Ray &ray, kaguya::scene::Interaction &hitRecord,
+                           double stepMin, double stepMax) {
+            bool isHit = _objectSampler->insect(ray, hitRecord, stepMin, stepMax);
             if (isHit) {
                 // 替换材质为发光体
                 hitRecord.material = _emitter;
@@ -42,15 +42,15 @@ namespace kaguya {
             return _objectSampler->sample();
         }
 
-        double Light::pdf(kaguya::scene::Interaction &point) {
+        double Light::pdf(Interaction &point) {
             return _objectSampler->pdf(point);
         }
 
-        Interaction Light::sample(const kaguya::scene::Interaction &eye) {
+        Interaction Light::sample(const Interaction &eye) {
             return _objectSampler->sample(eye);
         }
 
-        double Light::pdf(const kaguya::scene::Interaction &eye, const Vector3 &dir) {
+        double Light::pdf(const Interaction &eye, const Vector3 &dir) {
             return _objectSampler->pdf(eye, dir);
         }
 

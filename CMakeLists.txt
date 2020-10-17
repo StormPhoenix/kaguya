@@ -53,6 +53,7 @@ link_libraries(${ASSIMP_LINK})
 file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/bsdf/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/material/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/math/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/accumulation/*.cpp

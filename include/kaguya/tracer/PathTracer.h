@@ -9,11 +9,15 @@
 
 #include <kaguya/scene/Scene.h>
 #include <kaguya/tracer/Tracer.h>
-#include <kaguya/tracer/Camera.h>
+#include <kaguya/scene/Camera.h>
+
+#include <kaguya/core/Core.h>
+#include <kaguya/core/spectrum/Spectrum.hpp>
 
 namespace kaguya {
     namespace tracer {
 
+        using namespace kaguya::core;
         using kaguya::scene::Scene;
 
         class PathTracer : public Tracer {
@@ -42,33 +46,36 @@ namespace kaguya {
              * @param depth 反射次数
              * @return 渲染结果
              */
-            Vector3 shader(const Ray &ray, Scene &scene, int depth);
+            Spectrum shader(const Ray &ray, Scene &scene, int depth);
+
+            Spectrum shader2(const Ray &ray, Scene &scene, int depth);
 
             /**
+             * TODO 重构
              * 渲染公式
              * @param scatterPdf 散射概率
              * @param samplePdf 采样概率
-             * @param brdf bidirectional reflectance distribution function
+             * @param bsdf bidirectional scatter distribution function
              * @param scatterRay 散射光线
              * @param scene 场景
              * @param depth 迭代深度
              * @return
              */
-            Vector3 computeShaderColor(double scatterPdf, double samplePdf,
-                                       Vector3 brdf, Ray &scatterRay, Scene &scene, int depth);
+            Spectrum computeShaderColor(double scatterPdf, double samplePdf,
+                                       Spectrum bsdf, Ray &scatterRay, Scene &scene, int depth);
 
             /**
              * 获取背景颜色，这里可以用来设置背景贴图
              * @param ray
              * @return
              */
-            Vector3 background(const Ray &ray);
+            Spectrum background(const Ray &ray);
 
             /**
              * 输出渲染结果
              * @param color
              */
-            void writeShaderColor(const Vector3 &color, int row, int col);
+            void writeShaderColor(const Spectrum &spectrum, int row, int col);
 
             /**
              * 渲染结果写入 buffer

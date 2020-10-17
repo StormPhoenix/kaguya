@@ -24,7 +24,7 @@ namespace kaguya {
 
             bool scatter(const Ray &ray, const Interaction &hitRecord, Ray &scatteredRay, double &pdf) override;
 
-            Vector3 brdf(const Interaction &hitRecord, const Vector3 &scatterDirection) override;
+            virtual std::shared_ptr<BSDF> bsdf(Interaction &insect) override;
 
         private:
             std::shared_ptr<Texture> _albedo = nullptr;

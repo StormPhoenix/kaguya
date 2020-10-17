@@ -24,9 +24,10 @@ namespace kaguya {
 
             virtual bool scatter(const Ray &ray, const Interaction &hitRecord, Ray &scatteredRay, double &pdf) override;
 
-            virtual Vector3 brdf(const Interaction &hitRecord, const Vector3 &scatterDirection) override;
-
             virtual double scatterPDF(const Ray &hitRay, const Interaction &hitRecord, const Ray &scatterRay) override;
+
+            virtual std::shared_ptr<BSDF> bsdf(Interaction &insect) override;
+
 
         private:
             double _refractiveIndex;

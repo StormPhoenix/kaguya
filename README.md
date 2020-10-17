@@ -1,3 +1,8 @@
+## 修改成 pbrt 架构
+-   不传输 Material 了，改为传输 BSDF，光源的判断 / 光源的发光 / 光源的采样
+-   pbrt 中好像是不和光源做求交判断的
+
+
 ## 空间变换
 
 ## 散射 PDF 与采样 PDF
@@ -28,6 +33,10 @@
 
 ## 未解决的问题
 
+- 动态内存分配
+
+- RGB 扩展为 SpectrumTemplate
+
 - bunny 金属材质下非常不平滑，但是按道理讲，Normal 是进行插值过了的
     > DEBUG：设置成 Lambertian 表面做插值
 
@@ -36,7 +45,7 @@
 
 - Triangle 优化 Triangle 内部的矩阵变换效率（提前做变换）
     > Triangle 中的 Vertex / Normal 坐标向 World Space 的变换提前做好。不同于其他 Shape 将 Ray 转化到 Object Space
-    > 的方法，Triangle 需要做大量 hit 操作，频繁对 Ray 进行变换会损失效率
+    > 的方法，Triangle 需要做大量 insect 操作，频繁对 Ray 进行变换会损失效率
     > 这也提醒自己最好将其他 Shape 的 Transformation 修改成对 Ray 的变换
 - Bitmap 的写入策略替换
 
@@ -63,7 +72,7 @@
 
 - 俄罗斯轮盘赌不只适用于判断何时处理不继续递归问题。还可以根据 BRDF 函数，取消掉一部分 Shadow Ray
 
-- RGB 类型 -> Spectrum 类型
+- RGB 类型 -> SpectrumTemplate 类型
     评估 Light Unit 的指标
     
 ## 一些想法

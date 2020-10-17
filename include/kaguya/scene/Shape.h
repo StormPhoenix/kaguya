@@ -5,6 +5,7 @@
 #ifndef KAGUYA_SHAPE_H
 #define KAGUYA_SHAPE_H
 
+#include <kaguya/core/Interaction.h>
 #include <kaguya/math/Math.hpp>
 #include <kaguya/scene/accumulation/AABB.h>
 
@@ -26,40 +27,7 @@ namespace kaguya {
         using kaguya::material::Material;
         using kaguya::scene::acc::AABB;
         using kaguya::tracer::Ray;
-
-        /**
-         * Ray 与 Hittable 的交点记录
-         */
-        typedef struct Interaction {
-            // 击中光线方向
-            Vector3 direction;
-            // 击中点
-            Vector3 point;
-            // 击中点法线方向
-            Vector3 normal;
-            // 击中射线步长
-            double step;
-            // 击中材质种类
-            std::shared_ptr<Material> material = nullptr;
-            // 击中位置是否是外侧
-            bool isFrontFace;
-            // 击中点纹理坐标
-            double u;
-            double v;
-            // 击中物体的 ID
-            long long id = -1;
-
-            /**
-             * 设置击中位置处的法线
-             * @param outwardNormal
-             * @param hitDirection
-             */
-            void setOutwardNormal(const Vector3 &outwardNormal, const Vector3 &hitDirection) {
-                direction = hitDirection;
-                isFrontFace = DOT(outwardNormal, direction) < 0;
-                normal = isFrontFace ? NORMALIZE(outwardNormal) : -NORMALIZE(outwardNormal);
-            }
-        } Interaction;
+        using kaguya::core::Interaction;
 
         class Shape {
         public:
@@ -71,7 +39,7 @@ namespace kaguya {
              * @param stepMax 射线步长最大值
              * @return
              */
-            virtual bool hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) = 0;
+            virtual bool insect(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) = 0;
 
             /**
              * 计算 AxisAlignBoundingBox

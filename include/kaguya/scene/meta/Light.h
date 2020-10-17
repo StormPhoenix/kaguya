@@ -28,7 +28,7 @@ namespace kaguya {
 
             virtual double pdf(const Interaction &eye, const Vector3 &dir) override;
 
-            virtual bool hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
+            virtual bool insect(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
 
             virtual const AABB &boundingBox() const override;
 

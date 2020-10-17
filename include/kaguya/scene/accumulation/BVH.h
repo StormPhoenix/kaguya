@@ -26,7 +26,7 @@ namespace kaguya {
 
                 const AABB &boundingBox() const override;
 
-                bool hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
+                bool insect(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
 
             protected:
                 /**

@@ -6,7 +6,7 @@
 #define KAGUYA_SCENE_H
 
 #include <kaguya/scene/Shape.h>
-#include <kaguya/tracer/Camera.h>
+#include <kaguya/scene/Camera.h>
 #include <kaguya/scene/meta/Light.h>
 #include <memory>
 
@@ -20,10 +20,6 @@ namespace kaguya {
          */
         class Scene {
         public:
-            /**
-             * 测试场景，构建两个球体
-             */
-            void testBuildTwoSphere();
 
             /**
              * 构建 Cornel box

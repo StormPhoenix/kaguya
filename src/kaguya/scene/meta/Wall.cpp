@@ -64,8 +64,8 @@ namespace kaguya {
             _area = (transformedWidth * transformedHeight);
         }
 
-        bool Wall::hit(const Ray &ray, Interaction &hitRecord,
-                       double stepMin, double stepMax) {
+        bool Wall::insect(const Ray &ray, Interaction &hitRecord,
+                          double stepMin, double stepMax) {
             // 仿照三角形平面求直线交点解法
             Vector3 transformedA = _transformMatrix != nullptr ?
                                    (*_transformMatrix) * Vector4(_leftTop, 1.0f) : _leftTop;
@@ -168,8 +168,8 @@ namespace kaguya {
             init();
         }
 
-        bool ZXWall::hit(const Ray &ray, Interaction &hitRecord,
-                         double stepMin, double stepMax) {
+        bool ZXWall::insect(const Ray &ray, Interaction &hitRecord,
+                            double stepMin, double stepMax) {
             double step = (_y - ray.getOrigin().y) / ray.getDirection().y;
             if (step >= stepMin && step <= stepMax) {
                 double z = ray.getOrigin().z + step * ray.getDirection().z;
@@ -243,8 +243,8 @@ namespace kaguya {
             init();
         }
 
-        bool YZWall::hit(const Ray &ray, Interaction &hitRecord,
-                         double stepMin, double stepMax) {
+        bool YZWall::insect(const Ray &ray, Interaction &hitRecord,
+                            double stepMin, double stepMax) {
             double step = (_x - ray.getOrigin().x) / ray.getDirection().x;
             if (step >= stepMin && step <= stepMax) {
                 double z = ray.getOrigin().z + step * ray.getDirection().z;
@@ -318,8 +318,8 @@ namespace kaguya {
             init();
         }
 
-        bool XYWall::hit(const Ray &ray, Interaction &hitRecord,
-                         double stepMin, double stepMax) {
+        bool XYWall::insect(const Ray &ray, Interaction &hitRecord,
+                            double stepMin, double stepMax) {
             double step = (_z - ray.getOrigin().z) / ray.getDirection().z;
             if (step >= stepMin && step <= stepMax) {
                 double x = ray.getOrigin().x + step * ray.getDirection().x;

@@ -5,15 +5,22 @@
 #ifndef KAGUYA_MATERIAL_H
 #define KAGUYA_MATERIAL_H
 
+#include <kaguya/core/Interaction.h>
+#include <kaguya/core/spectrum/Spectrum.hpp>
+#include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/math/Math.hpp>
 #include <kaguya/tracer/Ray.h>
 #include <kaguya/scene/Shape.h>
 
+
+// TODO Material 移动到 core
 namespace kaguya {
     namespace material {
 
         using kaguya::tracer::Ray;
-        using kaguya::scene::Interaction;
+        using kaguya::core::Interaction;
+        using kaguya::core::Spectrum;
+        using kaguya::core::BSDF;
 
         /**
          * 物体材质
@@ -31,12 +38,10 @@ namespace kaguya {
             virtual bool scatter(const Ray &ray, const Interaction &hitRecord, Ray &scatteredRay, double &pdf) = 0;
 
             /**
-             * 材质处理入射光、散射光之间能量传递的反射率
-             * @param hitRecord
-             * @param scatterDirection
-             * @return 反射率
+             * 计算材质的 bsdf
+             * @param insect ray 与 shape 的相交点
              */
-            virtual Vector3 brdf(const Interaction &hitRecord, const Vector3 &scatterDirection) = 0;
+            virtual std::shared_ptr<BSDF> bsdf(Interaction &insect) = 0;
 
             /**
              * 材质表面散射方向分布 PDF
@@ -71,8 +76,8 @@ namespace kaguya {
              * @param v 材质表面的纹理坐标
              * @return 发射光线能量
              */
-            virtual Vector3 emitted(double u, double v) {
-                return Vector3(0.0f, 0.0f, 0.0f);
+            virtual Spectrum emitted(double u, double v) {
+                return Spectrum(0.0f);
             }
         };
 

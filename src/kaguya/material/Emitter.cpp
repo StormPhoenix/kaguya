@@ -8,7 +8,7 @@
 namespace kaguya {
     namespace material {
 
-        Emitter::Emitter() : Emitter(std::make_shared<ConstantTexture>(Vector3(1.0, 1.0, 1.0))) {}
+        Emitter::Emitter() : Emitter(std::make_shared<ConstantTexture>(Spectrum(1.0))) {}
 
         Emitter::Emitter(std::shared_ptr<Texture> albedo) : _albedo(albedo) {}
 
@@ -16,15 +16,15 @@ namespace kaguya {
             return false;
         }
 
-        Vector3 Emitter::brdf(const Interaction &hitRecord, const Vector3 &scatterDirection) {
-            return {0.0f, 0.0f, 0.0f};
-        }
-
         double Emitter::scatterPDF(const Ray &hitRay, const Interaction &hitRecord, const Ray &scatterRay) {
             return 0;
         }
 
-        Vector3 Emitter::emitted(double u, double v) {
+        std::shared_ptr<BSDF> Emitter::bsdf(kaguya::core::Interaction &insect) {
+            return nullptr;
+        }
+
+        Spectrum Emitter::emitted(double u, double v) {
             return _albedo->sample(u, v);
         }
     }

@@ -2,6 +2,7 @@
 // Created by Storm Phoenix on 2020/10/8.
 //
 
+#include <kaguya/core/bsdf/BXDFSpecular.h>
 #include <kaguya/math/RefractSampler.h>
 #include <kaguya/material/Dielectric.h>
 
@@ -9,6 +10,7 @@ namespace kaguya {
     namespace material {
 
         using kaguya::math::RefractSampler;
+        using kaguya::core::BXDFSpecular;
 
         Dielectric::Dielectric(std::shared_ptr<Texture> albedo) : Dielectric(albedo, 1.5) {}
 
@@ -34,8 +36,12 @@ namespace kaguya {
             return true;
         }
 
-        Vector3 Dielectric::brdf(const Interaction &hitRecord, const Vector3 &scatterDirection) {
-            return _albedo->sample(hitRecord.u, hitRecord.v);
+        std::shared_ptr<BSDF> Dielectric::bsdf(kaguya::core::Interaction &insect) {
+            Spectrum albedo = _albedo->sample(insect.u, insect.v);
+            std::shared_ptr<BXDFSpecular> specularBXDF = std::make_shared<BXDFSpecular>(albedo, 1.0f, _refractiveIndex);
+            std::shared_ptr<BSDF> bsdf = std::make_shared<BSDF>(insect);
+            bsdf->addBXDF(specularBXDF);
+            return bsdf;
         }
 
         double Dielectric::scatterPDF(const Ray &hitRay, const Interaction &hitRecord, const Ray &scatterRay) {

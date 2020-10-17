@@ -30,7 +30,7 @@ namespace kaguya {
             }
         }
 
-        bool Sphere::hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) {
+        bool Sphere::insect(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) {
             Vector3 centerToOrigin = ray.getOrigin() - _transformedCenter;
             double c = DOT(centerToOrigin, centerToOrigin) - _radius * _radius;
             double a = pow(LENGTH(ray.getDirection()), 2);

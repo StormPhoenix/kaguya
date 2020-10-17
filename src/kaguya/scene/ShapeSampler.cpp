@@ -20,7 +20,7 @@ namespace kaguya {
             Ray ray = Ray(eye.point, dir);
             // 判断交点
             Interaction intersection;
-            if (hit(ray, intersection, 0.001, infinity)) {
+            if (insect(ray, intersection, 0.001, infinity)) {
                 // 将交点处 pdf 转化为 w_i pdf
                 double distance = LENGTH(intersection.point - ray.getOrigin());
                 double cosine = abs(DOT(dir, intersection.normal));

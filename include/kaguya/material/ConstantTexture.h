@@ -6,6 +6,8 @@
 #define KAGUYA_CONSTANTTEXTURE_H
 
 #include <kaguya/material/Texture.h>
+#include <kaguya/core/Core.h>
+#include <kaguya/core/spectrum/Spectrum.hpp>
 
 namespace kaguya {
     namespace material {
@@ -14,12 +16,12 @@ namespace kaguya {
         public:
             ConstantTexture();
 
-            ConstantTexture(const Vector3 &albedo);
+            ConstantTexture(const Spectrum &albedo);
 
-            Vector3 sample(double u, double v) override;
+            Spectrum sample(double u, double v) override;
 
         private:
-            Vector3 _albedo;
+            Spectrum _albedo;
         };
 
     }

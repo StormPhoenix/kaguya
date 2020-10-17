@@ -39,14 +39,14 @@ namespace kaguya {
                 build(objects, start, end);
             }
 
-            bool BVH::hit(const Ray &ray, Interaction &hitRecord,
-                          double stepMin, double stepMax) {
-                // 在 hit 之前，BVH 必须已经构建完毕
+            bool BVH::insect(const Ray &ray, Interaction &hitRecord,
+                             double stepMin, double stepMax) {
+                // 在 insect 之前，BVH 必须已经构建完毕
                 assert(_isValid);
 
                 if (_aabb.hit(ray, stepMin, stepMax)) {
-                    bool leftHit = _left->hit(ray, hitRecord, stepMin, stepMax);
-                    bool rightHit = _right->hit(ray, hitRecord, stepMin, leftHit ? hitRecord.step : stepMax);
+                    bool leftHit = _left->insect(ray, hitRecord, stepMin, stepMax);
+                    bool rightHit = _right->insect(ray, hitRecord, stepMin, leftHit ? hitRecord.step : stepMax);
                     return leftHit || rightHit;
                 } else {
                     return false;

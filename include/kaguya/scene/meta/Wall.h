@@ -22,7 +22,7 @@ namespace kaguya {
             Wall(double width, double height, std::shared_ptr<Material> material,
                  std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
-            virtual bool hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
+            virtual bool insect(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
 
             virtual const AABB &boundingBox() const override;
 
@@ -78,7 +78,7 @@ namespace kaguya {
 
             virtual void init() override;
 
-            virtual bool hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
+            virtual bool insect(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
 
             virtual double area() override;
 
@@ -111,7 +111,7 @@ namespace kaguya {
 
             virtual void init() override;
 
-            virtual bool hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
+            virtual bool insect(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
 
             virtual double area() override;
 
@@ -144,7 +144,7 @@ namespace kaguya {
 
             virtual void init() override;
 
-            virtual bool hit(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
+            virtual bool insect(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
 
             virtual double area() override;
 

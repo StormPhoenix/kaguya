@@ -18,19 +18,19 @@ namespace kaguya {
         public:
             Metal();
 
-            Metal(const Vector3 &albedo, double fuzzy = 0);
+            Metal(const Spectrum &albedo, double fuzzy = 0);
 
             virtual bool scatter(const Ray &ray, const Interaction &hitRecord, Ray &scatteredRay, double &pdf) override;
 
             virtual bool isSpecular() override;
 
-            virtual Vector3 brdf(const Interaction &hitRecord, const Vector3 &scatterDirection) override;
-
             virtual double scatterPDF(const Ray &hitRay, const Interaction &hitRecord, const Ray &scatterRay) override;
+
+            virtual std::shared_ptr<BSDF> bsdf(Interaction &insect) override ;
 
         private:
             // 反射率
-            Vector3 _albedo;
+            Spectrum _albedo;
             // 毛玻璃效果系数
             double _fuzzy;
             // 散射分布函数

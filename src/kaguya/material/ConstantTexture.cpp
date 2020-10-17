@@ -8,12 +8,12 @@ namespace kaguya {
     namespace material {
 
         ConstantTexture::ConstantTexture() {
-            _albedo = {0.0f, 0.0f, 0.0f};
+            _albedo = Spectrum(0.0);
         }
 
-        ConstantTexture::ConstantTexture(const Vector3 &albedo) : _albedo(albedo) {}
+        ConstantTexture::ConstantTexture(const Spectrum &albedo) : _albedo(albedo) {}
 
-        Vector3 ConstantTexture::sample(double u, double v) {
+        Spectrum ConstantTexture::sample(double u, double v) {
             return _albedo;
         }
 

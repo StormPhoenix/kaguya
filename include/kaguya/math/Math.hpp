@@ -13,6 +13,8 @@
 #include <functional>
 #include <random>
 
+// TODO 相关函数分离定义到 core 里面
+
 using Vector2 = glm::dvec2;
 using Vector3 = glm::dvec3;
 using Vector4 = glm::dvec4;
@@ -21,6 +23,7 @@ using Matrix3 = glm::dmat3x3;
 
 const double infinity = std::numeric_limits<double>::infinity();
 const double PI = 3.1415926535897932385;
+const double INV_PI = 1.0 / PI;
 const double EPSILON = 10e-6f;
 const double REFRACTION_INDEX_WATER = 1.0f;
 
@@ -75,10 +78,33 @@ inline Vector3 reflect(const Vector3 &v, const Vector3 &normal) {
     return v - 2 * DOT(v, NORMALIZE(normal)) * normal;
 }
 
+// TODO delete
 inline Vector3 refract(const Vector3 &v, const Vector3 &normal, double refraction) {
     Vector3 perpendicularToNormal = refraction * (v + (DOT(-v, normal)) * normal);
     Vector3 parallelToNormal = sqrt(1 - pow(LENGTH(perpendicularToNormal), 2)) * -normal;
     return perpendicularToNormal + parallelToNormal;
+}
+
+/**
+ * 折射 wo，如果发射全反射，则返回 false，否则返回返回 true
+ * @param wo
+ * @param normal normal 与 wo 必须在同一侧
+ * @param refraction
+ * @param wi
+ * @return
+ */
+inline bool refract(const Vector3 &wo, const Vector3 &normal, double refraction, Vector3 *wi) {
+    double cosineThetaI = DOT(wo, normal);
+    double sineThetaI = std::sqrt(std::max(0.0, 1 - cosineThetaI * cosineThetaI));
+    double sineThetaT = refraction * sineThetaI;
+    if (sineThetaT > 1) {
+        // 全反射，无法折射
+        return false;
+    }
+
+    double cosineThetaT = std::sqrt(std::max(0.0, 1 - sineThetaT * sineThetaT));
+    *wi = refraction * (-wo) + (refraction * cosineThetaI - cosineThetaT) * normal;
+    return true;
 }
 
 

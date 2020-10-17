@@ -2,7 +2,7 @@
 // Created by Storm Phoenix on 2020/9/30.
 //
 
-#include <kaguya/tracer/Camera.h>
+#include <kaguya/scene/Camera.h>
 
 namespace kaguya {
     namespace tracer {

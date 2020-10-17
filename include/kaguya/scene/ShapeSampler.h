@@ -5,6 +5,7 @@
 #ifndef KAGUYA_SHAPESAMPLER_H
 #define KAGUYA_SHAPESAMPLER_H
 
+
 #include <kaguya/math/Math.hpp>
 #include <kaguya/tracer/Ray.h>
 #include <kaguya/scene/Shape.h>

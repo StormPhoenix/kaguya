@@ -5,10 +5,13 @@
 #ifndef KAGUYA_TEXTURE_H
 #define KAGUYA_TEXTURE_H
 
+#include <kaguya/core/Core.h>
 #include <kaguya/math/Math.hpp>
 
 namespace kaguya {
     namespace material {
+
+        using kaguya::core::Spectrum;
 
         class Texture {
         public:
@@ -18,7 +21,7 @@ namespace kaguya {
              * @param v 纹理坐标 - y
              * @return
              */
-            virtual Vector3 sample(double u, double v) = 0;
+            virtual Spectrum sample(double u, double v) = 0;
         };
 
     }

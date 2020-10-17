@@ -1,0 +1,129 @@
+//
+// Created by Storm Phoenix on 2020/10/16.
+//
+
+#include <kaguya/core/bsdf/BSDF.h>
+
+namespace kaguya {
+    namespace core {
+
+        BSDF::BSDF(const Interaction &insect) {
+            // 构造切线空间
+            /* 此处的实现和 pbrt 中的实现不同，pbrt 用的是 dudp 和纹理相关，但目前没有实现纹理部分
+             * 暂时用入射光线和法线来构造切线空间*/
+            _tanY = NORMALIZE(insect.normal);
+            _tanZ = NORMALIZE(CROSS(insect.direction, _tanY));
+            _tanX = NORMALIZE(CROSS(_tanY, _tanZ));
+        }
+
+        Vector3 BSDF::toObjectSpace(const Vector3 &v) const {
+            return Vector3(DOT(_tanX, v),
+                           DOT(_tanY, v),
+                           DOT(_tanZ, v));
+        }
+
+        Vector3 BSDF::toWorldSpace(const Vector3 &v) const {
+            return Vector3(_tanX.x * v.x + _tanY.x * v.y + _tanZ.x * v.z,
+                           _tanX.y * v.x + _tanY.y * v.y + _tanZ.y * v.z,
+                           _tanX.z * v.x + _tanY.z * v.y + _tanZ.z * v.z);
+        }
+
+        void BSDF::addBXDF(std::shared_ptr<BXDF> bxdf) {
+            assert(_bxdfCount < MAX_BXDF_NUM && bxdf != nullptr);
+            _bxdfs[_bxdfCount] = bxdf;
+            _bxdfCount++;
+        }
+
+        Spectrum BSDF::f(const Vector3 &worldWo, const Vector3 &worldWi, BXDFType type) const {
+            Vector3 wo = toObjectSpace(worldWo);
+            Vector3 wi = toObjectSpace(worldWi);
+
+            bool reflect = wo.y * wi.y > 0;
+            Spectrum f = 0;
+            for (int i = 0; i < _bxdfCount; i++) {
+                if (_bxdfs[i]->typeMatch(type)) {
+                    if ((reflect && _bxdfs[i]->hasType(BSDF_REFLECTION)) ||
+                        (!reflect && _bxdfs[i]->hasType(BSDF_TRANSMISSION))) {
+                        f += _bxdfs[i]->f(wo, wi);
+                    }
+                }
+            }
+            return f;
+        }
+
+        Spectrum BSDF::sampleF(const Vector3 &worldWo, Vector3 *worldWi, double *pdf, BXDFType type) {
+            // 找到符合类型的 BXDF，并随机选择一个做 sampleF
+            int matchedCount = 0;
+            for (int i = 0; i < _bxdfCount; i++) {
+                if (_bxdfs[i] != nullptr && _bxdfs[i]->typeMatch(type)) {
+                    matchedCount++;
+                }
+            }
+
+            if (matchedCount == 0) {
+                // 没有类型被匹配上
+                return Spectrum(0.0);
+            } else {
+                std::shared_ptr<BXDF> bxdf = nullptr;
+                // 随机选取 bxdf
+                int bxdfOrder = randomInt(1, matchedCount);
+                int order = 0;
+                for (int i = 0; i < _bxdfCount; i++) {
+                    if (_bxdfs[i] != nullptr && _bxdfs[i]->typeMatch(type)) {
+                        order++;
+                        if (order == bxdfOrder) {
+                            // 找到选中的 bxdf
+                            bxdf = _bxdfs[i];
+                            break;
+                        }
+                    }
+                }
+                assert(bxdf != nullptr);
+
+                // 匹配成功，开始采样 bxdf 值
+                Vector3 wo = toObjectSpace(worldWo);
+                Vector3 wi = Vector3(0.0f);
+                double samplePdf;
+                Spectrum f = bxdf->sampleF(wo, &wi, &samplePdf);
+                // 一般来说 pdf = 0 的情况不会发生
+                if (samplePdf == 0) {
+                    return Spectrum(0.0);
+                }
+
+                // 计算最终 samplePdf
+                if (!bxdf->hasType(BSDF_SPECULAR) && matchedCount > 1) {
+                    // 如果是 specular 类型，则可以不用进行额外计算
+                    for (int i = 0; i < _bxdfCount; i++) {
+                        if (_bxdfs[i] != nullptr && _bxdfs[i] != bxdf && _bxdfs[i]->typeMatch(type)) {
+                            samplePdf += _bxdfs[i]->samplePdf(wo, wi);
+                        }
+                    }
+                }
+
+                // 计算最终 samplePdf 采用的办法是均匀在多个 BXDF 中采样，更好的办法是根据 BXDF 的分布去按照概率采样
+                if (matchedCount > 1) {
+                    samplePdf /= matchedCount;
+                }
+
+                // 计算 f 的总和
+                /* 计算 f 的总和一直觉得有问题有问题，如果处理不当 f 的加和是会大于 1 的，
+                 * 参考 pbrt 中 MixMaterial 中的方法，当多个 BXDF 加在一起是会进行加权的 */
+                if (!bxdf->hasType(BSDF_SPECULAR)) {
+                    for (int i = 0; i < _bxdfCount; i++) {
+                        bool reflect = wi.y * wo.y > 0 ? true : false;
+                        if (_bxdfs[i] != nullptr && _bxdfs[i] != bxdf) {
+                            if ((reflect && _bxdfs[i]->hasType(BSDF_REFLECTION)) ||
+                                (!reflect && _bxdfs[i]->hasType(BSDF_TRANSMISSION))) {
+                                f += _bxdfs[i]->f(wo, wi);
+                            }
+                        }
+                    }
+                }
+                (*worldWi) = toWorldSpace(wi);
+                (*pdf) = samplePdf;
+                return f;
+            }
+        }
+
+    }
+}

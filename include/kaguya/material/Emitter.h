@@ -19,9 +19,9 @@ namespace kaguya {
 
             virtual bool scatter(const Ray &ray, const Interaction &hitRecord, Ray &scatteredRay, double &pdf) override;
 
-            virtual Vector3 brdf(const Interaction &hitRecord, const Vector3 &scatterDirection) override;
-
             virtual double scatterPDF(const Ray &hitRay, const Interaction &hitRecord, const Ray &scatterRay) override;
+
+            virtual std::shared_ptr<BSDF> bsdf(Interaction &insect) override;
 
             /**
              * TODO delete
@@ -31,7 +31,7 @@ namespace kaguya {
                 return true;
             }
 
-            virtual Vector3 emitted(double u, double v) override;
+            virtual Spectrum emitted(double u, double v) override;
 
         protected:
             std::shared_ptr<Texture> _albedo = nullptr;
