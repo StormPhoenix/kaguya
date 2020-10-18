@@ -18,6 +18,9 @@ namespace kaguya {
 
     class Config {
     public:
+        static int beginRussianRouletteBounce;
+        // 终止概率
+        static double russianRoulette;
         // 最大散射深度
         static int maxScatterDepth;
         // 每像素采样次数
@@ -37,9 +40,9 @@ namespace kaguya {
         // TODO 测试
         static std::shared_ptr<Scene> testBuildScene() {
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-            scene->testBuildCornelBoxWithBunny();
+//            scene->testBuildCornelBoxWithBunny();
 //            scene->testBuildCornelBox();
-//            scene->testBuildEmptyCornelBox();
+            scene->testBuildEmptyCornelBox();
             return scene;
         }
     };

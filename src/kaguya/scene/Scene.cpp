@@ -327,9 +327,9 @@ namespace kaguya {
 
             // light spectrum
             Spectrum lightSpectrum = Spectrum(0.0);
-            lightSpectrum.r(double(249.0) / 255.0 * 10);
-            lightSpectrum.g(double(222.0) / 255.0 * 10);
-            lightSpectrum.b(double(180.0) / 255.0 * 10);
+            lightSpectrum.r(double(249.0) / 255.0 * 15);
+            lightSpectrum.g(double(222.0) / 255.0 * 15);
+            lightSpectrum.b(double(180.0) / 255.0 * 15);
             std::shared_ptr<Texture> lightAlbedo = std::make_shared<ConstantTexture>(lightSpectrum);
 
             // lambertian materials

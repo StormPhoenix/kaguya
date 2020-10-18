@@ -45,9 +45,9 @@ namespace kaguya {
             bool reflect = wo.y * wi.y > 0;
             Spectrum f = 0;
             for (int i = 0; i < _bxdfCount; i++) {
-                if (_bxdfs[i]->typeMatch(type)) {
-                    if ((reflect && _bxdfs[i]->hasType(BSDF_REFLECTION)) ||
-                        (!reflect && _bxdfs[i]->hasType(BSDF_TRANSMISSION))) {
+                if (_bxdfs[i]->belongToType(type)) {
+                    if ((reflect && _bxdfs[i]->containType(BSDF_REFLECTION)) ||
+                        (!reflect && _bxdfs[i]->containType(BSDF_TRANSMISSION))) {
                         f += _bxdfs[i]->f(wo, wi);
                     }
                 }
@@ -55,17 +55,21 @@ namespace kaguya {
             return f;
         }
 
-        Spectrum BSDF::sampleF(const Vector3 &worldWo, Vector3 *worldWi, double *pdf, BXDFType type) {
+        Spectrum BSDF::sampleF(const Vector3 &worldWo, Vector3 *worldWi, double *pdf,
+                               BXDFType type, BXDFType *sampleType) {
             // 找到符合类型的 BXDF，并随机选择一个做 sampleF
             int matchedCount = 0;
             for (int i = 0; i < _bxdfCount; i++) {
-                if (_bxdfs[i] != nullptr && _bxdfs[i]->typeMatch(type)) {
+                if (_bxdfs[i] != nullptr && _bxdfs[i]->belongToType(type)) {
                     matchedCount++;
                 }
             }
 
             if (matchedCount == 0) {
                 // 没有类型被匹配上
+                if (sampleType != nullptr) {
+                    *sampleType = BXDFType(0);
+                }
                 return Spectrum(0.0);
             } else {
                 std::shared_ptr<BXDF> bxdf = nullptr;
@@ -73,7 +77,7 @@ namespace kaguya {
                 int bxdfOrder = randomInt(1, matchedCount);
                 int order = 0;
                 for (int i = 0; i < _bxdfCount; i++) {
-                    if (_bxdfs[i] != nullptr && _bxdfs[i]->typeMatch(type)) {
+                    if (_bxdfs[i] != nullptr && _bxdfs[i]->belongToType(type)) {
                         order++;
                         if (order == bxdfOrder) {
                             // 找到选中的 bxdf
@@ -83,6 +87,9 @@ namespace kaguya {
                     }
                 }
                 assert(bxdf != nullptr);
+                if (sampleType != nullptr) {
+                    *sampleType = bxdf->type;
+                }
 
                 // 匹配成功，开始采样 bxdf 值
                 Vector3 wo = toObjectSpace(worldWo);
@@ -95,10 +102,10 @@ namespace kaguya {
                 }
 
                 // 计算最终 samplePdf
-                if (!bxdf->hasType(BSDF_SPECULAR) && matchedCount > 1) {
+                if (!bxdf->containType(BSDF_SPECULAR) && matchedCount > 1) {
                     // 如果是 specular 类型，则可以不用进行额外计算
                     for (int i = 0; i < _bxdfCount; i++) {
-                        if (_bxdfs[i] != nullptr && _bxdfs[i] != bxdf && _bxdfs[i]->typeMatch(type)) {
+                        if (_bxdfs[i] != nullptr && _bxdfs[i] != bxdf && _bxdfs[i]->belongToType(type)) {
                             samplePdf += _bxdfs[i]->samplePdf(wo, wi);
                         }
                     }
@@ -112,12 +119,12 @@ namespace kaguya {
                 // 计算 f 的总和
                 /* 计算 f 的总和一直觉得有问题有问题，如果处理不当 f 的加和是会大于 1 的，
                  * 参考 pbrt 中 MixMaterial 中的方法，当多个 BXDF 加在一起是会进行加权的 */
-                if (!bxdf->hasType(BSDF_SPECULAR)) {
+                if (!bxdf->containType(BSDF_SPECULAR)) {
                     for (int i = 0; i < _bxdfCount; i++) {
                         bool reflect = wi.y * wo.y > 0 ? true : false;
                         if (_bxdfs[i] != nullptr && _bxdfs[i] != bxdf) {
-                            if ((reflect && _bxdfs[i]->hasType(BSDF_REFLECTION)) ||
-                                (!reflect && _bxdfs[i]->hasType(BSDF_TRANSMISSION))) {
+                            if ((reflect && _bxdfs[i]->containType(BSDF_REFLECTION)) ||
+                                (!reflect && _bxdfs[i]->containType(BSDF_TRANSMISSION))) {
                                 f += _bxdfs[i]->f(wo, wi);
                             }
                         }
@@ -141,12 +148,22 @@ namespace kaguya {
             double pdf = 0.0f;
             int matchCount = 0;
             for (int i = 0; i < _bxdfCount; ++i)
-                if (_bxdfs[i]->typeMatch(type)) {
+                if (_bxdfs[i]->belongToType(type)) {
                     matchCount++;
                     pdf += _bxdfs[i]->samplePdf(wo, wi);
                 }
             pdf = matchCount > 0 ? pdf / matchCount : 0.f;
             return pdf;
+        }
+
+        int BSDF::belongToType(BXDFType bxdfType) {
+            int ans = 0;
+            for (int i = 0; i < _bxdfCount; i++) {
+                if (_bxdfs[i]->belongToType(bxdfType)) {
+                    ans++;
+                }
+            }
+            return ans;
         }
     }
 }

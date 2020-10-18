@@ -28,11 +28,11 @@ namespace kaguya {
             }
         }
 
-        bool BXDF::typeMatch(const BXDFType bxdfType) {
+        bool BXDF::belongToType(const BXDFType bxdfType) {
             return (type & bxdfType) == type;
         }
 
-        bool BXDF::hasType(const BXDFType bxdfType) {
+        bool BXDF::containType(const BXDFType bxdfType) {
             return (type & bxdfType) == bxdfType;
         }
 

@@ -5,6 +5,8 @@
 #ifndef KAGUYA_LIGHT_H
 #define KAGUYA_LIGHT_H
 
+#include <kaguya/core/Core.h>
+#include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/scene/ShapeSampler.h>
 #include <kaguya/material/Emitter.h>
 
@@ -12,6 +14,7 @@ namespace kaguya {
     namespace scene {
 
         using kaguya::material::Emitter;
+        using kaguya::core::Spectrum;
 
         class Light : public ShapeSampler {
         public:
@@ -50,6 +53,8 @@ namespace kaguya {
              * @return 采样射线的 PDF
              */
             virtual double rayPdf(const Ray &sampleRay);
+
+            virtual Spectrum luminance(double u, double v);
 
         protected:
             /**

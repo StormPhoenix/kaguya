@@ -42,6 +42,7 @@ namespace kaguya {
             }
 
             /**
+             * TODO delete 逐渐删除 isSpecular
              * 是否具有反光、折射属性
              * @return
              */

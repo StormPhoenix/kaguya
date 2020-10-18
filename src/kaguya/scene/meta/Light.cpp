@@ -67,5 +67,10 @@ namespace kaguya {
             eye.point = sampleRay.getOrigin();
             return pdf(eye, NORMALIZE(sampleRay.getDirection()));
         }
+
+        Spectrum Light::luminance(double u, double v) {
+            assert(_emitter != nullptr);
+            return _emitter->emitted(u, v);
+        }
     }
 }

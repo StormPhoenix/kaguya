@@ -48,7 +48,7 @@ namespace kaguya {
              */
             Spectrum shader(const Ray &ray, Scene &scene, int depth);
 
-            Spectrum shader2(const Ray &ray, Scene &scene, int depth);
+            Spectrum shader2(const Ray &ray, Scene &scene);
 
             /**
              * 获取背景颜色，这里可以用来设置背景贴图
@@ -81,6 +81,10 @@ namespace kaguya {
             int _maxDepth = 100;
             // 每个像素采样次数
             int _samplePerPixel = 300;
+            // 开始 Russian Roulette 时机
+            int _russianRouletteBounce;
+            // Russian Roulette 概率
+            double _russianRoulette;
             // 对光源采样概率
             double _sampleLightProb = 0.2;
             // 渲染结果位图

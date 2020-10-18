@@ -32,11 +32,42 @@ namespace kaguya {
              */
             Vector3 toWorldSpace(const Vector3 &v) const;
 
+            /**
+             * 计算 f(p, wi, wo)
+             * @param worldWo
+             * @param worldWi
+             * @param type
+             * @return
+             */
             Spectrum f(const Vector3 &worldWo, const Vector3 &worldWi, BXDFType type = BSDF_ALL) const;
 
-            Spectrum sampleF(const Vector3 &worldWo, Vector3 *worldWi, double *pdf, BXDFType type = BSDF_ALL);
+            /**
+             * 随机采样 worldWi f(p, wo, wi)
+             * @param worldWo
+             * @param worldWi
+             * @param pdf
+             * @param type
+             * @param sampleType 返回采样的 BXDF 类型
+             * @return
+             */
+            Spectrum sampleF(const Vector3 &worldWo, Vector3 *worldWi, double *pdf,
+                             BXDFType type = BSDF_ALL, BXDFType *sampleType = nullptr);
 
+            /**
+             * 计算 worldWi worldWo 的采样概率
+             * @param worldWo
+             * @param worldWi
+             * @param type
+             * @return
+             */
             double samplePdf(const Vector3 &worldWo, const Vector3 &worldWi, BXDFType type = BSDF_ALL) const;
+
+            /**
+             * 计算有多少个 bxdfType 类型的材质
+             * @param bxdfType
+             * @return
+             */
+            int belongToType(BXDFType bxdfType);
 
         private:
             int _bxdfCount = 0;

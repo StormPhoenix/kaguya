@@ -5,9 +5,11 @@
 #include <kaguya/Config.h>
 
 namespace kaguya {
+    int Config::beginRussianRouletteBounce = 5;
+    double Config::russianRoulette = 0.1;
     int Config::maxScatterDepth = 50;
-    int Config::samplePerPixel = 200;
+    int Config::samplePerPixel = 100;
     double Config::sampleLightProb = 0.3f;
-    int Config::resolutionWidth = 700;
-    int Config::resolutionHeight = 700;
+    int Config::resolutionWidth = 400;
+    int Config::resolutionHeight = 400;
 }

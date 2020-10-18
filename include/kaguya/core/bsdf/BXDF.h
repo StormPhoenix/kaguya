@@ -59,14 +59,14 @@ namespace kaguya {
              * @param bxdfType
              * @return
              */
-            bool typeMatch(const BXDFType bxdfType);
+            bool belongToType(const BXDFType bxdfType);
 
             /**
              * 判断自身是否包含 bxdfType
              * @param bxdfType
              * @return
              */
-            bool hasType(const BXDFType bxdfType);
+            bool containType(const BXDFType bxdfType);
         private:
             /**
              * 默认半球采样函数

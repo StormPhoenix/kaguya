@@ -28,26 +28,108 @@ namespace kaguya {
             _samplePerPixel = Config::samplePerPixel;
             _sampleLightProb = Config::sampleLightProb;
             _maxDepth = Config::maxScatterDepth;
+            _russianRouletteBounce = Config::beginRussianRouletteBounce;
+            _russianRoulette = Config::russianRoulette;
         }
 
 
-        Spectrum PathTracer::shader2(const kaguya::tracer::Ray &ray, kaguya::Scene &scene, int depth) {
-            // intersect
+        Spectrum PathTracer::shader2(const kaguya::tracer::Ray &ray, kaguya::Scene &scene) {
+            // 最终渲染结果
+            Spectrum shaderColor = Spectrum(0);
+            // 光线是否是 delta distribution
+            bool isSpecular = false;
+            // 保存历次反射计算的 (f(p, wi, wo) * G(wo, wi)) / p(wi)
+            Spectrum beta = 1.0;
+            // 散射光线
+            Ray scatterRay = ray;
 
-            // 求交点
+            // TODO 依然只考虑一个光源的情况
+            const std::shared_ptr<Light> light = scene.getLight();
+            assert(light != nullptr);
 
-            // 判断上次 step 是否有采样 light
-            // 若没有则采样交点 / 背景
+            // 最多进行 _maxDepth 次数弹射
+            // TODO 修改 Russian Roulette，不设置终止条件
+            for (int bounce = 0; bounce < _maxDepth; bounce++) {
+                // intersect
+                Interaction intersection;
+                bool isIntersected = scene.hit(scatterRay, intersection);
 
-            // 判断反射终止条件 没有击中 / 超过反射深度 / 或者击中的是光源
+                // 此处参考 pbrt 的写法，需要判断 bounce = 0 和 isSpecular 两种特殊情况
+                if (bounce == 0 || isSpecular) {
+                    if (isIntersected) {
+                        assert(intersection.material != nullptr);
+                        // 如果有交点，则直接从交点上取值
+                        shaderColor += (beta * intersection.material->emitted(intersection.u, intersection.v));
+                        // 判断交点是否是光源
+                        if (intersection.material->isLight()) {
+                            break;
+                        }
+                    } else {
+                        shaderColor += (beta * background(scatterRay));
+                        break;
+                    }
+                }
 
-            // 计算 BSDF
+                // 终止条件判断
+                if (!isIntersected) {
+                    break;
+                }
 
-            // 判断是否是 specular
-            // 不是则采样 light
+                // 判断击中的是否是光源
+                if (intersection.material->isLight()) {
+                    shaderColor += (beta * intersection.material->emitted(intersection.u, intersection.v));
+                    break;
+                }
 
-            // 计算 beta / 新射线
-            return Spectrum(0);
+                std::shared_ptr<Material> material = intersection.material;
+                assert(material != nullptr);
+
+                std::shared_ptr<BSDF> bsdf = material->bsdf(intersection);
+                assert(bsdf != nullptr);
+
+                // 判断是否向光源采样
+                if (bsdf->belongToType(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
+                    // TODO 依然没有考虑到 shadow ray 是否可以击中光源的情况
+                    Ray shadowRay;
+                    // p(wi)
+                    double shadowRayPdf = 0;
+                    light->sampleRay(intersection.point, shadowRay);
+                    shadowRayPdf = light->rayPdf(shadowRay);
+
+                    // cosine
+                    double cosine = std::abs(DOT(intersection.normal, shadowRay.getDirection()));
+
+                    // f(p, wo, wi)
+                    Spectrum f = bsdf->f(-scatterRay.getDirection(), shadowRay.getDirection());
+
+                    shaderColor += (beta * f * cosine / shadowRayPdf *
+                                    light->luminance(intersection.u, intersection.v));
+                }
+
+                // 计算下一次反射
+                Vector3 worldWo = -scatterRay.getDirection();
+                Vector3 worldWi = Vector3(0.0);
+                // 材质反射类型
+                BXDFType bxdfType;
+                // p(wi)
+                double samplePdf = 0;
+                // f(p, wo, wi)
+                Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, BSDF_ALL, &bxdfType);
+                // cosine
+                double cosine = std::abs(DOT(intersection.normal, NORMALIZE(worldWi)));
+                // 计算 beta
+                beta *= (f * cosine / samplePdf);
+                // 设置下一次打击光线
+                scatterRay.setOrigin(intersection.point);
+                scatterRay.setDirection(NORMALIZE(worldWi));
+
+                isSpecular = (bxdfType & BSDF_SPECULAR) > 0;
+
+                if (bounce > _russianRouletteBounce && uniformSample() < _russianRoulette) {
+                    beta /= (1 - _russianRoulette);
+                }
+            }
+            return shaderColor;
         }
 
         Spectrum PathTracer::shader(const Ray &ray, Scene &scene, int depth) {
@@ -171,6 +253,7 @@ namespace kaguya {
                             // 发射采样光线，开始渲染
                             Ray sampleRay = _camera->sendRay(u, v);
                             ans += shader(sampleRay, *_scene, 0);
+//                            ans += shader2(sampleRay, *_scene);
                         }
                         ans *= sampleWeight;
                         // TODO 写入渲染结果，用更好的方式写入
