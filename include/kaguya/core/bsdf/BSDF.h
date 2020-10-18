@@ -36,6 +36,8 @@ namespace kaguya {
 
             Spectrum sampleF(const Vector3 &worldWo, Vector3 *worldWi, double *pdf, BXDFType type = BSDF_ALL);
 
+            double samplePdf(const Vector3 &worldWo, const Vector3 &worldWi, BXDFType type = BSDF_ALL) const;
+
         private:
             int _bxdfCount = 0;
             // 存储 bxdf

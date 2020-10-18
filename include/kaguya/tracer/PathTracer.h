@@ -51,20 +51,6 @@ namespace kaguya {
             Spectrum shader2(const Ray &ray, Scene &scene, int depth);
 
             /**
-             * TODO 重构
-             * 渲染公式
-             * @param scatterPdf 散射概率
-             * @param samplePdf 采样概率
-             * @param bsdf bidirectional scatter distribution function
-             * @param scatterRay 散射光线
-             * @param scene 场景
-             * @param depth 迭代深度
-             * @return
-             */
-            Spectrum computeShaderColor(double scatterPdf, double samplePdf,
-                                       Spectrum bsdf, Ray &scatterRay, Scene &scene, int depth);
-
-            /**
              * 获取背景颜色，这里可以用来设置背景贴图
              * @param ray
              * @return

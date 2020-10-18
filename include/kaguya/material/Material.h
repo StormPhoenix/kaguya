@@ -28,31 +28,10 @@ namespace kaguya {
         class Material {
         public:
             /**
-             * 依据材质表面散射方向分布 PDF，生成一条散射光线
-             * @param ray 入射光线
-             * @param hitRecord 击中位置记录
-             * @param scatteredRay 散射方向
-             * @param pdf scatteredRay 散射方向的采样概率
-             * @return 是否发生散射
-             */
-            virtual bool scatter(const Ray &ray, const Interaction &hitRecord, Ray &scatteredRay, double &pdf) = 0;
-
-            /**
              * 计算材质的 bsdf
              * @param insect ray 与 shape 的相交点
              */
             virtual std::shared_ptr<BSDF> bsdf(Interaction &insect) = 0;
-
-            /**
-             * 材质表面散射方向分布 PDF
-             * @param hitRay
-             * @param hitRecord
-             * @param scatterRay
-             * @return 分布概率密度
-             */
-            virtual double scatterPDF(const Ray &hitRay, const Interaction &hitRecord, const Ray &scatterRay) {
-                return 0;
-            }
 
             /**
              * TODO delete

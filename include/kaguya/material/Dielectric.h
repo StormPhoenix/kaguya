@@ -22,10 +22,6 @@ namespace kaguya {
 
             virtual bool isSpecular() override;
 
-            virtual bool scatter(const Ray &ray, const Interaction &hitRecord, Ray &scatteredRay, double &pdf) override;
-
-            virtual double scatterPDF(const Ray &hitRay, const Interaction &hitRecord, const Ray &scatterRay) override;
-
             virtual std::shared_ptr<BSDF> bsdf(Interaction &insect) override;
 
 
@@ -33,8 +29,6 @@ namespace kaguya {
             double _refractiveIndex;
 
             std::shared_ptr<Texture> _albedo = nullptr;
-
-            std::shared_ptr<ScatterSampler> _pdf = nullptr;
         };
 
     }

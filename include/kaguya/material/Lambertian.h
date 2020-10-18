@@ -20,10 +20,6 @@ namespace kaguya {
         public:
             Lambertian(std::shared_ptr<Texture> albedo);
 
-            double scatterPDF(const Ray &hitRay, const Interaction &hitRecord, const Ray &scatterRay) override;
-
-            bool scatter(const Ray &ray, const Interaction &hitRecord, Ray &scatteredRay, double &pdf) override;
-
             virtual std::shared_ptr<BSDF> bsdf(Interaction &insect) override;
 
         private:

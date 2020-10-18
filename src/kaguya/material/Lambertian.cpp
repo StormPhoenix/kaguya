@@ -21,16 +21,6 @@ namespace kaguya {
 //            _pdf = std::make_shared<HemiUniformSampler>();
         }
 
-        double Lambertian::scatterPDF(const Ray &hitRay, const Interaction &hitRecord, const Ray &scatterRay) {
-            return _pdf->pdf(hitRay.getDirection(), hitRecord.normal, scatterRay.getDirection());
-        }
-
-        bool Lambertian::scatter(const Ray &ray, const Interaction &hitRecord, Ray &scatteredRay, double &pdf) {
-            scatteredRay.setOrigin(hitRecord.point);
-            scatteredRay.setDirection(_pdf->sample(ray.getDirection(), hitRecord.normal, pdf));
-            return true;
-        }
-
         std::shared_ptr<BSDF> Lambertian::bsdf(Interaction &insect) {
             Spectrum albedo = _albedo->sample(insect.u, insect.v);
             std::shared_ptr<BXDFLambertianReflection> lambertianBXDF =

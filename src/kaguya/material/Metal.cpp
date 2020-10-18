@@ -26,16 +26,6 @@ namespace kaguya {
             return true;
         }
 
-        bool Metal::scatter(const Ray &ray, const Interaction &hitRecord, Ray &scatteredRay, double &pdf) {
-            scatteredRay.setOrigin(hitRecord.point);
-            scatteredRay.setDirection(_pdf->sample(ray.getDirection(), hitRecord.normal, pdf));
-            return true;
-        }
-
-        double Metal::scatterPDF(const Ray &hitRay, const Interaction &hitRecord, const Ray &scatterRay) {
-            return _pdf->pdf(hitRay.getDirection(), hitRecord.normal, scatterRay.getDirection());
-        }
-
         std::shared_ptr<BSDF> Metal::bsdf(Interaction &insect) {
             std::shared_ptr<FresnelDefault> fresnel = std::make_shared<FresnelDefault>();
             std::shared_ptr<BXDFSpecularReflection> bxdf = std::make_shared<BXDFSpecularReflection>(_albedo, fresnel);

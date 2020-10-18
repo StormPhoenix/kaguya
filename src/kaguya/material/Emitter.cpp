@@ -12,14 +12,6 @@ namespace kaguya {
 
         Emitter::Emitter(std::shared_ptr<Texture> albedo) : _albedo(albedo) {}
 
-        bool Emitter::scatter(const Ray &ray, const Interaction &hitRecord, Ray &scatteredRay, double &pdf) {
-            return false;
-        }
-
-        double Emitter::scatterPDF(const Ray &hitRay, const Interaction &hitRecord, const Ray &scatterRay) {
-            return 0;
-        }
-
         std::shared_ptr<BSDF> Emitter::bsdf(kaguya::core::Interaction &insect) {
             return nullptr;
         }

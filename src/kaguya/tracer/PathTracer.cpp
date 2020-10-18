@@ -58,7 +58,6 @@ namespace kaguya {
                 Interaction hitRecord;
                 if (scene.hit(ray, hitRecord)) {
                     // 击中，检查击中材质
-                    // TODO
                     std::shared_ptr<Material> material = hitRecord.material;
                     if (material->isLight()) {
                         // 发光物体
@@ -68,7 +67,7 @@ namespace kaguya {
                         // 若对光源采样，则记录采样射线
                         Ray scatterRay;
                         // 若对光源采样，则记录采样概率
-                        double samplePdf;
+                        double samplePdf = 0;
 
                         if (!material->isSpecular() &&
                             sampleFromLights(scene, hitRecord.point, scatterRay, samplePdf)) {
@@ -79,46 +78,34 @@ namespace kaguya {
                             }
 
                             // 对非光源采样进行加权
-                            double scatterPdf = material->scatterPDF(ray, hitRecord, scatterRay);
+                            double scatterPdf = bsdf->samplePdf(-ray.getDirection(), scatterRay.getDirection());
                             samplePdf = _sampleLightProb * samplePdf + (1 - _sampleLightProb) * scatterPdf;
-
 
                             Spectrum f = bsdf->f(NORMALIZE(-ray.getDirection()), NORMALIZE(scatterRay.getDirection()));
                             Spectrum shaderColor =
                                     std::abs(DOT(hitRecord.normal, scatterRay.getDirection())) * f /
                                     samplePdf * shader(scatterRay, scene, depth + 1);
+
                             return material->emitted(hitRecord.u, hitRecord.v) + shaderColor;
                         } else {
-                            if (hitRecord.id == 1) {
-                                int a = 0;
-                                a++;
-                            }
-
                             std::shared_ptr<BSDF> bsdf = material->bsdf(hitRecord);
                             Vector3 worldWo = -ray.getDirection();
                             Vector3 worldWi = Vector3(0.0);
-                            double samplePdf = 0;
                             Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf);
-
-                            if (samplePdf == 0 || f.isBlack()) {
-                                return material->emitted(hitRecord.u, hitRecord.v);
-                            }
+                            scatterRay.setOrigin(hitRecord.point);
+                            scatterRay.setDirection(NORMALIZE(worldWi));
 
                             // TODO 区分反射种类
                             if (!material->isSpecular()) {
                                 // TODO 目前只考虑单光源的情况
                                 std::shared_ptr<Light> light = scene.getLight();
-                                // TODO delete
-                                double tempPdf = light->rayPdf(scatterRay);
                                 samplePdf = (1 - _sampleLightProb) * samplePdf +
-                                            _sampleLightProb * tempPdf;
+                                            _sampleLightProb * light->rayPdf(scatterRay);
                             }
 
                             double cosine = std::abs(DOT(hitRecord.normal, NORMALIZE(worldWi)));
-
-                            scatterRay.setOrigin(hitRecord.point);
-                            scatterRay.setDirection(worldWi);
-                            Spectrum shaderColor = f * cosine / samplePdf * shader(scatterRay, scene, depth + 1);
+                            Spectrum shaderColor = cosine * f / samplePdf *
+                                                   shader(scatterRay, scene, depth + 1);
                             return material->emitted(hitRecord.u, hitRecord.v) + shaderColor;
                         }
                     }
@@ -130,11 +117,6 @@ namespace kaguya {
                 // 停止散射
                 return Spectrum(0.0f);
             }
-        }
-
-        Spectrum PathTracer::computeShaderColor(double scatterPdf, double samplePdf, Spectrum brdf, Ray &scatterRay,
-                                                kaguya::Scene &scene, int depth) {
-            return brdf * scatterPdf * shader(scatterRay, scene, depth) / samplePdf;
         }
 
         bool PathTracer::sampleFromLights(Scene &scene, Vector3 sampleObject, Ray &sampleLightRay,
@@ -183,7 +165,6 @@ namespace kaguya {
 
                         // 做 _samplePerPixel 次采样
                         for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
-
                             auto u = (col + uniformSample()) / cameraWidth;
                             auto v = (row + uniformSample()) / cameraHeight;
 

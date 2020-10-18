@@ -6,8 +6,8 @@
 
 namespace kaguya {
     int Config::maxScatterDepth = 50;
-    int Config::samplePerPixel = 300;
-    double Config::sampleLightProb = 0.2f;
+    int Config::samplePerPixel = 200;
+    double Config::sampleLightProb = 0.3f;
     int Config::resolutionWidth = 700;
     int Config::resolutionHeight = 700;
 }

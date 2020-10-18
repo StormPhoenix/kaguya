@@ -11,7 +11,11 @@ namespace kaguya {
             // 构造切线空间
             /* 此处的实现和 pbrt 中的实现不同，pbrt 用的是 dudp 和纹理相关，但目前没有实现纹理部分
              * 暂时用入射光线和法线来构造切线空间*/
-            _tanY = NORMALIZE(insect.normal);
+            if (insect.isFrontFace) {
+                _tanY = NORMALIZE(insect.normal);
+            } else {
+                _tanY = NORMALIZE(-insect.normal);
+            }
             _tanZ = NORMALIZE(CROSS(insect.direction, _tanY));
             _tanX = NORMALIZE(CROSS(_tanY, _tanZ));
         }
@@ -125,5 +129,24 @@ namespace kaguya {
             }
         }
 
+        double BSDF::samplePdf(const Vector3 &worldWo, const Vector3 &worldWi, BXDFType type) const {
+            if (_bxdfCount == 0) {
+                return 0.f;
+            }
+            Vector3 wo = toObjectSpace(worldWo);
+            Vector3 wi = toObjectSpace(worldWi);
+            if (std::abs(wo.y - 0) < EPSILON) {
+                return 0.0;
+            }
+            double pdf = 0.0f;
+            int matchCount = 0;
+            for (int i = 0; i < _bxdfCount; ++i)
+                if (_bxdfs[i]->typeMatch(type)) {
+                    matchCount++;
+                    pdf += _bxdfs[i]->samplePdf(wo, wi);
+                }
+            pdf = matchCount > 0 ? pdf / matchCount : 0.f;
+            return pdf;
+        }
     }
 }

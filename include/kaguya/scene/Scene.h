@@ -31,6 +31,11 @@ namespace kaguya {
              */
             void testBuildCornelBoxWithBunny();
 
+            /**
+             * 空 Cornel box
+             */
+            void testBuildEmptyCornelBox();
+
             bool hit(const Ray &ray, Interaction &hitRecord);
 
             std::shared_ptr<Shape> getWorld() {
