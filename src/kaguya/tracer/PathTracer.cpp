@@ -110,7 +110,7 @@ namespace kaguya {
                                 double cosine = std::abs(DOT(intersection.normal, shadowRay.getDirection()));
                                 // f(p, wo, wi)
                                 Spectrum f = bsdf->f(-scatterRay.getDirection(), shadowRay.getDirection());
-                                // shaderOfRecursion spectrum
+                                // shader spectrum
                                 shaderColor += (beta * f * cosine / shadowRayPdf *
                                                 light->luminance(intersection.u, intersection.v));
                             }
@@ -127,6 +127,11 @@ namespace kaguya {
                 double samplePdf = 0;
                 // f(p, wo, wi)
                 Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, BSDF_ALL, &bxdfType);
+                if (std::abs(samplePdf - 0) < EPSILON) {
+                    int a = 0;
+                    a++;
+                }
+
                 // cosine
                 double cosine = std::abs(DOT(intersection.normal, NORMALIZE(worldWi)));
                 // 计算 beta
@@ -199,7 +204,7 @@ namespace kaguya {
 
                             double cosine = std::abs(DOT(hitRecord.normal, NORMALIZE(worldWi)));
                             Spectrum shaderColor = cosine * f / samplePdf *
-                                    shaderOfRecursion(scatterRay, scene, depth + 1);
+                                                   shaderOfRecursion(scatterRay, scene, depth + 1);
                             return material->emitted(hitRecord.u, hitRecord.v) + shaderColor;
                         }
                     }
@@ -262,11 +267,11 @@ namespace kaguya {
 
                         // 做 _samplePerPixel 次采样
                         for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
-//                            auto u = (col + uniformSample()) / cameraWidth;
-//                            auto v = (row + uniformSample()) / cameraHeight;
+                            auto u = (col + uniformSample()) / cameraWidth;
+                            auto v = (row + uniformSample()) / cameraHeight;
 
-                            auto u = (col + uniformSample() * 0.5) / cameraWidth;
-                            auto v = (row + uniformSample() * 0.5) / cameraHeight;
+//                            auto u = (col + uniformSample() * 0.5) / cameraWidth;
+//                            auto v = (row + uniformSample() * 0.5) / cameraHeight;
 
                             // 发射采样光线，开始渲染
                             Ray sampleRay = _camera->sendRay(u, v);

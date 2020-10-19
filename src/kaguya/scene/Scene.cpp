@@ -109,7 +109,7 @@ namespace kaguya {
             std::shared_ptr<Shape> metalSphere = std::make_shared<Sphere>(Vector3(-125, -149, 100), 100, metal);
 
             // light
-            std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(-100, 100, -100, 100, 248, false,
+            std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(-100, 100, -100, 100, 245, false,
                                                                                nullptr);
 
             std::shared_ptr<Light> light = std::make_shared<Light>(lightMaterial, lightWall);
@@ -123,8 +123,8 @@ namespace kaguya {
             *transformMatrix = TRANSLATE(*transformMatrix, Vector3(-scale / 2, -scale / 2, -scale / 2));
             *transformMatrix = SCALE(*transformMatrix, Vector3(scale, scale, scale));
             std::shared_ptr<Shape> bunny = std::static_pointer_cast<Shape>(
-                    std::make_shared<TriangleMesh>(bunnyVertexes, lambertTop, transformMatrix));
-//                    std::make_shared<TriangleMesh>(bunnyVertexes, glass, transformMatrix));
+//                    std::make_shared<TriangleMesh>(bunnyVertexes, lambertTop, transformMatrix));
+                    std::make_shared<TriangleMesh>(bunnyVertexes, glass, transformMatrix));
 //                    std::make_shared<TriangleMesh>(bunnyVertexes, metal, transformMatrix));
 
 

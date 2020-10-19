@@ -8,6 +8,7 @@
 #define RGB_SPECTRUM
 
 #include <kaguya/math/Math.hpp>
+#include <memory>
 
 namespace kaguya {
     namespace core {

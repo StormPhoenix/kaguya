@@ -1,7 +1,7 @@
 # Project
 /cmake-build-debug
 /output
-/resource
+#/resource
 
 # IDE
 /.idea

@@ -55,10 +55,17 @@ inline bool checkRange(double num, double min, double max) {
 inline double schlick(double cosine, double ref_idx) {
     if (cosine < 0) {
         ref_idx = 1 / ref_idx;
+        cosine = -cosine;
     }
+
+    double sine = std::sqrt(std::max(0.0, 1 - std::pow(cosine, 2)));
+    if (sine * ref_idx >= 1) {
+        return 1.0;
+    }
+
     auto r0 = (1 - ref_idx) / (1 + ref_idx);
     r0 = r0 * r0;
-    return r0 + (1 - r0) * pow((1 - std::abs(cosine)), 5);
+    return r0 + (1 - r0) * pow((1 - cosine), 5);
 }
 
 inline double uniformSample() {
@@ -79,13 +86,6 @@ inline int randomInt(int min, int max) {
 
 inline Vector3 reflect(const Vector3 &v, const Vector3 &normal) {
     return v - 2 * DOT(v, NORMALIZE(normal)) * normal;
-}
-
-// TODO delete
-inline Vector3 refract(const Vector3 &v, const Vector3 &normal, double refraction) {
-    Vector3 perpendicularToNormal = refraction * (v + (DOT(-v, normal)) * normal);
-    Vector3 parallelToNormal = sqrt(1 - pow(LENGTH(perpendicularToNormal), 2)) * -normal;
-    return perpendicularToNormal + parallelToNormal;
 }
 
 /**

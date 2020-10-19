@@ -24,7 +24,6 @@ namespace kaguya {
                   _normal1(normal1), _normal2(normal2), _normal3(normal3),
                   _uv1(uv1), _uv2(uv2), _uv3(uv3),
                   _material(material), _transformMatrix(transformMatrix) {
-
             init();
         }
 
@@ -38,6 +37,7 @@ namespace kaguya {
                                     (*_transformMatrix) * Vector4(_position3, 1.0f) : _position3;
 
             // 计算变换后的法线，参考 https://blog.csdn.net/lawest/article/details/98328127
+            // TODO 判断 _transformMatrix 是否为 nullptr
             _transformedNormal1 = NORMALIZE(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal1, 0.0f));
             _transformedNormal2 = NORMALIZE(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal2, 0.0f));
             _transformedNormal3 = NORMALIZE(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal3, 0.0f));
@@ -111,6 +111,7 @@ namespace kaguya {
                 Vector3 normal = alpha * _transformedNormal1 +
                                  ans[0] * _transformedNormal2 +
                                  ans[1] * _transformedNormal3;
+
                 hitRecord.setOutwardNormal(normal, dir);
                 hitRecord.u = DOT(factor, Vector3(_uv1.x, _uv2.x, _uv3.x));
                 hitRecord.v = DOT(factor, Vector3(_uv1.y, _uv2.y, _uv3.y));

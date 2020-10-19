@@ -24,7 +24,6 @@ namespace kaguya {
             //directory = path.substr(0, path.find_last_of('/'));
             // process ASSIMP's root node recursively
             loadNode(scene->mRootNode, scene, vertexes);
-
             return vertexes;
         }
 
@@ -66,6 +65,14 @@ namespace kaguya {
                         vector.x = mesh->mNormals[idx].x;
                         vector.y = mesh->mNormals[idx].y;
                         vector.z = mesh->mNormals[idx].z;
+                    }
+
+                    if (std::abs(vector.x - 0) < EPSILON &&
+                        std::abs(vector.y - 0) < EPSILON &&
+                        std::abs(vector.z - 0) < EPSILON) {
+                        vector.x = 0;
+                        vector.y = 1;
+                        vector.z = 0;
                     }
 
                     vertex.normal = vector;

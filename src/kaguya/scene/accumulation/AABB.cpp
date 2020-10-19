@@ -12,7 +12,7 @@ namespace kaguya {
 
             bool AxisAlignBoundingBox::hit(const Ray &ray, double minStep, double maxStep) {
                 for (int axis = 0; axis < 3; axis++) {
-                    double subStep = 1.0f / ray.getDirection()[axis];
+                    double subStep = 1.0 / ray.getDirection()[axis];
                     double t0 = (_min[axis] - ray.getOrigin()[axis]) * subStep;
                     double t1 = (_max[axis] - ray.getOrigin()[axis]) * subStep;
 

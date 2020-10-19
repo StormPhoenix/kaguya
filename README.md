@@ -36,7 +36,7 @@
 
 - 去掉 Interaction 里面的 frontFace
 
-- 动态内存分配
+- *动态内存分配*
 
 - RGB 扩展为 SpectrumTemplate
 
