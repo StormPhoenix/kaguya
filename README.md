@@ -32,6 +32,9 @@
 - Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法
 
 ## 未解决的问题
+- class Light 应该允许 Intersection 操作，这样修改的话需要仔细考虑 class Light 的设计 
+
+- 去掉 Interaction 里面的 frontFace
 
 - 动态内存分配
 
@@ -76,7 +79,7 @@
     评估 Light Unit 的指标
     
 ## 一些想法
-- 新的光线追踪想法：不需要像 Path Tracing 一次性把 shader color 求解出来，而是多次迭代。每次迭代只让光线反射一次，迭代 N 轮让
+- 新的光线追踪想法：不需要像 Path Tracing 一次性把 shaderOfRecursion color 求解出来，而是多次迭代。每次迭代只让光线反射一次，迭代 N 轮让
     结果收敛。 
     
 - 编译 PBRT，对 SamplerIntegrator::Render() 做 debug

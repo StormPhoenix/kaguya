@@ -242,7 +242,7 @@ namespace kaguya {
             std::shared_ptr<Shape> metalSphere = std::make_shared<Sphere>(Vector3(-125, -149, 100), 100, metal);
 
             // light
-            std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(-100, 100, -100, 100, 248, false,
+            std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(-100, 100, -100, 100, 235, false,
                                                                                nullptr);
             std::shared_ptr<Light> light = std::make_shared<Light>(lightMaterial, lightWall);
             _light = light;
@@ -356,7 +356,7 @@ namespace kaguya {
                                                                         lambertFront);
 
             // light
-            std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(-100, 100, -100, 100, 248, false,
+            std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(-100, 100, -100, 100, 230, false,
                                                                                nullptr);
             std::shared_ptr<Light> light = std::make_shared<Light>(lightMaterial, lightWall);
             _light = light;

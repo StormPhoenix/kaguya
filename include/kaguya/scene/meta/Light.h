@@ -45,7 +45,7 @@ namespace kaguya {
              * @param sampleRay 计算得到的采样射线
              * @return
              */
-            virtual void sampleRay(const Vector3 &point, Ray &sampleRay);
+            virtual bool sampleRay(const Vector3 &point, Ray &sampleRay);
 
             /**
              * 计算采样射线的 PDF

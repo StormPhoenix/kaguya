@@ -54,12 +54,20 @@ namespace kaguya {
             return _objectSampler->pdf(eye, dir);
         }
 
-        void Light::sampleRay(const Vector3 &point, Ray &sampleRay) {
+        bool Light::sampleRay(const Vector3 &point, Ray &sampleRay) {
             Interaction eye;
             eye.point = point;
             Interaction intersection = sample(eye);
-            sampleRay.setOrigin(point);
-            sampleRay.setDirection(NORMALIZE(intersection.point - point));
+            // 采样点方向
+            Vector3 rayDir = NORMALIZE(intersection.point - point);
+            // 这里默认是单向光，所以要判断方向
+            if (DOT(-rayDir, intersection.normal) > 0) {
+                sampleRay.setOrigin(point);
+                sampleRay.setDirection(rayDir);
+                return true;
+            } else {
+                return false;
+            }
         }
 
         double Light::rayPdf(const Ray &sampleRay) {

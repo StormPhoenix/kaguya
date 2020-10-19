@@ -153,7 +153,7 @@ namespace kaguya {
                 return ret;
             }
 
-            SpectrumTemplate clamp(float low = 0, float high = infinity) const {
+            SpectrumTemplate truncate(float low = 0, float high = infinity) const {
                 SpectrumTemplate ret;
                 for (int i = 0; i < SpectrumSamples; ++i)
                     ret.value[i] = clamp(value[i], low, high);

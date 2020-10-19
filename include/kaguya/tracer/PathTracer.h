@@ -46,9 +46,15 @@ namespace kaguya {
              * @param depth 反射次数
              * @return 渲染结果
              */
-            Spectrum shader(const Ray &ray, Scene &scene, int depth);
+            Spectrum shaderOfRecursion(const Ray &ray, Scene &scene, int depth=0);
 
-            Spectrum shader2(const Ray &ray, Scene &scene);
+            /**
+             * Path Tracing 渲染代码，渐进式实现
+             * @param ray
+             * @param scene
+             * @return
+             */
+            Spectrum shaderOfProgression(const Ray &ray, Scene &scene);
 
             /**
              * 获取背景颜色，这里可以用来设置背景贴图

@@ -33,7 +33,7 @@ namespace kaguya {
         }
 
 
-        Spectrum PathTracer::shader2(const kaguya::tracer::Ray &ray, kaguya::Scene &scene) {
+        Spectrum PathTracer::shaderOfProgression(const kaguya::tracer::Ray &ray, kaguya::Scene &scene) {
             // 最终渲染结果
             Spectrum shaderColor = Spectrum(0);
             // 光线是否是 delta distribution
@@ -77,7 +77,11 @@ namespace kaguya {
 
                 // 判断击中的是否是光源
                 if (intersection.material->isLight()) {
-                    shaderColor += (beta * intersection.material->emitted(intersection.u, intersection.v));
+                    /*
+                     * TODO 还没有完全认清楚 Light 在 scene 中是否应该作为反射物质来判断
+                     * 这里再加上 对光源采样，相当于在同一深度对光源采样了两次
+                     */
+//                    shaderColor += (beta * intersection.material->emitted(intersection.u, intersection.v));
                     break;
                 }
 
@@ -93,17 +97,25 @@ namespace kaguya {
                     Ray shadowRay;
                     // p(wi)
                     double shadowRayPdf = 0;
-                    light->sampleRay(intersection.point, shadowRay);
-                    shadowRayPdf = light->rayPdf(shadowRay);
-
-                    // cosine
-                    double cosine = std::abs(DOT(intersection.normal, shadowRay.getDirection()));
-
-                    // f(p, wo, wi)
-                    Spectrum f = bsdf->f(-scatterRay.getDirection(), shadowRay.getDirection());
-
-                    shaderColor += (beta * f * cosine / shadowRayPdf *
-                                    light->luminance(intersection.u, intersection.v));
+                    // 对光源采样采样，不同类型光源的采样方式不一样
+                    if (light->sampleRay(intersection.point, shadowRay)) {
+                        // 判断 shadowRay 是否击中
+                        Interaction shadowInteraction;
+                        bool lightIntersected = scene.hit(shadowRay, shadowInteraction);
+                        if (lightIntersected && shadowInteraction.id == light->getId()) {
+                            shadowRayPdf = light->rayPdf(shadowRay);
+                            // 防止 shadowRayPdf = 0
+                            if (std::abs(shadowRayPdf - 0) > EPSILON) {
+                                // cosine
+                                double cosine = std::abs(DOT(intersection.normal, shadowRay.getDirection()));
+                                // f(p, wo, wi)
+                                Spectrum f = bsdf->f(-scatterRay.getDirection(), shadowRay.getDirection());
+                                // shaderOfRecursion spectrum
+                                shaderColor += (beta * f * cosine / shadowRayPdf *
+                                                light->luminance(intersection.u, intersection.v));
+                            }
+                        }
+                    }
                 }
 
                 // 计算下一次反射
@@ -132,7 +144,7 @@ namespace kaguya {
             return shaderColor;
         }
 
-        Spectrum PathTracer::shader(const Ray &ray, Scene &scene, int depth) {
+        Spectrum PathTracer::shaderOfRecursion(const Ray &ray, Scene &scene, int depth) {
             // TODO 判断采用固定深度还是轮盘赌
             // TODO 添加对光源采样；对光源采样需要计算两个 pdf
 
@@ -166,7 +178,7 @@ namespace kaguya {
                             Spectrum f = bsdf->f(NORMALIZE(-ray.getDirection()), NORMALIZE(scatterRay.getDirection()));
                             Spectrum shaderColor =
                                     std::abs(DOT(hitRecord.normal, scatterRay.getDirection())) * f /
-                                    samplePdf * shader(scatterRay, scene, depth + 1);
+                                    samplePdf * shaderOfRecursion(scatterRay, scene, depth + 1);
 
                             return material->emitted(hitRecord.u, hitRecord.v) + shaderColor;
                         } else {
@@ -187,7 +199,7 @@ namespace kaguya {
 
                             double cosine = std::abs(DOT(hitRecord.normal, NORMALIZE(worldWi)));
                             Spectrum shaderColor = cosine * f / samplePdf *
-                                                   shader(scatterRay, scene, depth + 1);
+                                    shaderOfRecursion(scatterRay, scene, depth + 1);
                             return material->emitted(hitRecord.u, hitRecord.v) + shaderColor;
                         }
                     }
@@ -215,7 +227,10 @@ namespace kaguya {
                 double shadowRayPdf;
                 // 构造虚拟 shadow ray
                 Ray shadowRay;
-                light->sampleRay(shadowRayOrigin, shadowRay);
+                if (!light->sampleRay(shadowRayOrigin, shadowRay)) {
+                    // 无法采样到光线
+                    return false;
+                }
                 shadowRayPdf = light->rayPdf(shadowRay);
 
                 sampleLightRay = shadowRay;
@@ -247,13 +262,16 @@ namespace kaguya {
 
                         // 做 _samplePerPixel 次采样
                         for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
-                            auto u = (col + uniformSample()) / cameraWidth;
-                            auto v = (row + uniformSample()) / cameraHeight;
+//                            auto u = (col + uniformSample()) / cameraWidth;
+//                            auto v = (row + uniformSample()) / cameraHeight;
+
+                            auto u = (col + uniformSample() * 0.5) / cameraWidth;
+                            auto v = (row + uniformSample() * 0.5) / cameraHeight;
 
                             // 发射采样光线，开始渲染
                             Ray sampleRay = _camera->sendRay(u, v);
-                            ans += shader(sampleRay, *_scene, 0);
-//                            ans += shader2(sampleRay, *_scene);
+//                            ans += shaderOfRecursion(sampleRay, *_scene, 0);
+                            ans += shaderOfProgression(sampleRay, *_scene);
                         }
                         ans *= sampleWeight;
                         // TODO 写入渲染结果，用更好的方式写入
