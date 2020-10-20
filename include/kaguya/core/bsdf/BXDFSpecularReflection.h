@@ -26,7 +26,7 @@ namespace kaguya {
 
         private:
             const Spectrum _albedo;
-            std::shared_ptr<Fresnel> _fresnel = nullptr;
+            Fresnel *_fresnel = nullptr;
 
         };
 
