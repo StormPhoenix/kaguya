@@ -146,9 +146,7 @@ namespace kaguya {
             return shaderColor;
         }
 
-        /*
-         * TODO
-        Spectrum PathTracer::shaderOfRecursion(const Ray &ray, Scene &scene, int depth) {
+        Spectrum PathTracer::shaderOfRecursion(const Ray &ray, Scene &scene, int depth, MemoryArena &memoryArena) {
             // TODO 判断采用固定深度还是轮盘赌
             // TODO 添加对光源采样；对光源采样需要计算两个 pdf
 
@@ -169,7 +167,7 @@ namespace kaguya {
 
                         if (!material->isSpecular() &&
                             sampleFromLights(scene, hitRecord.point, scatterRay, samplePdf)) {
-                            std::shared_ptr<BSDF> bsdf = material->bsdf(hitRecord);
+                            BSDF *bsdf = material->bsdf(hitRecord, memoryArena);
 
                             if (bsdf == nullptr) {
                                 return Spectrum(0.0);
@@ -182,11 +180,11 @@ namespace kaguya {
                             Spectrum f = bsdf->f(NORMALIZE(-ray.getDirection()), NORMALIZE(scatterRay.getDirection()));
                             Spectrum shaderColor =
                                     std::abs(DOT(hitRecord.normal, scatterRay.getDirection())) * f /
-                                    samplePdf * shaderOfRecursion(scatterRay, scene, depth + 1);
+                                    samplePdf * shaderOfRecursion(scatterRay, scene, depth + 1, memoryArena);
 
                             return material->emitted(hitRecord.u, hitRecord.v) + shaderColor;
                         } else {
-                            std::shared_ptr<BSDF> bsdf = material->bsdf(hitRecord);
+                            BSDF *bsdf = material->bsdf(hitRecord, memoryArena);
                             Vector3 worldWo = -ray.getDirection();
                             Vector3 worldWi = Vector3(0.0);
                             Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf);
@@ -203,7 +201,7 @@ namespace kaguya {
 
                             double cosine = std::abs(DOT(hitRecord.normal, NORMALIZE(worldWi)));
                             Spectrum shaderColor = cosine * f / samplePdf *
-                                                   shaderOfRecursion(scatterRay, scene, depth + 1);
+                                                   shaderOfRecursion(scatterRay, scene, depth + 1, memoryArena);
                             return material->emitted(hitRecord.u, hitRecord.v) + shaderColor;
                         }
                     }
@@ -216,7 +214,7 @@ namespace kaguya {
                 return Spectrum(0.0f);
             }
         }
-         */
+
 
         bool PathTracer::sampleFromLights(Scene &scene, Vector3 sampleObject, Ray &sampleLightRay,
                                           double &sampleLightPdf) {
@@ -274,13 +272,13 @@ namespace kaguya {
 
                             // 发射采样光线，开始渲染
                             Ray sampleRay = _camera->sendRay(u, v);
-//                            ans += shaderOfRecursion(sampleRay, *_scene, 0);
+//                            ans += shaderOfRecursion(sampleRay, *_scene, 0, arena);
                             ans += shaderOfProgression(sampleRay, *_scene, arena);
+                            arena.clean();
                         }
                         ans *= sampleWeight;
                         // TODO 写入渲染结果，用更好的方式写入
                         writeShaderColor(ans, row, col);
-                        arena.clean();
                     }
 #pragma omp critical
                     finishedLine++;

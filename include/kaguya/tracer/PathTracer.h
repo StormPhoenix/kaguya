@@ -50,9 +50,7 @@ namespace kaguya {
              * @param depth 反射次数
              * @return 渲染结果
              */
-            /* TODO
-           Spectrum shaderOfRecursion(const Ray &ray, Scene &scene, int depth=0);
-             */
+            Spectrum shaderOfRecursion(const Ray &ray, Scene &scene, int depth, MemoryArena &memoryArena);
 
             /**
              * Path Tracing 渲染代码，渐进式实现

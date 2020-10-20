@@ -94,9 +94,7 @@ namespace kaguya {
 
         void MemoryArena::clean() {
             _availableBlocks.splice(_availableBlocks.begin(), _usedBlocks);
-            _block = nullptr;
             _currentOffset = 0;
-            _allocatedBlockSize = 0;
         }
     }
 }

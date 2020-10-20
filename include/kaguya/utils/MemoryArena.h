@@ -8,6 +8,7 @@
 // 内存 alloc、free 管理类
 #include <list>
 #include <cstddef>
+#include <cstdint>
 
 #ifndef KAGUYA_CACHE_LINE_SIZE
 // cache line size 默认为 64 字节
