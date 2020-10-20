@@ -119,8 +119,8 @@ namespace kaguya {
             std::vector<Vertex> bunnyVertexes = kaguya::utils::ObjLoader::loadModel("./resource/objects/bunny.obj");
 
             std::shared_ptr<Matrix4> transformMatrix = std::make_shared<Matrix4>(1.0f);
-            double scale = 490.0;
-            *transformMatrix = TRANSLATE(*transformMatrix, Vector3(-scale / 2, -scale / 2, -scale / 2));
+            double scale = 200.0;
+            *transformMatrix = TRANSLATE(*transformMatrix, Vector3(0, -scale, 0));
             *transformMatrix = SCALE(*transformMatrix, Vector3(scale, scale, scale));
             std::shared_ptr<Shape> bunny = std::static_pointer_cast<Shape>(
 //                    std::make_shared<TriangleMesh>(bunnyVertexes, lambertTop, transformMatrix));
@@ -276,7 +276,7 @@ namespace kaguya {
             _camera = camera;
         }
 
-        void Scene::testBuildEmptyCornelBox(){
+        void Scene::testBuildEmptyCornelBox() {
             // For testing
             // albedos
             // total white

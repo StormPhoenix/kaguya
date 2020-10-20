@@ -33,7 +33,8 @@ namespace kaguya {
         }
 
 
-        Spectrum PathTracer::shaderOfProgression(const kaguya::tracer::Ray &ray, kaguya::Scene &scene) {
+        Spectrum PathTracer::shaderOfProgression(const kaguya::tracer::Ray &ray, kaguya::Scene &scene,
+                                                 MemoryArena &memoryArena) {
             // 最终渲染结果
             Spectrum shaderColor = Spectrum(0);
             // 光线是否是 delta distribution
@@ -88,7 +89,7 @@ namespace kaguya {
                 std::shared_ptr<Material> material = intersection.material;
                 assert(material != nullptr);
 
-                std::shared_ptr<BSDF> bsdf = material->bsdf(intersection);
+                BSDF *bsdf = material->bsdf(intersection, memoryArena);
                 assert(bsdf != nullptr);
 
                 // 判断是否向光源采样
@@ -127,10 +128,6 @@ namespace kaguya {
                 double samplePdf = 0;
                 // f(p, wo, wi)
                 Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, BSDF_ALL, &bxdfType);
-                if (std::abs(samplePdf - 0) < EPSILON) {
-                    int a = 0;
-                    a++;
-                }
 
                 // cosine
                 double cosine = std::abs(DOT(intersection.normal, NORMALIZE(worldWi)));
@@ -149,6 +146,8 @@ namespace kaguya {
             return shaderColor;
         }
 
+        /*
+         * TODO
         Spectrum PathTracer::shaderOfRecursion(const Ray &ray, Scene &scene, int depth) {
             // TODO 判断采用固定深度还是轮盘赌
             // TODO 添加对光源采样；对光源采样需要计算两个 pdf
@@ -217,6 +216,7 @@ namespace kaguya {
                 return Spectrum(0.0f);
             }
         }
+         */
 
         bool PathTracer::sampleFromLights(Scene &scene, Vector3 sampleObject, Ray &sampleLightRay,
                                           double &sampleLightPdf) {
@@ -255,16 +255,15 @@ namespace kaguya {
 
                 // TODO 将 bitmap 封装到写入策略模式
                 _bitmap = (int *) malloc(cameraHeight * cameraWidth * SPECTRUM_CHANNEL * sizeof(unsigned int));
-
                 double sampleWeight = 1.0 / _samplePerPixel;
-                // 遍历相机成像图案上每个像素
                 // 已完成扫描的行数
                 int finishedLine = 0;
 #pragma omp parallel for num_threads(4)
+                // 遍历相机成像图案上每个像素
                 for (int row = cameraHeight - 1; row >= 0; row--) {
+                    MemoryArena arena;
                     for (int col = 0; col < cameraWidth; col++) {
                         Spectrum ans = {0};
-
                         // 做 _samplePerPixel 次采样
                         for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
                             auto u = (col + uniformSample()) / cameraWidth;
@@ -276,11 +275,12 @@ namespace kaguya {
                             // 发射采样光线，开始渲染
                             Ray sampleRay = _camera->sendRay(u, v);
 //                            ans += shaderOfRecursion(sampleRay, *_scene, 0);
-                            ans += shaderOfProgression(sampleRay, *_scene);
+                            ans += shaderOfProgression(sampleRay, *_scene, arena);
                         }
                         ans *= sampleWeight;
                         // TODO 写入渲染结果，用更好的方式写入
                         writeShaderColor(ans, row, col);
+                        arena.clean();
                     }
 #pragma omp critical
                     finishedLine++;

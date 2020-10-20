@@ -14,11 +14,15 @@
 #include <kaguya/core/Core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
+#include <kaguya/utils/MemoryArena.h>
+
 namespace kaguya {
     namespace tracer {
 
         using namespace kaguya::core;
         using kaguya::scene::Scene;
+        using kaguya::memory::MemoryArena;
+
 
         class PathTracer : public Tracer {
         public:
@@ -46,15 +50,18 @@ namespace kaguya {
              * @param depth 反射次数
              * @return 渲染结果
              */
-            Spectrum shaderOfRecursion(const Ray &ray, Scene &scene, int depth=0);
+            /* TODO
+           Spectrum shaderOfRecursion(const Ray &ray, Scene &scene, int depth=0);
+             */
 
             /**
              * Path Tracing 渲染代码，渐进式实现
              * @param ray
              * @param scene
+             * @param memoryArena
              * @return
              */
-            Spectrum shaderOfProgression(const Ray &ray, Scene &scene);
+            Spectrum shaderOfProgression(const Ray &ray, Scene &scene, MemoryArena &memoryArena);
 
             /**
              * 获取背景颜色，这里可以用来设置背景贴图

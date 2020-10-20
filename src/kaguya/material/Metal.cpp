@@ -26,11 +26,10 @@ namespace kaguya {
             return true;
         }
 
-        std::shared_ptr<BSDF> Metal::bsdf(Interaction &insect) {
-            std::shared_ptr<FresnelDefault> fresnel = std::make_shared<FresnelDefault>();
-            std::shared_ptr<BXDFSpecularReflection> bxdf = std::make_shared<BXDFSpecularReflection>(_albedo, fresnel);
-
-            std::shared_ptr<BSDF> bsdf = std::make_shared<BSDF>(insect);
+        BSDF *Metal::bsdf(Interaction &insect, MemoryArena &memoryArena) {
+            FresnelDefault *fresnel = ALLOC(memoryArena, FresnelDefault)();
+            BXDFSpecularReflection *bxdf = ALLOC(memoryArena, BXDFSpecularReflection)(_albedo, fresnel);
+            BSDF *bsdf = ALLOC(memoryArena, BSDF)(insect);
             bsdf->addBXDF(bxdf);
             return bsdf;
         }

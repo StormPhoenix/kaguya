@@ -20,6 +20,7 @@ namespace kaguya {
              * @return
              */
             double pdf(const Vector3 &inDir, const Vector3 &normal, const Vector3 &outDir);
+
             /**
              * 按照 fuzzy 角度做 2 / fuzzy 采样
              * @param inDir

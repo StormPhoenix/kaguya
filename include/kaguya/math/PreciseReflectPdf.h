@@ -20,6 +20,7 @@ namespace kaguya {
              * @return
              */
             double pdf(const Vector3 &inDir, const Vector3 &normal, const Vector3 &outDir);
+
             /**
              * 只采样光线反射方向
              * @param inDir

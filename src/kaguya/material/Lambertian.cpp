@@ -18,15 +18,15 @@ namespace kaguya {
 
         Lambertian::Lambertian(std::shared_ptr<Texture> albedo) : _albedo(albedo) {
             _pdf = std::make_shared<HemiCosineSampler>();
+            // TODO delete
 //            _pdf = std::make_shared<HemiUniformSampler>();
         }
 
-        std::shared_ptr<BSDF> Lambertian::bsdf(Interaction &insect) {
+        BSDF *Lambertian::bsdf(Interaction &insect, MemoryArena &memoryArena) {
             Spectrum albedo = _albedo->sample(insect.u, insect.v);
-            std::shared_ptr<BXDFLambertianReflection> lambertianBXDF =
-                    std::make_shared<BXDFLambertianReflection>(albedo);
-
-            std::shared_ptr<BSDF> bsdf = std::make_shared<BSDF>(insect);
+            BXDFLambertianReflection *lambertianBXDF =
+                    ALLOC(memoryArena, BXDFLambertianReflection)(albedo);
+            BSDF *bsdf = ALLOC(memoryArena, BSDF)(insect);
             bsdf->addBXDF(lambertianBXDF);
             return bsdf;
         }

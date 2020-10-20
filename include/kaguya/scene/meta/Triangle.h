@@ -55,9 +55,9 @@ namespace kaguya {
             const Vector3 _normal3;
 
             // world space 中的法线坐标
-             Vector3 _transformedNormal1;
-             Vector3 _transformedNormal2;
-             Vector3 _transformedNormal3;
+            Vector3 _transformedNormal1;
+            Vector3 _transformedNormal2;
+            Vector3 _transformedNormal3;
 
             const Vector2 _uv1;
             const Vector2 _uv2;

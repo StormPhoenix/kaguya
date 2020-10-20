@@ -32,7 +32,7 @@ namespace kaguya {
                            _tanX.z * v.x + _tanY.z * v.y + _tanZ.z * v.z);
         }
 
-        void BSDF::addBXDF(std::shared_ptr<BXDF> bxdf) {
+        void BSDF::addBXDF(BXDF *bxdf) {
             assert(_bxdfCount < MAX_BXDF_NUM && bxdf != nullptr);
             _bxdfs[_bxdfCount] = bxdf;
             _bxdfCount++;
@@ -72,7 +72,7 @@ namespace kaguya {
                 }
                 return Spectrum(0.0);
             } else {
-                std::shared_ptr<BXDF> bxdf = nullptr;
+                BXDF *bxdf = nullptr;
                 // 随机选取 bxdf
                 int bxdfOrder = randomInt(1, matchedCount);
                 int order = 0;

@@ -20,10 +20,14 @@ namespace kaguya {
             return true;
         }
 
-        std::shared_ptr<BSDF> Dielectric::bsdf(kaguya::core::Interaction &insect) {
+        BSDF *Dielectric::bsdf(kaguya::core::Interaction &insect, MemoryArena &memoryArena) {
+            // TODO MemoryArena &memoryArena
             Spectrum albedo = _albedo->sample(insect.u, insect.v);
-            std::shared_ptr<BXDFSpecular> specularBXDF = std::make_shared<BXDFSpecular>(albedo, 1.0f, _refractiveIndex);
-            std::shared_ptr<BSDF> bsdf = std::make_shared<BSDF>(insect);
+            BXDFSpecular *specularBXDF = ALLOC(memoryArena, BXDFSpecular)(albedo, 1.0f, _refractiveIndex);
+            BSDF *bsdf = ALLOC(memoryArena, BSDF)(insect);
+            // TODO delete
+//            std::shared_ptr<BXDFSpecular> specularBXDF = std::make_shared<BXDFSpecular>(albedo, 1.0f, _refractiveIndex);
+//            std::shared_ptr<BSDF> bsdf = std::make_shared<BSDF>(insect);
             bsdf->addBXDF(specularBXDF);
             return bsdf;
         }

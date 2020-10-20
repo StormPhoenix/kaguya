@@ -16,7 +16,7 @@ namespace kaguya {
          */
         class BXDFSpecularReflection : public BXDF {
         public:
-            BXDFSpecularReflection(const Spectrum &albedo, std::shared_ptr<Fresnel> fresnel);
+            BXDFSpecularReflection(const Spectrum &albedo, Fresnel *fresnel);
 
             virtual Spectrum f(const Vector3 &wo, const Vector3 &wi) const override;
 

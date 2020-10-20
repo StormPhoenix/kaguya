@@ -11,6 +11,7 @@
 #include <kaguya/math/Math.hpp>
 #include <kaguya/tracer/Ray.h>
 #include <kaguya/scene/Shape.h>
+#include <kaguya/utils/MemoryArena.h>
 
 
 // TODO Material 移动到 core
@@ -21,6 +22,7 @@ namespace kaguya {
         using kaguya::core::Interaction;
         using kaguya::core::Spectrum;
         using kaguya::core::BSDF;
+        using kaguya::memory::MemoryArena;
 
         /**
          * 物体材质
@@ -31,7 +33,7 @@ namespace kaguya {
              * 计算材质的 bsdf
              * @param insect ray 与 shape 的相交点
              */
-            virtual std::shared_ptr<BSDF> bsdf(Interaction &insect) = 0;
+            virtual BSDF *bsdf(Interaction &insect, MemoryArena &memoryArena) = 0;
 
             /**
              * TODO delete

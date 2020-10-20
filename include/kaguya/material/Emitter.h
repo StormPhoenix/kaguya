@@ -17,7 +17,7 @@ namespace kaguya {
 
             Emitter(std::shared_ptr<Texture> albedo);
 
-            virtual std::shared_ptr<BSDF> bsdf(Interaction &insect) override;
+            virtual BSDF *bsdf(Interaction &insect, MemoryArena &memoryArena) override;
 
             /**
              * TODO delete

@@ -67,6 +67,7 @@ namespace kaguya {
              * @return
              */
             bool containType(const BXDFType bxdfType);
+
         private:
             /**
              * 默认半球采样函数

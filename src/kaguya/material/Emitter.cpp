@@ -12,7 +12,7 @@ namespace kaguya {
 
         Emitter::Emitter(std::shared_ptr<Texture> albedo) : _albedo(albedo) {}
 
-        std::shared_ptr<BSDF> Emitter::bsdf(kaguya::core::Interaction &insect) {
+        BSDF *Emitter::bsdf(kaguya::core::Interaction &insect, MemoryArena &memoryArena) {
             return nullptr;
         }
 

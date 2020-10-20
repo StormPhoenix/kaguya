@@ -7,7 +7,7 @@
 namespace kaguya {
     namespace core {
 
-        BXDFSpecularReflection::BXDFSpecularReflection(const Spectrum &albedo, std::shared_ptr<Fresnel> fresnel) :
+        BXDFSpecularReflection::BXDFSpecularReflection(const Spectrum &albedo, Fresnel *fresnel) :
                 BXDF(BXDFType(BSDF_SPECULAR | BSDF_REFLECTION)),
                 _albedo(albedo),
                 _fresnel(fresnel) {

@@ -16,7 +16,7 @@ namespace kaguya {
         public:
             BSDF(const Interaction &insect);
 
-            void addBXDF(std::shared_ptr<BXDF> bxdf);
+            void addBXDF(BXDF *bxdf);
 
             /**
              * 向量 v 转化到局部坐标系
@@ -72,7 +72,7 @@ namespace kaguya {
         private:
             int _bxdfCount = 0;
             // 存储 bxdf
-            std::shared_ptr<BXDF> _bxdfs[MAX_BXDF_NUM];
+            BXDF *_bxdfs[MAX_BXDF_NUM];
             // 入射光方向与交点法线构成的切线空间
             Vector3 _tanY;
             Vector3 _tanX;
