@@ -40,6 +40,7 @@ namespace kaguya {
             long long id = -1;
 
             /**
+             * TODO delete
              * 设置击中位置处的法线
              * @param outwardNormal
              * @param hitDirection

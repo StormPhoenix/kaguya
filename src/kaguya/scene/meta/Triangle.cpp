@@ -38,9 +38,15 @@ namespace kaguya {
 
             // 计算变换后的法线，参考 https://blog.csdn.net/lawest/article/details/98328127
             // TODO 判断 _transformMatrix 是否为 nullptr
-            _transformedNormal1 = NORMALIZE(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal1, 0.0f));
-            _transformedNormal2 = NORMALIZE(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal2, 0.0f));
-            _transformedNormal3 = NORMALIZE(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal3, 0.0f));
+            _transformedNormal1 = _transformMatrix != nullptr ?
+                                  NORMALIZE(Vector3(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal1, 0.0f))) :
+                                  NORMALIZE(_normal1);
+            _transformedNormal2 = _transformMatrix != nullptr ?
+                                  NORMALIZE(Vector3(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal2, 0.0f))) :
+                                  NORMALIZE(_normal2);
+            _transformedNormal3 = _transformMatrix != nullptr ?
+                                  NORMALIZE(Vector3(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal3, 0.0f))) :
+                                  NORMALIZE(_normal3);
 
 
             double minX =

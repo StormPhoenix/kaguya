@@ -5,14 +5,17 @@
 #ifndef KAGUYA_BIDIRECTIONALPATHTRACER_H
 #define KAGUYA_BIDIRECTIONALPATHTRACER_H
 
+#include <kaguya/tracer/Tracer.h>
+
 namespace kaguya {
     namespace tracer {
 
         /**
          * Bidirectional Path Tracing
          */
-        class BidirectionalPathTracer {
+        class BidirectionalPathTracer : public Tracer {
         public:
+        private:
 
         };
 

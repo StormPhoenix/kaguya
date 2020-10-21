@@ -54,6 +54,8 @@ namespace kaguya {
              */
             virtual double samplePdf(const Vector3 &wo, const Vector3 &wi) const;
 
+            virtual ~BXDF() {}
+
             /**
              * 判断自身 type 是否包含在 bxdfType 之中
              * @param bxdfType

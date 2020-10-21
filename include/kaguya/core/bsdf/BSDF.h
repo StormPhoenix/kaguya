@@ -70,6 +70,9 @@ namespace kaguya {
             int belongToType(BXDFType bxdfType);
 
         private:
+            ~BSDF() {}
+
+        private:
             int _bxdfCount = 0;
             // 存储 bxdf
             BXDF *_bxdfs[MAX_BXDF_NUM];

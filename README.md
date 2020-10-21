@@ -13,6 +13,10 @@
 ## 背景贴图
 
 ## 已解决问题
+- 内存溢出
+    MemoryArena::clean() 将未保存的 block 指针赋值为 nullptr，造成内存溢出
+    Metal::bsdf() 生成的 Fresnel * 复制给了智能指针 std::shared_ptr<Fresnel> 导致内存溢出，暂时不清楚原理。
+    
 - 黑斑
     玻璃球、金属球表面的反射会出现黑斑
     
@@ -28,17 +32,21 @@
 
 - Triangle 内部的法线变换是不对的 (采用 inverse transpose 对法线做变换)
 
+- 条带
+    图像中心出现十字条带(修改切线空间后消失，不清楚是不是这个原因)
+    Debug：不知道修改了什么，这个现象消失了
+    
 ## TODO
 - Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法
 
 ## 未解决的问题
+- 烟雾体积渲染
+
+- 多光源问题
+
 - class Light 应该允许 Intersection 操作，这样修改的话需要仔细考虑 class Light 的设计 
 
 - 去掉 Interaction 里面的 frontFace
-
-- *动态内存分配*
-
-- RGB 扩展为 SpectrumTemplate
 
 - bunny 金属材质下非常不平滑，但是按道理讲，Normal 是进行插值过了的
     > DEBUG：设置成 Lambertian 表面做插值
@@ -53,9 +61,6 @@
 - Bitmap 的写入策略替换
 
 - OpenMP 到底是什么？应该如何配置
-
-- 条带
-    图像中心出现十字条带(修改切线空间后消失，不清楚是不是这个原因)
 
 - Shadow Ray 
    - 先阅读 PBRT 中的 Path Tracing 部分再说
@@ -75,9 +80,6 @@
 
 - 俄罗斯轮盘赌不只适用于判断何时处理不继续递归问题。还可以根据 BRDF 函数，取消掉一部分 Shadow Ray
 
-- RGB 类型 -> SpectrumTemplate 类型
-    评估 Light Unit 的指标
-    
 ## 一些想法
 - 新的光线追踪想法：不需要像 Path Tracing 一次性把 shaderOfRecursion color 求解出来，而是多次迭代。每次迭代只让光线反射一次，迭代 N 轮让
     结果收敛。 
