@@ -6,7 +6,7 @@
 ## 空间变换
 
 ## 散射 PDF 与采样 PDF
-    Pdf 采样过程中应该返回一个 pdf
+    Pdf 采样过程中应该返回一个 surfacePointPdf
     
 ## 对光源采样
 
@@ -40,6 +40,8 @@
 - Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法
 
 ## 未解决的问题
+- 删除 isFrontFace
+
 - 烟雾体积渲染
 
 - 多光源问题

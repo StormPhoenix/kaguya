@@ -11,11 +11,7 @@ namespace kaguya {
             // 构造切线空间
             /* 此处的实现和 pbrt 中的实现不同，pbrt 用的是 dudp 和纹理相关，但目前没有实现纹理部分
              * 暂时用入射光线和法线来构造切线空间*/
-            if (insect.isFrontFace) {
-                _tanY = NORMALIZE(insect.normal);
-            } else {
-                _tanY = NORMALIZE(-insect.normal);
-            }
+            _tanY = NORMALIZE(insect.normal);
             _tanZ = NORMALIZE(CROSS(insect.direction, _tanY));
             _tanX = NORMALIZE(CROSS(_tanY, _tanZ));
         }
@@ -96,7 +92,7 @@ namespace kaguya {
                 Vector3 wi = Vector3(0.0f);
                 double samplePdf;
                 Spectrum f = bxdf->sampleF(wo, &wi, &samplePdf);
-                // 一般来说 pdf = 0 的情况不会发生
+                // 一般来说 surfacePointPdf = 0 的情况不会发生
                 if (samplePdf == 0) {
                     return Spectrum(0.0);
                 }

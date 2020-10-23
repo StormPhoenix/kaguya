@@ -9,13 +9,17 @@
 
 namespace kaguya {
     namespace material {
+
         class Material;
+
     }
 }
+
 
 namespace kaguya {
     namespace core {
 
+        class AreaLight;
 
         /**
         * Ray 与 Hittable 的交点记录
@@ -25,19 +29,20 @@ namespace kaguya {
             Vector3 direction;
             // 击中点
             Vector3 point;
-            // 击中点法线方向
+            // 击中点法线方向，发现永远指向物体表面外侧
             Vector3 normal;
             // 击中射线步长
             double step;
             // 击中材质种类
             std::shared_ptr<kaguya::material::Material> material = nullptr;
-            // 击中位置是否是外侧
-            bool isFrontFace;
             // 击中点纹理坐标
             double u;
             double v;
             // 击中物体的 ID
             long long id = -1;
+            // TODO 应该做一个 SurfaceInteraction 类型了
+            // 如果被击中物体是 AreaLight，则这一项应该被赋值
+            std::shared_ptr<AreaLight> areaLight = nullptr;
 
             /**
              * TODO delete
@@ -47,8 +52,7 @@ namespace kaguya {
              */
             void setOutwardNormal(const Vector3 &outwardNormal, const Vector3 &hitDirection) {
                 direction = hitDirection;
-                isFrontFace = DOT(outwardNormal, direction) < 0;
-                normal = isFrontFace ? NORMALIZE(outwardNormal) : -NORMALIZE(outwardNormal);
+                normal = outwardNormal;
             }
         } Interaction;
     }

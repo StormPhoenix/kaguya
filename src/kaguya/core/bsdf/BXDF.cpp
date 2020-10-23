@@ -15,7 +15,7 @@ namespace kaguya {
             if (wo.y < 0) {
                 wi->y *= -1;
             }
-            // 采样 pdf
+            // 采样 surfacePointPdf
             *pdf = samplePdf(wo, *wi);
             return f(wo, *wi);
         }

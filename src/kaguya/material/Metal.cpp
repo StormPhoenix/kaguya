@@ -17,9 +17,6 @@ namespace kaguya {
         Metal::Metal() : Metal(Spectrum(1.0f), 0) {}
 
         Metal::Metal(const Spectrum &albedo, double fuzzy) : _albedo(albedo), _fuzzy(fuzzy) {
-            // TODO 判断 _fuzzy
-            // TODO delete
-            _pdf = std::make_shared<HemiReflectSampler>();
         }
 
         bool Metal::isSpecular() {

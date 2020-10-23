@@ -1,0 +1,36 @@
+//
+// Created by Storm Phoenix on 2020/10/22.
+//
+
+#ifndef KAGUYA_POINTLIGHT_H
+#define KAGUYA_POINTLIGHT_H
+
+#include <kaguya/core/light/Light.h>
+#include <kaguya/core/spectrum/Spectrum.hpp>
+
+namespace kaguya {
+    namespace core {
+
+        class PointLight : public Light {
+        public:
+            /**
+             * 点光源
+             * @param center 光源位置
+             * @param intensity 光源处，单位立体角的光通量
+             */
+            PointLight(const Vector3 &center, const Spectrum &intensity);
+
+            virtual Spectrum sampleRay(
+                    const Interaction &eye,
+                    Vector3 *wi, double *pdf,
+                    VisibilityTester *visibilityTester) override;
+
+        private:
+            const Spectrum _intensity;
+            const Vector3 _center;
+        };
+
+    }
+}
+
+#endif //KAGUYA_POINTLIGHT_H

@@ -37,7 +37,6 @@ namespace kaguya {
                                     (*_transformMatrix) * Vector4(_position3, 1.0f) : _position3;
 
             // 计算变换后的法线，参考 https://blog.csdn.net/lawest/article/details/98328127
-            // TODO 判断 _transformMatrix 是否为 nullptr
             _transformedNormal1 = _transformMatrix != nullptr ?
                                   NORMALIZE(Vector3(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal1, 0.0f))) :
                                   NORMALIZE(_normal1);

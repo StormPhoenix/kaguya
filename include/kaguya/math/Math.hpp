@@ -111,6 +111,11 @@ inline bool refract(const Vector3 &wo, const Vector3 &normal, double refraction,
     return true;
 }
 
+inline double misWeight(int nSampleF, double pdfF, int nSampleG, double pdfG) {
+    double f = nSampleF * pdfF;
+    double g = nSampleG * pdfG;
+    return (f * f) / (g * g + f * f);
+}
 
 #define DEGREES_TO_RADIANS(degrees) degreesToRadians(degrees)
 

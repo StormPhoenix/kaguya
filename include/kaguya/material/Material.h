@@ -6,21 +6,15 @@
 #define KAGUYA_MATERIAL_H
 
 #include <kaguya/core/Interaction.h>
-#include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/math/Math.hpp>
-#include <kaguya/tracer/Ray.h>
 #include <kaguya/scene/Shape.h>
 #include <kaguya/utils/MemoryArena.h>
 
-
-// TODO Material 移动到 core
 namespace kaguya {
     namespace material {
 
-        using kaguya::tracer::Ray;
         using kaguya::core::Interaction;
-        using kaguya::core::Spectrum;
         using kaguya::core::BSDF;
         using kaguya::memory::MemoryArena;
 
@@ -36,14 +30,6 @@ namespace kaguya {
             virtual BSDF *bsdf(Interaction &insect, MemoryArena &memoryArena) = 0;
 
             /**
-             * TODO delete
-             * @return
-             */
-            virtual bool isLight() {
-                return false;
-            }
-
-            /**
              * TODO delete 逐渐删除 isSpecular
              * 是否具有反光、折射属性
              * @return
@@ -52,15 +38,6 @@ namespace kaguya {
                 return false;
             }
 
-            /**
-             * 材质发射光线的能量
-             * @param u 材质表面的纹理坐标
-             * @param v 材质表面的纹理坐标
-             * @return 发射光线能量
-             */
-            virtual Spectrum emitted(double u, double v) {
-                return Spectrum(0.0f);
-            }
         };
 
     }

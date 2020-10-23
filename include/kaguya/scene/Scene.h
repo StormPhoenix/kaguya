@@ -7,13 +7,21 @@
 
 #include <kaguya/scene/Shape.h>
 #include <kaguya/scene/Camera.h>
-#include <kaguya/scene/meta/Light.h>
 #include <memory>
+
+namespace kaguya {
+    namespace core {
+
+        class Light;
+
+    }
+}
 
 namespace kaguya {
     namespace scene {
 
         using kaguya::tracer::Camera;
+        using kaguya::core::Light;
 
         /**
          * 保存场景数据
@@ -24,12 +32,12 @@ namespace kaguya {
             /**
              * 构建 Cornel box
              */
-            void testBuildCornelBox();
+//            void testBuildCornelBox();
 
             /**
              * 构建 Cornel box，加载 bunny 模型
              */
-            void testBuildCornelBoxWithBunny();
+//            void testBuildCornelBoxWithBunny();
 
             /**
              * 空 Cornel box
@@ -50,9 +58,10 @@ namespace kaguya {
                 return _light;
             }
 
-            const std::vector<std::shared_ptr<Light>> &getLights() {
-                return _lights;
-            }
+            // TODO 增加多个光源选项
+//            const std::vector<std::shared_ptr<DiffuseLight>> &getLights() {
+//                return _lights;
+//            }
 
         protected:
             // scene objects
@@ -61,8 +70,8 @@ namespace kaguya {
             std::shared_ptr<Camera> _camera = nullptr;
             // TODO 单个光源 用于测试
             std::shared_ptr<Light> _light = nullptr;
-            // lights
-            std::vector<std::shared_ptr<Light>> _lights;
+            // TODO 增加多个光源选项
+//            std::vector<std::shared_ptr<DiffuseLight>> _lights;
         };
 
     }

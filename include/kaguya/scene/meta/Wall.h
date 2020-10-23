@@ -5,7 +5,6 @@
 #ifndef KAGUYA_WALL_H
 #define KAGUYA_WALL_H
 
-#include <kaguya/scene/Shape.h>
 #include <kaguya/scene/ShapeSampler.h>
 #include <kaguya/scene/accumulation/AABB.h>
 
@@ -28,9 +27,9 @@ namespace kaguya {
 
             virtual double area() override;
 
-            virtual Interaction sample() override;
+            virtual Interaction sampleSurfacePoint() override;
 
-            virtual double pdf(Interaction &point) override;
+            virtual double surfacePointPdf(Interaction &point) override;
 
         protected:
             /**
@@ -82,9 +81,9 @@ namespace kaguya {
 
             virtual double area() override;
 
-            virtual Interaction sample() override;
+            virtual Interaction sampleSurfacePoint() override;
 
-            virtual double pdf(Interaction &point) override;
+            virtual double surfacePointPdf(Interaction &point) override;
 
         protected:
             double _y;
@@ -115,9 +114,9 @@ namespace kaguya {
 
             virtual double area() override;
 
-            virtual Interaction sample() override;
+            virtual Interaction sampleSurfacePoint() override;
 
-            virtual double pdf(Interaction &point) override;
+            virtual double surfacePointPdf(Interaction &point) override;
 
         protected:
             double _x;
@@ -148,9 +147,9 @@ namespace kaguya {
 
             virtual double area() override;
 
-            virtual Interaction sample() override;
+            virtual Interaction sampleSurfacePoint() override;
 
-            virtual double pdf(Interaction &point) override;
+            virtual double surfacePointPdf(Interaction &point) override;
 
         protected:
             double _z;

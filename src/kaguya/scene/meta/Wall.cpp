@@ -107,6 +107,7 @@ namespace kaguya {
                     hitRecord.v = offsetY / _height;
                     hitRecord.material = _material;
                     hitRecord.id = getId();
+                    hitRecord.areaLight = _areaLight;
                     return true;
                 } else {
                     return false;
@@ -124,7 +125,7 @@ namespace kaguya {
             return _area;
         }
 
-        Interaction Wall::sample() {
+        Interaction Wall::sampleSurfacePoint() {
             // 随机采样坐标
             double u = uniformSample();
             double v = uniformSample();
@@ -138,7 +139,7 @@ namespace kaguya {
             return samplePoint;
         }
 
-        double Wall::pdf(Interaction &point) {
+        double Wall::surfacePointPdf(Interaction &point) {
             Vector3 transformedPoint = _transformMatrix != nullptr ?
                                        INVERSE((*_transformMatrix)) * Vector4(point.point, 1.0f)
                                                                    : point.point;
@@ -183,6 +184,7 @@ namespace kaguya {
                     hitRecord.setOutwardNormal(_normal, ray.getDirection());
                     hitRecord.u = (x - _x0) / (_x1 - _x0);
                     hitRecord.v = (z - _z0) / (_z1 - _z0);
+                    hitRecord.areaLight = _areaLight;
                     return true;
                 } else {
                     return false;
@@ -198,7 +200,7 @@ namespace kaguya {
             return width * height;
         }
 
-        Interaction ZXWall::sample() {
+        Interaction ZXWall::sampleSurfacePoint() {
             double u = uniformSample();
             double v = uniformSample();
 
@@ -211,7 +213,7 @@ namespace kaguya {
             return interaction;
         }
 
-        double ZXWall::pdf(Interaction &point) {
+        double ZXWall::surfacePointPdf(Interaction &point) {
             Vector3 samplePoint = point.point;
             if (samplePoint.y - _y < EPSILON &&
                 samplePoint.x > _x0 && samplePoint.x < _x1 &&
@@ -258,6 +260,7 @@ namespace kaguya {
                     hitRecord.setOutwardNormal(_normal, ray.getDirection());
                     hitRecord.u = (z - _z0) / (_z1 - _z0);
                     hitRecord.v = (y - _y0) / (_y1 - _y0);
+                    hitRecord.areaLight = _areaLight;
                     return true;
                 } else {
                     return false;
@@ -277,7 +280,7 @@ namespace kaguya {
             return width * height;
         }
 
-        Interaction YZWall::sample() {
+        Interaction YZWall::sampleSurfacePoint() {
             double u = uniformSample();
             double v = uniformSample();
 
@@ -290,7 +293,7 @@ namespace kaguya {
             return interaction;
         }
 
-        double YZWall::pdf(Interaction &point) {
+        double YZWall::surfacePointPdf(Interaction &point) {
             Vector3 samplePoint = point.point;
             if (samplePoint.y - _x < EPSILON &&
                 samplePoint.x > _y0 && samplePoint.x < _y1 &&
@@ -333,6 +336,7 @@ namespace kaguya {
                     hitRecord.setOutwardNormal(_normal, ray.getDirection());
                     hitRecord.u = (x - _x0) / (_x1 - _x0);
                     hitRecord.v = (y - _y0) / (_y1 - _y0);
+                    hitRecord.areaLight = _areaLight;
                     return true;
                 } else {
                     return false;
@@ -352,7 +356,7 @@ namespace kaguya {
             return width * height;
         }
 
-        Interaction XYWall::sample() {
+        Interaction XYWall::sampleSurfacePoint() {
             double u = uniformSample();
             double v = uniformSample();
 
@@ -365,7 +369,7 @@ namespace kaguya {
             return interaction;
         }
 
-        double XYWall::pdf(Interaction &point) {
+        double XYWall::surfacePointPdf(Interaction &point) {
             Vector3 samplePoint = point.point;
             if (samplePoint.x - _z < EPSILON &&
                 samplePoint.y > _y0 && samplePoint.x < _y1 &&

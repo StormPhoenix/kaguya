@@ -5,6 +5,8 @@
 #ifndef KAGUYA_METAL_H
 #define KAGUYA_METAL_H
 
+#include <kaguya/core/spectrum/Spectrum.hpp>
+
 #include <kaguya/material/Material.h>
 #include <kaguya/math/Math.hpp>
 #include <kaguya/math/ScatterSampler.h>
@@ -12,6 +14,7 @@
 namespace kaguya {
     namespace material {
 
+        using kaguya::core::Spectrum;
         using kaguya::math::ScatterSampler;
 
         class Metal : public Material {
@@ -29,8 +32,6 @@ namespace kaguya {
             Spectrum _albedo;
             // 毛玻璃效果系数
             double _fuzzy;
-            // 散射分布函数
-            std::shared_ptr<ScatterSampler> _pdf = nullptr;
         };
 
     }

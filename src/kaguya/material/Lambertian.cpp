@@ -18,8 +18,6 @@ namespace kaguya {
 
         Lambertian::Lambertian(std::shared_ptr<Texture> albedo) : _albedo(albedo) {
             _pdf = std::make_shared<HemiCosineSampler>();
-            // TODO delete
-//            _pdf = std::make_shared<HemiUniformSampler>();
         }
 
         BSDF *Lambertian::bsdf(Interaction &insect, MemoryArena &memoryArena) {

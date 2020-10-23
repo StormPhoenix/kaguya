@@ -34,14 +34,15 @@ namespace kaguya {
             void init();
 
             /**
-             * 对光源采样
-             * @param scene 场景
-             * @param sampleObject 从 sampleObject 发射采样光线
-             * @param sampleLightRay 采样光线
-             * @param sampleLightPdf 采样光线概率
-             * @return 是否采样成功
+             * 在 eye 处对光源采样
+             * @param scene scene
+             * @param eye
+             * @param bsdf
+             * @param sampleRay eye 处出发的射线
+             * @param lightPdf 采样概率
+             * @return
              */
-            bool sampleFromLights(Scene &scene, Vector3 sampleObject, Ray &sampleLightRay, double &sampleLightPdf);
+            Spectrum evaluateDirectLight(Scene &scene, const Interaction &eye, const BSDF &bsdf);
 
             /**
              * 具体渲染代码，CPU版本
