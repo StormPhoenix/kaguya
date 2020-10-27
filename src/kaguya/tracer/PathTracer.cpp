@@ -3,13 +3,12 @@
 //
 
 #include <kaguya/Config.h>
-#include <kaguya/tracer/PathTracer.h>
-#include <kaguya/scene/Shape.h>
-#include <kaguya/material/Material.h>
-#include <iostream>
-
 #include <kaguya/core/light/AreaLight.h>
+#include <kaguya/material/Material.h>
+#include <kaguya/scene/Shape.h>
+#include <kaguya/tracer/PathTracer.h>
 
+#include <iostream>
 #include <omp.h>
 
 namespace kaguya {
@@ -51,7 +50,7 @@ namespace kaguya {
             // 最多进行 _maxDepth 次数弹射
             for (int bounce = 0; bounce < _maxDepth; bounce++) {
                 // intersect
-                Interaction intersection;
+                SurfaceInteraction intersection;
                 bool isIntersected = scene.hit(scatterRay, intersection);
 
                 // 此处参考 pbrt 的写法，需要判断 bounce = 0 和 isSpecular 两种特殊情况
@@ -118,7 +117,7 @@ namespace kaguya {
             // TODO 添加对光源采样；对光源采样需要计算两个 surfacePointPdf
 
             if (depth < _maxDepth) {
-                Interaction hitRecord;
+                SurfaceInteraction hitRecord;
                 if (scene.hit(ray, hitRecord)) {
                     // 击中，检查击中材质
                     std::shared_ptr<Material> material = hitRecord.material;

@@ -21,15 +21,15 @@ namespace kaguya {
             Wall(double width, double height, std::shared_ptr<Material> material,
                  std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
-            virtual bool insect(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
+            virtual bool insect(const Ray &ray, SurfaceInteraction &hitRecord, double stepMin, double stepMax) override;
 
             virtual const AABB &boundingBox() const override;
 
             virtual double area() override;
 
-            virtual Interaction sampleSurfacePoint() override;
+            virtual SurfaceInteraction sampleSurfacePoint() override;
 
-            virtual double surfacePointPdf(Interaction &point) override;
+            virtual double surfacePointPdf(SurfaceInteraction &point) override;
 
         protected:
             /**
@@ -77,13 +77,13 @@ namespace kaguya {
 
             virtual void init() override;
 
-            virtual bool insect(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
+            virtual bool insect(const Ray &ray, SurfaceInteraction &hitRecord, double stepMin, double stepMax) override;
 
             virtual double area() override;
 
-            virtual Interaction sampleSurfacePoint() override;
+            virtual SurfaceInteraction sampleSurfacePoint() override;
 
-            virtual double surfacePointPdf(Interaction &point) override;
+            virtual double surfacePointPdf(SurfaceInteraction &point) override;
 
         protected:
             double _y;
@@ -110,13 +110,13 @@ namespace kaguya {
 
             virtual void init() override;
 
-            virtual bool insect(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
+            virtual bool insect(const Ray &ray, SurfaceInteraction &hitRecord, double stepMin, double stepMax) override;
 
             virtual double area() override;
 
-            virtual Interaction sampleSurfacePoint() override;
+            virtual SurfaceInteraction sampleSurfacePoint() override;
 
-            virtual double surfacePointPdf(Interaction &point) override;
+            virtual double surfacePointPdf(SurfaceInteraction &point) override;
 
         protected:
             double _x;
@@ -143,13 +143,13 @@ namespace kaguya {
 
             virtual void init() override;
 
-            virtual bool insect(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) override;
+            virtual bool insect(const Ray &ray, SurfaceInteraction &hitRecord, double stepMin, double stepMax) override;
 
             virtual double area() override;
 
-            virtual Interaction sampleSurfacePoint() override;
+            virtual SurfaceInteraction sampleSurfacePoint() override;
 
-            virtual double surfacePointPdf(Interaction &point) override;
+            virtual double surfacePointPdf(SurfaceInteraction &point) override;
 
         protected:
             double _z;

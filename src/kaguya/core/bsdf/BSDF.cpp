@@ -114,7 +114,7 @@ namespace kaguya {
 
                 // 计算 f 的总和
                 /* 计算 f 的总和一直觉得有问题有问题，如果处理不当 f 的加和是会大于 1 的，
-                 * 参考 pbrt 中 MixMaterial 中的方法，当多个 BXDF 加在一起是会进行加权的 */
+                 * 参考 pbrt 中 MixMaterial 中的方法，当多个 BXDF 加在一起是会进行加权的，其加权和为 1 */
                 if (!bxdf->containType(BSDF_SPECULAR)) {
                     for (int i = 0; i < _bxdfCount; i++) {
                         bool reflect = wi.y * wo.y > 0 ? true : false;

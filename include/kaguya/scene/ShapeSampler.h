@@ -40,21 +40,21 @@ namespace kaguya {
              * 在 Shape 表面进行均匀采样
              * @return
              */
-            virtual Interaction sampleSurfacePoint() = 0;
+            virtual SurfaceInteraction sampleSurfacePoint() = 0;
 
             /**
              * 计算surface上做均匀采样的概率
              * @param point 采样点
              * @return
              */
-            virtual double surfacePointPdf(Interaction &point);
+            virtual double surfacePointPdf(SurfaceInteraction &point);
 
             /**
              * 从 eye 处采样射线与 Shape 相交，返回交点
              * @param eye
              * @return
              */
-            virtual Interaction sampleRayIntersection(const Interaction &eye);
+            virtual SurfaceInteraction sampleRayIntersection(const Interaction &eye);
 
             /**
              * 计算从 eye 出发，沿 dir 方向击中 Shape 上的点的概率

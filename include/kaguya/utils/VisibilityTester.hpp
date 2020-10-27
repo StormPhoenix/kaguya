@@ -15,6 +15,7 @@ namespace kaguya {
     namespace utils {
 
         using kaguya::core::Interaction;
+        using kaguya::core::SurfaceInteraction;
         using kaguya::scene::Scene;
         using kaguya::tracer::Ray;
 
@@ -23,19 +24,26 @@ namespace kaguya {
             VisibilityTester() {}
 
             VisibilityTester(const Interaction start, const Interaction end) :
-                    _start(start), _end(end) {}
+                    _start(start), _end(end) {
+                _step = LENGTH(_end.point - _start.point);
+            }
 
             bool isVisible(Scene &scene) {
                 Ray ray(_start.point, NORMALIZE(_end.point - _start.point));
-                Interaction interaction;
+                // TODO 如何融合 Surface 和 Voluem
+                SurfaceInteraction interaction;
                 bool isIntersect = scene.hit(ray, interaction);
-                // TODO 可能不能直接用等号
-                if (isIntersect && pointMatch(interaction.point, _end.point)) {
+
+//                return (!isIntersect) || (isIntersect && interaction.step >= (_step - EPSILON));
+                // TODO
+                if (!isIntersect) {
+                    // 如果没有击中任何物体，则 Ray 必定穿过 _end
+                    return true;
+                } else if (interaction.step >= (_step - EPSILON)) {
                     return true;
                 } else {
                     return false;
                 }
-//                return isIntersect && interaction.point == _end.point;
             }
 
         private:
@@ -48,6 +56,7 @@ namespace kaguya {
         private:
             Interaction _start;
             Interaction _end;
+            double _step;
         };
 
     }

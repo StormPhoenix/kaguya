@@ -22,7 +22,7 @@ namespace kaguya {
 
             virtual bool isSpecular() override;
 
-            virtual BSDF *bsdf(Interaction &insect, MemoryArena &memoryArena) override;
+            virtual BSDF *bsdf(SurfaceInteraction &insect, MemoryArena &memoryArena) override;
 
 
         private:

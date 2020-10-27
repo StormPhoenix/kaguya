@@ -7,11 +7,11 @@
 namespace kaguya {
     namespace scene {
 
-        double ShapeSampler::surfacePointPdf(Interaction &point) {
+        double ShapeSampler::surfacePointPdf(SurfaceInteraction &point) {
             return 1 / area();
         }
 
-        Interaction ShapeSampler::sampleRayIntersection(const Interaction &eye) {
+        SurfaceInteraction ShapeSampler::sampleRayIntersection(const Interaction &eye) {
             return sampleSurfacePoint();
         }
 
@@ -19,7 +19,7 @@ namespace kaguya {
             // 构建射线
             Ray ray = Ray(eye.point, dir);
             // 判断交点
-            Interaction intersection;
+            SurfaceInteraction intersection;
             if (insect(ray, intersection, 0.001, infinity)) {
                 // 将交点处 rayPdf 转化为 w_i surfacePointPdf
                 double distance = LENGTH(intersection.point - ray.getOrigin());

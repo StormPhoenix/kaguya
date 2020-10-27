@@ -20,7 +20,7 @@ namespace kaguya {
             _pdf = std::make_shared<HemiCosineSampler>();
         }
 
-        BSDF *Lambertian::bsdf(Interaction &insect, MemoryArena &memoryArena) {
+        BSDF *Lambertian::bsdf(SurfaceInteraction &insect, MemoryArena &memoryArena) {
             Spectrum albedo = _albedo->sample(insect.u, insect.v);
             BXDFLambertianReflection *lambertianBXDF =
                     ALLOC(memoryArena, BXDFLambertianReflection)(albedo);

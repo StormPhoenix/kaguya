@@ -83,7 +83,7 @@ namespace kaguya {
             _aabb = AABB(Vector3(minX, minY, minZ), Vector3(maxX, maxY, maxZ));
         }
 
-        bool Triangle::insect(const Ray &ray, Interaction &hitRecord,
+        bool Triangle::insect(const Ray &ray, SurfaceInteraction &hitRecord,
                               double stepMin, double stepMax) {
 
             const Vector3 &dir = ray.getDirection();

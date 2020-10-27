@@ -6,7 +6,7 @@
 #define KAGUYA_BXDFSPECULARTRANSMISSION_H
 
 #include <kaguya/core/bsdf/BXDF.h>
-#include <kaguya/core/bsdf/Fresnel.h>
+#include <kaguya/core/bsdf/FresnelDielectric.h>
 
 namespace kaguya {
     namespace core {
@@ -16,8 +16,16 @@ namespace kaguya {
          */
         class BXDFSpecularTransmission : public BXDF {
         public:
+            /**
+             * TODO 说明 RADIANCE 的作用
+             * @param albedo
+             * @param thetaI
+             * @param thetaT
+             * @param fresnel
+             * @param mode
+             */
             BXDFSpecularTransmission(const Spectrum &albedo, double thetaI, double thetaT,
-                                     std::shared_ptr<Fresnel> fresnel);
+                                     FresnelDielectric *fresnel, TransportMode mode = TransportMode::RADIANCE);
 
             virtual Spectrum f(const Vector3 &wo, const Vector3 &wi) const override;
 
@@ -29,7 +37,9 @@ namespace kaguya {
             const Spectrum _albedo;
             const double _thetaI;
             const double _thetaT;
-            std::shared_ptr<Fresnel> _fresnel = nullptr;
+            // 光线传输模式
+            const TransportMode _mode;
+            FresnelDielectric *_fresnel = nullptr;
         };
 
     }

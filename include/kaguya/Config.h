@@ -7,7 +7,7 @@
 
 #include <kaguya/scene/Shape.h>
 #include <kaguya/scene/Scene.h>
-#include <kaguya/scene/Camera.h>
+#include <kaguya/tracer/Camera.h>
 #include <memory>
 
 namespace kaguya {
@@ -42,7 +42,9 @@ namespace kaguya {
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 //            scene->testBuildCornelBoxWithBunny();
 //            scene->testBuildCornelBox();
-            scene->testBuildEmptyCornelBox();
+//            scene->testBuildEmptyCornelBox();
+            scene->testSpotLight();
+//            scene->testAreaLight();
             return scene;
         }
     };

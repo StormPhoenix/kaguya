@@ -15,6 +15,7 @@ namespace kaguya {
     namespace material {
 
         using kaguya::core::Interaction;
+        using kaguya::core::SurfaceInteraction;
         using kaguya::core::BSDF;
         using kaguya::memory::MemoryArena;
 
@@ -27,7 +28,7 @@ namespace kaguya {
              * 计算材质的 bsdf
              * @param insect ray 与 shape 的相交点
              */
-            virtual BSDF *bsdf(Interaction &insect, MemoryArena &memoryArena) = 0;
+            virtual BSDF *bsdf(SurfaceInteraction &insect, MemoryArena &memoryArena) = 0;
 
             /**
              * TODO delete 逐渐删除 isSpecular

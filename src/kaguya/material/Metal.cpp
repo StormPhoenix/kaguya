@@ -23,7 +23,7 @@ namespace kaguya {
             return true;
         }
 
-        BSDF *Metal::bsdf(Interaction &insect, MemoryArena &memoryArena) {
+        BSDF *Metal::bsdf(SurfaceInteraction &insect, MemoryArena &memoryArena) {
             FresnelDefault *fresnel = ALLOC(memoryArena, FresnelDefault)();
             BXDFSpecularReflection *bxdf = ALLOC(memoryArena, BXDFSpecularReflection)(_albedo, fresnel);
             BSDF *bsdf = ALLOC(memoryArena, BSDF)(insect);

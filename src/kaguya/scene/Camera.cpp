@@ -2,7 +2,7 @@
 // Created by Storm Phoenix on 2020/9/30.
 //
 
-#include <kaguya/scene/Camera.h>
+#include <kaguya/tracer/Camera.h>
 
 namespace kaguya {
     namespace tracer {
@@ -26,6 +26,10 @@ namespace kaguya {
                     _leftBottomCorner + 2 * _halfWindowWidth * u * _right + 2 * _halfWindowHeight * v * _up;
             Vector3 dir = NORMALIZE(samplePoint - _eye);
             return Ray(_eye, dir);
+        }
+
+        Vector3 Camera::getEye() const{
+            return _eye;
         }
 
         int Camera::getResolutionHeight() {

@@ -45,6 +45,8 @@ namespace kaguya {
              */
             Ray sendRay(double u, double v);
 
+            Vector3 getEye() const;
+
             /**
              * 获得相机成像宽度
              * @return

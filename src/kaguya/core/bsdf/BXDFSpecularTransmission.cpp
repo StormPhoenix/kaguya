@@ -9,9 +9,9 @@ namespace kaguya {
     namespace core {
 
         BXDFSpecularTransmission::BXDFSpecularTransmission(const Spectrum &albedo, double thetaI, double thetaT,
-                                                           std::shared_ptr<Fresnel> fresnel) :
-                BXDF(BXDFType(BSDF_SPECULAR | BSDF_TRANSMISSION)), _thetaI(thetaI), _thetaT(thetaT) {
-            _fresnel = std::make_shared<FresnelDielectric>(thetaI, thetaT);
+                                                           FresnelDielectric *fresnel, TransportMode mode) :
+                BXDF(BXDFType(BSDF_SPECULAR | BSDF_TRANSMISSION)), _thetaI(thetaI), _thetaT(thetaT), _mode(mode) {
+            _fresnel = fresnel;
         }
 
         Spectrum BXDFSpecularTransmission::f(const Vector3 &wo, const Vector3 &wi) const {
@@ -40,7 +40,11 @@ namespace kaguya {
             *pdf = 1;
             double cosineThetaI = abs(wo.y);
             double cosineThetaT = abs(wi->y);
-            return _albedo * (Spectrum(1.0) - _fresnel->fresnel(cosineThetaI)) / cosineThetaT;
+            Spectrum f = _albedo * (Spectrum(1.0) - _fresnel->fresnel(cosineThetaI)) / cosineThetaT;
+            if (_mode == TransportMode::RADIANCE) {
+                f *= std::pow(refraction, 2);
+            }
+            return f;
         }
 
         double BXDFSpecularTransmission::samplePdf(const Vector3 &wo, const Vector3 &wi) const {

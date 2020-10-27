@@ -5,8 +5,9 @@
 #ifndef KAGUYA_SCENE_H
 #define KAGUYA_SCENE_H
 
+#include <kaguya/core/Interaction.h>
 #include <kaguya/scene/Shape.h>
-#include <kaguya/scene/Camera.h>
+#include <kaguya/tracer/Camera.h>
 #include <memory>
 
 namespace kaguya {
@@ -22,6 +23,7 @@ namespace kaguya {
 
         using kaguya::tracer::Camera;
         using kaguya::core::Light;
+        using kaguya::core::SurfaceInteraction;
 
         /**
          * 保存场景数据
@@ -32,19 +34,29 @@ namespace kaguya {
             /**
              * 构建 Cornel box
              */
-//            void testBuildCornelBox();
+            void testBuildCornelBox();
 
             /**
              * 构建 Cornel box，加载 bunny 模型
              */
-//            void testBuildCornelBoxWithBunny();
+            void testBuildCornelBoxWithBunny();
 
             /**
              * 空 Cornel box
              */
             void testBuildEmptyCornelBox();
 
-            bool hit(const Ray &ray, Interaction &hitRecord);
+            /**
+             * 测试 SpotLight
+             */
+            void testSpotLight();
+
+            /**
+             * 测试区域光
+             */
+            void testAreaLight();
+
+            bool hit(const Ray &ray, SurfaceInteraction &hitRecord);
 
             std::shared_ptr<Shape> getWorld() {
                 return _world;

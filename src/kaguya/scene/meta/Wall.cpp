@@ -64,7 +64,7 @@ namespace kaguya {
             _area = (transformedWidth * transformedHeight);
         }
 
-        bool Wall::insect(const Ray &ray, Interaction &hitRecord,
+        bool Wall::insect(const Ray &ray, SurfaceInteraction &hitRecord,
                           double stepMin, double stepMax) {
             // 仿照三角形平面求直线交点解法
             Vector3 transformedA = _transformMatrix != nullptr ?
@@ -125,7 +125,7 @@ namespace kaguya {
             return _area;
         }
 
-        Interaction Wall::sampleSurfacePoint() {
+        SurfaceInteraction Wall::sampleSurfacePoint() {
             // 随机采样坐标
             double u = uniformSample();
             double v = uniformSample();
@@ -133,13 +133,13 @@ namespace kaguya {
             Vector3 horizontal = (_transformedRightBottom - _transformedLeftBottom) * u;
             Vector3 vertical = (_transformedLeftTop - _transformedLeftBottom) * v;
 
-            Interaction samplePoint;
+            SurfaceInteraction samplePoint;
             samplePoint.point = _transformedLeftBottom + horizontal + vertical;
             samplePoint.normal = _transformedNormal;
             return samplePoint;
         }
 
-        double Wall::surfacePointPdf(Interaction &point) {
+        double Wall::surfacePointPdf(SurfaceInteraction &point) {
             Vector3 transformedPoint = _transformMatrix != nullptr ?
                                        INVERSE((*_transformMatrix)) * Vector4(point.point, 1.0f)
                                                                    : point.point;
@@ -169,7 +169,7 @@ namespace kaguya {
             init();
         }
 
-        bool ZXWall::insect(const Ray &ray, Interaction &hitRecord,
+        bool ZXWall::insect(const Ray &ray, SurfaceInteraction &hitRecord,
                             double stepMin, double stepMax) {
             double step = (_y - ray.getOrigin().y) / ray.getDirection().y;
             if (step >= stepMin && step <= stepMax) {
@@ -200,20 +200,20 @@ namespace kaguya {
             return width * height;
         }
 
-        Interaction ZXWall::sampleSurfacePoint() {
+        SurfaceInteraction ZXWall::sampleSurfacePoint() {
             double u = uniformSample();
             double v = uniformSample();
 
             double width = abs(_x1 - _x0);
             double height = abs(_z1 - _z0);
 
-            Interaction interaction;
+            SurfaceInteraction interaction;
             interaction.point = {_x0 + width * u, _y, _z0 + height * v};
             interaction.normal = _normal;
             return interaction;
         }
 
-        double ZXWall::surfacePointPdf(Interaction &point) {
+        double ZXWall::surfacePointPdf(SurfaceInteraction &point) {
             Vector3 samplePoint = point.point;
             if (samplePoint.y - _y < EPSILON &&
                 samplePoint.x > _x0 && samplePoint.x < _x1 &&
@@ -245,7 +245,7 @@ namespace kaguya {
             init();
         }
 
-        bool YZWall::insect(const Ray &ray, Interaction &hitRecord,
+        bool YZWall::insect(const Ray &ray, SurfaceInteraction &hitRecord,
                             double stepMin, double stepMax) {
             double step = (_x - ray.getOrigin().x) / ray.getDirection().x;
             if (step >= stepMin && step <= stepMax) {
@@ -280,20 +280,20 @@ namespace kaguya {
             return width * height;
         }
 
-        Interaction YZWall::sampleSurfacePoint() {
+        SurfaceInteraction YZWall::sampleSurfacePoint() {
             double u = uniformSample();
             double v = uniformSample();
 
             double width = abs(_z1 - _z0);
             double height = abs(_y1 - _y0);
 
-            Interaction interaction;
+            SurfaceInteraction interaction;
             interaction.point = {_x, _y0 + v * height, _z0 + width * u};
             interaction.normal = _normal;
             return interaction;
         }
 
-        double YZWall::surfacePointPdf(Interaction &point) {
+        double YZWall::surfacePointPdf(SurfaceInteraction &point) {
             Vector3 samplePoint = point.point;
             if (samplePoint.y - _x < EPSILON &&
                 samplePoint.x > _y0 && samplePoint.x < _y1 &&
@@ -321,7 +321,7 @@ namespace kaguya {
             init();
         }
 
-        bool XYWall::insect(const Ray &ray, Interaction &hitRecord,
+        bool XYWall::insect(const Ray &ray, SurfaceInteraction &hitRecord,
                             double stepMin, double stepMax) {
             double step = (_z - ray.getOrigin().z) / ray.getDirection().z;
             if (step >= stepMin && step <= stepMax) {
@@ -356,20 +356,20 @@ namespace kaguya {
             return width * height;
         }
 
-        Interaction XYWall::sampleSurfacePoint() {
+        SurfaceInteraction XYWall::sampleSurfacePoint() {
             double u = uniformSample();
             double v = uniformSample();
 
             double width = abs(_x1 - _x0);
             double height = abs(_y1 - _y0);
 
-            Interaction interaction;
+            SurfaceInteraction interaction;
             interaction.point = {_x0 + width * u, _y0 + v * height, _z};
             interaction.normal = _normal;
             return interaction;
         }
 
-        double XYWall::surfacePointPdf(Interaction &point) {
+        double XYWall::surfacePointPdf(SurfaceInteraction &point) {
             Vector3 samplePoint = point.point;
             if (samplePoint.x - _z < EPSILON &&
                 samplePoint.y > _y0 && samplePoint.x < _y1 &&

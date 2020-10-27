@@ -9,7 +9,7 @@
 
 #include <kaguya/scene/Scene.h>
 #include <kaguya/tracer/Tracer.h>
-#include <kaguya/scene/Camera.h>
+#include <kaguya/tracer/Camera.h>
 
 #include <kaguya/core/Core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>

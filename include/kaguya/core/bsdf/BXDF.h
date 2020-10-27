@@ -11,6 +11,11 @@
 namespace kaguya {
     namespace core {
 
+        typedef enum TransportMode {
+            IMPORTANCE,
+            RADIANCE
+        } TransportMode;
+
         enum BXDFType {
             BSDF_REFLECTION = 1 << 0,
             BSDF_DIFFUSE = 1 << 1,

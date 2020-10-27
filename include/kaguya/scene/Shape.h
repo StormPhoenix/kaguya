@@ -27,6 +27,7 @@ namespace kaguya {
         using kaguya::material::Material;
         using kaguya::scene::acc::AABB;
         using kaguya::tracer::Ray;
+        using kaguya::core::SurfaceInteraction;
         using kaguya::core::Interaction;
 
         class Shape {
@@ -39,7 +40,7 @@ namespace kaguya {
              * @param stepMax 射线步长最大值
              * @return
              */
-            virtual bool insect(const Ray &ray, Interaction &hitRecord, double stepMin, double stepMax) = 0;
+            virtual bool insect(const Ray &ray, SurfaceInteraction &hitRecord, double stepMin, double stepMax) = 0;
 
             /**
              * 计算 AxisAlignBoundingBox

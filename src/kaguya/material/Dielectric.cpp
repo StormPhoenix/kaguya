@@ -20,7 +20,7 @@ namespace kaguya {
             return true;
         }
 
-        BSDF *Dielectric::bsdf(kaguya::core::Interaction &insect, MemoryArena &memoryArena) {
+        BSDF *Dielectric::bsdf(SurfaceInteraction &insect, MemoryArena &memoryArena) {
             Spectrum albedo = _albedo->sample(insect.u, insect.v);
             BXDFSpecular *specularBXDF = ALLOC(memoryArena, BXDFSpecular)(albedo, 1.0f, _refractiveIndex);
             BSDF *bsdf = ALLOC(memoryArena, BSDF)(insect);
