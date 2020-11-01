@@ -20,7 +20,8 @@ namespace kaguya {
         public:
             Lambertian(std::shared_ptr<Texture> albedo);
 
-            virtual BSDF *bsdf(SurfaceInteraction &insect, MemoryArena &memoryArena) override;
+            virtual BSDF *bsdf(SurfaceInteraction &insect, MemoryArena &memoryArena,
+                               TransportMode mode = TransportMode::RADIANCE) override;
 
         private:
             std::shared_ptr<Texture> _albedo = nullptr;

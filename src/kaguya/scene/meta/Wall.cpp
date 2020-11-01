@@ -105,7 +105,7 @@ namespace kaguya {
                     hitRecord.setOutwardNormal(normal, dir);
                     hitRecord.u = offsetX / _width;
                     hitRecord.v = offsetY / _height;
-                    hitRecord.material = _material;
+                    hitRecord.material = _material.get();
                     hitRecord.id = getId();
                     hitRecord.areaLight = _areaLight;
                     return true;
@@ -177,7 +177,7 @@ namespace kaguya {
                 double x = ray.getOrigin().x + step * ray.getDirection().x;
 
                 if (checkRange(z, _z0, _z1) && checkRange(x, _x0, _x1)) {
-                    hitRecord.material = _material;
+                    hitRecord.material = _material.get();
                     hitRecord.id = getId();
                     hitRecord.point = ray.at(step);
                     hitRecord.step = step;
@@ -253,7 +253,7 @@ namespace kaguya {
                 double y = ray.getOrigin().y + step * ray.getDirection().y;
 
                 if (checkRange(z, _z0, _z1) && checkRange(y, _y0, _y1)) {
-                    hitRecord.material = _material;
+                    hitRecord.material = _material.get();
                     hitRecord.id = getId();
                     hitRecord.point = ray.at(step);
                     hitRecord.step = step;
@@ -329,7 +329,7 @@ namespace kaguya {
                 double y = ray.getOrigin().y + step * ray.getDirection().y;
 
                 if (checkRange(x, _x0, _x1) && checkRange(y, _y0, _y1)) {
-                    hitRecord.material = _material;
+                    hitRecord.material = _material.get();
                     hitRecord.id = getId();
                     hitRecord.point = ray.at(step);
                     hitRecord.step = step;

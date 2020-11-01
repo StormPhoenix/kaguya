@@ -40,7 +40,7 @@ namespace kaguya {
             *pdf = 1;
             double cosineThetaI = abs(wo.y);
             double cosineThetaT = abs(wi->y);
-            Spectrum f = _albedo * (Spectrum(1.0) - _fresnel->fresnel(cosineThetaI)) / cosineThetaT;
+            Spectrum f = _albedo * (Spectrum(1.0) - _fresnel->fresnel(cosineThetaT)) / cosineThetaT;
             if (_mode == TransportMode::RADIANCE) {
                 f *= std::pow(refraction, 2);
             }

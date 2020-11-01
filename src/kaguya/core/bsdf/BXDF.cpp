@@ -36,19 +36,5 @@ namespace kaguya {
             return (type & bxdfType) == bxdfType;
         }
 
-        Vector3 BXDF::hemiCosineSampling() {
-            // fi = 2 * Pi * sampleU
-            double sampleU = uniformSample();
-            // sampleV = sin^2(theta)
-            double sampleV = uniformSample();
-            // x = sin(theta) * cos(fi)
-            double x = sqrt(sampleV) * cos(2 * PI * sampleU);
-            // y = cos(theta)
-            double y = sqrt(1 - sampleV);
-            // z = sin(theta) * sin(fi)
-            double z = sqrt(sampleV) * sin(2 * PI * sampleU);
-            return NORMALIZE(Vector3(x, y, z));
-        }
-
     }
 }

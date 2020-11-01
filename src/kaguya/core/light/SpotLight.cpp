@@ -24,14 +24,38 @@ namespace kaguya {
             Interaction interaction;
             interaction.point = _center;
             (*visibilityTester) = VisibilityTester(eye, interaction);
-            return _intensity * luminance(-(*wi)) / std::pow(LENGTH(_center - eye.point), 2);
+            return _intensity * fallOffWeight(-(*wi)) / std::pow(LENGTH(_center - eye.point), 2);
         }
 
         double SpotLight::sampleRayPdf(const Interaction &eye, const Vector3 &dir) {
             return 0;
         }
 
-        Spectrum SpotLight::luminance(const Vector3 &wo) {
+        Spectrum SpotLight::sampleLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) {
+            // 在局部坐标空间中均匀采样射线
+            Vector3 dirLocal = coneUniformSampling(_cosTotalRange);
+
+            // 计算切线空间
+            Vector3 tanY = _dir;
+            Vector3 tanX;
+            Vector3 tanZ;
+            tangentSpace(tanY, &tanX, &tanZ);
+
+            // 计算世界坐标系中射线方向
+            Vector3 dirWorld = dirLocal.x * tanX + dirLocal.y * tanY + dirLocal.z * tanZ;
+
+            // 设置 ray
+            ray->setOrigin(_center);
+            ray->setDirection(dirWorld);
+
+            (*normal) = dirWorld;
+            (*pdfPos) = 1.0;
+            (*pdfDir) = coneUniformSamplePdf(_cosTotalRange);
+
+            return _intensity * fallOffWeight(dirWorld);
+        }
+
+        Spectrum SpotLight::fallOffWeight(const Vector3 &wo) {
             double cosine = DOT(wo, _dir);
             if (cosine < _cosTotalRange) {
                 return Spectrum(0);

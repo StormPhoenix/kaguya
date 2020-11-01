@@ -6,7 +6,7 @@
 #include <kaguya/core/light/AreaLight.h>
 #include <kaguya/material/Material.h>
 #include <kaguya/scene/Shape.h>
-#include <kaguya/tracer/PathTracer.h>
+#include <kaguya/tracer/pt/PathTracer.h>
 
 #include <iostream>
 #include <omp.h>
@@ -74,10 +74,10 @@ namespace kaguya {
                     break;
                 }
 
-                std::shared_ptr<Material> material = intersection.material;
+                Material *material = intersection.material;
                 assert(material != nullptr);
 
-                BSDF *bsdf = material->bsdf(intersection, memoryArena);
+                BSDF *bsdf = intersection.buildBSDF(memoryArena);
                 assert(bsdf != nullptr);
 
                 // 判断是否向光源采样
@@ -120,7 +120,7 @@ namespace kaguya {
                 SurfaceInteraction hitRecord;
                 if (scene.hit(ray, hitRecord)) {
                     // 击中，检查击中材质
-                    std::shared_ptr<Material> material = hitRecord.material;
+                    Material *material = hitRecord.material;
                     // 不发光物体
                     // 若对光源采样，则记录采样射线
                     Ray scatterRay;
@@ -129,7 +129,7 @@ namespace kaguya {
 
                     if (!material->isSpecular()) {
                         // 不是 Specular 类型，考虑对光源采样
-                        BSDF *bsdf = material->bsdf(hitRecord, memoryArena);
+                        BSDF *bsdf = hitRecord.buildBSDF(memoryArena);
                         if (bsdf == nullptr) {
                             return Spectrum(0.0);
                         }
@@ -166,7 +166,7 @@ namespace kaguya {
                         }
                     }
 
-                    BSDF *bsdf = material->bsdf(hitRecord, memoryArena);
+                    BSDF *bsdf = hitRecord.buildBSDF(memoryArena);
                     Vector3 worldWo = -ray.getDirection();
                     Vector3 worldWi = Vector3(0.0);
                     Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf);
@@ -260,9 +260,6 @@ namespace kaguya {
                         for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
                             auto u = (col + uniformSample()) / cameraWidth;
                             auto v = (row + uniformSample()) / cameraHeight;
-
-//                            auto u = (col + uniformSample() * 0.5) / cameraWidth;
-//                            auto v = (row + uniformSample() * 0.5) / cameraHeight;
 
                             // 发射采样光线，开始渲染
                             Ray sampleRay = _camera->sendRay(u, v);

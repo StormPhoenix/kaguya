@@ -118,6 +118,111 @@ inline double misWeight(int nSampleF, double pdfF, int nSampleG, double pdfG) {
     return (f * f) / (g * g + f * f);
 }
 
+/**
+ * （局部坐标系）
+ * 从 y > 0 的半球面，按照 cos(theta) / Pi 的概率采样射线
+ * @return
+ */
+inline Vector3 hemiCosineSampling() {
+    // fi = 2 * Pi * sampleU
+    double sampleU = uniformSample();
+    // sampleV = sin^2(theta)
+    double sampleV = uniformSample();
+    // x = sin(theta) * cos(fi)
+    double x = sqrt(sampleV) * cos(2 * PI * sampleU);
+    // y = cos(theta)
+    double y = sqrt(1 - sampleV);
+    // z = sin(theta) * sin(fi)
+    double z = sqrt(sampleV) * sin(2 * PI * sampleU);
+    return NORMALIZE(Vector3(x, y, z));
+}
+
+/**
+ * （局部坐标系）
+ * 在球面做均匀采样，默认 (0, 1, 0) 为法线方向
+ * @return
+ */
+inline Vector3 sphereUniformSampling() {
+    // phi = 2 * Pi * sampleU
+    double sampleU = uniformSample();
+    // 2 * sampleV = 1 - cos(theta)
+    double sampleV = uniformSample();
+
+    // y = 1 - 2 * sampleV
+    double y = 1 - 2 * sampleV;
+    // x = sin(theta) * cos(phi)
+    double x = std::sqrt(std::max(0.0, (1 - y * y))) * std::cos(2 * PI * sampleU);
+    // z = sin(theta) * sin(phi)
+    double z = std::sqrt(std::max(0.0, (1 - y * y))) * std::sin(2 * PI * sampleU);
+
+    return NORMALIZE(Vector3(x, y, z));
+}
+
+/**
+ * （局部坐标系）
+ * 计算 sample 在 hemi-sphere cosine 分布下的 pdf
+ * @param sample
+ * @return
+ */
+inline double hemiCosineSamplePdf(Vector3 sample) {
+    double cosine = NORMALIZE(sample).y;
+    return cosine < 0 ? 0 : cosine * INV_PI;
+}
+
+/**
+ * 计算切线空间
+ * @param tanY 切线空间 Y 轴
+ * @param tanX 切线空间 X 轴
+ * @param tanZ 切线空间 Z 轴
+ */
+inline void tangentSpace(Vector3 &tanY, Vector3 *tanX, Vector3 *tanZ) {
+    // 计算与 tanY 垂直的 tanX
+    if (std::abs(tanY.x) > std::abs(tanY.y)) {
+        (*tanX) = Vector3(-tanY.z, 0, tanY.x);
+    } else {
+        (*tanX) = Vector3(0, tanY.z, -tanY.y);
+    }
+    (*tanX) = NORMALIZE(*tanX);
+    (*tanZ) = NORMALIZE(CROSS(tanY, *tanX));
+}
+
+/**
+ * 从 cone 空间中均匀采样射线
+ * @param cosThetaMax
+ * @return
+ */
+inline Vector3 coneUniformSampling(double cosThetaMax) {
+    // phi = 2 * PI * sampleU
+    double sampleU = uniformSample();
+    // sampleV = (1 - cos(theta)) / (1 - cos(thetaMax))
+    double sampleV = uniformSample();
+
+    // 计算 cos(theta) sin(theta)
+    double cosTheta = 1.0 - sampleV + sampleV * cosThetaMax;
+    double sinTheta = std::sqrt(std::max(0.0, 1 - cosTheta * cosTheta));
+    // 计算 cos(phi) sin(phi)
+    double cosPhi = std::cos(2 * PI * sampleU);
+    double sinPhi = std::sin(2 * PI * sampleU);
+
+    // y = cos(theta)
+    double y = cosTheta;
+    // x = sin(theta) * cos(phi)
+    double x = sinTheta * cosPhi;
+    // z = sin(theta) * sin(phi)
+    double z = sinTheta * sinPhi;
+
+    return NORMALIZE(Vector3(x, y, z));
+}
+
+/**
+ * 计算 cone 空间中均匀采样射线的 pdf
+ * @param cosThetaMax
+ * @return
+ */
+inline double coneUniformSamplePdf(double cosThetaMax) {
+    return 1 / (2 * PI * (1 - cosThetaMax));
+}
+
 #define DEGREES_TO_RADIANS(degrees) degreesToRadians(degrees)
 
 #endif //KAGUYA_MATH_HPP

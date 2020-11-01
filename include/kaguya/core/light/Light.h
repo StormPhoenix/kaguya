@@ -7,12 +7,14 @@
 
 #include <kaguya/core/Core.h>
 #include <kaguya/core/Interaction.h>
+#include <kaguya/tracer/Ray.h>
 #include <kaguya/utils/VisibilityTester.hpp>
 
 namespace kaguya {
     namespace core {
 
         using kaguya::utils::VisibilityTester;
+        using kaguya::tracer::Ray;
 
         // 灯光类型
         typedef enum LightType {
@@ -46,7 +48,16 @@ namespace kaguya {
              */
             virtual double sampleRayPdf(const Interaction &eye, const Vector3 &dir) = 0;
 
-            bool isDeltaType() {
+            /**
+             * light 主动发射光线
+             * @param ray 发射射线
+             * @param pdfPos 射线位置 pdf
+             * @param pdfDir 射线方向 pdf
+             * @return
+             */
+            virtual Spectrum sampleLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) = 0;
+
+            bool isDeltaType() const {
                 return (_type & (DELTA_DIRECTION | DELTA_POSITION)) > 0;
             }
 

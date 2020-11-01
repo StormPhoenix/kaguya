@@ -15,7 +15,8 @@ namespace kaguya {
          */
         class BXDFSpecular : public BXDF {
         public:
-            BXDFSpecular(const Spectrum &albedo, double thetaI, double thetaT);
+            BXDFSpecular(const Spectrum &albedo, double thetaI, double thetaT,
+                         TransportMode mode = TransportMode::RADIANCE);
 
             virtual Spectrum f(const Vector3 &wo, const Vector3 &wi) const override;
 
@@ -27,6 +28,7 @@ namespace kaguya {
             double _thetaI;
             double _thetaT;
             Spectrum _albedo;
+            const TransportMode _mode;
         };
 
     }

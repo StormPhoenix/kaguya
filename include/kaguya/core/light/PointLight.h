@@ -35,6 +35,8 @@ namespace kaguya {
 
             virtual double sampleRayPdf(const Interaction &eye, const Vector3 &dir) override;
 
+            virtual Spectrum sampleLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) override;
+
         private:
             // 单位立体角的光强
             const Spectrum _intensity;

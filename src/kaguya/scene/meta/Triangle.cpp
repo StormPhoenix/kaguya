@@ -120,7 +120,7 @@ namespace kaguya {
                 hitRecord.setOutwardNormal(normal, dir);
                 hitRecord.u = DOT(factor, Vector3(_uv1.x, _uv2.x, _uv3.x));
                 hitRecord.v = DOT(factor, Vector3(_uv1.y, _uv2.y, _uv3.y));
-                hitRecord.material = _material;
+                hitRecord.material = _material.get();
                 hitRecord.id = getId();
                 return true;
             } else {

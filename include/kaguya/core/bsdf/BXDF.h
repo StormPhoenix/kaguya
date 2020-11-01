@@ -75,13 +75,6 @@ namespace kaguya {
              */
             bool containType(const BXDFType bxdfType);
 
-        private:
-            /**
-             * 默认半球采样函数
-             * @return
-             */
-            Vector3 hemiCosineSampling();
-
         public:
             const BXDFType type;
         };

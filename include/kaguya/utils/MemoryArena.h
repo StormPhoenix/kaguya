@@ -53,6 +53,17 @@ namespace kaguya {
              */
             void *alloc(size_t bytes);
 
+            template<typename T>
+            T *alloc(size_t count, bool initialize) {
+                T *ret = (T *) alloc(sizeof(T) * count);
+                if (initialize) {
+                    for (int offset = 0; offset < count; offset++) {
+                        new(&ret[offset])T();
+                    }
+                }
+                return ret;
+            }
+
             /**
              * 清空所有已分配内存
              */

@@ -6,6 +6,8 @@
 #define KAGUYA_INTERACTION_H
 
 #include <kaguya/core/Core.h>
+#include <kaguya/utils/MemoryArena.h>
+#include <kaguya/core/bsdf/BXDF.h>
 
 namespace kaguya {
     namespace material {
@@ -27,9 +29,11 @@ namespace kaguya {
         class Light;
 
         using kaguya::tracer::Camera;
+        using kaguya::material::Material;
+        using kaguya::memory::MemoryArena;
 
         /**
-        * Ray 与 Hittable 的交点记录
+        * Ray 与 Scene 的交点记录
         */
         class Interaction {
         public:
@@ -42,7 +46,7 @@ namespace kaguya {
             // 击中射线步长
             double step;
             // 击中材质种类
-            std::shared_ptr<kaguya::material::Material> material = nullptr;
+            Material *material = nullptr;
             // 击中物体的 ID
             long long id = -1;
 
@@ -74,9 +78,13 @@ namespace kaguya {
                                double step, double u = 0, double v = 0) :
                     Interaction(point, direction, normal, step), u(u), v(v) {}
 
+            BSDF *buildBSDF(MemoryArena &memoryArena, TransportMode mode = TransportMode::RADIANCE);
+
             // 击中点纹理坐标
             double u;
             double v;
+            // 击中点处的 BSDF
+            BSDF *bsdf = nullptr;
             // 如果被击中物体是 AreaLight，则这一项应该被赋值
             std::shared_ptr<AreaLight> areaLight = nullptr;
         };
@@ -97,7 +105,16 @@ namespace kaguya {
 
             StartEndInteraction(const Camera *camera) : camera(camera) {}
 
-            StartEndInteraction(const Light *light) : light(light) {}
+            StartEndInteraction(const Light *light, const Interaction &interaction) :
+                    light(light), Interaction(interaction) {}
+
+            StartEndInteraction(const Light *light, const Vector3 &p, const Vector3 &dir,
+                                const Vector3 &n)
+                    : light(light) {
+                point = p;
+                direction = dir;
+                normal = n;
+            }
 
         };
     }

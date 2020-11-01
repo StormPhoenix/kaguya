@@ -10,8 +10,8 @@ namespace kaguya {
         AreaLight::AreaLight(const Spectrum &intensity, std::shared_ptr<ShapeSampler> shapeSampler, LightType type) :
                 Light(LightType(type | AREA)), _intensity(intensity), _shapeSampler(shapeSampler) {}
 
-        Spectrum
-        AreaLight::sampleRay(const Interaction &eye, Vector3 *wi, double *pdf, VisibilityTester *visibilityTester) {
+        Spectrum AreaLight::sampleRay(const Interaction &eye, Vector3 *wi, double *pdf,
+                                      VisibilityTester *visibilityTester) {
             assert(_shapeSampler != nullptr);
             // 从 eye 出发采样一条射线，返回与 shape 的交点
             Interaction intersection = _shapeSampler->sampleRayIntersection(eye);

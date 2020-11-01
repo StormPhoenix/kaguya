@@ -7,7 +7,9 @@
 #if defined(KAGUYA_WINDOWS_MALLOC_ALIGNED)
 #include <malloc.h>
 #elif defined(KAGUYA_POSIX_MALLOC_ALIGNED)
+
 #include <stdlib.h>
+
 #endif
 
 void *allocAlignedMemory(size_t bytes) {

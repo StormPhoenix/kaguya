@@ -25,6 +25,18 @@ namespace kaguya {
             return 0.0;
         }
 
+        Spectrum PointLight::sampleLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) {
+            // 采样射线
+            Vector3 rayDir = sphereUniformSampling();
+            ray->setOrigin(_center);
+            ray->setDirection(rayDir);
+
+            *normal = rayDir;
+            *pdfPos = 1.0;
+            *pdfDir = INV_4PI;
+            return _intensity;
+        }
+
         std::shared_ptr<PointLight> PointLight::buildPointLight(const Vector3 &center, const Spectrum &intensity) {
             std::shared_ptr<PointLight> light =
                     std::make_shared<PointLight>(center, intensity);

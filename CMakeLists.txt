@@ -94,6 +94,7 @@ endif (OPENMP_FOUND)
 file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/bsdf/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/light/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/material/*.cpp
@@ -102,6 +103,8 @@ file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/meta/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/utils/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/bdpt/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/pt/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/*.cpp)
 
 add_executable(kaguya ${sources})

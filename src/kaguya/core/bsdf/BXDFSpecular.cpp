@@ -8,9 +8,9 @@
 namespace kaguya {
     namespace core {
 
-        BXDFSpecular::BXDFSpecular(const Spectrum &albedo, double thetaI, double thetaT) :
+        BXDFSpecular::BXDFSpecular(const Spectrum &albedo, double thetaI, double thetaT, TransportMode mode) :
                 BXDF(BXDFType(BSDF_SPECULAR | BSDF_REFLECTION | BSDF_TRANSMISSION)),
-                _albedo(albedo), _thetaI(thetaI), _thetaT(thetaT) {}
+                _albedo(albedo), _thetaI(thetaI), _thetaT(thetaT), _mode(mode) {}
 
         Spectrum BXDFSpecular::f(const Vector3 &wo, const Vector3 &wi) const {
             return Spectrum(0.0);
@@ -52,7 +52,11 @@ namespace kaguya {
                 }
 
                 *pdf = 1 - reflectProb;
-                return _albedo * (Spectrum(1.0) - reflectProb) / std::abs(wi->y);
+                Spectrum f = _albedo * (Spectrum(1.0) - reflectProb) / std::abs(wi->y);
+                if (_mode == RADIANCE) {
+                    f *= std::pow(refraction, 2);
+                }
+                return f;
             }
         }
 

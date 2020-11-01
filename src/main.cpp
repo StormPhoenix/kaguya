@@ -4,7 +4,8 @@
 #include <kaguya/Config.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/meta/Vertex.h>
-#include <kaguya/tracer/PathTracer.h>
+#include <kaguya/tracer/pt/PathTracer.h>
+#include <kaguya/tracer/bdpt/BDPathTracer.h>
 
 //#include <kaguya/math/Math.hpp>
 //#include <kaguya/scene/meta/Sphere.h>
@@ -15,6 +16,7 @@
 
 int main() {
     using kaguya::tracer::PathTracer;
+    using kaguya::tracer::BDPathTracer;
     using kaguya::tracer::Camera;
     using kaguya::tracer::Ray;
     using kaguya::Config;
@@ -22,8 +24,11 @@ int main() {
     using kaguya::utils::ObjLoader;
     using kaguya::scene::Vertex;
 
-    PathTracer pathTracer = PathTracer();
-    pathTracer.run();
+//    PathTracer pathTracer = PathTracer();
+//    pathTracer.run();
+
+    BDPathTracer bdPathTracer = BDPathTracer();
+    bdPathTracer.run();
 
 //    std::vector<Vertex> vertexes = ObjLoader::loadModel("./resource/objects/bunny.obj");
 

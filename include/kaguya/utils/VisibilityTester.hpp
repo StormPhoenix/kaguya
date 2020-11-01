@@ -34,16 +34,15 @@ namespace kaguya {
                 SurfaceInteraction interaction;
                 bool isIntersect = scene.hit(ray, interaction);
 
-//                return (!isIntersect) || (isIntersect && interaction.step >= (_step - EPSILON));
-                // TODO
-                if (!isIntersect) {
-                    // 如果没有击中任何物体，则 Ray 必定穿过 _end
-                    return true;
-                } else if (interaction.step >= (_step - EPSILON)) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return (!isIntersect) || (isIntersect && interaction.step >= (_step - EPSILON));
+            }
+
+            Interaction getStart() {
+                return _start;
+            }
+
+            Interaction getEnd() {
+                return _end;
             }
 
         private:

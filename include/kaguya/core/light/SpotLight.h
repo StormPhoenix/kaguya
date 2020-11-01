@@ -37,8 +37,10 @@ namespace kaguya {
             SpotLight(const Vector3 eye, const Vector3 dir, Spectrum intensity,
                       double fallOffRange = 30, double totalRange = 45);
 
+            virtual Spectrum sampleLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) override;
+
         private:
-            Spectrum luminance(const Vector3 &wo);
+            Spectrum fallOffWeight(const Vector3 &wo);
 
         private:
             const Vector3 _center;
