@@ -9,7 +9,6 @@
 
 #include <kaguya/scene/Scene.h>
 #include <kaguya/tracer/Tracer.h>
-#include <kaguya/tracer/Camera.h>
 
 #include <kaguya/core/Core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
@@ -70,12 +69,6 @@ namespace kaguya {
             Spectrum background(const Ray &ray);
 
             /**
-             * 输出渲染结果
-             * @param color
-             */
-            void writeShaderColor(const Spectrum &spectrum, int row, int col);
-
-            /**
              * 渲染结果写入 buffer
              * @param color
              * @param row
@@ -84,8 +77,6 @@ namespace kaguya {
             void writeBuffer(const Vector3 &color, int row, int col);
 
         private:
-            // 相机
-            std::shared_ptr<Camera> _camera = nullptr;
             // 场景
             std::shared_ptr<Scene> _scene = nullptr;
             // TODO 以下参数写入配置文件

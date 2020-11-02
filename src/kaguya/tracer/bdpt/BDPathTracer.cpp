@@ -130,6 +130,12 @@ namespace kaguya {
                     break;
                 }
 
+                // TODO delete
+                if (depth == 4) {
+                    int a = 0;
+                    a ++;
+                }
+
                 SurfaceInteraction interaction;
                 bool isIntersected = scene->hit(scatterRay, interaction);
                 if (isIntersected) {
@@ -137,14 +143,14 @@ namespace kaguya {
                     PathVertex &vertex = path[depth];
                     PathVertex &preVertex = path[depth - 1];
 
+                    // 构建 BSDF
+                    BSDF *bsdf = interaction.buildBSDF(memoryArena, mode);
+                    assert(bsdf != nullptr);
+
                     // 添加新点 TODO 默认只有 Surface 类型
                     vertex = PathVertex::createSurfaceVertex(interaction, pdfPreWi, preVertex, beta);
                     vertex.beta = beta;
                     vertexCount++;
-
-                    // 构建 BSDF
-                    BSDF *bsdf = interaction.buildBSDF(memoryArena, mode);
-                    assert(bsdf != nullptr);
 
                     // 采样下一个射线
                     Vector3 worldWo = -interaction.direction;
@@ -255,7 +261,7 @@ namespace kaguya {
             // 连接点
             for (int t = 2; t <= cameraPathLength; t++) {
                 for (int s = 0; s <= lightPathLength; s++) {
-                    shaderColor += connectPath(scene, cameraSubPath, t, cameraPathLength,
+                    shaderColor += connectPath(scene, cameraSubPath, cameraPathLength, t,
                                                lightSubPath, lightPathLength, s);
                 }
             }

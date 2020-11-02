@@ -54,34 +54,10 @@ namespace kaguya {
             return pdfFwd;
         }
 
-        PathVertex PathVertex::createCameraVertex(const Camera *camera) {
-            StartEndInteraction ei = StartEndInteraction(camera);
-            return PathVertex(PathVertexType::CAMERA, ei, Spectrum(1.0));
+        bool PathVertex::isConnectible() {
+            // TODO
+            return false;
         }
-
-        PathVertex PathVertex::createSurfaceVertex(const SurfaceInteraction &si,
-                                                   double pdfPreWi,
-                                                   const PathVertex &pre,
-                                                   const Spectrum &beta) {
-            // 创建路径点
-            PathVertex v = PathVertex(si, beta);
-            // 计算上个点发射线击中当前点时，当前点对应的概率
-            v.pdfForward = pre.computePdfForward(pdfPreWi, v);
-            return v;
-        }
-
-        PathVertex PathVertex::createLightVertex(const StartEndInteraction &ei,
-                                                 kaguya::core::Spectrum &beta) {
-            return PathVertex(PathVertexType::LIGHT, ei, beta);
-        }
-
-        PathVertex PathVertex::createLightVertex(const Light *light, const Vector3 &p, const Vector3 &dir,
-                                                 const Vector3 &n, const Spectrum &intensity) {
-            StartEndInteraction ei = StartEndInteraction(light, p, dir, n);
-            PathVertex pathVertex = PathVertex(PathVertexType::LIGHT, ei, intensity);
-            return pathVertex;
-        }
-
 
     }
 }

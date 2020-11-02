@@ -20,6 +20,9 @@
 #include <kaguya/tracer/bdpt/PathVertex.h>
 #include <kaguya/utils/MemoryArena.h>
 
+#include <iostream>
+#include <omp.h>
+
 namespace kaguya {
     namespace tracer {
 
@@ -47,9 +50,13 @@ namespace kaguya {
                     int cameraWidth = _camera->getResolutionWidth();
                     int cameraHeight = _camera->getResolutionHeight();
 
+                    // TODO 将 bitmap 封装到写入策略模式
+                    // TODO 代码移动到 tracer
+                    _bitmap = (int *) malloc(cameraHeight * cameraWidth * SPECTRUM_CHANNEL * sizeof(unsigned int));
                     double sampleWeight = 1.0 / _samplePerPixel;
                     // 已完成扫描的行数
                     int finishedLine = 0;
+#pragma omp parallel for num_threads(12)
                     // 遍历相机成像图案上每个像素
                     for (int row = cameraHeight - 1; row >= 0; row--) {
                         MemoryArena arena;
@@ -66,9 +73,32 @@ namespace kaguya {
                                 arena.clean();
                             }
                             ans *= sampleWeight;
-                            // TODO write to image
+                            // TODO 写入渲染结果，用更好的方式写入
+                            writeShaderColor(ans, row, col);
+                        }
+#pragma omp critical
+                        finishedLine++;
+                        // TODO delete
+                        std::cerr << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "
+                                  << std::flush;
+                    }
+
+                    // TODO delete
+                    std::cout << "P3\n" << cameraWidth << " " << cameraHeight << "\n255\n";
+                    // TODO 更改成写入替换策略
+                    for (int row = cameraHeight - 1; row >= 0; row--) {
+                        for (int col = 0; col < cameraWidth; col++) {
+                            int offset = (row * _camera->getResolutionWidth() + col) * SPECTRUM_CHANNEL;
+                            // TODO 修改此处，用于适应 Spectrum
+                            // Write the translated [0,255] value of each color component.
+                            std::cout << *(_bitmap + offset) << ' '
+                                      << *(_bitmap + offset + 1) << ' '
+                                      << *(_bitmap + offset + 2) << '\n';
                         }
                     }
+
+                    delete[] _bitmap;
+                    _bitmap = nullptr;
                 }
             }
 
@@ -161,8 +191,6 @@ namespace kaguya {
             double g(const PathVertex &pre, const PathVertex &next);
 
         private:
-            // 相机
-            std::shared_ptr<Camera> _camera = nullptr;
             // 场景
             std::shared_ptr<Scene> _scene = nullptr;
             // TODO 以下参数写入配置文件
@@ -176,8 +204,6 @@ namespace kaguya {
             double _russianRoulette;
             // 对光源采样概率
             double _sampleLightProb = 0.2;
-            // 渲染结果位图
-            int *_bitmap = nullptr;
         };
 
     }

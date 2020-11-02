@@ -246,6 +246,7 @@ namespace kaguya {
                 int cameraHeight = _camera->getResolutionHeight();
 
                 // TODO 将 bitmap 封装到写入策略模式
+                // TODO 代码移动到 tracer
                 _bitmap = (int *) malloc(cameraHeight * cameraWidth * SPECTRUM_CHANNEL * sizeof(unsigned int));
                 double sampleWeight = 1.0 / _samplePerPixel;
                 // 已完成扫描的行数
@@ -312,14 +313,6 @@ namespace kaguya {
             double t = 0.5 * (dir.y + 1.0);
             return (1.0 - t) * Vector3(1.0, 1.0, 1.0) + t * Vector3(0.5, 0.7, 1.0);
              */
-        }
-
-        void PathTracer::writeShaderColor(const Spectrum &spectrum, int row, int col) {
-            assert(_bitmap != nullptr && _camera != nullptr);
-            int offset = (row * _camera->getResolutionWidth() + col) * SPECTRUM_CHANNEL;
-            for (int channel = 0; channel < SPECTRUM_CHANNEL; channel++) {
-                *(_bitmap + offset + channel) = static_cast<int>(256 * clamp(std::sqrt(spectrum[channel]), 0.0, 0.999));
-            }
         }
 
     }
