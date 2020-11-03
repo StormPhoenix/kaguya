@@ -16,6 +16,81 @@ namespace kaguya {
         using kaguya::memory::ScopeSwapper;
         using kaguya::utils::VisibilityTester;
 
+        void BDPathTracer::run() {
+            // TODO 临时代码；提取到 class Tracer
+            if (_camera != nullptr && _scene != nullptr) {
+                int cameraWidth = _camera->getResolutionWidth();
+                int cameraHeight = _camera->getResolutionHeight();
+
+                // TODO 将 bitmap 封装到写入策略模式
+                // TODO 代码移动到 tracer
+                _bitmap = (int *) malloc(cameraHeight * cameraWidth * SPECTRUM_CHANNEL * sizeof(unsigned int));
+                double sampleWeight = 1.0 / _samplePerPixel;
+                // 已完成扫描的行数
+                int finishedLine = 0;
+//#pragma omp parallel for num_threads(12)
+                // 遍历相机成像图案上每个像素
+                for (int row = cameraHeight - 1; row >= 0; row--) {
+                    MemoryArena arena;
+                    for (int col = 0; col < cameraWidth; col++) {
+
+                        // TODO delete
+                        if (row == cameraHeight - 17 && col == 32) {
+                            int a = 0;
+                            a++;
+                        }
+
+                        MemoryArena arena;
+                        Spectrum ans = {0};
+                        // 做 _samplePerPixel 次采样
+                        for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
+                            auto u = (col + uniformSample()) / cameraWidth;
+                            auto v = (row + uniformSample()) / cameraHeight;
+
+                            Ray sampleRay = _camera->sendRay(u, v);
+                            ans += shader(sampleRay, *(_scene.get()), _maxDepth, arena);
+                            arena.clean();
+                        }
+                        ans *= sampleWeight;
+                        // TODO 写入渲染结果，用更好的方式写入
+                        writeShaderColor(ans, row, col);
+                    }
+//#pragma omp critical
+                    finishedLine++;
+                    // TODO delete
+                    std::cerr << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "
+                              << std::flush;
+                }
+
+                // TODO delete
+                std::cout << "P3\n" << cameraWidth << " " << cameraHeight << "\n255\n";
+                // TODO 更改成写入替换策略
+                for (int row = cameraHeight - 1; row >= 0; row--) {
+                    for (int col = 0; col < cameraWidth; col++) {
+                        int offset = (row * _camera->getResolutionWidth() + col) * SPECTRUM_CHANNEL;
+                        // TODO 修改此处，用于适应 Spectrum
+                        // Write the translated [0,255] value of each color component.
+                        std::cout << *(_bitmap + offset) << ' '
+                                  << *(_bitmap + offset + 1) << ' '
+                                  << *(_bitmap + offset + 2) << '\n';
+                    }
+                }
+
+                delete[] _bitmap;
+                _bitmap = nullptr;
+            }
+        }
+
+        void BDPathTracer::init() {
+            _scene = Config::testBuildScene();
+            _camera = _scene->getCamera();
+            _samplePerPixel = Config::samplePerPixel;
+            _sampleLightProb = Config::sampleLightProb;
+            _maxDepth = Config::maxScatterDepth;
+            _russianRouletteBounce = Config::beginRussianRouletteBounce;
+            _russianRoulette = Config::russianRoulette;
+        }
+
         Spectrum BDPathTracer::connectPath(Scene &scene,
                                            PathVertex *cameraSubPath, int cameraPathLength, int t,
                                            PathVertex *lightSubPath, int lightPathLength, int s) {
@@ -161,12 +236,6 @@ namespace kaguya {
                     break;
                 }
 
-                // TODO delete
-                if (depth == 4) {
-                    int a = 0;
-                    a++;
-                }
-
                 SurfaceInteraction interaction;
                 bool isIntersected = scene->hit(scatterRay, interaction);
                 if (isIntersected) {
@@ -225,6 +294,10 @@ namespace kaguya {
         double BDPathTracer::misWeight(PathVertex *cameraSubPath, int t,
                                        PathVertex *lightSubPath, int s,
                                        PathVertex &tempLightVertex) {
+
+            if (s + t == 2) {
+                return 1;
+            }
             /**
              * 1. 如果 light 有被替换，则用新的点临时替换 lightSubPath[s - 1]
              * 2. 重新计算连接位置的 cameraSubPath[t - 1].pdfBackward 和 lightSubPath[s - 1].pdfBackward
@@ -289,7 +362,8 @@ namespace kaguya {
             double ri;
             // 计算 cameraSubPath 的 Ri
             ri = 1;
-            for (int i = t - 1; i > 0; i--) {
+            // TODO 因为我没有考虑 t = 1 的情况，所以这里将 i = 1 的情况也不考虑
+            for (int i = t - 1; i > 1; i--) {
                 double pdfBackward = cameraSubPath[i].pdfBackward == 0 ? 1 : cameraSubPath[i].pdfBackward;
                 double pdfForward = cameraSubPath[i].pdfForward == 0 ? 1 : cameraSubPath[i].pdfForward;
                 ri *= (pdfBackward / pdfForward);
@@ -302,9 +376,10 @@ namespace kaguya {
 
             // 计算 lightSubPath 的 Ri
             ri = 1;
-            for (int i = s - 1; i > 0; i--) {
+            for (int i = s - 1; i >= 0; i--) {
                 double pdfBackward = lightSubPath[i].pdfBackward == 0 ? 1 : lightSubPath[i].pdfBackward;
                 double pdfForward = lightSubPath[i].pdfForward == 0 ? 1 : lightSubPath[i].pdfForward;
+                ri *= (pdfBackward / pdfForward);
 
                 // 1. 如果还没有到达最后的灯源点（i > 0），则要像 cameraSubPath 一样判断是否是 delta 分布
                 // 2. 如果到达了最后的光源点 (i = 0)，则判断光源是否是 delta
@@ -339,14 +414,14 @@ namespace kaguya {
 
         Spectrum BDPathTracer::shader(const Ray &ray, Scene &scene, int maxDepth, MemoryArena &memoryArena) {
             // 创建临时变量用于存储 camera、light 路径
-            PathVertex *cameraSubPath = memoryArena.alloc<PathVertex>(maxDepth, false);
-            PathVertex *lightSubPath = memoryArena.alloc<PathVertex>(maxDepth, false);
+            PathVertex *cameraSubPath = memoryArena.alloc<PathVertex>(maxDepth + 2, false);
+            PathVertex *lightSubPath = memoryArena.alloc<PathVertex>(maxDepth + 1, false);
 
             // 生成相机路径
-            int cameraPathLength = generateCameraPath(_scene, ray, _camera, cameraSubPath, maxDepth, memoryArena);
+            int cameraPathLength = generateCameraPath(_scene, ray, _camera, cameraSubPath, maxDepth + 2, memoryArena);
 
             // 生成光源路径
-            int lightPathLength = generateLightPath(_scene, lightSubPath, maxDepth, memoryArena);
+            int lightPathLength = generateLightPath(_scene, lightSubPath, maxDepth + 1, memoryArena);
 
             Spectrum shaderColor = Spectrum(0.0);
             // 连接点

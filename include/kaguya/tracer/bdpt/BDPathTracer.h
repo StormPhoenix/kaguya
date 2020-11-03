@@ -44,83 +44,12 @@ namespace kaguya {
                 init();
             }
 
-            void run() override {
-                // TODO 临时测试
-                if (_camera != nullptr && _scene != nullptr) {
-                    int cameraWidth = _camera->getResolutionWidth();
-                    int cameraHeight = _camera->getResolutionHeight();
-
-                    // TODO 将 bitmap 封装到写入策略模式
-                    // TODO 代码移动到 tracer
-                    _bitmap = (int *) malloc(cameraHeight * cameraWidth * SPECTRUM_CHANNEL * sizeof(unsigned int));
-                    double sampleWeight = 1.0 / _samplePerPixel;
-                    // 已完成扫描的行数
-                    int finishedLine = 0;
-#pragma omp parallel for num_threads(12)
-                    // 遍历相机成像图案上每个像素
-                    for (int row = cameraHeight - 1; row >= 0; row--) {
-                        MemoryArena arena;
-                        for (int col = 0; col < cameraWidth; col++) {
-
-                            // TODO delete
-                            if (row == cameraHeight - 17 && col == 32) {
-                                int a = 0;
-                                a++;
-                            }
-
-                            MemoryArena arena;
-                            Spectrum ans = {0};
-                            // 做 _samplePerPixel 次采样
-                            for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
-                                auto u = (col + uniformSample()) / cameraWidth;
-                                auto v = (row + uniformSample()) / cameraHeight;
-
-                                Ray sampleRay = _camera->sendRay(u, v);
-                                ans += shader(sampleRay, *(_scene.get()), _maxDepth, arena);
-                                arena.clean();
-                            }
-                            ans *= sampleWeight;
-                            // TODO 写入渲染结果，用更好的方式写入
-                            writeShaderColor(ans, row, col);
-                        }
-#pragma omp critical
-                        finishedLine++;
-                        // TODO delete
-                        std::cerr << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "
-                                  << std::flush;
-                    }
-
-                    // TODO delete
-                    std::cout << "P3\n" << cameraWidth << " " << cameraHeight << "\n255\n";
-                    // TODO 更改成写入替换策略
-                    for (int row = cameraHeight - 1; row >= 0; row--) {
-                        for (int col = 0; col < cameraWidth; col++) {
-                            int offset = (row * _camera->getResolutionWidth() + col) * SPECTRUM_CHANNEL;
-                            // TODO 修改此处，用于适应 Spectrum
-                            // Write the translated [0,255] value of each color component.
-                            std::cout << *(_bitmap + offset) << ' '
-                                      << *(_bitmap + offset + 1) << ' '
-                                      << *(_bitmap + offset + 2) << '\n';
-                        }
-                    }
-
-                    delete[] _bitmap;
-                    _bitmap = nullptr;
-                }
-            }
+            void run() override;
 
             /**
              * TODO 从 PathTracer 复制过来的，后续需要修改
              */
-            void init() {
-                _scene = Config::testBuildScene();
-                _camera = _scene->getCamera();
-                _samplePerPixel = Config::samplePerPixel;
-                _sampleLightProb = Config::sampleLightProb;
-                _maxDepth = Config::maxScatterDepth;
-                _russianRouletteBounce = Config::beginRussianRouletteBounce;
-                _russianRoulette = Config::russianRoulette;
-            }
+            void init();
 
         private:
 
