@@ -56,16 +56,16 @@ namespace kaguya {
                     double sampleWeight = 1.0 / _samplePerPixel;
                     // 已完成扫描的行数
                     int finishedLine = 0;
-//#pragma omp parallel for num_threads(12)
+#pragma omp parallel for num_threads(12)
                     // 遍历相机成像图案上每个像素
                     for (int row = cameraHeight - 1; row >= 0; row--) {
                         MemoryArena arena;
                         for (int col = 0; col < cameraWidth; col++) {
 
                             // TODO delete
-                            if (row == 150 && col == 40) {
+                            if (row == cameraHeight - 17 && col == 32) {
                                 int a = 0;
-                                a ++;
+                                a++;
                             }
 
                             MemoryArena arena;
@@ -83,7 +83,7 @@ namespace kaguya {
                             // TODO 写入渲染结果，用更好的方式写入
                             writeShaderColor(ans, row, col);
                         }
-//#pragma omp critical
+#pragma omp critical
                         finishedLine++;
                         // TODO delete
                         std::cerr << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "

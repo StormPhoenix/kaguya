@@ -81,7 +81,7 @@ namespace kaguya {
                 assert(bsdf != nullptr);
 
                 // 判断是否向光源采样
-                if (bsdf->belongToType(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
+                if (bsdf->allIncludeOf(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
                     shaderColor += (beta * evaluateDirectLight(scene, intersection, (*bsdf)));
                 }
 

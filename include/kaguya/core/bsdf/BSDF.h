@@ -63,11 +63,25 @@ namespace kaguya {
             double samplePdf(const Vector3 &worldWo, const Vector3 &worldWi, BXDFType type = BSDF_ALL) const;
 
             /**
-             * 计算有多少个 bxdfType 类型的材质
+             * 计算属于 bxdfType 类型集合的材质有多少个
              * @param bxdfType
              * @return
              */
-            int belongToType(BXDFType bxdfType);
+            int allIncludeOf(BXDFType bxdfType);
+
+            /**
+             * 计算包含 bxdfType 类型集合的材质有多少个
+             * @param bxdfType
+             * @return
+             */
+            int hasAllOf(BXDFType bxdfType);
+
+            /**
+             * 计算包含 bxdfType 中任一类型集合的材质有多少个
+             * @param bxdfType
+             * @return
+             */
+            int hasAnyOf(const BXDFType bxdfType);
 
         private:
             ~BSDF() {}

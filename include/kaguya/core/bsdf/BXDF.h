@@ -66,14 +66,21 @@ namespace kaguya {
              * @param bxdfType
              * @return
              */
-            bool belongToType(const BXDFType bxdfType);
+            bool allIncludeOf(const BXDFType bxdfType);
 
             /**
              * 判断自身是否包含 bxdfType
              * @param bxdfType
              * @return
              */
-            bool containType(const BXDFType bxdfType);
+            bool hasAllOf(const BXDFType bxdfType);
+
+            /**
+             * 判断是否包含 bxdfType 中任一类型
+             * @param bxdfType
+             * @return
+             */
+            bool hasAnyOf(const BXDFType bxdfType);
 
         public:
             const BXDFType type;

@@ -90,7 +90,7 @@ namespace kaguya {
                 case SURFACE:
                     // 判断 specular 类型
                     assert(si.bsdf != nullptr);
-                    return si.bsdf->belongToType(BXDFType(BXDFType::BSDF_DIFFUSE | BXDFType::BSDF_GLOSSY)) > 0;
+                    return si.bsdf->hasAnyOf(BXDFType(BXDFType::BSDF_DIFFUSE | BXDFType::BSDF_GLOSSY)) > 0;
                 case VOLUME:
                     // TODO 暂时不支持 Volume Rendering
                     assert(1 == 0);

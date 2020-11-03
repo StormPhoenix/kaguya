@@ -198,6 +198,7 @@ namespace kaguya {
                     scatterRay.setOrigin(interaction.point);
                     scatterRay.setDirection(worldWi);
 
+                    // TODO cosine 的计算感觉有问题，对于从光源发射的光线，应该用 worldWo
                     // 更新 beta
                     double cosine = std::abs(DOT(interaction.normal, worldWi));
                     beta *= (f * cosine / pdfPreWi);
