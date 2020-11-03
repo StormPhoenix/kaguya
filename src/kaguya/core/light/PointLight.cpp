@@ -10,9 +10,9 @@ namespace kaguya {
         PointLight::PointLight(const Vector3 &center, const Spectrum &intensity) :
                 Light(DELTA_POSITION), _center(center), _intensity(intensity) {}
 
-        Spectrum PointLight::sampleRay(const Interaction &eye,
-                                       Vector3 *wi, double *pdf,
-                                       VisibilityTester *visibilityTester) {
+        Spectrum PointLight::sampleFromLight(const Interaction &eye,
+                                             Vector3 *wi, double *pdf,
+                                             VisibilityTester *visibilityTester) {
             (*wi) = NORMALIZE(_center - eye.point);
             (*pdf) = 1;
             Interaction interaction;
@@ -21,11 +21,11 @@ namespace kaguya {
             return _intensity / std::pow(LENGTH(_center - eye.point), 2);
         }
 
-        double PointLight::sampleRayPdf(const Interaction &eye, const Vector3 &dir) {
+        double PointLight::sampleFromLightPdf(const Interaction &eye, const Vector3 &dir) {
             return 0.0;
         }
 
-        Spectrum PointLight::sampleLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) {
+        Spectrum PointLight::randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) {
             // 采样射线
             Vector3 rayDir = sphereUniformSampling();
             ray->setOrigin(_center);
@@ -35,6 +35,12 @@ namespace kaguya {
             *pdfPos = 1.0;
             *pdfDir = INV_4PI;
             return _intensity;
+        }
+
+        void PointLight::randomLightRayPdf(const Ray &ray, const Vector3 &normal,
+                                           double *pdfPos, double *pdfDir) const {
+            (*pdfPos) = 0.0;
+            (*pdfDir) = INV_4PI;
         }
 
         std::shared_ptr<PointLight> PointLight::buildPointLight(const Vector3 &center, const Spectrum &intensity) {

@@ -56,11 +56,18 @@ namespace kaguya {
                     double sampleWeight = 1.0 / _samplePerPixel;
                     // 已完成扫描的行数
                     int finishedLine = 0;
-#pragma omp parallel for num_threads(12)
+//#pragma omp parallel for num_threads(12)
                     // 遍历相机成像图案上每个像素
                     for (int row = cameraHeight - 1; row >= 0; row--) {
                         MemoryArena arena;
                         for (int col = 0; col < cameraWidth; col++) {
+
+                            // TODO delete
+                            if (row == 150 && col == 40) {
+                                int a = 0;
+                                a ++;
+                            }
+
                             MemoryArena arena;
                             Spectrum ans = {0};
                             // 做 _samplePerPixel 次采样
@@ -76,7 +83,7 @@ namespace kaguya {
                             // TODO 写入渲染结果，用更好的方式写入
                             writeShaderColor(ans, row, col);
                         }
-#pragma omp critical
+//#pragma omp critical
                         finishedLine++;
                         // TODO delete
                         std::cerr << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "
@@ -126,6 +133,8 @@ namespace kaguya {
              * @return
              */
             Spectrum shader(const Ray &ray, Scene &scene, int maxDepth, MemoryArena &memoryArena);
+
+            Spectrum shaderOfMyImplemention();
 
             /**
              * 计算从相机位置出发的路径，统计每一条路径的概率密度
@@ -179,8 +188,21 @@ namespace kaguya {
             Spectrum connectPath(Scene &scene, PathVertex *cameraSubPath, int cameraPathLength, int t,
                                  PathVertex *lightSubPath, int lightPathLength, int s);
 
-            double mis(PathVertex *cameraSubPath, int t,
-                       PathVertex *lightSubPath, int s);
+            /**
+             * 计算 connect 路径的 pdf
+             *
+             * 这一段参考了 PBRT，自己写的时候很容易出错
+             *
+             * @param cameraSubPath 相机子路径
+             * @param t 相机路径长度
+             * @param lightSubPath 光源子路径
+             * @param s 光源路径长度
+             * @param tempLightVertex 如果额外进行了对光源采样，则传入 lightVertex
+             * @return
+             */
+            double misWeight(PathVertex *cameraSubPath, int t,
+                             PathVertex *lightSubPath, int s,
+                             PathVertex &tempLightVertex);
 
             /**
              * 计算路径中某个段中两端点段几何关系

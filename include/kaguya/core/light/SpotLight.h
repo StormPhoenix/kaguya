@@ -19,12 +19,12 @@ namespace kaguya {
                 return light;
             }
 
-            virtual Spectrum sampleRay(
+            virtual Spectrum sampleFromLight(
                     const Interaction &eye,
                     Vector3 *wi, double *pdf,
                     VisibilityTester *visibilityTester) override;
 
-            virtual double sampleRayPdf(const Interaction &eye, const Vector3 &dir) override;
+            virtual double sampleFromLightPdf(const Interaction &eye, const Vector3 &dir) override;
 
             /**
              * 聚光灯
@@ -37,7 +37,10 @@ namespace kaguya {
             SpotLight(const Vector3 eye, const Vector3 dir, Spectrum intensity,
                       double fallOffRange = 30, double totalRange = 45);
 
-            virtual Spectrum sampleLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) override;
+            virtual Spectrum randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) override;
+
+            virtual void randomLightRayPdf(const Ray &ray, const Vector3 &normal,
+                                           double *pdfPos, double *pdfDir) const override;
 
         private:
             Spectrum fallOffWeight(const Vector3 &wo);

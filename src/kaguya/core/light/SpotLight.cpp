@@ -16,9 +16,9 @@ namespace kaguya {
             _cosTotalRange = std::cos(DEGREES_TO_RADIANS(totalRange));
         }
 
-        Spectrum SpotLight::sampleRay(const Interaction &eye,
-                                      Vector3 *wi, double *pdf,
-                                      VisibilityTester *visibilityTester) {
+        Spectrum SpotLight::sampleFromLight(const Interaction &eye,
+                                            Vector3 *wi, double *pdf,
+                                            VisibilityTester *visibilityTester) {
             (*wi) = NORMALIZE(_center - eye.point);
             (*pdf) = 1.0;
             Interaction interaction;
@@ -27,11 +27,11 @@ namespace kaguya {
             return _intensity * fallOffWeight(-(*wi)) / std::pow(LENGTH(_center - eye.point), 2);
         }
 
-        double SpotLight::sampleRayPdf(const Interaction &eye, const Vector3 &dir) {
+        double SpotLight::sampleFromLightPdf(const Interaction &eye, const Vector3 &dir) {
             return 0;
         }
 
-        Spectrum SpotLight::sampleLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) {
+        Spectrum SpotLight::randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) {
             // 在局部坐标空间中均匀采样射线
             Vector3 dirLocal = coneUniformSampling(_cosTotalRange);
 
@@ -53,6 +53,13 @@ namespace kaguya {
             (*pdfDir) = coneUniformSamplePdf(_cosTotalRange);
 
             return _intensity * fallOffWeight(dirWorld);
+        }
+
+        void SpotLight::randomLightRayPdf(const Ray &ray, const Vector3 &,
+                                          double *pdfPos, double *pdfDir) const {
+            (*pdfPos) = 0;
+            (*pdfDir) = std::cos(DOT(ray.getDirection(), _dir)) >= _cosTotalRange ?
+                        coneUniformSamplePdf(_cosTotalRange) : 0;
         }
 
         Spectrum SpotLight::fallOffWeight(const Vector3 &wo) {

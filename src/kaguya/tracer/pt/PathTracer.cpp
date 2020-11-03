@@ -59,7 +59,7 @@ namespace kaguya {
                         assert(intersection.material != nullptr);
                         // 如果有交点，则直接从交点上取值
                         if (intersection.areaLight != nullptr) {
-                            shaderColor += (intersection.areaLight->luminance(intersection, -intersection.direction) *
+                            shaderColor += (intersection.areaLight->lightRadiance(intersection, -intersection.direction) *
                                             beta);
                         }
                     } else {
@@ -141,8 +141,8 @@ namespace kaguya {
                             auto light = scene.getLight();
 
                             VisibilityTester visibilityTester;
-                            Spectrum spectrum = light->sampleRay(hitRecord, &scatterRayDir, &samplePdf,
-                                                                 &visibilityTester);
+                            Spectrum spectrum = light->sampleFromLight(hitRecord, &scatterRayDir, &samplePdf,
+                                                                       &visibilityTester);
 
                             if (samplePdf > EPSILON && !spectrum.isBlack()) {
                                 // 计算该方向的散射 PDF
@@ -160,7 +160,8 @@ namespace kaguya {
                                          shaderOfRecursion(scatterRay, scene, depth + 1, memoryArena) /
                                          (1 - _russianRoulette));
                                 return shaderColor + (hitRecord.areaLight != nullptr ?
-                                                      hitRecord.areaLight->luminance(hitRecord, -hitRecord.direction) :
+                                                      hitRecord.areaLight->lightRadiance(hitRecord,
+                                                                                         -hitRecord.direction) :
                                                       Spectrum(0.0));
                             }
                         }
@@ -179,7 +180,7 @@ namespace kaguya {
                         Interaction eye;
                         eye.point = hitRecord.point;
                         samplePdf = (1 - _sampleLightProb) * samplePdf +
-                                    _sampleLightProb * light->sampleRayPdf(eye, scatterRay.getDirection());
+                                    _sampleLightProb * light->sampleFromLightPdf(eye, scatterRay.getDirection());
                     }
 
                     double cosine = std::abs(DOT(hitRecord.normal, NORMALIZE(worldWi)));
@@ -190,7 +191,7 @@ namespace kaguya {
                                             (1 - _russianRoulette));
 
                     return shaderColor + (hitRecord.areaLight != nullptr ?
-                                          hitRecord.areaLight->luminance(hitRecord, -hitRecord.direction) :
+                                          hitRecord.areaLight->lightRadiance(hitRecord, -hitRecord.direction) :
                                           Spectrum(0.0));
                 } else {
                     // 未击中
@@ -213,9 +214,9 @@ namespace kaguya {
             // visibility tester
             VisibilityTester visibilityTester;
             // 对光源采样采样
-            Spectrum luminance = light->sampleRay(eye, &shadowRayDir,
-                                                  &lightPdf,
-                                                  &visibilityTester);
+            Spectrum luminance = light->sampleFromLight(eye, &shadowRayDir,
+                                                        &lightPdf,
+                                                        &visibilityTester);
 
             // 排除对光源采样贡献为 0 的情况
             if (lightPdf > EPSILON && !luminance.isBlack()) {
@@ -264,7 +265,7 @@ namespace kaguya {
 
                             // 发射采样光线，开始渲染
                             Ray sampleRay = _camera->sendRay(u, v);
-//                            ans += shaderOfRecursion(sampleRay, *_scene, 0, arena);
+//                            ans += shaderOfRecursion(sampleFromLight, *_scene, 0, arena);
                             ans += shaderOfProgression(sampleRay, *_scene, arena);
                             arena.clean();
                         }

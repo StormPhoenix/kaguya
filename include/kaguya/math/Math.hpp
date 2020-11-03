@@ -36,6 +36,7 @@ const double REFRACTION_INDEX_WATER = 1.0f;
 #define INVERSE_TRANSPOSE(matrix) glm::inverseTranspose(matrix)
 #define DETERMINANT(x) glm::determinant(x)
 #define DOT(x, y) glm::dot(x, y)
+#define ABS_DOT(x, y) std::abs(glm::dot(x, y))
 #define NORMALIZE(x) glm::normalize(x)
 #define LENGTH(x) glm::length(x)
 #define CROSS(x, y) glm::cross(x, y)
@@ -167,6 +168,10 @@ inline Vector3 sphereUniformSampling() {
 inline double hemiCosineSamplePdf(Vector3 sample) {
     double cosine = NORMALIZE(sample).y;
     return cosine < 0 ? 0 : cosine * INV_PI;
+}
+
+inline double hemiCosineSamplePdf(double cosTheta) {
+    return cosTheta / PI;
 }
 
 /**

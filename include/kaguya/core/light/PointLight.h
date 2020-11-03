@@ -28,14 +28,17 @@ namespace kaguya {
              */
             PointLight(const Vector3 &center, const Spectrum &intensity);
 
-            virtual Spectrum sampleRay(
+            virtual Spectrum sampleFromLight(
                     const Interaction &eye,
                     Vector3 *wi, double *pdf,
                     VisibilityTester *visibilityTester) override;
 
-            virtual double sampleRayPdf(const Interaction &eye, const Vector3 &dir) override;
+            virtual double sampleFromLightPdf(const Interaction &eye, const Vector3 &dir) override;
 
-            virtual Spectrum sampleLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) override;
+            virtual Spectrum randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) override;
+
+            virtual void randomLightRayPdf(const Ray &ray, const Vector3 &normal,
+                                           double *pdfPos, double *pdfDir) const override;
 
         private:
             // 单位立体角的光强

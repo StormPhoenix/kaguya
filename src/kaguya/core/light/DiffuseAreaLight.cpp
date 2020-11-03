@@ -22,7 +22,7 @@ namespace kaguya {
                                            bool singleSide) :
                 AreaLight(intensity, shapeSampler, AREA), _singleSide(singleSide) {}
 
-        Spectrum DiffuseAreaLight::sampleLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) {
+        Spectrum DiffuseAreaLight::randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) {
             assert(_shapeSampler != nullptr);
 
             // 采样位置
@@ -63,10 +63,21 @@ namespace kaguya {
             ray->setOrigin(si.point);
             ray->setDirection(dirWorld);
 
-            return luminance(si, dirWorld);
+            return lightRadiance(si, dirWorld);
         }
 
-        Spectrum DiffuseAreaLight::luminance(const Interaction &interaction, const Vector3 &wo) {
+        void DiffuseAreaLight::randomLightRayPdf(const Ray &ray, const Vector3 &normal,
+                                                 double *pdfPos, double *pdfDir) const {
+            assert(_shapeSampler != nullptr);
+            // 创建 SurfaceInteraction
+            SurfaceInteraction si;
+            si.point = ray.getOrigin();
+            (*pdfPos) = _shapeSampler->surfacePointPdf(si);
+            double cosTheta = ABS_DOT(normal, ray.getDirection());
+            (*pdfDir) = _singleSide ? hemiCosineSamplePdf(cosTheta) : 0.5 * hemiCosineSamplePdf(cosTheta);
+        }
+
+        Spectrum DiffuseAreaLight::lightRadiance(const Interaction &interaction, const Vector3 &wo) {
             double cosine = DOT(interaction.normal, wo);
             return (!_singleSide || cosine > 0) ? _intensity : Spectrum(0.0);
 

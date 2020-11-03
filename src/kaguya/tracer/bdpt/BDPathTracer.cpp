@@ -5,14 +5,16 @@
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
 #include <kaguya/utils/VisibilityTester.hpp>
+#include <kaguya/utils/ScopeSwapper.hpp>
 
 
 namespace kaguya {
     namespace tracer {
 
-        using kaguya::core::TransportMode;
-        using kaguya::utils::VisibilityTester;
         using kaguya::core::BXDFType;
+        using kaguya::core::TransportMode;
+        using kaguya::memory::ScopeSwapper;
+        using kaguya::utils::VisibilityTester;
 
         Spectrum BDPathTracer::connectPath(Scene &scene,
                                            PathVertex *cameraSubPath, int cameraPathLength, int t,
@@ -21,55 +23,84 @@ namespace kaguya {
             assert(t >= 0 && t <= cameraPathLength);
             assert(s >= 0 && s <= lightPathLength);
 
+            /* 处理策略
+             *
+             * Case s = 0:
+             *      light 路径上没有任何点，此时 cameraSubPath 就是一个完整的路径，此时参考 cameraSubPath[t - 1] 是否发光
+             *
+             * Case t = 1:
+             *      我这儿不支持处理只有一个 Camera 的情况
+             *
+             * Case s = 1:
+             *      直接对光源采样
+             */
+
+            Spectrum ret = Spectrum(0.0);
+
+            // 额外采样的光源点
+            PathVertex lightVertex;
+
             // 区分不同情况
             if (t < 2) {
-                // cameraSubPath 至少包括两个点：1. 相机本身位置。2. 相机发出的射线和场景d交点
-                return Spectrum(0.0f);
+                // cameraSubPath 路径点少于2个，此时不处理
+                ret = Spectrum(0.0f);
             } else if (s == 0) {
-                // 由于 lightSubPath 没有任何点参与路径构建，所以我们重新采样一个光源点，加到 cameraSubPath 上
-                PathVertex pt = cameraSubPath[t - 1];
-                // TODO 默认只有一个光源，我们只对这个光源采样
-                std::shared_ptr<Light> light = scene.getLight();
-                Vector3 worldWi;
-                double sampleLightPdf;
-                VisibilityTester visibilityTester;
-                // 直接对光源采样，同时 visibilityTester 会保存两端交点
-                Spectrum sampleIntensity = light->sampleRay(pt.getInteraction(), &worldWi, &sampleLightPdf,
-                                                            &visibilityTester);
-
-                if (std::abs(sampleLightPdf - 0) < EPSILON || sampleIntensity.isBlack() ||
-                    !visibilityTester.isVisible(scene)) {
-                    // 没有任何光源亮度贡献的情况，直接返回 0
-                    return Spectrum(0.0);
-                } else {
-                    // 构建一个新 StartEndInteraction，用于保存路径点上的光源
-                    StartEndInteraction ei = StartEndInteraction(light.get(), visibilityTester.getEnd());
-                    Spectrum L = (sampleIntensity / sampleLightPdf);
-                    PathVertex lightVertex =
-                            PathVertex::createLightVertex(ei, L);
-                    Spectrum ret = pt.beta * pt.f(lightVertex) * lightVertex.beta;
-
-                    if (pt.type == PathVertexType::SURFACE) {
-                        ret *= std::abs(DOT(pt.normal, worldWi));
-                    }
-                    // 在对光源采样对过程中，也不做 MIS，而是直接返回
-                    return ret;
+                // lightSubPath 上没有任何路径点
+                const PathVertex &pt = cameraSubPath[t - 1];
+                if (pt.isLight()) {
+                    ret = pt.emit(cameraSubPath[t - 2].point) * pt.beta;
                 }
+            } else if (s == 1) {
+                // 由于 lightSubPath 没有任何点参与路径构建，所以我们重新采样一个光源点，加到 cameraSubPath 上
 
+                // TODO 由于更新了采样光源，需要重新计算 pdfForward
+
+                PathVertex &pt = cameraSubPath[t - 1];
+                if (pt.isConnectible()) {
+                    // TODO 默认只有一个光源，我们只对这个光源采样
+                    std::shared_ptr<Light> light = scene.getLight();
+                    Vector3 worldWi;
+                    // 光源采样处的 pdf（这里指 pt 点的入射角 wi 的 pdf)
+                    double sampleLightPdf;
+                    VisibilityTester visibilityTester;
+                    // 直接对光源采样，同时 visibilityTester 会保存两端交点
+                    Spectrum sampleIntensity = light->sampleFromLight(pt.getInteraction(), &worldWi, &sampleLightPdf,
+                                                                      &visibilityTester);
+
+                    if (std::abs(sampleLightPdf - 0) < EPSILON || sampleIntensity.isBlack() ||
+                        !visibilityTester.isVisible(scene)) {
+                        // 没有任何光源亮度贡献的情况，直接返回 0
+                        ret = Spectrum(0.0);
+                    } else {
+                        // 构建一个新 StartEndInteraction，用于保存路径点上的光源
+                        StartEndInteraction ei = StartEndInteraction(light.get(), visibilityTester.getEnd());
+                        Spectrum L = (sampleIntensity / sampleLightPdf);
+                        // 由于对光源采样位置是一个新点，所以要重新创建 PathVertex
+                        lightVertex =
+                                PathVertex::createLightVertex(ei, L);
+                        ret = pt.beta * pt.f(lightVertex) * lightVertex.beta;
+
+                        if (pt.type == PathVertexType::SURFACE) {
+                            ret *= std::abs(DOT(pt.normal, worldWi));
+                        }
+                    }
+                }
             } else {
                 // 其余情况
-                PathVertex pt = cameraSubPath[t - 1];
-                PathVertex ps = lightSubPath[s - 1];
+                PathVertex &pt = cameraSubPath[t - 1];
+                PathVertex &ps = lightSubPath[s - 1];
                 if (pt.isConnectible() && ps.isConnectible()) {
-                    // 调用 pt.f() 和 ps.f，计算 pt 和 ps 连接起来的 pdf
+                    // 调用 pt.f() 和 ps.f，计算 pt 和 ps 连接起来的 pdf，其中 g 包含了 visible 项
                     // TODO 我不知道这里为什么没有除以 MC 采样的 pdf
-                    Spectrum ret = pt.beta * pt.f(ps) * ps.f(pt) * ps.beta * g(pt, ps);
-                    double misWeight = mis(cameraSubPath, t, lightSubPath, s);
-                    return misWeight * ret;
+                    ret = pt.beta * pt.f(ps) * ps.f(pt) * ps.beta * g(pt, ps);
                 } else {
-                    return Spectrum(0.0);
+                    ret = Spectrum(0.0);
                 }
             }
+
+            double misWt = ret.isBlack() ? 0.0 : misWeight(cameraSubPath, t, lightSubPath, s, lightVertex);
+            ret *= misWt;
+            return ret;
         }
 
         int BDPathTracer::generateCameraPath(std::shared_ptr<Scene> scene, const Ray &ray,
@@ -105,7 +136,7 @@ namespace kaguya {
             // 光源发射光线
             Ray scatterRay;
             // 采样光源发射
-            Spectrum intensity = light->sampleLightRay(&scatterRay, &lightNormal, &pdfPos, &pdfDir);
+            Spectrum intensity = light->randomLightRay(&scatterRay, &lightNormal, &pdfPos, &pdfDir);
             // 创建光源点
             lightSubPath[0] = PathVertex::createLightVertex(light.get(), scatterRay.getOrigin(),
                                                             scatterRay.getDirection(), lightNormal, intensity);
@@ -133,7 +164,7 @@ namespace kaguya {
                 // TODO delete
                 if (depth == 4) {
                     int a = 0;
-                    a ++;
+                    a++;
                 }
 
                 SurfaceInteraction interaction;
@@ -168,7 +199,7 @@ namespace kaguya {
                     scatterRay.setDirection(worldWi);
 
                     // 更新 beta
-                    double cosine = std::abs(DOT(interaction.normal, worldWo));
+                    double cosine = std::abs(DOT(interaction.normal, worldWi));
                     beta *= (f * cosine / pdfPreWi);
 
                     // 计算向后 pdfWo
@@ -182,7 +213,7 @@ namespace kaguya {
                     }
 
                     // 更新前一个点的 pdfBackward
-                    preVertex.pdfBackward = vertex.computePdfForward(pdfWo, preVertex);
+                    preVertex.pdfBackward = vertex.computeForwardDensityPdf(pdfWo, preVertex);
                 } else {
                     break;
                 }
@@ -190,8 +221,67 @@ namespace kaguya {
             return vertexCount;
         }
 
-        double BDPathTracer::mis(PathVertex *cameraSubPath, int t,
-                                 PathVertex *lightSubPath, int s) {
+        double BDPathTracer::misWeight(PathVertex *cameraSubPath, int t,
+                                       PathVertex *lightSubPath, int s,
+                                       PathVertex &tempLightVertex) {
+            /**
+             * 1. 如果 light 有被替换，则用新的点临时替换 lightSubPath[s - 1]
+             * 2. 重新计算连接位置的 cameraSubPath[t - 1].pdfBackward 和 lightSubPath[s - 1].pdfBackward
+             * 3. 重新计算 cameraSubPath[t - 2].pdfBackward
+             * 4. 重新计算 lightSubPath[s - 2].pdfBackward
+             */
+
+            // 提前取出 PathVertex，方便后续计算
+            PathVertex *pt = t > 0 ? &cameraSubPath[t - 1] : nullptr;
+            PathVertex *ptMinus = t > 1 ? &cameraSubPath[t - 2] : nullptr;
+
+            PathVertex *ps = s > 0 ? &lightSubPath[s - 1] : nullptr;
+            PathVertex *psMinus = s > 1 ? &lightSubPath[s - 2] : nullptr;
+
+            // 当 s = 1，会对光源进行采样，此时需要更换 lightSubPath[s - 1]
+            ScopeSwapper<PathVertex> swapper1;
+            if (s == 1) {
+                swapper1 = {&(lightSubPath[s - 1]), tempLightVertex};
+            }
+
+            // 当 t > 0， 更新 cameraSubPath[t - 1].pdfBackward
+            ScopeSwapper<double> swapper2;
+            if (t > 0) {
+                swapper2 = {&(pt->pdfBackward), s > 0 ? ps->computeDensityPdf(*psMinus, *pt)
+                                                      : pt->computeDensityPdfOfLightOrigin(*ptMinus)};
+            }
+
+            // 当 s > 0，更新 lightSubPath[s - 1].pdfBackward
+            ScopeSwapper<double> swapper3;
+            if (s > 0) {
+                // 这里不考虑 t 的大小，因为 t < 2 的情况是不可能进入的
+                swapper3 = {&(ps->pdfBackward), pt->computeDensityPdf(*ptMinus, *ps)};
+            }
+
+            // 当 t > 2，则更新 cameraSubPath[t - 2].pdfBackward
+            ScopeSwapper<double> swapper4;
+            if (ptMinus != nullptr) {
+                swapper4 = {&(ptMinus->pdfBackward), s > 0 ? pt->computeDensityPdf(*ps, *ptMinus) :
+                                                     pt->computeDensityPdfFromLight(*ptMinus)};
+            }
+
+            // 当 s > 2，则更新 lightSubPath[s - 2].pdfBackward
+            ScopeSwapper<double> swapper5;
+            if (psMinus != nullptr) {
+                swapper5 = {&(psMinus->pdfBackward), ps->computeDensityPdf(*pt, *psMinus)};
+            }
+
+            // 临时替换 isDelta 项目
+            ScopeSwapper<bool> swapper6;
+            if (pt != nullptr) {
+                swapper6 = {&(pt->isDelta), false};
+            }
+
+            ScopeSwapper<bool> swapper7;
+            if (ps != nullptr) {
+                swapper7 = {&(ps->isDelta), false};
+            }
+
             // ri 项总和
             double sumRi = 0;
             // 临时 ri 项

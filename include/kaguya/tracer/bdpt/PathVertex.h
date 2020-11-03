@@ -57,18 +57,55 @@ namespace kaguya {
             PathVertex(PathVertexType type, const StartEndInteraction &ei, const Spectrum &beta) :
                     type(type), ei(ei), point(ei.point), beta(beta) {}
 
-            // 是否可以与其他点做连接
+            /**
+             * 是否可以与其他点做连接
+             *
+             * @return
+             */
             bool isConnectible();
 
-            Spectrum f(const PathVertex &p);
+            /**
+             * 计算 PathVertex 位置处到下一个点 next 处的 bsdf 值
+             * @param p
+             * @return
+             */
+            Spectrum f(const PathVertex &next);
 
             /**
              * 当前点发出射线指向下一个点 next，计算 next 的概率密度
+             * (将 next 点基于 angle 的密度转化成基于 area 的密度)
              * @param pdfWi 当前点向 wi 方向发射射线的概率
              * @param next 下一个点
              * @return
              */
-            double computePdfForward(double pdfWi, const PathVertex &next) const;
+            double computeForwardDensityPdf(double pdfWi, const PathVertex &next) const;
+
+            /**
+             * 计算 pre -> p -> next 的 density pdf，这个 ，density pdf 是 next 的。
+             * 计算方法和 computePdfForward 一致，
+             * 不同之处在于 computePdfForward 是在已知 pdfWi 的情况下计算的，
+             * computePdf 需要自己计算 pdfWi
+             * @param pre
+             * @param next
+             * @return
+             */
+            double computeDensityPdf(const PathVertex &pre, const PathVertex &next) const;
+
+            /**
+             * 计算 p -> next 的 density pdf（密度 pdf），这个 density pdf 是 next 的 density pdf，
+             * 与 computePdf 类似，
+             * (区别在于 p 是 Light 类型)
+             * @param next
+             * @return
+             */
+            double computeDensityPdfFromLight(const PathVertex &next) const;
+
+            /**
+             * 当前 PathVertex 作为发光体的时候，计算这个发光体上的发光点的 density pdf
+             * @param next
+             * @return
+             */
+            double computeDensityPdfOfLightOrigin(const PathVertex &next) const;
 
             const Interaction getInteraction() const;
 
@@ -78,11 +115,24 @@ namespace kaguya {
              */
             bool isDeltaLight() const;
 
-            static inline PathVertex createCameraVertex(const Camera *camera){
+            /**
+             * 判断是否是光源类型
+             * @return
+             */
+            bool isLight() const;
+
+            /**
+             * 假设 PathVertex 可以发光，则此处计算 PathVertex 向 eye 方向投射射线的 Radiance
+             *
+             * @param eye
+             * @return
+             */
+            Spectrum emit(const Vector3 &eye) const;
+
+            static inline PathVertex createCameraVertex(const Camera *camera) {
                 StartEndInteraction ei = StartEndInteraction(camera);
                 return PathVertex(PathVertexType::CAMERA, ei, Spectrum(1.0));
             }
-
 
 
             static inline PathVertex createLightVertex(const Light *light, const Vector3 &p, const Vector3 &dir,
@@ -104,10 +154,9 @@ namespace kaguya {
                 // 创建路径点
                 PathVertex v = PathVertex(si, beta);
                 // 计算上个点发射线击中当前点时，当前点对应的概率
-                v.pdfForward = pre.computePdfForward(pdfPreWi, v);
+                v.pdfForward = pre.computeForwardDensityPdf(pdfPreWi, v);
                 return v;
             }
-
 
         } PathVertex;
 

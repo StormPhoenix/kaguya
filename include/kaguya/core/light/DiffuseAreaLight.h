@@ -16,9 +16,12 @@ namespace kaguya {
                              std::shared_ptr<ShapeSampler> shapeSampler,
                              bool singleSide = true);
 
-            Spectrum luminance(const Interaction &interaction, const Vector3 &wo) override;
+            Spectrum lightRadiance(const Interaction &interaction, const Vector3 &wo) override;
 
-            virtual Spectrum sampleLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) override;
+            virtual Spectrum randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) override;
+
+            virtual void randomLightRayPdf(const Ray &ray, const Vector3 &normal,
+                                           double *pdfPos, double *pdfDir) const override;
 
         public:
             // 构造漫反射区域灯光
