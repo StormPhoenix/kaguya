@@ -90,8 +90,6 @@ namespace kaguya {
             double _russianRoulette;
             // 对光源采样概率
             double _sampleLightProb = 0.2;
-            // 渲染结果位图
-            int *_bitmap = nullptr;
         };
     }
 }

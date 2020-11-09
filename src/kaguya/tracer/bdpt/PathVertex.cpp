@@ -15,7 +15,6 @@ namespace kaguya {
 
         Spectrum PathVertex::f(const PathVertex &next) {
             Vector3 worldWi = NORMALIZE(next.point - point);
-            // TODO 判断类型
             switch (type) {
                 case SURFACE:
                     assert(si.bsdf != nullptr);
@@ -70,6 +69,10 @@ namespace kaguya {
         }
 
         double PathVertex::computeForwardDensityPdf(double pdfWi, const PathVertex &next) const {
+            if (type == PathVertexType::CAMERA) {
+                return 1.0;
+            }
+
             double distSquare = std::pow(LENGTH(point - next.point), 2);
             double pdfFwd = pdfWi / distSquare;
             if (next.type == PathVertexType::SURFACE) {
@@ -148,7 +151,7 @@ namespace kaguya {
 
         double PathVertex::computeDensityPdfFromLight(const PathVertex &next) const {
             // 获取当前 PathVertex 保存的 light 和 areaLight
-            const Light *light = (type == LIGHT) ? ei.light : si.areaLight.get();
+            const Light *light = (type == LIGHT) ? ei.light : si.areaLight;
             assert(light != nullptr);
 
             Vector3 dirToNext = next.point - point;
@@ -174,7 +177,7 @@ namespace kaguya {
             Vector3 dirToNext = next.point - point;
             dirToNext = NORMALIZE(dirToNext);
 
-            const Light *light = (type == LIGHT) ? ei.light : si.areaLight.get();
+            const Light *light = (type == LIGHT) ? ei.light : si.areaLight;
             assert(light != nullptr);
 
             // TODO 只考虑一个光源的情况，如果有多光源，则计算 pdf 时候要考虑到对不同光源采样的概率

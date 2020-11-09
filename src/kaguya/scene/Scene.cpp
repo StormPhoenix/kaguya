@@ -29,10 +29,10 @@ namespace kaguya {
         void Scene::testBuildCornelBoxWithBunny() {
             // For testing
             // total white
+
             Spectrum totalWhiteSpectrum = Spectrum(1.0);
             std::shared_ptr<Texture> totalWhite = std::make_shared<ConstantTexture>(totalWhiteSpectrum);
 
-            // albedos
             // white
             Spectrum whiteSpectrum = Spectrum(0.0);
             whiteSpectrum.r(0.73);
@@ -67,7 +67,6 @@ namespace kaguya {
             blueSpectrum.g(0);
             blueSpectrum.b(1.0);
             std::shared_ptr<Texture> blue = std::make_shared<ConstantTexture>(blueSpectrum);
-
 
             // pink
             Spectrum pinkSpectrum = Spectrum(0.0);
@@ -115,6 +114,7 @@ namespace kaguya {
             std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(-100, 100, -100, 100, 245, false,
                                                                                nullptr);
 
+            // build light
             std::shared_ptr<AreaLight> light = DiffuseAreaLight::buildDiffuseAreaLight(lightSpectrum, lightWall);
             _light = light;
 
@@ -130,7 +130,6 @@ namespace kaguya {
                     std::make_shared<TriangleMesh>(bunnyVertexes, glass, transformMatrix));
 //                    std::make_shared<TriangleMesh>(bunnyVertexes, metal, transformMatrix));
 
-
             // objects
             std::vector<std::shared_ptr<Shape>> objects;
             objects.push_back(leftWall);
@@ -139,7 +138,7 @@ namespace kaguya {
             objects.push_back(topWall);
             objects.push_back(frontWall);
             objects.push_back(lightWall);
-            objects.push_back(bunny);
+            // objects.push_back(bunny);
 
             // 给所有 object 赋予 id
             for (long long id = 0; id < objects.size(); id++) {
@@ -161,8 +160,8 @@ namespace kaguya {
 
         void Scene::testBuildCornelBox() {
             // For testing
-            // albedos
             // total white
+
             Spectrum totalWhiteSpectrum = Spectrum(1.0);
             std::shared_ptr<Texture> totalWhite = std::make_shared<ConstantTexture>(totalWhiteSpectrum);
 
@@ -209,10 +208,11 @@ namespace kaguya {
             std::shared_ptr<Texture> pink = std::make_shared<ConstantTexture>(pinkSpectrum);
 
             // light spectrum
+            int lightIntensity = 15;
             Spectrum lightSpectrum = Spectrum(0.0);
-            lightSpectrum.r(double(249.0) / 255.0 * 15);
-            lightSpectrum.g(double(222.0) / 255.0 * 15);
-            lightSpectrum.b(double(180.0) / 255.0 * 15);
+            lightSpectrum.r(double(249.0) / 255.0 * lightIntensity);
+            lightSpectrum.g(double(222.0) / 255.0 * lightIntensity);
+            lightSpectrum.b(double(180.0) / 255.0 * lightIntensity);
             std::shared_ptr<Texture> lightAlbedo = std::make_shared<ConstantTexture>(lightSpectrum);
 
             // lambertian materials
@@ -245,6 +245,7 @@ namespace kaguya {
             // light
             std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(-100, 100, -100, 100, 235, false,
                                                                                lambertTop);
+
             // build light
             std::shared_ptr<AreaLight> light = DiffuseAreaLight::buildDiffuseAreaLight(lightSpectrum, lightWall);
             _light = light;
@@ -258,6 +259,7 @@ namespace kaguya {
             objects.push_back(frontWall);
             objects.push_back(glassSphere);
             objects.push_back(metalSphere);
+            objects.push_back(lightWall);
 
             // 给所有 object 赋予 id
             for (long long id = 0; id < objects.size(); id++) {

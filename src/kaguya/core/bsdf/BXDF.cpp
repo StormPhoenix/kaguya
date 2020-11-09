@@ -37,7 +37,7 @@ namespace kaguya {
         }
 
         bool BXDF::hasAnyOf(const BXDFType bxdfType) {
-            return type & bxdfType > 0;
+            return (type & bxdfType) > 0;
         }
     }
 }

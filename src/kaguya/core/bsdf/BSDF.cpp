@@ -13,7 +13,11 @@ namespace kaguya {
              * 暂时用入射光线和法线来构造切线空间*/
             _tanY = NORMALIZE(insect.normal);
             _tanZ = NORMALIZE(CROSS(insect.direction, _tanY));
-            _tanX = NORMALIZE(CROSS(_tanY, _tanZ));
+            if (!isValid(_tanZ)) {
+                tangentSpace(_tanY, &_tanX, &_tanZ);
+            } else {
+                _tanX = NORMALIZE(CROSS(_tanY, _tanZ));
+            }
         }
 
         Vector3 BSDF::toObjectSpace(const Vector3 &v) const {

@@ -107,7 +107,7 @@ namespace kaguya {
                     hitRecord.v = offsetY / _height;
                     hitRecord.material = _material.get();
                     hitRecord.id = getId();
-                    hitRecord.areaLight = _areaLight;
+                    hitRecord.areaLight = _areaLight.get();
                     return true;
                 } else {
                     return false;
@@ -184,7 +184,7 @@ namespace kaguya {
                     hitRecord.setOutwardNormal(_normal, ray.getDirection());
                     hitRecord.u = (x - _x0) / (_x1 - _x0);
                     hitRecord.v = (z - _z0) / (_z1 - _z0);
-                    hitRecord.areaLight = _areaLight;
+                    hitRecord.areaLight = _areaLight.get();
                     return true;
                 } else {
                     return false;
@@ -260,7 +260,7 @@ namespace kaguya {
                     hitRecord.setOutwardNormal(_normal, ray.getDirection());
                     hitRecord.u = (z - _z0) / (_z1 - _z0);
                     hitRecord.v = (y - _y0) / (_y1 - _y0);
-                    hitRecord.areaLight = _areaLight;
+                    hitRecord.areaLight = _areaLight.get();
                     return true;
                 } else {
                     return false;
@@ -336,7 +336,7 @@ namespace kaguya {
                     hitRecord.setOutwardNormal(_normal, ray.getDirection());
                     hitRecord.u = (x - _x0) / (_x1 - _x0);
                     hitRecord.v = (y - _y0) / (_y1 - _y0);
-                    hitRecord.areaLight = _areaLight;
+                    hitRecord.areaLight = _areaLight.get();
                     return true;
                 } else {
                     return false;

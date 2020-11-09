@@ -55,7 +55,8 @@ namespace kaguya {
                     vi(vi), beta(beta), point(vi.point), type(PathVertexType::VOLUME) {}
 
             PathVertex(PathVertexType type, const StartEndInteraction &ei, const Spectrum &beta) :
-                    type(type), ei(ei), point(ei.point), beta(beta) {}
+                    type(type), ei(ei), point(ei.point), normal(ei.normal), beta(beta) {
+            }
 
             /**
              * 是否可以与其他点做连接
@@ -136,9 +137,10 @@ namespace kaguya {
 
 
             static inline PathVertex createLightVertex(const Light *light, const Vector3 &p, const Vector3 &dir,
-                                                       const Vector3 &n, const Spectrum &intensity) {
+                                                       const Vector3 &n, const Spectrum &intensity, double pdf) {
                 StartEndInteraction ei = StartEndInteraction(light, p, dir, n);
                 PathVertex pathVertex = PathVertex(PathVertexType::LIGHT, ei, intensity);
+                pathVertex.pdfForward = pdf;
                 return pathVertex;
             }
 

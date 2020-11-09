@@ -8,6 +8,7 @@
 #include <kaguya/core/Core.h>
 #include <kaguya/utils/MemoryArena.h>
 #include <kaguya/core/bsdf/BXDF.h>
+#include <kaguya/tracer/Camera.h>
 
 namespace kaguya {
     namespace material {
@@ -86,7 +87,7 @@ namespace kaguya {
             // 击中点处的 BSDF
             BSDF *bsdf = nullptr;
             // 如果被击中物体是 AreaLight，则这一项应该被赋值
-            std::shared_ptr<AreaLight> areaLight = nullptr;
+            AreaLight *areaLight = nullptr;
         };
 
         class VolumeInteraction : public Interaction {
@@ -103,11 +104,22 @@ namespace kaguya {
 
             StartEndInteraction() : Interaction() {}
 
-            StartEndInteraction(const Camera *camera) : camera(camera) {}
+            StartEndInteraction(const Camera *camera) : camera(camera) {
+                assert(camera != nullptr);
+                point = camera->getEye();
+            }
 
             StartEndInteraction(const Light *light, const Interaction &interaction) :
-                    light(light), Interaction(interaction) {}
+                    light(light), Interaction(interaction) {
+            }
 
+            /**
+             * 创建 光源 / 相机 路径点
+             * @param light 光源
+             * @param p 点位置
+             * @param dir 入射方向
+             * @param n 击中点法线
+             */
             StartEndInteraction(const Light *light, const Vector3 &p, const Vector3 &dir,
                                 const Vector3 &n)
                     : light(light) {

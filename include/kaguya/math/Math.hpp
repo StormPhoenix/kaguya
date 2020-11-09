@@ -174,6 +174,10 @@ inline double hemiCosineSamplePdf(double cosTheta) {
     return cosTheta / PI;
 }
 
+inline bool isValid(const Vector3 v) {
+    return !std::isnan(v.x) && !std::isnan(v.y) && !std::isnan(v.z);
+}
+
 /**
  * 计算切线空间
  * @param tanY 切线空间 Y 轴

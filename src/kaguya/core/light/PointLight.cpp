@@ -15,8 +15,13 @@ namespace kaguya {
                                              VisibilityTester *visibilityTester) {
             (*wi) = NORMALIZE(_center - eye.point);
             (*pdf) = 1;
-            Interaction interaction;
-            interaction.point = _center;
+
+            Vector3 samplePoint = _center;
+            Vector3 sampleDir = NORMALIZE(_center - eye.point);
+            Vector3 sampleNormal = -sampleDir;
+            double step = LENGTH(_center - eye.point);
+            Interaction interaction = Interaction(samplePoint, sampleDir, sampleNormal, step);
+
             (*visibilityTester) = VisibilityTester(eye, interaction);
             return _intensity / std::pow(LENGTH(_center - eye.point), 2);
         }
