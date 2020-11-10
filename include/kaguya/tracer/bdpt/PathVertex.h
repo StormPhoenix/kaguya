@@ -49,13 +49,13 @@ namespace kaguya {
             PathVertex() {}
 
             PathVertex(const SurfaceInteraction &si, const Spectrum &beta) :
-                    si(si), beta(beta), point(si.point), normal(si.normal), type(PathVertexType::SURFACE) {}
+                    si(si), beta(beta), point(si.getPoint()), normal(si.getNormal()), type(PathVertexType::SURFACE) {}
 
             PathVertex(const VolumeInteraction &vi, const Spectrum &beta) :
-                    vi(vi), beta(beta), point(vi.point), type(PathVertexType::VOLUME) {}
+                    vi(vi), beta(beta), point(vi.getPoint()), type(PathVertexType::VOLUME) {}
 
             PathVertex(PathVertexType type, const StartEndInteraction &ei, const Spectrum &beta) :
-                    type(type), ei(ei), point(ei.point), normal(ei.normal), beta(beta) {
+                    type(type), ei(ei), point(ei.getPoint()), normal(ei.getNormal()), beta(beta) {
             }
 
             /**

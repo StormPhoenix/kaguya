@@ -13,6 +13,28 @@
 ## 背景贴图
 
 ## 已解决问题
+
+- BSDF.cpp 的构造函数，计算切线空间有误，direction 和 _tanY 如果平行，则 CROSS 计算得到 nan
+
+- 玻璃材质球下面本应该是阴影的地方渲染成了亮白色
+    Interaction 中添加了 areaLight 变量，Interaction 在场景求交的过程中传递时恰好和光源相交，areaLight 变量被赋值。但后续发现这个
+    光源被遮挡，因此 Interaction 变量需要被修改，而 areaLight 变量是新添加的，应该也被修改成 nullptr，这部分代码没有添加进去导致地板
+    看不到光的位置也被渲染成白色。
+    
+- 实现的 BDPT 算法渲染 lambertian 球时，出现棱一条明显的边界，实验情况如下：
+    - 替换成 PT，没有出现上述情况
+    - 移动光源位置、扩展 box 边界：不影响棱边位置
+    - depth = 2：出现棱边
+    - depth = 2，s = 0：无棱边
+    - depth = 2，s = 1：有棱边
+    - depth = 2，s = 1，MIS 默认返回 1：无棱边
+        在 MIS = 1 的情况下，除了球体外的场景在视觉上看不出什么区别，唯独是边界位置，使用 MIS 明显很暗淡
+    - depth = 2, s = 1，有 MIS，改变光源位置、大小，相机位置，都不会影响边界，但移动球的位置会影响边界
+    - TODO: 将 s = 1 作为限制条件，看是否出现 "边界"。s = 1 的情况相当于 PT 了，
+        如果继续出现边界说明 randomIntersect 有问题了。
+    - 已解决：cameraSubPath 起始点 PathVertex 是 Camera 类型，但在创建 camera path vertex 时没有给 PathVertex
+        的 point 属性赋值。
+        
 - 内存溢出
     MemoryArena::clean() 将未保存的 block 指针赋值为 nullptr，造成内存溢出
     Metal::bsdf() 生成的 Fresnel * 复制给了智能指针 std::shared_ptr<Fresnel> 导致内存溢出，暂时不清楚原理。
@@ -40,28 +62,7 @@
 - Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法
 
 ## 未解决的问题
-- 实现的 BDPT 算法存在白色躁点，目前看到的情况如下：
-    - 躁点只会在 s > 1 的情况下出现
-    - 躁点会沿着盒子的棱边分布
     
-- BDPT 中的 misWeight() 遍历循环 cameraSubPath 时少遍历了 cameraSubPath 的起始点，这个会不会
-    是出现躁点的原因？
-    TODO：尝试去掉 MIS 过程，看在 metal sphere 的条件下会不会出现大量躁点。
-    
-- 实现的 BDPT 算法渲染 lambertian 球时，出现棱一条明显的边界，实验情况如下：
-    - 替换成 PT，没有出现上述情况
-    - 移动光源位置、扩展 box 边界：不影响棱边位置
-    - depth = 2：出现棱边
-    - depth = 2，s = 0：无棱边
-    - depth = 2，s = 1：有棱边
-    - depth = 2，s = 1，MIS 默认返回 1：无棱边
-        在 MIS = 1 的情况下，除了球体外的场景在视觉上看不出什么区别，唯独是边界位置，使用 MIS 明显很暗淡
-    - depth = 2, s = 1，有 MIS，改变光源位置、大小，相机位置，都不会影响边界，但移动球的位置会影响边界
-    - TODO: 将 s = 1 作为限制条件，看是否出现 "边界"。s = 1 的情况相当于 PT 了，
-        如果继续出现边界说明 randomIntersect 有问题了。
-
-- BSDF.cpp 的构造函数，计算切线空间有误，direction 和 _tanY 如果平行，则 CROSS 计算得到 nan
-
 - randomInt 会出现随机到 randomValue = 1.0 的地方，得出的 int 值会让调用者越界
 
 - 删除 isFrontFace

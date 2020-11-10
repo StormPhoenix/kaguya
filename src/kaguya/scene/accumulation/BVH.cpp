@@ -46,7 +46,7 @@ namespace kaguya {
 
                 if (_aabb.hit(ray, stepMin, stepMax)) {
                     bool leftHit = _left->insect(ray, hitRecord, stepMin, stepMax);
-                    bool rightHit = _right->insect(ray, hitRecord, stepMin, leftHit ? hitRecord.step : stepMax);
+                    bool rightHit = _right->insect(ray, hitRecord, stepMin, leftHit ? hitRecord.getStep() : stepMax);
                     return leftHit || rightHit;
                 } else {
                     return false;

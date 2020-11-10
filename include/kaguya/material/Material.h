@@ -39,7 +39,7 @@ namespace kaguya {
              * 是否具有反光、折射属性
              * @return
              */
-            virtual bool isSpecular() {
+            virtual bool isSpecular() const {
                 return false;
             }
 

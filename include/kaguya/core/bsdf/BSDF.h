@@ -81,7 +81,7 @@ namespace kaguya {
              * @param bxdfType
              * @return
              */
-            int hasAnyOf(const BXDFType bxdfType);
+            int hasAnyOf(const BXDFType bxdfType) const;
 
         private:
             ~BSDF() {}

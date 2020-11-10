@@ -38,34 +38,75 @@ namespace kaguya {
         */
         class Interaction {
         public:
-            // 击中光线方向
-            Vector3 direction;
-            // 击中点
-            Vector3 point;
-            // 击中点法线方向，发现永远指向物体表面外侧
-            Vector3 normal;
-            // 击中射线步长
-            double step;
-            // 击中材质种类
-            Material *material = nullptr;
-            // 击中物体的 ID
-            long long id = -1;
-
             Interaction() {}
 
-            Interaction(const Vector3 &point, const Vector3 &direction, const Vector3 &normal, double step) :
-                    point(point), direction(direction), normal(normal), step(step) {}
+            Interaction(const Vector3 &point, const Vector3 &direction, const Vector3 &normal,
+                        double step, Material *material = nullptr) :
+                    _point(point), _direction(direction), _normal(normal),
+                    _step(step), _material(material) {}
 
-            /**
-             * TODO delete
-             * 设置击中位置处的法线
-             * @param outwardNormal
-             * @param hitDirection
-             */
-            void setOutwardNormal(const Vector3 &outwardNormal, const Vector3 &hitDirection) {
-                direction = hitDirection;
-                normal = outwardNormal;
+            const Vector3 getDirection() const {
+                return _direction;
             }
+
+            const Vector3 getPoint() const {
+                return _point;
+            }
+
+            const Vector3 getNormal() const {
+                return _normal;
+            }
+
+            void setNormal(const Vector3 &normal) {
+                _normal = normal;
+            }
+
+            const double getStep() const {
+                return _step;
+            }
+
+            void setStep(double step) {
+                _step = step;
+            }
+
+            const Material *getMaterial() const {
+                return _material;
+            }
+
+            void setMaterial(Material *material) {
+                _material = material;
+            }
+
+            void setPoint(const Vector3 &point) {
+                _point = point;
+            }
+
+            void setId(long long id) {
+//                reset();
+                _id = id;
+            }
+
+        protected:
+            /**
+             * 清空 Interaction 中部分属性
+             */
+            virtual void reset() {
+                _material = nullptr;
+            }
+
+        protected:
+            // 击中光线方向
+            Vector3 _direction;
+            // 击中点
+            Vector3 _point;
+            // 击中点法线方向，发现永远指向物体表面外侧
+            Vector3 _normal;
+            // 击中射线步长
+            double _step;
+            // 击中材质种类
+            Material *_material = nullptr;
+            // 击中物体的 ID
+            long long _id = -1;
         };
 
         /**
@@ -76,18 +117,65 @@ namespace kaguya {
             SurfaceInteraction() : Interaction() {}
 
             SurfaceInteraction(const Vector3 &point, const Vector3 &direction, const Vector3 &normal,
-                               double step, double u = 0, double v = 0) :
-                    Interaction(point, direction, normal, step), u(u), v(v) {}
+                               double step, double u = 0, double v = 0, Material *material = nullptr) :
+                    Interaction(point, direction, normal, step, material),
+                    _u(u), _v(v) {}
 
             BSDF *buildBSDF(MemoryArena &memoryArena, TransportMode mode = TransportMode::RADIANCE);
 
+            /**
+             * TODO delete
+             * 设置击中位置处的法线
+             * @param outwardNormal
+             * @param hitDirection
+             */
+            void setOutwardNormal(const Vector3 &outwardNormal, const Vector3 &hitDirection) {
+                _direction = hitDirection;
+                _normal = outwardNormal;
+            }
+
+            const double getU() {
+                return _u;
+            }
+
+            void setU(double u) {
+                _u = u;
+            }
+
+            const double getV() {
+                return _v;
+            }
+
+            void setV(double v) {
+                _v = v;
+            }
+
+            const AreaLight *getAreaLight() const {
+                return _areaLight;
+            }
+
+            void setAreaLight(AreaLight *areaLight) {
+                _areaLight = areaLight;
+            }
+
+            const BSDF *getBSDF() const {
+                return _bsdf;
+            }
+
+            virtual void reset() override {
+                Interaction::reset();
+                _bsdf = nullptr;
+                _areaLight = nullptr;
+            }
+
+        protected:
             // 击中点纹理坐标
-            double u;
-            double v;
+            double _u;
+            double _v;
             // 击中点处的 BSDF
-            BSDF *bsdf = nullptr;
+            BSDF *_bsdf = nullptr;
             // 如果被击中物体是 AreaLight，则这一项应该被赋值
-            AreaLight *areaLight = nullptr;
+            AreaLight *_areaLight = nullptr;
         };
 
         class VolumeInteraction : public Interaction {
@@ -106,7 +194,7 @@ namespace kaguya {
 
             StartEndInteraction(const Camera *camera) : camera(camera) {
                 assert(camera != nullptr);
-                point = camera->getEye();
+                _point = camera->getEye();
             }
 
             StartEndInteraction(const Light *light, const Interaction &interaction) :
@@ -123,9 +211,9 @@ namespace kaguya {
             StartEndInteraction(const Light *light, const Vector3 &p, const Vector3 &dir,
                                 const Vector3 &n)
                     : light(light) {
-                point = p;
-                direction = dir;
-                normal = n;
+                _point = p;
+                _direction = dir;
+                _normal = n;
             }
 
         };

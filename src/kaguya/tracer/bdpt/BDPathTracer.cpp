@@ -44,10 +44,6 @@ namespace kaguya {
                             auto u = (col + uniformSample()) / double(cameraWidth);
                             auto v = (row + uniformSample()) / double(cameraHeight);
 
-//                             TODO 临时使用这个
-//                            auto u = double(col) / cameraWidth;
-//                            auto v = double(row) / cameraHeight;
-
                             Ray sampleRay = _camera->sendRay(u, v);
                             ans += shader(sampleRay, *(_scene.get()), _maxDepth, arena);
                             arena.clean();
@@ -258,7 +254,7 @@ namespace kaguya {
                     vertexCount++;
 
                     // 采样下一个射线
-                    Vector3 worldWo = -interaction.direction;
+                    Vector3 worldWo = -interaction.getDirection();
                     Vector3 worldWi = Vector3(0);
                     BXDFType sampleType;
                     Spectrum f = bsdf->sampleF(worldWo, &worldWi, &pdfPreWi, BXDFType::BSDF_ALL, &sampleType);
@@ -269,12 +265,12 @@ namespace kaguya {
                     }
 
                     // 设置新的散射光线
-                    scatterRay.setOrigin(interaction.point);
+                    scatterRay.setOrigin(interaction.getPoint());
                     scatterRay.setDirection(worldWi);
 
                     // TODO cosine 的计算感觉有问题，对于从光源发射的光线，应该用 worldWo
                     // 更新 beta
-                    double cosine = std::abs(DOT(interaction.normal, worldWi));
+                    double cosine = std::abs(DOT(interaction.getNormal(), worldWi));
                     beta *= (f * cosine / pdfPreWi);
 
                     // 计算向后 pdfWo
@@ -301,7 +297,6 @@ namespace kaguya {
         double BDPathTracer::misWeight(PathVertex *cameraSubPath, int t,
                                        PathVertex *lightSubPath, int s,
                                        PathVertex &tempLightVertex) {
-
 //            if (s + t == 2) {
 //                return 1;
 //            }
@@ -420,21 +415,24 @@ namespace kaguya {
 
         Spectrum BDPathTracer::shader(const Ray &ray, Scene &scene, int maxDepth, MemoryArena &memoryArena) {
             // 创建临时变量用于存储 camera、light 路径
-            PathVertex *cameraSubPath = memoryArena.alloc<PathVertex>(maxDepth + 2, false);
-            PathVertex *lightSubPath = memoryArena.alloc<PathVertex>(maxDepth + 1, false);
+            PathVertex *cameraSubPath = memoryArena.alloc<PathVertex>(maxDepth + 1, false);
+            PathVertex *lightSubPath = memoryArena.alloc<PathVertex>(maxDepth, false);
 
             // 生成相机路径
-            int cameraPathLength = generateCameraPath(_scene, ray, _camera, cameraSubPath, maxDepth + 2, memoryArena);
+            int cameraPathLength = generateCameraPath(_scene, ray, _camera, cameraSubPath, maxDepth + 1, memoryArena);
 
             // 生成光源路径
-            int lightPathLength = generateLightPath(_scene, lightSubPath, maxDepth + 1, memoryArena);
+            int lightPathLength = generateLightPath(_scene, lightSubPath, maxDepth, memoryArena);
 
             Spectrum shaderColor = Spectrum(0.0);
             // 路径连接
             for (int t = 2; t <= cameraPathLength; t++) {
                 for (int s = 0; s <= lightPathLength; s++) {
-                    shaderColor += connectPath(scene, cameraSubPath, cameraPathLength, t,
-                                               lightSubPath, lightPathLength, s);
+                    int depth = t + s - 1;
+                    if (depth <= maxDepth && depth > 0) {
+                        shaderColor += connectPath(scene, cameraSubPath, cameraPathLength, t,
+                                                   lightSubPath, lightPathLength, s);
+                    }
                 }
             }
             return shaderColor;

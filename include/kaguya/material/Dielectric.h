@@ -20,7 +20,7 @@ namespace kaguya {
 
             Dielectric(std::shared_ptr<Texture> albedo, double refractiveIndex);
 
-            virtual bool isSpecular() override;
+            virtual bool isSpecular() const override;
 
             virtual BSDF *bsdf(SurfaceInteraction &insect, MemoryArena &memoryArena,
                                TransportMode mode = TransportMode::RADIANCE) override;

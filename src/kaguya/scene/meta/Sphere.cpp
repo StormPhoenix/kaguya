@@ -42,26 +42,30 @@ namespace kaguya {
             if (discriminant > 0) {
                 double root = (-halfB - sqrt(discriminant)) / a;
                 if (root >= stepMin && root <= stepMax) {
-                    hitRecord.step = root;
-                    hitRecord.point = ray.at(root);
-                    hitRecord.material = _material.get();
-                    hitRecord.id = getId();
-                    hitRecord.u = 0;
-                    hitRecord.v = 0;
+                    hitRecord.setId(getId());
+                    hitRecord.setStep(root);
+                    hitRecord.setPoint(ray.at(root));
+                    hitRecord.setMaterial(_material.get());
+                    hitRecord.setU(0);
+                    hitRecord.setV(0);
+                    hitRecord.setAreaLight(nullptr);
 
-                    Vector3 outwardNormal = computeNormal(hitRecord.point);
+                    Vector3 outwardNormal = computeNormal(hitRecord.getPoint());
                     hitRecord.setOutwardNormal(outwardNormal, ray.getDirection());
                     return true;
                 }
 
                 root = (-halfB + sqrt(discriminant)) / a;
                 if (root >= stepMin && root <= stepMax) {
-                    hitRecord.step = root;
-                    hitRecord.point = ray.at(root);
-                    hitRecord.material = _material.get();
-                    hitRecord.id = getId();
+                    hitRecord.setId(getId());
+                    hitRecord.setStep( root);
+                    hitRecord.setPoint(ray.at(root));
+                    hitRecord.setMaterial( _material.get());
+                    hitRecord.setU(0);
+                    hitRecord.setV(0);
+                    hitRecord.setAreaLight(nullptr);
 
-                    Vector3 outwardNormal = computeNormal(hitRecord.point);
+                    Vector3 outwardNormal = computeNormal(hitRecord.getPoint());
                     hitRecord.setOutwardNormal(outwardNormal, ray.getDirection());
                     return true;
                 } else {

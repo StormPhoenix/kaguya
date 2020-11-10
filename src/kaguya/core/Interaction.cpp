@@ -11,9 +11,9 @@ namespace kaguya {
         using kaguya::material::Material;
 
         BSDF *SurfaceInteraction::buildBSDF(MemoryArena &memoryArena, TransportMode mode) {
-            assert(material != nullptr);
-            bsdf = material->bsdf(*this, memoryArena, mode);
-            return bsdf;
+            assert(_material != nullptr);
+            _bsdf = _material->bsdf(*this, memoryArena, mode);
+            return _bsdf;
         }
 
     }

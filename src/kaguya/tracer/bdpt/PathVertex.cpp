@@ -17,8 +17,8 @@ namespace kaguya {
             Vector3 worldWi = NORMALIZE(next.point - point);
             switch (type) {
                 case SURFACE:
-                    assert(si.bsdf != nullptr);
-                    return si.bsdf->f(-si.direction, worldWi);
+                    assert(si.getBSDF() != nullptr);
+                    return si.getBSDF()->f(-si.getDirection(), worldWi);
                 case CAMERA:
                 case LIGHT:
                 case VOLUME:
@@ -36,7 +36,7 @@ namespace kaguya {
 
         bool PathVertex::isLight() const {
             return (type == PathVertexType::LIGHT ||
-                    (type == PathVertexType::SURFACE && si.areaLight != nullptr));
+                    (type == PathVertexType::SURFACE && si.getAreaLight() != nullptr));
         }
 
         Spectrum PathVertex::emit(const Vector3 &eye) const {
@@ -53,7 +53,7 @@ namespace kaguya {
             if (type == PathVertexType::LIGHT && ei.light != nullptr) {
                 return ei.light->lightRadiance(Ray(point, dirToEye));
             } else {
-                return si.areaLight->lightRadiance(si, dirToEye);
+                return si.getAreaLight()->lightRadiance(si, dirToEye);
             }
         }
 
@@ -76,8 +76,8 @@ namespace kaguya {
             double distSquare = std::pow(LENGTH(point - next.point), 2);
             double pdfFwd = pdfWi / distSquare;
             if (next.type == PathVertexType::SURFACE) {
-                Vector3 surfaceNormal = next.si.normal;
-                Vector3 dirToPre = -next.si.direction;
+                Vector3 surfaceNormal = next.si.getNormal();
+                Vector3 dirToPre = -next.si.getDirection();
                 pdfFwd *= std::abs(DOT(surfaceNormal, dirToPre));
             }
             return pdfFwd;
@@ -92,8 +92,8 @@ namespace kaguya {
                     return !isDeltaLight();
                 case SURFACE:
                     // 判断 specular 类型
-                    assert(si.bsdf != nullptr);
-                    return si.bsdf->hasAnyOf(BXDFType(BXDFType::BSDF_DIFFUSE | BXDFType::BSDF_GLOSSY)) > 0;
+                    assert(si.getBSDF() != nullptr);
+                    return si.getBSDF()->hasAnyOf(BXDFType(BXDFType::BSDF_DIFFUSE | BXDFType::BSDF_GLOSSY)) > 0;
                 case VOLUME:
                     // TODO 暂时不支持 Volume Rendering
                     assert(1 == 0);
@@ -133,7 +133,7 @@ namespace kaguya {
                     pdf = 1.0;
                     break;
                 case SURFACE:
-                    pdf = si.bsdf->samplePdf(wo, wi);
+                    pdf = si.getBSDF()->samplePdf(wo, wi);
                     break;
                 case VOLUME:
                     assert(1 == 0);
@@ -151,7 +151,7 @@ namespace kaguya {
 
         double PathVertex::computeDensityPdfFromLight(const PathVertex &next) const {
             // 获取当前 PathVertex 保存的 light 和 areaLight
-            const Light *light = (type == LIGHT) ? ei.light : si.areaLight;
+            const Light *light = (type == LIGHT) ? ei.light : si.getAreaLight();
             assert(light != nullptr);
 
             Vector3 dirToNext = next.point - point;
@@ -177,7 +177,7 @@ namespace kaguya {
             Vector3 dirToNext = next.point - point;
             dirToNext = NORMALIZE(dirToNext);
 
-            const Light *light = (type == LIGHT) ? ei.light : si.areaLight;
+            const Light *light = (type == LIGHT) ? ei.light : si.getAreaLight();
             assert(light != nullptr);
 
             // TODO 只考虑一个光源的情况，如果有多光源，则计算 pdf 时候要考虑到对不同光源采样的概率

@@ -23,7 +23,7 @@ namespace kaguya {
 
             Metal(const Spectrum &albedo, double fuzzy = 0);
 
-            virtual bool isSpecular() override;
+            virtual bool isSpecular() const override;
 
             virtual BSDF *bsdf(SurfaceInteraction &insect, MemoryArena &memoryArena,
                                TransportMode mode = TransportMode::RADIANCE) override;

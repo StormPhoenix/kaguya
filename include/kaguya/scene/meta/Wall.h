@@ -29,7 +29,7 @@ namespace kaguya {
 
             virtual SurfaceInteraction sampleSurfacePoint() override;
 
-            virtual double surfacePointPdf(SurfaceInteraction &point) override;
+            virtual double surfacePointPdf(SurfaceInteraction &si) override;
 
         protected:
             /**
@@ -83,7 +83,7 @@ namespace kaguya {
 
             virtual SurfaceInteraction sampleSurfacePoint() override;
 
-            virtual double surfacePointPdf(SurfaceInteraction &point) override;
+            virtual double surfacePointPdf(SurfaceInteraction &si) override;
 
         protected:
             double _y;
@@ -149,7 +149,7 @@ namespace kaguya {
 
             virtual SurfaceInteraction sampleSurfacePoint() override;
 
-            virtual double surfacePointPdf(SurfaceInteraction &point) override;
+            virtual double surfacePointPdf(SurfaceInteraction &si) override;
 
         protected:
             double _z;

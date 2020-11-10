@@ -11,8 +11,8 @@ namespace kaguya {
             // 构造切线空间
             /* 此处的实现和 pbrt 中的实现不同，pbrt 用的是 dudp 和纹理相关，但目前没有实现纹理部分
              * 暂时用入射光线和法线来构造切线空间*/
-            _tanY = NORMALIZE(insect.normal);
-            _tanZ = NORMALIZE(CROSS(insect.direction, _tanY));
+            _tanY = NORMALIZE(insect.getNormal());
+            _tanZ = NORMALIZE(CROSS(insect.getDirection(), _tanY));
             if (!isValid(_tanZ)) {
                 tangentSpace(_tanY, &_tanX, &_tanZ);
             } else {
@@ -176,7 +176,7 @@ namespace kaguya {
             return ret;
         }
 
-        int BSDF::hasAnyOf(const BXDFType bxdfType) {
+        int BSDF::hasAnyOf(const BXDFType bxdfType) const {
             int ret = 0;
             for (int i = 0; i < _bxdfCount; i++) {
                 if (_bxdfs[i]->hasAnyOf(bxdfType)) {

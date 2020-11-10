@@ -236,9 +236,7 @@ namespace kaguya {
             std::shared_ptr<Shape> frontWall = std::make_shared<XYWall>(-250, 250, -250, 250, -250, false,
                                                                         lambertFront);
 
-            std::shared_ptr<Shape> glassSphere = std::make_shared<Sphere>(Vector3(125, -169, 0), 80, glass);
-//            std::shared_ptr<Shape> glassSphere = std::make_shared<Sphere>(Vector3(0, -169, 0), 80, glass);
-//            std::shared_ptr<Shape> glassSphere = std::make_shared<Sphere>(Vector3(75, 0, 0), 80, metal);
+            std::shared_ptr<Shape> glassSphere = std::make_shared<Sphere>(Vector3(75, -169, 0), 80, glass);
 
             std::shared_ptr<Shape> metalSphere = std::make_shared<Sphere>(Vector3(-125, -149, 100), 100, metal);
 

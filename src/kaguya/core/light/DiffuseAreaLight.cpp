@@ -27,7 +27,7 @@ namespace kaguya {
 
             // 采样位置
             SurfaceInteraction si = _shapeSampler->sampleSurfacePoint();
-            *normal = si.normal;
+            *normal = si.getNormal();
 
             // 采样位置 pdf
             *pdfPos = _shapeSampler->surfacePointPdf(si);
@@ -60,7 +60,7 @@ namespace kaguya {
             Vector3 dirWorld = dirLocal.x * tanX + dirLocal.y * tanY + dirLocal.z * tanZ;
 
             // 设置 ray
-            ray->setOrigin(si.point);
+            ray->setOrigin(si.getPoint());
             ray->setDirection(dirWorld);
 
             return lightRadiance(si, dirWorld);
@@ -71,14 +71,14 @@ namespace kaguya {
             assert(_shapeSampler != nullptr);
             // 创建 SurfaceInteraction
             SurfaceInteraction si;
-            si.point = ray.getOrigin();
+            si.setPoint(ray.getOrigin());
             (*pdfPos) = _shapeSampler->surfacePointPdf(si);
             double cosTheta = ABS_DOT(normal, ray.getDirection());
             (*pdfDir) = _singleSide ? hemiCosineSamplePdf(cosTheta) : 0.5 * hemiCosineSamplePdf(cosTheta);
         }
 
-        Spectrum DiffuseAreaLight::lightRadiance(const Interaction &interaction, const Vector3 &wo) {
-            double cosine = DOT(interaction.normal, wo);
+        Spectrum DiffuseAreaLight::lightRadiance(const Interaction &interaction, const Vector3 &wo) const {
+            double cosine = DOT(interaction.getNormal(), wo);
             return (!_singleSide || cosine > 0) ? _intensity : Spectrum(0.0);
 
             /*

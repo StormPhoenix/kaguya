@@ -16,7 +16,7 @@ namespace kaguya {
                              std::shared_ptr<ShapeSampler> shapeSampler,
                              bool singleSide = true);
 
-            Spectrum lightRadiance(const Interaction &interaction, const Vector3 &wo) override;
+            Spectrum lightRadiance(const Interaction &interaction, const Vector3 &wo) const override;
 
             virtual Spectrum randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) override;
 

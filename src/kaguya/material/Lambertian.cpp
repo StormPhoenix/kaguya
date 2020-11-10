@@ -21,7 +21,7 @@ namespace kaguya {
         }
 
         BSDF *Lambertian::bsdf(SurfaceInteraction &insect, MemoryArena &memoryArena, TransportMode mode) {
-            Spectrum albedo = _albedo->sample(insect.u, insect.v);
+            Spectrum albedo = _albedo->sample(insect.getU(), insect.getV());
             BXDFLambertianReflection *lambertianBXDF =
                     ALLOC(memoryArena, BXDFLambertianReflection)(albedo);
             BSDF *bsdf = ALLOC(memoryArena, BSDF)(insect);

@@ -19,17 +19,17 @@ namespace kaguya {
         Spectrum SpotLight::sampleFromLight(const Interaction &eye,
                                             Vector3 *wi, double *pdf,
                                             VisibilityTester *visibilityTester) {
-            (*wi) = NORMALIZE(_center - eye.point);
+            (*wi) = NORMALIZE(_center - eye.getPoint());
             (*pdf) = 1.0;
 
             Vector3 samplePoint = _center;
-            Vector3 sampleDir = NORMALIZE(_center - eye.point);
+            Vector3 sampleDir = NORMALIZE(_center - eye.getPoint());
             Vector3 sampleNormal = -sampleDir;
-            double step = LENGTH(_center - eye.point);
+            double step = LENGTH(_center - eye.getPoint());
             Interaction interaction = Interaction(samplePoint, sampleDir, sampleNormal, step);
 
             (*visibilityTester) = VisibilityTester(eye, interaction);
-            return _intensity * fallOffWeight(-(*wi)) / std::pow(LENGTH(_center - eye.point), 2);
+            return _intensity * fallOffWeight(-(*wi)) / std::pow(LENGTH(_center - eye.getPoint()), 2);
         }
 
         double SpotLight::sampleFromLightPdf(const Interaction &eye, const Vector3 &dir) {

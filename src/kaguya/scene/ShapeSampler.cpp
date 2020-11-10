@@ -17,13 +17,13 @@ namespace kaguya {
 
         double ShapeSampler::rayPdf(const Interaction &eye, const Vector3 &dir) {
             // 构建射线
-            Ray ray = Ray(eye.point, dir);
+            Ray ray = Ray(eye.getPoint(), dir);
             // 判断交点
             SurfaceInteraction intersection;
             if (insect(ray, intersection, 0.001, infinity)) {
                 // 将交点处 rayPdf 转化为 w_i surfacePointPdf
-                double distance = LENGTH(intersection.point - ray.getOrigin());
-                double cosine = abs(DOT(dir, intersection.normal));
+                double distance = LENGTH(intersection.getPoint() - ray.getOrigin());
+                double cosine = abs(DOT(dir, intersection.getNormal()));
                 if (std::abs(cosine - 0) < EPSILON) {
                     return 0;
                 }

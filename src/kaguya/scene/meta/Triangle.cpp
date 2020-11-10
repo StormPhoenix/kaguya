@@ -110,18 +110,19 @@ namespace kaguya {
 
                 Vector3 factor = Vector3(alpha, ans[0], ans[1]);
 
-                hitRecord.step = step;
-                hitRecord.point = ray.at(hitRecord.step);
+                hitRecord.setStep(step);
+                hitRecord.setPoint(ray.at(step));
 
                 Vector3 normal = alpha * _transformedNormal1 +
                                  ans[0] * _transformedNormal2 +
                                  ans[1] * _transformedNormal3;
 
+                hitRecord.setId(getId());
                 hitRecord.setOutwardNormal(normal, dir);
-                hitRecord.u = DOT(factor, Vector3(_uv1.x, _uv2.x, _uv3.x));
-                hitRecord.v = DOT(factor, Vector3(_uv1.y, _uv2.y, _uv3.y));
-                hitRecord.material = _material.get();
-                hitRecord.id = getId();
+                hitRecord.setU(DOT(factor, Vector3(_uv1.x, _uv2.x, _uv3.x)));
+                hitRecord.setV(DOT(factor, Vector3(_uv1.y, _uv2.y, _uv3.y)));
+                hitRecord.setMaterial(_material.get());
+                hitRecord.setAreaLight(nullptr);
                 return true;
             } else {
                 return false;

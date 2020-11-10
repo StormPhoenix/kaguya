@@ -16,12 +16,12 @@ namespace kaguya {
                 : _refractiveIndex(refractiveIndex), _albedo(albedo) {
         }
 
-        bool Dielectric::isSpecular() {
+        bool Dielectric::isSpecular() const {
             return true;
         }
 
         BSDF *Dielectric::bsdf(SurfaceInteraction &insect, MemoryArena &memoryArena, TransportMode mode) {
-            Spectrum albedo = _albedo->sample(insect.u, insect.v);
+            Spectrum albedo = _albedo->sample(insect.getU(), insect.getV());
             BXDFSpecular *specularBXDF = ALLOC(memoryArena, BXDFSpecular)(albedo, 1.0f, _refractiveIndex, mode);
             BSDF *bsdf = ALLOC(memoryArena, BSDF)(insect);
             bsdf->addBXDF(specularBXDF);

@@ -25,16 +25,16 @@ namespace kaguya {
 
             VisibilityTester(const Interaction start, const Interaction end) :
                     _start(start), _end(end) {
-                _step = LENGTH(_end.point - _start.point);
+                _step = LENGTH(_end.getPoint() - _start.getPoint());
             }
 
             bool isVisible(Scene &scene) {
-                Ray ray(_start.point, NORMALIZE(_end.point - _start.point));
+                Ray ray(_start.getPoint(), NORMALIZE(_end.getPoint() - _start.getPoint()));
                 // TODO 如何融合 Surface 和 Voluem
                 SurfaceInteraction interaction;
                 bool isIntersect = scene.hit(ray, interaction);
 
-                return (!isIntersect) || (isIntersect && interaction.step >= (_step - EPSILON));
+                return (!isIntersect) || (isIntersect && interaction.getStep() >= (_step - EPSILON));
             }
 
             Interaction getStart() {

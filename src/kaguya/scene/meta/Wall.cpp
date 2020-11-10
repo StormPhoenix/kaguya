@@ -99,15 +99,15 @@ namespace kaguya {
                 // 判断是否在四边形内部
                 if (checkRange(offsetX, 0, _width)
                     && checkRange(offsetY, 0, _height)) {
-                    hitRecord.step = step;
-                    hitRecord.point = hitPoint;
+                    hitRecord.setId(getId());
+                    hitRecord.setStep(step);
+                    hitRecord.setPoint(hitPoint);
                     Vector3 normal = (*_transformMatrix) * Vector4(_normal, 0.0f);
                     hitRecord.setOutwardNormal(normal, dir);
-                    hitRecord.u = offsetX / _width;
-                    hitRecord.v = offsetY / _height;
-                    hitRecord.material = _material.get();
-                    hitRecord.id = getId();
-                    hitRecord.areaLight = _areaLight.get();
+                    hitRecord.setU(offsetX / _width);
+                    hitRecord.setV(offsetY / _height);
+                    hitRecord.setMaterial(_material.get());
+                    hitRecord.setAreaLight(_areaLight.get());
                     return true;
                 } else {
                     return false;
@@ -134,15 +134,15 @@ namespace kaguya {
             Vector3 vertical = (_transformedLeftTop - _transformedLeftBottom) * v;
 
             SurfaceInteraction samplePoint;
-            samplePoint.point = _transformedLeftBottom + horizontal + vertical;
-            samplePoint.normal = _transformedNormal;
+            samplePoint.setPoint(_transformedLeftBottom + horizontal + vertical);
+            samplePoint.setNormal(_transformedNormal);
             return samplePoint;
         }
 
-        double Wall::surfacePointPdf(SurfaceInteraction &point) {
+        double Wall::surfacePointPdf(SurfaceInteraction &si) {
             Vector3 transformedPoint = _transformMatrix != nullptr ?
-                                       INVERSE((*_transformMatrix)) * Vector4(point.point, 1.0f)
-                                                                   : point.point;
+                                       INVERSE((*_transformMatrix)) * Vector4(si.getPoint(), 1.0f)
+                                                                   : si.getPoint();
             if (transformedPoint.z - 0 <= EPSILON &&
                 transformedPoint.x > -_width / 2 && transformedPoint.x < _width / 2 &&
                 transformedPoint.y > -_height / 2 && transformedPoint.y < _height / 2) {
@@ -177,14 +177,14 @@ namespace kaguya {
                 double x = ray.getOrigin().x + step * ray.getDirection().x;
 
                 if (checkRange(z, _z0, _z1) && checkRange(x, _x0, _x1)) {
-                    hitRecord.material = _material.get();
-                    hitRecord.id = getId();
-                    hitRecord.point = ray.at(step);
-                    hitRecord.step = step;
+                    hitRecord.setId(getId());
+                    hitRecord.setMaterial(_material.get());
+                    hitRecord.setPoint(ray.at(step));
+                    hitRecord.setStep(step);
                     hitRecord.setOutwardNormal(_normal, ray.getDirection());
-                    hitRecord.u = (x - _x0) / (_x1 - _x0);
-                    hitRecord.v = (z - _z0) / (_z1 - _z0);
-                    hitRecord.areaLight = _areaLight.get();
+                    hitRecord.setU((x - _x0) / (_x1 - _x0));
+                    hitRecord.setV((z - _z0) / (_z1 - _z0));
+                    hitRecord.setAreaLight(_areaLight.get());
                     return true;
                 } else {
                     return false;
@@ -208,13 +208,13 @@ namespace kaguya {
             double height = abs(_z1 - _z0);
 
             SurfaceInteraction interaction;
-            interaction.point = {_x0 + width * u, _y, _z0 + height * v};
-            interaction.normal = _normal;
+            interaction.setPoint({_x0 + width * u, _y, _z0 + height * v});
+            interaction.setNormal(_normal);
             return interaction;
         }
 
-        double ZXWall::surfacePointPdf(SurfaceInteraction &point) {
-            Vector3 samplePoint = point.point;
+        double ZXWall::surfacePointPdf(SurfaceInteraction &si) {
+            Vector3 samplePoint = si.getPoint();
             if (samplePoint.y - _y < EPSILON &&
                 samplePoint.x > _x0 && samplePoint.x < _x1 &&
                 samplePoint.z > _z0 && samplePoint.z < _z1) {
@@ -253,14 +253,14 @@ namespace kaguya {
                 double y = ray.getOrigin().y + step * ray.getDirection().y;
 
                 if (checkRange(z, _z0, _z1) && checkRange(y, _y0, _y1)) {
-                    hitRecord.material = _material.get();
-                    hitRecord.id = getId();
-                    hitRecord.point = ray.at(step);
-                    hitRecord.step = step;
+                    hitRecord.setId(getId());
+                    hitRecord.setMaterial(_material.get());
+                    hitRecord.setPoint(ray.at(step));
+                    hitRecord.setStep(step);
                     hitRecord.setOutwardNormal(_normal, ray.getDirection());
-                    hitRecord.u = (z - _z0) / (_z1 - _z0);
-                    hitRecord.v = (y - _y0) / (_y1 - _y0);
-                    hitRecord.areaLight = _areaLight.get();
+                    hitRecord.setU((z - _z0) / (_z1 - _z0));
+                    hitRecord.setV((y - _y0) / (_y1 - _y0));
+                    hitRecord.setAreaLight(_areaLight.get());
                     return true;
                 } else {
                     return false;
@@ -288,13 +288,13 @@ namespace kaguya {
             double height = abs(_y1 - _y0);
 
             SurfaceInteraction interaction;
-            interaction.point = {_x, _y0 + v * height, _z0 + width * u};
-            interaction.normal = _normal;
+            interaction.setPoint({_x, _y0 + v * height, _z0 + width * u});
+            interaction.setNormal(_normal);
             return interaction;
         }
 
         double YZWall::surfacePointPdf(SurfaceInteraction &point) {
-            Vector3 samplePoint = point.point;
+            Vector3 samplePoint = point.getPoint();
             if (samplePoint.y - _x < EPSILON &&
                 samplePoint.x > _y0 && samplePoint.x < _y1 &&
                 samplePoint.z > _z0 && samplePoint.z < _z1) {
@@ -329,14 +329,14 @@ namespace kaguya {
                 double y = ray.getOrigin().y + step * ray.getDirection().y;
 
                 if (checkRange(x, _x0, _x1) && checkRange(y, _y0, _y1)) {
-                    hitRecord.material = _material.get();
-                    hitRecord.id = getId();
-                    hitRecord.point = ray.at(step);
-                    hitRecord.step = step;
+                    hitRecord.setId(getId());
+                    hitRecord.setMaterial(_material.get());
+                    hitRecord.setPoint(ray.at(step));
+                    hitRecord.setStep(step);
                     hitRecord.setOutwardNormal(_normal, ray.getDirection());
-                    hitRecord.u = (x - _x0) / (_x1 - _x0);
-                    hitRecord.v = (y - _y0) / (_y1 - _y0);
-                    hitRecord.areaLight = _areaLight.get();
+                    hitRecord.setU((x - _x0) / (_x1 - _x0));
+                    hitRecord.setV((y - _y0) / (_y1 - _y0));
+                    hitRecord.setAreaLight(_areaLight.get());
                     return true;
                 } else {
                     return false;
@@ -364,13 +364,13 @@ namespace kaguya {
             double height = abs(_y1 - _y0);
 
             SurfaceInteraction interaction;
-            interaction.point = {_x0 + width * u, _y0 + v * height, _z};
-            interaction.normal = _normal;
+            interaction.setPoint({_x0 + width * u, _y0 + v * height, _z});
+            interaction.setNormal(_normal);
             return interaction;
         }
 
-        double XYWall::surfacePointPdf(SurfaceInteraction &point) {
-            Vector3 samplePoint = point.point;
+        double XYWall::surfacePointPdf(SurfaceInteraction &si) {
+            Vector3 samplePoint = si.getPoint();
             if (samplePoint.x - _z < EPSILON &&
                 samplePoint.y > _y0 && samplePoint.x < _y1 &&
                 samplePoint.x > _x0 && samplePoint.z < _x1) {

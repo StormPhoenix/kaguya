@@ -16,7 +16,7 @@ namespace kaguya {
             // 从 eye 出发采样一条射线，返回与 shape 的交点
             SurfaceInteraction intersection = _shapeSampler->sampleRayIntersection(eye);
             // 射线方向
-            (*wi) = NORMALIZE(intersection.point - eye.point);
+            (*wi) = NORMALIZE(intersection.getPoint() - eye.getPoint());
             // 该射线方向的 PDF
             (*pdf) = _shapeSampler->rayPdf(eye, *wi);
             // 可见性判断

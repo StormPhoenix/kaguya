@@ -56,10 +56,11 @@ namespace kaguya {
                 // 此处参考 pbrt 的写法，需要判断 bounce = 0 和 isSpecular 两种特殊情况
                 if (bounce == 0 || isSpecular) {
                     if (isIntersected) {
-                        assert(intersection.material != nullptr);
+                        assert(intersection.getMaterial() != nullptr);
                         // 如果有交点，则直接从交点上取值
-                        if (intersection.areaLight != nullptr) {
-                            shaderColor += (intersection.areaLight->lightRadiance(intersection, -intersection.direction) *
+                        if (intersection.getAreaLight() != nullptr) {
+                            shaderColor += (intersection.getAreaLight()->lightRadiance(intersection,
+                                                                                       -intersection.getDirection()) *
                                             beta);
                         }
                     } else {
@@ -74,7 +75,7 @@ namespace kaguya {
                     break;
                 }
 
-                Material *material = intersection.material;
+                const Material *material = intersection.getMaterial();
                 assert(material != nullptr);
 
                 BSDF *bsdf = intersection.buildBSDF(memoryArena);
@@ -96,11 +97,11 @@ namespace kaguya {
                 Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, BSDF_ALL, &bxdfType);
 
                 // cosine
-                double cosine = std::abs(DOT(intersection.normal, NORMALIZE(worldWi)));
+                double cosine = std::abs(DOT(intersection.getNormal(), NORMALIZE(worldWi)));
                 // 计算 beta
                 beta *= (f * cosine / samplePdf);
                 // 设置下一次打击光线
-                scatterRay.setOrigin(intersection.point);
+                scatterRay.setOrigin(intersection.getPoint());
                 scatterRay.setDirection(NORMALIZE(worldWi));
 
                 isSpecular = (bxdfType & BSDF_SPECULAR) > 0;
@@ -120,7 +121,7 @@ namespace kaguya {
                 SurfaceInteraction hitRecord;
                 if (scene.hit(ray, hitRecord)) {
                     // 击中，检查击中材质
-                    Material *material = hitRecord.material;
+                    const Material *material = hitRecord.getMaterial();
                     // 不发光物体
                     // 若对光源采样，则记录采样射线
                     Ray scatterRay;
@@ -150,18 +151,19 @@ namespace kaguya {
                                 // 对非光源采样进行加权
                                 samplePdf = _sampleLightProb * samplePdf + (1 - _sampleLightProb) * scatterPdf;
                                 Spectrum f = bsdf->f(NORMALIZE(-ray.getDirection()), NORMALIZE(scatterRayDir));
-                                scatterRay.setOrigin(hitRecord.point);
+                                scatterRay.setOrigin(hitRecord.getPoint());
                                 scatterRay.setDirection(NORMALIZE(scatterRayDir));
                                 Spectrum shaderColor =
-                                        std::abs(DOT(hitRecord.normal, NORMALIZE(scatterRayDir))) * f /
+                                        std::abs(DOT(hitRecord.getNormal(), NORMALIZE(scatterRayDir))) * f /
                                         samplePdf *
                                         ((depth > _russianRoulette && uniformSample() < _russianRoulette) ?
                                          Spectrum(0.0) :
                                          shaderOfRecursion(scatterRay, scene, depth + 1, memoryArena) /
                                          (1 - _russianRoulette));
-                                return shaderColor + (hitRecord.areaLight != nullptr ?
-                                                      hitRecord.areaLight->lightRadiance(hitRecord,
-                                                                                         -hitRecord.direction) :
+                                return shaderColor + (hitRecord.getAreaLight() != nullptr ?
+                                                      hitRecord.getAreaLight()->lightRadiance(hitRecord,
+                                                                                              -hitRecord.getDirection())
+                                                                                          :
                                                       Spectrum(0.0));
                             }
                         }
@@ -171,28 +173,28 @@ namespace kaguya {
                     Vector3 worldWo = -ray.getDirection();
                     Vector3 worldWi = Vector3(0.0);
                     Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf);
-                    scatterRay.setOrigin(hitRecord.point);
+                    scatterRay.setOrigin(hitRecord.getPoint());
                     scatterRay.setDirection(NORMALIZE(worldWi));
 
                     if (!material->isSpecular()) {
                         // TODO 目前只考虑单光源的情况
                         std::shared_ptr<Light> light = scene.getLight();
                         Interaction eye;
-                        eye.point = hitRecord.point;
+                        eye.setPoint(hitRecord.getPoint());
                         samplePdf = (1 - _sampleLightProb) * samplePdf +
                                     _sampleLightProb * light->sampleFromLightPdf(eye, scatterRay.getDirection());
                     }
 
-                    double cosine = std::abs(DOT(hitRecord.normal, NORMALIZE(worldWi)));
+                    double cosine = std::abs(DOT(hitRecord.getNormal(), NORMALIZE(worldWi)));
                     Spectrum shaderColor = cosine * f / samplePdf *
                                            ((depth > _russianRoulette && uniformSample() < _russianRoulette) ?
                                             Spectrum(0.0) :
                                             shaderOfRecursion(scatterRay, scene, depth + 1, memoryArena) /
                                             (1 - _russianRoulette));
 
-                    return shaderColor + (hitRecord.areaLight != nullptr ?
-                                          hitRecord.areaLight->lightRadiance(hitRecord, -hitRecord.direction) :
-                                          Spectrum(0.0));
+                    return shaderColor + (hitRecord.getAreaLight() != nullptr ?
+                                          hitRecord.getAreaLight()->lightRadiance(hitRecord, -hitRecord.getDirection())
+                                                                              : Spectrum(0.0));
                 } else {
                     // 未击中
                     return background(ray);
@@ -223,15 +225,15 @@ namespace kaguya {
                 // 判断 shadowRay 是否击中
                 if (visibilityTester.isVisible(scene)) {
                     // cosine
-                    double cosine = std::abs(DOT(eye.normal, shadowRayDir));
+                    double cosine = std::abs(DOT(eye.getNormal(), shadowRayDir));
                     // f(p, wo, wi)
-                    Spectrum f = bsdf.f(-eye.direction, shadowRayDir);
+                    Spectrum f = bsdf.f(-eye.getDirection(), shadowRayDir);
                     if (light->isDeltaType()) {
                         // shader spectrum
                         return f * cosine / lightPdf * luminance;
                     } else {
                         // multiple importance sampling
-                        double scatterPdf = bsdf.samplePdf(-eye.direction, shadowRayDir);
+                        double scatterPdf = bsdf.samplePdf(-eye.getDirection(), shadowRayDir);
                         double weight = misWeight(1, lightPdf, 1, scatterPdf);
                         return f * cosine * weight / lightPdf * luminance;
                     }
