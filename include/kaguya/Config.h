@@ -41,10 +41,11 @@ namespace kaguya {
         static std::shared_ptr<Scene> testBuildScene() {
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 //            scene->testBuildCornelBoxWithBunny();
-            scene->testBuildCornelBox();
+//            scene->testBuildCornelBox();
 //            scene->testBuildEmptyCornelBox();
+//            scene->testPointLight();
 //            scene->testSpotLight();
-//            scene->testAreaLight();
+            scene->testAreaLight();
             return scene;
         }
     };

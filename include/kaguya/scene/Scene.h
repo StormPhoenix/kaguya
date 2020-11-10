@@ -47,6 +47,11 @@ namespace kaguya {
             void testBuildEmptyCornelBox();
 
             /**
+             * 测试 PointLight
+             */
+            void testPointLight();
+
+            /**
              * 测试 SpotLight
              */
             void testSpotLight();
