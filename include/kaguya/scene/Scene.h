@@ -42,6 +42,11 @@ namespace kaguya {
             void testBuildCornelBoxWithBunny();
 
             /**
+             * 构建 bunny，采用点光源
+             */
+            void testBunnyWithSpotLight();
+
+            /**
              * 空 Cornel box
              */
             void testBuildEmptyCornelBox();

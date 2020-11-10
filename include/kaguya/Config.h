@@ -43,9 +43,9 @@ namespace kaguya {
 //            scene->testBuildCornelBoxWithBunny();
 //            scene->testBuildCornelBox();
 //            scene->testBuildEmptyCornelBox();
-//            scene->testPointLight();
+            scene->testPointLight();
 //            scene->testSpotLight();
-            scene->testAreaLight();
+//            scene->testAreaLight();
             return scene;
         }
     };
