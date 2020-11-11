@@ -9,6 +9,7 @@
 #include <kaguya/utils/MemoryArena.h>
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/tracer/Camera.h>
+#include <kaguya/tracer/Ray.h>
 
 namespace kaguya {
     namespace material {
@@ -30,6 +31,7 @@ namespace kaguya {
         class Light;
 
         using kaguya::tracer::Camera;
+        using kaguya::tracer::Ray;
         using kaguya::material::Material;
         using kaguya::memory::MemoryArena;
 
@@ -192,9 +194,10 @@ namespace kaguya {
 
             StartEndInteraction() : Interaction() {}
 
-            StartEndInteraction(const Camera *camera) : camera(camera) {
+            StartEndInteraction(const Camera *camera, const Ray &ray) : camera(camera) {
                 assert(camera != nullptr);
                 _point = camera->getEye();
+                _normal = ray.getDirection();
             }
 
             StartEndInteraction(const Light *light, const Interaction &interaction) :

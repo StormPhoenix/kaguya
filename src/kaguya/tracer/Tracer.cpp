@@ -8,11 +8,8 @@ namespace kaguya {
     namespace tracer {
 
         void Tracer::writeShaderColor(const Spectrum &spectrum, int row, int col) {
-            assert(_bitmap != nullptr && _camera != nullptr);
-            int offset = (row * _camera->getResolutionWidth() + col) * SPECTRUM_CHANNEL;
-            for (int channel = 0; channel < SPECTRUM_CHANNEL; channel++) {
-                *(_bitmap + offset + channel) = static_cast<int>(256 * clamp(std::sqrt(spectrum[channel]), 0.0, 0.999));
-            }
+            assert(_filmPlane != nullptr && _camera != nullptr);
+            _filmPlane->addSpectrum(spectrum, row, col);
         }
 
     }

@@ -13,7 +13,7 @@ namespace kaguya {
         using kaguya::material::Material;
         using kaguya::core::BXDFType;
 
-        Spectrum PathVertex::f(const PathVertex &next) {
+        Spectrum PathVertex::f(const PathVertex &next) const {
             Vector3 worldWi = NORMALIZE(next.point - point);
             switch (type) {
                 case SURFACE:
@@ -63,7 +63,11 @@ namespace kaguya {
                     return si;
                 case VOLUME:
                     return vi;
+                case CAMERA:
+                    return ei;
                 default:
+                    assert(1 == 0);
+                    // TODO not support for now
                     return ei;
             }
         }
@@ -83,11 +87,11 @@ namespace kaguya {
             return pdfFwd;
         }
 
-        bool PathVertex::isConnectible() {
+        bool PathVertex::isConnectible() const {
             // 判断类型
             switch (type) {
                 case CAMERA:
-                    return false;
+                    return true;
                 case LIGHT:
                     return !isDeltaLight();
                 case SURFACE:
@@ -105,7 +109,7 @@ namespace kaguya {
             }
         }
 
-        double PathVertex::computeDensityPdf(const PathVertex &pre, const PathVertex &next) const {
+        double PathVertex::computeDensityPdf(const PathVertex *pre, const PathVertex &next) const {
             if (type == LIGHT) {
                 return computeDensityPdfFromLight(next);
             }
@@ -118,11 +122,17 @@ namespace kaguya {
             wi = NORMALIZE(wi);
 
             // 计算 wo
-            Vector3 wo = pre.point - point;
-            if (LENGTH(wo) == 0) {
-                return 0;
+            Vector3 wo;
+            if (pre != nullptr) {
+                Vector3 wo = pre->point - point;
+                if (LENGTH(wo) == 0) {
+                    return 0;
+                }
+                wo = NORMALIZE(wo);
+            } else {
+                // vertex type should be CAMERA
+                assert(type == CAMERA);
             }
-            wo = NORMALIZE(wo);
 
             double pdf = 0;
             // 判断类型

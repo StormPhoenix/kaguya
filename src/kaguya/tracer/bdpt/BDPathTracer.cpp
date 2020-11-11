@@ -6,6 +6,7 @@
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
 #include <kaguya/utils/VisibilityTester.hpp>
 #include <kaguya/utils/ScopeSwapper.hpp>
+#include <kaguya/tracer/bdpt/PathVertex.h>
 
 
 namespace kaguya {
@@ -28,11 +29,11 @@ namespace kaguya {
 
                 // TODO 将 bitmap 封装到写入策略模式
                 // TODO 代码移动到 tracer
-                _bitmap = (int *) malloc(cameraHeight * cameraWidth * SPECTRUM_CHANNEL * sizeof(unsigned int));
+                _filmPlane = _camera->buildFilmPlane(SPECTRUM_CHANNEL);
                 double sampleWeight = 1.0 / _samplePerPixel;
                 // 已完成扫描的行数
                 int finishedLine = 0;
-#pragma omp parallel for num_threads(12)
+//#pragma omp parallel for num_threads(12)
                 // 遍历相机成像图案上每个像素
                 for (int row = cameraHeight - 1; row >= 0; row--) {
                     MemoryArena arena;
@@ -46,13 +47,14 @@ namespace kaguya {
 
                             Ray sampleRay = _camera->sendRay(u, v);
                             ans += shader(sampleRay, *(_scene.get()), _maxDepth, arena);
+                            // TODO 区分
                             arena.clean();
                         }
                         ans *= sampleWeight;
                         // TODO 写入渲染结果，用更好的方式写入
                         writeShaderColor(ans, row, col);
                     }
-#pragma omp critical
+//#pragma omp critical
                     finishedLine++;
                     // TODO delete
                     std::cerr << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "
@@ -64,17 +66,14 @@ namespace kaguya {
                 // TODO 更改成写入替换策略
                 for (int row = cameraHeight - 1; row >= 0; row--) {
                     for (int col = 0; col < cameraWidth; col++) {
-                        int offset = (row * _camera->getResolutionWidth() + col) * SPECTRUM_CHANNEL;
-                        // TODO 修改此处，用于适应 Spectrum
-                        // Write the translated [0,255] value of each color component.
-                        std::cout << *(_bitmap + offset) << ' '
-                                  << *(_bitmap + offset + 1) << ' '
-                                  << *(_bitmap + offset + 2) << '\n';
+                        std::cout << _filmPlane->getSpectrum(row, col, 0) << ' '
+                                  << _filmPlane->getSpectrum(row, col, 1) << ' '
+                                  << _filmPlane->getSpectrum(row, col, 2) << '\n';
                     }
                 }
 
-                delete[] _bitmap;
-                _bitmap = nullptr;
+                delete _filmPlane;
+                _filmPlane = nullptr;
             }
         }
 
@@ -90,7 +89,8 @@ namespace kaguya {
 
         Spectrum BDPathTracer::connectPath(Scene &scene,
                                            PathVertex *cameraSubPath, int cameraPathLength, int t,
-                                           PathVertex *lightSubPath, int lightPathLength, int s) {
+                                           PathVertex *lightSubPath, int lightPathLength, int s,
+                                           Point2d *samplePosition) {
             // 检查 t 和 s 的范围，必须处于 cameraPath 和 lightPathLength 的长度范围之中
             assert(t >= 0 && t <= cameraPathLength);
             assert(s >= 0 && s <= lightPathLength);
@@ -101,7 +101,7 @@ namespace kaguya {
              *      light 路径上没有任何点，此时 cameraSubPath 就是一个完整的路径，此时参考 cameraSubPath[t - 1] 是否发光
              *
              * Case t = 1:
-             *      我这儿不支持处理只有一个 Camera 的情况
+             *      直接连接 camera 和 lightSubPath[s - 1]
              *
              * Case s = 1:
              *      直接对光源采样
@@ -113,20 +113,32 @@ namespace kaguya {
             PathVertex lightVertex;
 
             // 区分不同情况
-            if (t < 2) {
-                // cameraSubPath 路径点少于2个，此时不处理
-                ret = Spectrum(0.0f);
-            } else if (s == 0) {
+            if (s == 0) {
                 // lightSubPath 上没有任何路径点
                 const PathVertex &pt = cameraSubPath[t - 1];
                 if (pt.isLight()) {
                     ret = pt.emit(cameraSubPath[t - 2].point) * pt.beta;
                 }
+            } else if (t == 1) {
+                // 去 lightSubPath 连接点
+                const PathVertex &ps = lightSubPath[s - 1];
+                if (ps.isConnectible()) {
+                    VisibilityTester visibilityTester = VisibilityTester(cameraSubPath[t - 1].getInteraction(),
+                                                                         ps.getInteraction());
+                    if (visibilityTester.isVisible(scene)) {
+                        const PathVertex &pt = cameraSubPath[0];
+                        Vector3 worldWi = NORMALIZE(pt.point - ps.point);
+                        // TODO check camera beta 是否正确
+                        ret = ps.beta * ps.f(pt) * pt.beta;
+                        if (ps.type == PathVertexType::SURFACE) {
+                            ret *= ABS_DOT(ps.normal, worldWi);
+                        }
+                        // 由于 camera vertex 和新的点连接，需要更新 sample vertex
+                        (*samplePosition) = _camera->getFilmPosition(-worldWi);
+                    }
+                }
             } else if (s == 1) {
                 // 由于 lightSubPath 没有任何点参与路径构建，所以我们重新采样一个光源点，加到 cameraSubPath 上
-
-                // TODO 由于更新了采样光源，需要重新计算 pdfForward
-
                 PathVertex &pt = cameraSubPath[t - 1];
                 if (pt.isConnectible()) {
                     // TODO 默认只有一个光源，我们只对这个光源采样
@@ -183,7 +195,7 @@ namespace kaguya {
             TransportMode mode = TransportMode::RADIANCE;
             assert(cameraSubPath != nullptr);
             // 第一个点 Camera
-            PathVertex cameraVertex = PathVertex::createCameraVertex(camera.get());
+            PathVertex cameraVertex = PathVertex::createCameraVertex(camera.get(), ray);
             cameraSubPath[0] = cameraVertex;
             // 初始 beta
             Spectrum beta = Spectrum(1.0);
@@ -323,28 +335,28 @@ namespace kaguya {
             // 当 t > 0， 更新 cameraSubPath[t - 1].pdfBackward
             ScopeSwapper<double> swapper2;
             if (pt != nullptr) {
-                swapper2 = {&(pt->pdfBackward), s > 0 ? ps->computeDensityPdf(*psMinus, *pt)
+                swapper2 = {&(pt->pdfBackward), s > 0 ? ps->computeDensityPdf(psMinus, *pt)
                                                       : pt->computeDensityPdfOfLightOrigin(*ptMinus)};
             }
 
             // 当 s > 0，更新 lightSubPath[s - 1].pdfBackward
             ScopeSwapper<double> swapper3;
-            if (s > 0) {
+            if (ps != nullptr) {
                 // 这里不考虑 t 的大小，因为 t < 2 的情况是不可能进入的
-                swapper3 = {&(ps->pdfBackward), pt->computeDensityPdf(*ptMinus, *ps)};
+                swapper3 = {&(ps->pdfBackward), pt->computeDensityPdf(ptMinus, *ps)};
             }
 
             // 当 t > 2，则更新 cameraSubPath[t - 2].pdfBackward
             ScopeSwapper<double> swapper4;
             if (ptMinus != nullptr) {
-                swapper4 = {&(ptMinus->pdfBackward), s > 0 ? pt->computeDensityPdf(*ps, *ptMinus) :
+                swapper4 = {&(ptMinus->pdfBackward), s > 0 ? pt->computeDensityPdf(ps, *ptMinus) :
                                                      pt->computeDensityPdfFromLight(*ptMinus)};
             }
 
             // 当 s > 2，则更新 lightSubPath[s - 2].pdfBackward
             ScopeSwapper<double> swapper5;
             if (psMinus != nullptr) {
-                swapper5 = {&(psMinus->pdfBackward), ps->computeDensityPdf(*pt, *psMinus)};
+                swapper5 = {&(psMinus->pdfBackward), ps->computeDensityPdf(pt, *psMinus)};
             }
 
             // 临时替换 isDelta 项目
@@ -365,7 +377,7 @@ namespace kaguya {
             // 计算 cameraSubPath 的 Ri
             ri = 1;
 
-            for (int i = t - 1; i > 0; i--) {
+            for (int i = t - 1; i >= 0; i--) {
                 double pdfBackward = cameraSubPath[i].pdfBackward == 0 ? 1 : cameraSubPath[i].pdfBackward;
                 double pdfForward = cameraSubPath[i].pdfForward == 0 ? 1 : cameraSubPath[i].pdfForward;
                 ri *= (pdfBackward / pdfForward);
@@ -426,12 +438,24 @@ namespace kaguya {
 
             Spectrum shaderColor = Spectrum(0.0);
             // 路径连接
-            for (int t = 2; t <= cameraPathLength; t++) {
+            for (int t = 1; t <= cameraPathLength; t++) {
+                // TODO delete
+//            int t = 1;
                 for (int s = 0; s <= lightPathLength; s++) {
                     int depth = t + s - 1;
                     if (depth <= maxDepth && depth > 0) {
-                        shaderColor += connectPath(scene, cameraSubPath, cameraPathLength, t,
-                                                   lightSubPath, lightPathLength, s);
+                        Point2d samplePosition;
+                        Spectrum value = connectPath(scene, cameraSubPath, cameraPathLength, t,
+                                                     lightSubPath, lightPathLength, s, &samplePosition);
+
+                        const double INV_WEIGHT = 1.0 / _samplePerPixel;
+
+                        if (t == 1) {
+                            // 在成像平面的 samplePosition 位置加上 value
+                            _filmPlane->addSpectrum(value * INV_WEIGHT, samplePosition.y, samplePosition.x);
+                        } else {
+                            shaderColor += value;
+                        }
                     }
                 }
             }

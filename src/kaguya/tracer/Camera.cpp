@@ -18,6 +18,7 @@ namespace kaguya {
             _front.x = cos(DEGREES_TO_RADIANS(pitch)) * cos(DEGREES_TO_RADIANS(yaw));
             _front.y = sin(DEGREES_TO_RADIANS(pitch));
             _front.z = cos(DEGREES_TO_RADIANS(pitch)) * sin(DEGREES_TO_RADIANS(yaw));
+            _front = NORMALIZE(_front);
             buildCameraCoordinate(fov, aspect);
         }
 
@@ -28,7 +29,18 @@ namespace kaguya {
             return Ray(_eye, dir);
         }
 
-        Vector3 Camera::getEye() const{
+        Point2d Camera::getFilmPosition(const Vector3 &dir) {
+            // dir 在 _front 上的投影长度
+            double frontLen = ABS_DOT(dir, _front);
+            double factor = _focal / frontLen;
+            // 射线投射到成像平面，并计算成像平面左下角到投射点的向量
+            Vector3 posVector = _eye + dir * factor - _leftBottomCorner;
+            double u = DOT(posVector, _right) / (2 * _halfWindowWidth);
+            double v = DOT(posVector, _up) / (2 * _halfWindowHeight);
+            return Point2d(u * _resolutionWidth, v * _resolutionHeight);
+        }
+
+        Vector3 Camera::getEye() const {
             return _eye;
         }
 
@@ -48,6 +60,10 @@ namespace kaguya {
             _resolutionWidth = resolutionWidth;
         }
 
+        FilmPlane *Camera::buildFilmPlane(int channel) {
+            return new FilmPlane(_resolutionWidth, _resolutionHeight, channel);
+        }
+
         void Camera::buildCameraCoordinate(float fov, float aspect) {
             Vector3 worldUp = Vector3(0.0f, 1.0f, 0.0f);
             // 判断 _fron 方向是否与 worldUp 重叠
@@ -58,11 +74,9 @@ namespace kaguya {
             }
             _up = NORMALIZE(CROSS(_right, _front));
 
-            // 默认焦距为 10
-            double focal = 10;
-            _halfWindowHeight = tan(DEGREES_TO_RADIANS(fov / 2)) * focal;
+            _halfWindowHeight = tan(DEGREES_TO_RADIANS(fov / 2)) * _focal;
             _halfWindowWidth = _halfWindowHeight * aspect;
-            _leftBottomCorner = _eye + focal * _front - _halfWindowWidth * _right - _halfWindowHeight * _up;
+            _leftBottomCorner = _eye + _focal * _front - _halfWindowWidth * _right - _halfWindowHeight * _up;
         }
     }
 }

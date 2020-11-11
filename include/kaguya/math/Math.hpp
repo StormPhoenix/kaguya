@@ -22,6 +22,8 @@ using Vector4 = glm::dvec4;
 using Matrix4 = glm::dmat4x4;
 using Matrix3 = glm::dmat3x3;
 
+typedef Vector2 Point2d;
+
 const double infinity = std::numeric_limits<double>::infinity();
 const double PI = 3.1415926535897932385;
 const double INV_PI = 1.0 / PI;

@@ -9,6 +9,7 @@
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
 #include <kaguya/tracer/Camera.h>
+#include <kaguya/tracer/FilmPlane.h>
 
 namespace kaguya {
     namespace tracer {
@@ -29,8 +30,8 @@ namespace kaguya {
         protected:
             // 相机
             std::shared_ptr<Camera> _camera = nullptr;
-            // 渲染结果位图
-            int *_bitmap = nullptr;
+            // 渲染结果
+            FilmPlane *_filmPlane = nullptr;
         };
 
     }

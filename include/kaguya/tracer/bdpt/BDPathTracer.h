@@ -109,10 +109,11 @@ namespace kaguya {
              * @param lightSubPath
              * @param lightPathLength
              * @param s lightSubPath 参与路径构建的点数
+             * @param samplePosition 最终在成像平面上采样的点。当 cameraSubPath 只去一个相机点时，samplePosition 会改变
              * @return
              */
             Spectrum connectPath(Scene &scene, PathVertex *cameraSubPath, int cameraPathLength, int t,
-                                 PathVertex *lightSubPath, int lightPathLength, int s);
+                                 PathVertex *lightSubPath, int lightPathLength, int s, Point2d *samplePosition);
 
             /**
              * 计算 connect 路径的 pdf

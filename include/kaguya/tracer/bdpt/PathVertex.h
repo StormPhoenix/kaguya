@@ -63,14 +63,14 @@ namespace kaguya {
              *
              * @return
              */
-            bool isConnectible();
+            bool isConnectible() const;
 
             /**
              * 计算 PathVertex 位置处到下一个点 next 处的 bsdf 值
              * @param p
              * @return
              */
-            Spectrum f(const PathVertex &next);
+            Spectrum f(const PathVertex &next) const;
 
             /**
              * 当前点发出射线指向下一个点 next，计算 next 的概率密度
@@ -90,7 +90,7 @@ namespace kaguya {
              * @param next
              * @return
              */
-            double computeDensityPdf(const PathVertex &pre, const PathVertex &next) const;
+            double computeDensityPdf(const PathVertex *pre, const PathVertex &next) const;
 
             /**
              * 计算 p -> next 的 density pdf（密度 pdf），这个 density pdf 是 next 的 density pdf，
@@ -130,9 +130,11 @@ namespace kaguya {
              */
             Spectrum emit(const Vector3 &eye) const;
 
-            static inline PathVertex createCameraVertex(const Camera *camera) {
-                StartEndInteraction ei = StartEndInteraction(camera);
-                return PathVertex(PathVertexType::CAMERA, ei, Spectrum(1.0));
+            static inline PathVertex createCameraVertex(const Camera *camera, const Ray &ray) {
+                StartEndInteraction ei = StartEndInteraction(camera, ray);
+                PathVertex cameraVertex = PathVertex(PathVertexType::CAMERA, ei, Spectrum(1.0));
+                cameraVertex.pdfForward = 1.0;
+                return cameraVertex;
             }
 
 

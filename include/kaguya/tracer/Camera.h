@@ -7,6 +7,7 @@
 
 #include <kaguya/math/Math.hpp>
 #include <kaguya/tracer/Ray.h>
+#include <kaguya/tracer/FilmPlane.h>
 
 namespace kaguya {
     namespace tracer {
@@ -45,6 +46,13 @@ namespace kaguya {
              */
             Ray sendRay(double u, double v);
 
+            /**
+             * 若相机按照 dir 投射射线，则返回射线在成像上的坐标
+             * @param dir
+             * @return
+             */
+            Point2d getFilmPosition(const Vector3 &dir);
+
             Vector3 getEye() const;
 
             /**
@@ -63,6 +71,8 @@ namespace kaguya {
 
             void setResolutionHeight(int resolutionHeight);
 
+            FilmPlane *buildFilmPlane(int channel);
+
         private:
             void buildCameraCoordinate(float fov, float aspect);
 
@@ -80,6 +90,9 @@ namespace kaguya {
             // 相机成像平面大小
             double _halfWindowHeight;
             double _halfWindowWidth;
+
+            // 默认焦距为 10
+            const double _focal = 10;
         };
 
     }

@@ -719,7 +719,7 @@ namespace kaguya {
 
             // light spectrum
             Spectrum areaLightSpectrum = Spectrum(0.0);
-            double areaLightIntensity = 10;
+            double areaLightIntensity = 5;
             areaLightSpectrum.r(double(249.0) / 255.0 * areaLightIntensity);
             areaLightSpectrum.g(double(222.0) / 255.0 * areaLightIntensity);
             areaLightSpectrum.b(double(180.0) / 255.0 * areaLightIntensity);
@@ -736,7 +736,7 @@ namespace kaguya {
             std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
+            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.3);
 //            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(white, 1.5);
             std::shared_ptr<Material> metal = std::make_shared<Metal>();
 
@@ -763,7 +763,10 @@ namespace kaguya {
                                                                         lambertFront);
 
             std::shared_ptr<Shape> glassSphere = std::make_shared<Sphere>(
-                    Vector3(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE, glass);
+                    Vector3(0. * MODEL_SCALE, -0.200 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE, glass);
+
+//            std::shared_ptr<Shape> glassSphere = std::make_shared<Sphere>(
+//                    Vector3(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE, glass);
 
             std::shared_ptr<Shape> metalSphere = std::make_shared<Sphere>(
                     Vector3(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE, metal);
@@ -778,10 +781,10 @@ namespace kaguya {
             objects.push_back(leftWall);
             objects.push_back(rightWall);
             objects.push_back(bottomWall);
-            objects.push_back(topWall);
+//            objects.push_back(topWall);
             objects.push_back(frontWall);
             objects.push_back(glassSphere);
-            objects.push_back(metalSphere);
+//            objects.push_back(metalSphere);
 
             // 给所有 object 赋予 id
             for (long long id = 0; id < objects.size(); id++) {

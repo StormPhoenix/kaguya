@@ -250,7 +250,7 @@ namespace kaguya {
 
                 // TODO 将 bitmap 封装到写入策略模式
                 // TODO 代码移动到 tracer
-                _bitmap = (int *) malloc(cameraHeight * cameraWidth * SPECTRUM_CHANNEL * sizeof(unsigned int));
+                _filmPlane = _camera->buildFilmPlane(SPECTRUM_CHANNEL);
                 double sampleWeight = 1.0 / _samplePerPixel;
                 // 已完成扫描的行数
                 int finishedLine = 0;
@@ -287,17 +287,14 @@ namespace kaguya {
                 // TODO 更改成写入替换策略
                 for (int row = cameraHeight - 1; row >= 0; row--) {
                     for (int col = 0; col < cameraWidth; col++) {
-                        int offset = (row * _camera->getResolutionWidth() + col) * SPECTRUM_CHANNEL;
-                        // TODO 修改此处，用于适应 Spectrum
-                        // Write the translated [0,255] value of each color component.
-                        std::cout << *(_bitmap + offset) << ' '
-                                  << *(_bitmap + offset + 1) << ' '
-                                  << *(_bitmap + offset + 2) << '\n';
+                        std::cout << _filmPlane->getSpectrum(row, col, 0) << ' '
+                                  << _filmPlane->getSpectrum(row, col, 1) << ' '
+                                  << _filmPlane->getSpectrum(row, col, 2) << '\n';
                     }
                 }
 
-                delete[] _bitmap;
-                _bitmap = nullptr;
+                delete _filmPlane;
+                _filmPlane = nullptr;
             }
         }
 
