@@ -226,6 +226,22 @@ inline Vector3 coneUniformSampling(double cosThetaMax) {
 }
 
 /**
+ * 对圆盘做均匀采样
+ * @return
+ */
+inline Vector2 diskUniformSampling(double radius = 1.) {
+    // sampleY = r / Radius
+    // sampleX = theta / (2 * PI)
+    double sampleY = uniformSample();
+    double sampleX = uniformSample();
+
+    double theta = 2 * PI * sampleX;
+    double r = sampleY * radius;
+
+    return Vector2(r * std::cos(theta), r * std::sin(theta));
+}
+
+/**
  * 计算 cone 空间中均匀采样射线的 pdf
  * @param cosThetaMax
  * @return

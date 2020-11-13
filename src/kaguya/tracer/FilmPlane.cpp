@@ -3,6 +3,7 @@
 //
 
 #include <kaguya/tracer/FilmPlane.h>
+#include <iostream>
 
 namespace kaguya {
     namespace tracer {
@@ -28,12 +29,22 @@ namespace kaguya {
         }
 
 
-        unsigned int FilmPlane::getSpectrum(int row, int col, int channel) const {
+        double FilmPlane::getSpectrum(int row, int col, int channel) const {
             int offset = (row * _resolutionWidth + col) * _channel;
-            // TODO 修改此处，用于适应 Spectrum
-            // TODO 应该由外界来 clamp
+            return (_bitmap + offset)[channel];
+        }
+
+        void FilmPlane::writeImage() const {
+            std::cout << "P3\n" << _resolutionWidth << " " << _resolutionHeight << "\n255\n";
             // Write the translated [0,255] value of each color component.
-            return static_cast<int>(256 * clamp(std::sqrt((_bitmap + offset)[channel]), 0.0, 0.999));
+            // TODO 更改成写入替换策略
+            for (int row = _resolutionHeight - 1; row >= 0; row--) {
+                for (int col = 0; col < _resolutionWidth; col++) {
+                    std::cout << static_cast<int>(256 * clamp(std::sqrt(getSpectrum(row, col, 0)), 0.0, 0.999)) << ' '
+                              << static_cast<int>(256 * clamp(std::sqrt(getSpectrum(row, col, 1)), 0.0, 0.999)) << ' '
+                              << static_cast<int>(256 * clamp(std::sqrt(getSpectrum(row, col, 2)), 0.0, 0.999)) << '\n';
+                }
+            }
         }
 
         FilmPlane::~FilmPlane() {

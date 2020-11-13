@@ -719,7 +719,7 @@ namespace kaguya {
 
             // light spectrum
             Spectrum areaLightSpectrum = Spectrum(0.0);
-            double areaLightIntensity = 5;
+            double areaLightIntensity = 7;
             areaLightSpectrum.r(double(249.0) / 255.0 * areaLightIntensity);
             areaLightSpectrum.g(double(222.0) / 255.0 * areaLightIntensity);
             areaLightSpectrum.b(double(180.0) / 255.0 * areaLightIntensity);
@@ -762,11 +762,11 @@ namespace kaguya {
                                                                         -0.5 * MODEL_SCALE, false,
                                                                         lambertFront);
 
-            std::shared_ptr<Shape> glassSphere = std::make_shared<Sphere>(
-                    Vector3(0. * MODEL_SCALE, -0.200 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE, glass);
-
 //            std::shared_ptr<Shape> glassSphere = std::make_shared<Sphere>(
-//                    Vector3(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE, glass);
+//                    Vector3(0. * MODEL_SCALE, -0.075 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE, glass);
+
+            std::shared_ptr<Shape> glassSphere = std::make_shared<Sphere>(
+                    Vector3(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE, glass);
 
             std::shared_ptr<Shape> metalSphere = std::make_shared<Sphere>(
                     Vector3(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE, metal);
@@ -781,10 +781,10 @@ namespace kaguya {
             objects.push_back(leftWall);
             objects.push_back(rightWall);
             objects.push_back(bottomWall);
-//            objects.push_back(topWall);
+            objects.push_back(topWall);
             objects.push_back(frontWall);
             objects.push_back(glassSphere);
-//            objects.push_back(metalSphere);
+            objects.push_back(metalSphere);
 
             // 给所有 object 赋予 id
             for (long long id = 0; id < objects.size(); id++) {

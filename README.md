@@ -31,7 +31,7 @@
         在 MIS = 1 的情况下，除了球体外的场景在视觉上看不出什么区别，唯独是边界位置，使用 MIS 明显很暗淡
     - depth = 2, s = 1，有 MIS，改变光源位置、大小，相机位置，都不会影响边界，但移动球的位置会影响边界
     - TODO: 将 s = 1 作为限制条件，看是否出现 "边界"。s = 1 的情况相当于 PT 了，
-        如果继续出现边界说明 randomIntersect 有问题了。
+        如果继续出现边界说明 randomWalk 有问题了。
     - 已解决：cameraSubPath 起始点 PathVertex 是 Camera 类型，但在创建 camera path vertex 时没有给 PathVertex
         的 point 属性赋值。
         

@@ -8,7 +8,6 @@
 #include <kaguya/core/Core.h>
 #include <kaguya/utils/MemoryArena.h>
 #include <kaguya/core/bsdf/BXDF.h>
-#include <kaguya/tracer/Camera.h>
 #include <kaguya/tracer/Ray.h>
 
 namespace kaguya {
@@ -43,9 +42,7 @@ namespace kaguya {
             Interaction() {}
 
             Interaction(const Vector3 &point, const Vector3 &direction, const Vector3 &normal,
-                        double step, Material *material = nullptr) :
-                    _point(point), _direction(direction), _normal(normal),
-                    _step(step), _material(material) {}
+                        double step, Material *material = nullptr);
 
             const Vector3 getDirection() const {
                 return _direction;
@@ -119,9 +116,7 @@ namespace kaguya {
             SurfaceInteraction() : Interaction() {}
 
             SurfaceInteraction(const Vector3 &point, const Vector3 &direction, const Vector3 &normal,
-                               double step, double u = 0, double v = 0, Material *material = nullptr) :
-                    Interaction(point, direction, normal, step, material),
-                    _u(u), _v(v) {}
+                               double step, double u = 0, double v = 0, Material *material = nullptr);
 
             BSDF *buildBSDF(MemoryArena &memoryArena, TransportMode mode = TransportMode::RADIANCE);
 
@@ -194,15 +189,9 @@ namespace kaguya {
 
             StartEndInteraction() : Interaction() {}
 
-            StartEndInteraction(const Camera *camera, const Ray &ray) : camera(camera) {
-                assert(camera != nullptr);
-                _point = camera->getEye();
-                _normal = ray.getDirection();
-            }
+            StartEndInteraction(const Camera *camera, const Ray &ray);
 
-            StartEndInteraction(const Light *light, const Interaction &interaction) :
-                    light(light), Interaction(interaction) {
-            }
+            StartEndInteraction(const Light *light, const Interaction &interaction);
 
             /**
              * 创建 光源 / 相机 路径点
@@ -212,12 +201,7 @@ namespace kaguya {
              * @param n 击中点法线
              */
             StartEndInteraction(const Light *light, const Vector3 &p, const Vector3 &dir,
-                                const Vector3 &n)
-                    : light(light) {
-                _point = p;
-                _direction = dir;
-                _normal = n;
-            }
+                                const Vector3 &n);
 
         };
     }

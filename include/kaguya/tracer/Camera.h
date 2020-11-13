@@ -5,12 +5,17 @@
 #ifndef KAGUYA_CAMERA_H
 #define KAGUYA_CAMERA_H
 
+#include <kaguya/core/Interaction.h>
 #include <kaguya/math/Math.hpp>
 #include <kaguya/tracer/Ray.h>
 #include <kaguya/tracer/FilmPlane.h>
+#include <kaguya/utils/VisibilityTester.h>
 
 namespace kaguya {
     namespace tracer {
+
+        using kaguya::core::Interaction;
+        using kaguya::utils::VisibilityTester;
 
         class Camera {
         public:
@@ -47,6 +52,7 @@ namespace kaguya {
             Ray sendRay(double u, double v);
 
             /**
+             * TODO delete
              * 若相机按照 dir 投射射线，则返回射线在成像上的坐标
              * @param dir
              * @return
@@ -71,9 +77,39 @@ namespace kaguya {
 
             void setResolutionHeight(int resolutionHeight);
 
+            /**
+             * 相机对 eye 发射采样射线，起点随机
+             * @param eye
+             * @param wi
+             * @param pdf
+             * @param filmPosition
+             * @param visibilityTester
+             * @return
+             */
+            Spectrum sampleCameraRay(const Interaction &eye, Vector3 *wi, double *pdf, Point2d *filmPosition,
+                                     VisibilityTester *visibilityTester) const;
+
+            /**
+             * 构建成像平面
+             * @param channel
+             * @return
+             */
             FilmPlane *buildFilmPlane(int channel);
 
         private:
+            /**
+             * 计算相机发射射线 ray 的 importance，并计算 filmPosition
+             * @param ray
+             * @param filmPosition
+             * @return
+             */
+            Spectrum importance(const Ray &ray, Point2d *filmPosition) const;
+
+            /**
+             * 构建相机坐标系
+             * @param fov
+             * @param aspect
+             */
             void buildCameraCoordinate(float fov, float aspect);
 
         private:
@@ -87,9 +123,15 @@ namespace kaguya {
             Vector3 _right;
             Vector3 _up;
             Vector3 _leftBottomCorner;
+            Vector3 _rightTopCorner;
+            Vector3 _diagonalVector;
             // 相机成像平面大小
             double _halfWindowHeight;
             double _halfWindowWidth;
+            // 相机成像平面面积
+            double _area;
+            // 相机光圈大小
+            double _lensRadius = 0.025;
 
             // 默认焦距为 10
             const double _focal = 10;

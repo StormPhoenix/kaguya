@@ -64,9 +64,72 @@ namespace kaguya {
             return new FilmPlane(_resolutionWidth, _resolutionHeight, channel);
         }
 
+        Spectrum Camera::sampleCameraRay(const Interaction &eye,
+                                         Vector3 *wi, double *pdf,
+                                         Point2d *filmPosition,
+                                         VisibilityTester *visibilityTester) const {
+            // 在相机镜头圆盘上随机采样
+            Vector2 diskSample = diskUniformSampling(_lensRadius);
+            // 计算相机镜头采样点 3D 坐标
+            Vector3 lensSample = _right * diskSample.x + _up * diskSample.y + _eye;
+
+            // 计算射线方向
+            (*wi) = lensSample - eye.getPoint();
+            double dist = LENGTH(*wi);
+            (*wi) = NORMALIZE(*wi);
+
+            // 创建 Interaction
+            Interaction lensInter = Interaction(lensSample, *wi, _front, dist);
+            // 设置 visibility tester
+            (*visibilityTester) = VisibilityTester(eye, lensInter);
+
+            // lensInter 向 eye 发射射线的 pdf
+            double lensArea = PI * _lensRadius * _lensRadius;
+            (*pdf) = (dist * dist) / (lensArea * ABS_DOT(lensInter.getNormal(), *wi));
+
+            return importance(Ray(lensSample, -(*wi)), filmPosition);
+        }
+
+        Spectrum Camera::importance(const Ray &ray, Point2d *filmPosition) const {
+            // 计算新射线光栅化位置
+            double step = _focal / ABS_DOT(ray.getDirection(), _front);
+            Vector3 raster = ray.getOrigin() + ray.getDirection() * step - _leftBottomCorner;
+            double u = DOT(raster, _right) / (DOT(_diagonalVector, _right));
+            double v = DOT(raster, _up) / (DOT(_diagonalVector, _up));
+            (*filmPosition) = Point2d(u * _resolutionWidth, v * _resolutionHeight);
+
+            // 如果超出边界，则 importance 为 0
+            if (std::floor(filmPosition->x) < 0 || std::floor(filmPosition->x) >= _resolutionWidth ||
+                std::floor(filmPosition->y) < 0 || std::floor(filmPosition->y) >= _resolutionHeight) {
+                return Spectrum(0.);
+            }
+
+            /*
+             * 计算相机采样的重要性，相机采样的重要性是基于:
+             * 在镜头 lens 和成像平面 film plane 上同时采样点的重要性
+             *
+             * 推导:
+             * 1) p(w) = dist^2 / (A * cosine)
+             * 2) dist * cosine = _focal
+             * 3) W_e = p(w) / (PI * lensRadius^2 * cosine)
+             * 4) A is area of image plane
+             * 5) W_e = _focal^2 / (cosine^4 * A * PI * lensRadius^2)
+             **/
+
+            double cosine = ABS_DOT(ray.getDirection(), _front);
+            /*
+            double dist = _focal / cosine;
+            double pW = dist * dist / (_area * cosine);
+            double weight = pW / (PI * _lensRadius * _lensRadius * cosine);
+             */
+            double weight = (_focal * _focal) /
+                            (_area * PI * _lensRadius * _lensRadius * std::pow(cosine, 4));
+            return Spectrum(weight);
+        }
+
         void Camera::buildCameraCoordinate(float fov, float aspect) {
             Vector3 worldUp = Vector3(0.0f, 1.0f, 0.0f);
-            // 判断 _fron 方向是否与 worldUp 重叠
+            // 判断 _front 方向是否与 worldUp 重叠
             if (abs(_front.x) < EPSILON && abs(_front.z) < EPSILON) {
                 _right = {1.0f, 0.0f, 0.0f};
             } else {
@@ -76,7 +139,10 @@ namespace kaguya {
 
             _halfWindowHeight = tan(DEGREES_TO_RADIANS(fov / 2)) * _focal;
             _halfWindowWidth = _halfWindowHeight * aspect;
+            _area = _halfWindowHeight * _halfWindowWidth;
             _leftBottomCorner = _eye + _focal * _front - _halfWindowWidth * _right - _halfWindowHeight * _up;
+            _rightTopCorner = _eye + _focal * _front + _halfWindowWidth * _right + _halfWindowHeight * _up;
+            _diagonalVector = _rightTopCorner - _leftBottomCorner;
         }
     }
 }

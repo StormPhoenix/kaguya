@@ -97,8 +97,8 @@ namespace kaguya {
              * @param mode
              * @return
              */
-            int randomIntersect(std::shared_ptr<Scene> scene, const Ray &ray, PathVertex *path, int maxDepth,
-                                double pdf, MemoryArena &memoryArena, Spectrum &beta, TransportMode mode);
+            int randomWalk(std::shared_ptr<Scene> scene, const Ray &ray, PathVertex *path, int maxDepth,
+                           double pdf, MemoryArena &memoryArena, Spectrum &beta, TransportMode mode);
 
             /**
              * 连接 Camera 和 Light 两条路径，并返回合成路径的 Radiance
@@ -124,12 +124,12 @@ namespace kaguya {
              * @param t 相机路径长度
              * @param lightSubPath 光源子路径
              * @param s 光源路径长度
-             * @param tempLightVertex 如果额外进行了对光源采样，则传入 lightVertex
+             * @param extraVertex t = 1 或 s = 1 时传入的点
              * @return
              */
             double misWeight(PathVertex *cameraSubPath, int t,
                              PathVertex *lightSubPath, int s,
-                             PathVertex &tempLightVertex);
+                             PathVertex &extraVertex);
 
             /**
              * 计算路径中某个段中两端点段几何关系

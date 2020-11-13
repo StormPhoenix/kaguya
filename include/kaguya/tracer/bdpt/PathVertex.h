@@ -130,9 +130,9 @@ namespace kaguya {
              */
             Spectrum emit(const Vector3 &eye) const;
 
-            static inline PathVertex createCameraVertex(const Camera *camera, const Ray &ray) {
+            static inline PathVertex createCameraVertex(const Camera *camera, const Ray &ray, Spectrum beta) {
                 StartEndInteraction ei = StartEndInteraction(camera, ray);
-                PathVertex cameraVertex = PathVertex(PathVertexType::CAMERA, ei, Spectrum(1.0));
+                PathVertex cameraVertex = PathVertex(PathVertexType::CAMERA, ei, beta);
                 cameraVertex.pdfForward = 1.0;
                 return cameraVertex;
             }

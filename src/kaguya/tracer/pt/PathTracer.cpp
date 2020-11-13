@@ -282,16 +282,8 @@ namespace kaguya {
                               << std::flush;
                 }
 
-                // TODO delete
-                std::cout << "P3\n" << cameraWidth << " " << cameraHeight << "\n255\n";
-                // TODO 更改成写入替换策略
-                for (int row = cameraHeight - 1; row >= 0; row--) {
-                    for (int col = 0; col < cameraWidth; col++) {
-                        std::cout << _filmPlane->getSpectrum(row, col, 0) << ' '
-                                  << _filmPlane->getSpectrum(row, col, 1) << ' '
-                                  << _filmPlane->getSpectrum(row, col, 2) << '\n';
-                    }
-                }
+                // write to image
+                _filmPlane->writeImage();
 
                 delete _filmPlane;
                 _filmPlane = nullptr;

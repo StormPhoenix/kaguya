@@ -19,7 +19,9 @@ namespace kaguya {
 
             void addSpectrum(const Spectrum &spectrum, int row, int col);
 
-            unsigned int getSpectrum(int row, int col, int channel) const;
+            double getSpectrum(int row, int col, int channel) const;
+
+            void writeImage() const;
 
             ~FilmPlane();
 

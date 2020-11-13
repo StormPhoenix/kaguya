@@ -8,7 +8,7 @@
 #include <kaguya/core/Core.h>
 #include <kaguya/core/Interaction.h>
 #include <kaguya/tracer/Ray.h>
-#include <kaguya/utils/VisibilityTester.hpp>
+#include <kaguya/utils/VisibilityTester.h>
 
 namespace kaguya {
     namespace core {
