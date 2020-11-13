@@ -79,7 +79,7 @@
     > DEBUG：设置成 Lambertian 表面做插值
 
 - bunny 透明材质出现黑块，且整体偏暗；光源面积缩小一倍，提高光源亮度，整个场景变成暗色，出现大量白色燥点；
-    参考 (知乎-文刀秋二)[https://www.zhihu.com/question/48961286/answer/113580178]
+    参考 ![知乎-文刀秋二](https://www.zhihu.com/question/48961286/answer/113580178)
 
 - Triangle 优化 Triangle 内部的矩阵变换效率（提前做变换）
     > Triangle 中的 Vertex / Normal 坐标向 World Space 的变换提前做好。不同于其他 Shape 将 Ray 转化到 Object Space
