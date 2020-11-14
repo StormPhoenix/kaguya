@@ -29,17 +29,6 @@ namespace kaguya {
             return Ray(_eye, dir);
         }
 
-        Point2d Camera::getFilmPosition(const Vector3 &dir) {
-            // dir 在 _front 上的投影长度
-            double frontLen = ABS_DOT(dir, _front);
-            double factor = _focal / frontLen;
-            // 射线投射到成像平面，并计算成像平面左下角到投射点的向量
-            Vector3 posVector = _eye + dir * factor - _leftBottomCorner;
-            double u = DOT(posVector, _right) / (2 * _halfWindowWidth);
-            double v = DOT(posVector, _up) / (2 * _halfWindowHeight);
-            return Point2d(u * _resolutionWidth, v * _resolutionHeight);
-        }
-
         Vector3 Camera::getEye() const {
             return _eye;
         }
@@ -85,12 +74,38 @@ namespace kaguya {
 
             // lensInter 向 eye 发射射线的 pdf
             double lensArea = PI * _lensRadius * _lensRadius;
+            // 从 eye 位置对相机成像平面采样 pdf
             (*pdf) = (dist * dist) / (lensArea * ABS_DOT(lensInter.getNormal(), *wi));
 
-            return importance(Ray(lensSample, -(*wi)), filmPosition);
+            return rayImportance(Ray(lensSample, -(*wi)), filmPosition);
         }
 
-        Spectrum Camera::importance(const Ray &ray, Point2d *filmPosition) const {
+        void Camera::rayImportance(const Ray &ray, double &pdfPos, double &pdfDir) const {
+            // 判断射线是否从正面发射出去
+            double cosine = DOT(ray.getDirection(), _front);
+            if (cosine <= 0) {
+                pdfPos = 0.0;
+                pdfDir = 0.0;
+                return;
+            }
+
+            // 判断射线是否击中成像平面
+            double step = _focal / cosine;
+            Vector3 raster = ray.getOrigin() + ray.getDirection() * step - _leftBottomCorner;
+            double u = DOT(raster, _right) / (DOT(_diagonalVector, _right));
+            double v = DOT(raster, _up) / (DOT(_diagonalVector, _up));
+            if (u < 0 || u >= 1 || v < 0 || v >= 1) {
+                pdfPos = 0.0;
+                pdfDir = 0.0;
+                return;
+            }
+
+            // 计算 pdfPos pdfDir
+            pdfPos = 1 / (PI * _lensRadius * _lensRadius);
+            pdfDir = (_focal * _focal) / (_area * cosine * cosine * cosine);
+        }
+
+        Spectrum Camera::rayImportance(const Ray &ray, Point2d *filmPosition) const {
             // 计算新射线光栅化位置
             double step = _focal / ABS_DOT(ray.getDirection(), _front);
             Vector3 raster = ray.getOrigin() + ray.getDirection() * step - _leftBottomCorner;
@@ -98,7 +113,7 @@ namespace kaguya {
             double v = DOT(raster, _up) / (DOT(_diagonalVector, _up));
             (*filmPosition) = Point2d(u * _resolutionWidth, v * _resolutionHeight);
 
-            // 如果超出边界，则 importance 为 0
+            // 如果超出边界，则 rayImportance 为 0
             if (std::floor(filmPosition->x) < 0 || std::floor(filmPosition->x) >= _resolutionWidth ||
                 std::floor(filmPosition->y) < 0 || std::floor(filmPosition->y) >= _resolutionHeight) {
                 return Spectrum(0.);

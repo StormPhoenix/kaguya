@@ -31,20 +31,22 @@ namespace kaguya {
             return _bsdf;
         }
 
-        StartEndInteraction::StartEndInteraction(const kaguya::tracer::Camera *camera,
-                                                 const kaguya::tracer::Ray &ray) : camera(camera) {
+        StartEndInteraction::StartEndInteraction(const Camera *camera,
+                                                 const Ray &ray) : camera(camera) {
             assert(camera != nullptr);
             _point = ray.getOrigin();
-            _normal = ray.getDirection();
+            _direction = ray.getDirection();
+            _normal = camera->getFront();
         }
 
-        StartEndInteraction::StartEndInteraction(const kaguya::core::Light *light,
-                                                 const kaguya::core::Interaction &interaction) :
+        StartEndInteraction::StartEndInteraction(const Light *light,
+                                                 const Interaction &interaction) :
                 light(light), Interaction(interaction) {
         }
 
-        StartEndInteraction::StartEndInteraction(const kaguya::core::Light *light, const Vector3 &p, const Vector3 &dir,
-                                                 const Vector3 &n) : light(light) {
+        StartEndInteraction::StartEndInteraction(const Light *light,
+                                                 const Vector3 &p, const Vector3 &dir, const Vector3 &n) :
+                light(light) {
             _point = p;
             _direction = dir;
             _normal = n;

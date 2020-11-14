@@ -40,18 +40,13 @@ namespace kaguya {
                     for (int col = 0; col < cameraWidth; col++) {
                         MemoryArena arena;
                         Spectrum ans = {0};
+
                         // 做 _samplePerPixel 次采样
                         for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
                             auto u = (col + uniformSample()) / double(cameraWidth);
                             auto v = (row + uniformSample()) / double(cameraHeight);
 
                             Ray sampleRay = _camera->sendRay(u, v);
-
-                            if (row == 179 && col == 34 && sampleCount == 0) {
-                                int c = 0;
-                                c++;
-                            }
-
                             ans += shader(sampleRay, *(_scene.get()), _maxDepth, arena);
                             // TODO 区分
                             arena.clean();
@@ -453,7 +448,8 @@ namespace kaguya {
 
                         if (t == 1) {
                             // 在成像平面的 samplePosition 位置加上 value
-                            _filmPlane->addSpectrum(value * INV_WEIGHT, samplePosition.y, samplePosition.x);
+                            _filmPlane->addSpectrum(value * INV_WEIGHT, std::floor(samplePosition.y),
+                                                    std::floor(samplePosition.x));
                         } else {
                             shaderColor += value;
                         }

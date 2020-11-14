@@ -62,6 +62,8 @@
 - Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法
 
 ## 未解决的问题
+
+- BDPT 中的点光源，在采样发射光线时没有考虑 distance，那为什么地板下面出现的颜色会暗淡，靠近地板的颜色会很亮呢？
     
 - randomInt 会出现随机到 randomValue = 1.0 的地方，得出的 int 值会让调用者越界
 
@@ -79,7 +81,7 @@
     > DEBUG：设置成 Lambertian 表面做插值
 
 - bunny 透明材质出现黑块，且整体偏暗；光源面积缩小一倍，提高光源亮度，整个场景变成暗色，出现大量白色燥点；
-    参考 ![知乎-文刀秋二](https://www.zhihu.com/question/48961286/answer/113580178)
+    参考 [知乎-文刀秋二](https://www.zhihu.com/question/48961286/answer/113580178)
 
 - Triangle 优化 Triangle 内部的矩阵变换效率（提前做变换）
     > Triangle 中的 Vertex / Normal 坐标向 World Space 的变换提前做好。不同于其他 Shape 将 Ray 转化到 Object Space

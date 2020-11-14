@@ -2,10 +2,11 @@
 // Created by Storm Phoenix on 2020/10/29.
 //
 
+#include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/core/light/AreaLight.h>
 #include <kaguya/material/Material.h>
 #include <kaguya/tracer/bdpt/PathVertex.h>
-#include <kaguya/core/bsdf/BXDF.h>
+#include <kaguya/tracer/Camera.h>
 
 namespace kaguya {
     namespace tracer {
@@ -73,11 +74,11 @@ namespace kaguya {
         }
 
         double PathVertex::computeForwardDensityPdf(double pdfWi, const PathVertex &next) const {
-            if (type == PathVertexType::CAMERA) {
-                return 1.0;
+            double distSquare = std::pow(LENGTH(point - next.point), 2);
+            if (distSquare == 0) {
+                return 0;
             }
 
-            double distSquare = std::pow(LENGTH(point - next.point), 2);
             double pdfFwd = pdfWi / distSquare;
             if (next.type == PathVertexType::SURFACE) {
                 Vector3 surfaceNormal = next.si.getNormal();
@@ -124,7 +125,7 @@ namespace kaguya {
             // 计算 wo
             Vector3 wo;
             if (pre != nullptr) {
-                Vector3 wo = pre->point - point;
+                wo = pre->point - point;
                 if (LENGTH(wo) == 0) {
                     return 0;
                 }
@@ -134,25 +135,20 @@ namespace kaguya {
                 assert(type == CAMERA);
             }
 
+            // 计算从当前点射向 next 点的 pdf
             double pdf = 0;
-            // 判断类型
-            // TODO 改成 if 类型
-            switch (type) {
-                case CAMERA:
-                    // 相机类型定点，其 pdf 必定为 1
-                    pdf = 1.0;
-                    break;
-                case SURFACE:
-                    pdf = si.getBSDF()->samplePdf(wo, wi);
-                    break;
-                case VOLUME:
-                    assert(1 == 0);
-                    // TODO 暂时不支持
-                    break;
-                default:
-                    assert(1 == 0);
-                    // 不存在其他类型
-                    break;
+            if (type == CAMERA) {
+                double pdfPos = 0;
+                Ray cameraRay = Ray(ei.getPoint(), ei.getDirection());
+                ei.camera->rayImportance(cameraRay, pdfPos, pdf);
+            } else if (type == SURFACE) {
+                pdf = si.getBSDF()->samplePdf(wo, wi);
+            } else if (type == VOLUME) {
+                // TODO 暂时不支持
+                assert(1 == 0);
+            } else {
+                // TODO 暂时不支持
+                assert(1 == 0);
             }
 
             // pdf 转化为基于 area 的 density

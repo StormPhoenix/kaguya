@@ -232,7 +232,7 @@ namespace kaguya {
                         // shader spectrum
                         return f * cosine / lightPdf * luminance;
                     } else {
-                        // multiple importance sampling
+                        // multiple rayImportance sampling
                         double scatterPdf = bsdf.samplePdf(-eye.getDirection(), shadowRayDir);
                         double weight = misWeight(1, lightPdf, 1, scatterPdf);
                         return f * cosine * weight / lightPdf * luminance;

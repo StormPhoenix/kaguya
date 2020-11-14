@@ -247,7 +247,7 @@ namespace kaguya {
 
             // light
             std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(-100, 100, -100, 100, 245, false,
-                                                                               nullptr);
+                                                                               lambertTop);
 
             // build light
             std::shared_ptr<AreaLight> light = DiffuseAreaLight::buildDiffuseAreaLight(lightSpectrum, lightWall);
@@ -783,8 +783,8 @@ namespace kaguya {
             objects.push_back(bottomWall);
             objects.push_back(topWall);
             objects.push_back(frontWall);
-            objects.push_back(glassSphere);
-            objects.push_back(metalSphere);
+//            objects.push_back(glassSphere);
+//            objects.push_back(metalSphere);
 
             // 给所有 object 赋予 id
             for (long long id = 0; id < objects.size(); id++) {

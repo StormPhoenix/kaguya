@@ -51,14 +51,6 @@ namespace kaguya {
              */
             Ray sendRay(double u, double v);
 
-            /**
-             * TODO delete
-             * 若相机按照 dir 投射射线，则返回射线在成像上的坐标
-             * @param dir
-             * @return
-             */
-            Point2d getFilmPosition(const Vector3 &dir);
-
             Vector3 getEye() const;
 
             /**
@@ -76,6 +68,10 @@ namespace kaguya {
             int getResolutionHeight();
 
             void setResolutionHeight(int resolutionHeight);
+
+            const Vector3 &getFront() const {
+                return _front;
+            }
 
             /**
              * 相机对 eye 发射采样射线，起点随机
@@ -96,14 +92,24 @@ namespace kaguya {
              */
             FilmPlane *buildFilmPlane(int channel);
 
+            /**
+             * 计算相机发射射线 ray 的 importance（pdfPos，pdfDir）
+             * @param ray
+             * @param pdfPos
+             * @param pdfDir
+             * @return
+             */
+            void rayImportance(const Ray &ray, double &pdfPos, double &pdfDir) const;
+
         private:
             /**
-             * 计算相机发射射线 ray 的 importance，并计算 filmPosition
+             * 计算相机发射射线 ray 的 importance，并计算 filmPosition。
+             * Importance 是 pdf of position 和 pdf of direction 的乘积
              * @param ray
              * @param filmPosition
              * @return
              */
-            Spectrum importance(const Ray &ray, Point2d *filmPosition) const;
+            Spectrum rayImportance(const Ray &ray, Point2d *filmPosition) const;
 
             /**
              * 构建相机坐标系
