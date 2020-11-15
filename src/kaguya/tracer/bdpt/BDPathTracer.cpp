@@ -21,15 +21,11 @@ namespace kaguya {
             init();
         }
 
-        void BDPathTracer::run() {
-            Tracer::run();
-            if (_scene != nullptr) {
+        bool BDPathTracer::render() {
+            if (_scene != nullptr && _camera != nullptr) {
                 int cameraWidth = _camera->getResolutionWidth();
                 int cameraHeight = _camera->getResolutionHeight();
 
-                // TODO 将 bitmap 封装到写入策略模式
-                // TODO 代码移动到 tracer
-                _filmPlane = _camera->buildFilmPlane(SPECTRUM_CHANNEL);
                 double sampleWeight = 1.0 / _samplePerPixel;
                 // 已完成扫描的行数
                 int finishedLine = 0;
@@ -52,25 +48,20 @@ namespace kaguya {
                             arena.clean();
                         }
                         ans *= sampleWeight;
-                        // TODO 写入渲染结果，用更好的方式写入
-                        writeShaderColor(ans, row, col);
+                        _filmPlane->addSpectrum(ans, row, col);
                     }
 #pragma omp critical
                     finishedLine++;
                     std::cout << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "
                               << std::flush;
                 }
-
-                _filmPlane->writeImage(Config::imageFilename.c_str());
-
-                delete _filmPlane;
-                _filmPlane = nullptr;
+                return true;
+            } else {
+                return false;
             }
         }
 
         void BDPathTracer::init() {
-            _scene = Config::testBuildScene();
-            _camera = _scene->getCamera();
             _samplePerPixel = Config::samplePerPixel;
             _sampleLightProb = Config::sampleLightProb;
             _maxDepth = Config::maxScatterDepth;

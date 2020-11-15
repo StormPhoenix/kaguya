@@ -25,10 +25,10 @@ namespace kaguya {
         public:
             PathTracer();
 
-            virtual void run() override;
+            virtual bool render() override;
 
         private:
-            void init();
+            virtual void init();
 
             /**
              * 在 eye 处对光源采样

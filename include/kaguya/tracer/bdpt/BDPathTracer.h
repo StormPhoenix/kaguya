@@ -41,13 +41,10 @@ namespace kaguya {
         public:
             BDPathTracer();
 
-            virtual void run() override;
-
         private:
-            /**
-             * TODO 从 PathTracer 复制过来的，后续需要修改
-             */
-            void init();
+            virtual bool render() override;
+
+            virtual void init();
 
             /**
              * 采样 ShaderColor

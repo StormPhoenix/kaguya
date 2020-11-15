@@ -22,8 +22,6 @@ namespace kaguya {
         }
 
         void PathTracer::init() {
-            _scene = Config::testBuildScene();
-            _camera = _scene->getCamera();
             _samplePerPixel = Config::samplePerPixel;
             _sampleLightProb = Config::sampleLightProb;
             _maxDepth = Config::maxScatterDepth;
@@ -243,9 +241,8 @@ namespace kaguya {
             return Spectrum(0.0);
         }
 
-        void PathTracer::run() {
-            Tracer::run();
-            if (_scene != nullptr) {
+        bool PathTracer::render() {
+            if (_scene != nullptr && _camera != nullptr) {
                 int cameraWidth = _camera->getResolutionWidth();
                 int cameraHeight = _camera->getResolutionHeight();
 
@@ -270,20 +267,17 @@ namespace kaguya {
                             arena.clean();
                         }
                         ans *= sampleWeight;
-                        // TODO 写入渲染结果，用更好的方式写入
-                        writeShaderColor(ans, row, col);
+                        _filmPlane->addSpectrum(ans, row, col);
+
                     }
 #pragma omp critical
                     finishedLine++;
                     std::cout << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "
                               << std::flush;
                 }
-
-                // write to image
-                _filmPlane->writeImage(Config::imageFilename.c_str());
-
-                delete _filmPlane;
-                _filmPlane = nullptr;
+                return true;
+            } else {
+                return false;
             }
         }
 

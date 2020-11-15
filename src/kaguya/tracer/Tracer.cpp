@@ -2,20 +2,31 @@
 // Created by Storm Phoenix on 2020/11/2.
 //
 
+#include <kaguya/Config.h>
 #include <kaguya/tracer/Tracer.h>
 
 namespace kaguya {
     namespace tracer {
 
+        using kaguya::Config;
+
+        Tracer::Tracer() {
+            _scene = Config::buildScene();
+            _camera = _scene->getCamera();
+        }
+
         void Tracer::run() {
             assert(_camera != nullptr);
             _filmPlane = _camera->buildFilmPlane(SPECTRUM_CHANNEL);
-        }
 
-        void Tracer::writeShaderColor(const Spectrum &spectrum, int row, int col) {
-            assert(_filmPlane != nullptr && _camera != nullptr);
-            _filmPlane->addSpectrum(spectrum, row, col);
-        }
+            // rendering
+            if (render()) {
+                // write to image
+                _filmPlane->writeImage(Config::imageFilename.c_str());
+            }
 
+            delete _filmPlane;
+            _filmPlane = nullptr;
+        }
     }
 }

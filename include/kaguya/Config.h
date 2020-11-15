@@ -43,7 +43,7 @@ namespace kaguya {
         }
 
         // TODO 测试
-        static std::shared_ptr<Scene> testBuildScene() {
+        static std::shared_ptr<Scene> buildScene() {
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
             scene->sceneTwoSpheresWithPointLight();
             return scene;

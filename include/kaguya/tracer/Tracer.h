@@ -20,27 +20,26 @@ namespace kaguya {
 
         class Tracer {
         public:
-            virtual void run();
+            Tracer();
 
-            ~Tracer() {
+            void run();
+
+            virtual ~Tracer() {
                 if (_filmPlane != nullptr) {
                     delete (_filmPlane);
                 }
             }
 
-        protected:
-            /**
-             * 渲染结果写入位图
-             * @param color
-             */
-            void writeShaderColor(const Spectrum &spectrum, int row, int col);
+        private:
+            // 渲染实现
+            virtual bool render() = 0;
 
         protected:
             // 场景
             std::shared_ptr<Scene> _scene = nullptr;
             // 相机
             std::shared_ptr<Camera> _camera = nullptr;
-            // 渲染结果
+            // 成像平面
             FilmPlane *_filmPlane = nullptr;
         };
 
