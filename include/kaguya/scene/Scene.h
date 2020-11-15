@@ -30,41 +30,30 @@ namespace kaguya {
          */
         class Scene {
         public:
-
-            /**
-             * 构建 Cornel box
-             */
-            void testBuildCornelBox();
-
             /**
              * 构建 Cornel box，加载 bunny 模型
              */
-            void testBuildCornelBoxWithBunny();
+            void sceneBunnyWithAreaLight();
 
             /**
              * 构建 bunny，采用点光源
              */
-            void testBunnyWithSpotLight();
+            void sceneBunnyWithPointLight();
 
             /**
-             * 空 Cornel box
+             * 构建 two spheres，用区域光源
              */
-            void testBuildEmptyCornelBox();
+            void sceneTwoSpheresWithAreaLight();
 
             /**
              * 测试 PointLight
              */
-            void testPointLight();
+            void sceneTwoSpheresWithPointLight();
 
             /**
              * 测试 SpotLight
              */
-            void testSpotLight();
-
-            /**
-             * 测试区域光
-             */
-            void testAreaLight();
+            void sceneTwoSpheresWithSpotLight();
 
             bool hit(const Ray &ray, SurfaceInteraction &hitRecord);
 
