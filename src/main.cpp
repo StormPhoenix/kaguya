@@ -1,36 +1,67 @@
-#include <iostream>
-#include <kaguya/math/Math.hpp>
-//#include <kaguya/tracer/Camera.h>
 #include <kaguya/Config.h>
+#include <kaguya/math/Math.hpp>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/meta/Vertex.h>
 #include <kaguya/tracer/pt/PathTracer.h>
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
 
-//#include <kaguya/math/Math.hpp>
-//#include <kaguya/scene/meta/Sphere.h>
+#include <iostream>
+#include <cstring>
+#include <clipp.h>
 
-//using namespace kaguya::scene;
+using namespace kaguya;
+using namespace kaguya::tracer;
 
-#include <kaguya/utils/ObjLoader.h>
+using namespace clipp;
+using namespace std;
 
-int main() {
-    using kaguya::tracer::PathTracer;
-    using kaguya::tracer::BDPathTracer;
-    using kaguya::tracer::Camera;
-    using kaguya::tracer::Ray;
-    using kaguya::Config;
-    using kaguya::scene::Scene;
-    using kaguya::utils::ObjLoader;
-    using kaguya::scene::Vertex;
+int main(int argc, char *argv[]) {
 
 //    PathTracer pathTracer = PathTracer();
 //    pathTracer.run();
 
-    BDPathTracer bdPathTracer = BDPathTracer();
-    bdPathTracer.run();
+    string render = "bdpt";
 
-//    std::vector<Vertex> vertexes = ObjLoader::loadModel("./resource/objects/bunny.obj");
+    auto cli = (
+            value("output name", Config::imageFilename),
+                    option("-rt", "--render-type") & value("render type", render),
+                    option("-ssp", "--sample-per-pixel") & value("sample per pixel", Config::samplePerPixel),
+                    option("-d", "--max-depth") & value("max scatter depth", Config::maxScatterDepth),
+                    option("-rb", "--russian-prob") & value("russian roulette probability", Config::russianRoulette),
+                    option("-rd", "--russian-depth") & value("russian roulette depth", Config::russianRouletteDepth),
+                    option("-h", "--height") & value("image height", Config::resolutionHeight),
+                    option("-w", "--width") & value("image width", Config::resolutionWidth)
+    );
+
+    if (parse(argc, argv, cli)) {
+        char filenameTemplate[80];
+        sprintf(filenameTemplate, "%s_ssp=%d_max-depth=%d_%dx%d.png",
+                Config::imageFilename.c_str(),
+                Config::samplePerPixel,
+                Config::maxScatterDepth,
+                Config::resolutionWidth,
+                Config::resolutionHeight);
+        Config::imageFilename = string(filenameTemplate);
+    } else {
+        cout << make_man_page(cli, argv[0]);
+        return 0;
+    }
+
+    Tracer *tracer = nullptr;
+
+    if (render == "bdpt") {
+        tracer = new BDPathTracer();
+    } else if (render == "pt") {
+        tracer = new PathTracer();
+    } else {
+        cout << "not support render type: " << render << endl;
+    }
+
+    if (tracer != nullptr) {
+        cout << "using render type: " << render << endl;
+        tracer->run();
+        delete tracer;
+    }
 
     return 0;
 }

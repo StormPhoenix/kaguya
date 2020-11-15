@@ -8,6 +8,7 @@
 #include <kaguya/core/Core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
+#include <kaguya/scene/Scene.h>
 #include <kaguya/tracer/Camera.h>
 #include <kaguya/tracer/FilmPlane.h>
 
@@ -15,10 +16,17 @@ namespace kaguya {
     namespace tracer {
 
         using namespace kaguya::core;
+        using kaguya::scene::Scene;
 
         class Tracer {
         public:
-            virtual void run() = 0;
+            virtual void run();
+
+            ~Tracer() {
+                if (_filmPlane != nullptr) {
+                    delete (_filmPlane);
+                }
+            }
 
         protected:
             /**
@@ -28,6 +36,8 @@ namespace kaguya {
             void writeShaderColor(const Spectrum &spectrum, int row, int col);
 
         protected:
+            // 场景
+            std::shared_ptr<Scene> _scene = nullptr;
             // 相机
             std::shared_ptr<Camera> _camera = nullptr;
             // 渲染结果

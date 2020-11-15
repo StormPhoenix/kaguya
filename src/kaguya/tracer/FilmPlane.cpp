@@ -3,7 +3,12 @@
 //
 
 #include <kaguya/tracer/FilmPlane.h>
+#include <cstring>
 #include <iostream>
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+
+#include <stb/stb_image_write.h>
 
 namespace kaguya {
     namespace tracer {
@@ -34,17 +39,29 @@ namespace kaguya {
             return (_bitmap + offset)[channel];
         }
 
-        void FilmPlane::writeImage() const {
-            std::cout << "P3\n" << _resolutionWidth << " " << _resolutionHeight << "\n255\n";
-            // Write the translated [0,255] value of each color component.
-            // TODO 更改成写入替换策略
+        void FilmPlane::writeImage(char const *filename) const {
+            // 创建 image buffer
+            unsigned char *image = (unsigned char *) malloc(
+                    sizeof(unsigned char) * _resolutionWidth * _resolutionHeight * _channel);
+
+            // 将光谱转化到 image buffer
             for (int row = _resolutionHeight - 1; row >= 0; row--) {
                 for (int col = 0; col < _resolutionWidth; col++) {
-                    std::cout << static_cast<int>(256 * clamp(std::sqrt(getSpectrum(row, col, 0)), 0.0, 0.999)) << ' '
-                              << static_cast<int>(256 * clamp(std::sqrt(getSpectrum(row, col, 1)), 0.0, 0.999)) << ' '
-                              << static_cast<int>(256 * clamp(std::sqrt(getSpectrum(row, col, 2)), 0.0, 0.999)) << '\n';
+                    int offset = ((_resolutionHeight - 1 - row) * _resolutionWidth + col) * _channel;
+                    (image + offset)[0] = static_cast<unsigned char>(256 *
+                                                                     clamp(std::sqrt(getSpectrum(row, col, 0)), 0.0,
+                                                                           0.999));
+                    (image + offset)[1] = static_cast<unsigned char>(256 *
+                                                                     clamp(std::sqrt(getSpectrum(row, col, 1)), 0.0,
+                                                                           0.999));
+                    (image + offset)[2] = static_cast<unsigned char>(256 *
+                                                                     clamp(std::sqrt(getSpectrum(row, col, 2)), 0.0,
+                                                                           0.999));
                 }
             }
+            // 写入 image file
+            stbi_write_png(filename, _resolutionWidth, _resolutionHeight, 3, image, 0);
+            free(image);
         }
 
         FilmPlane::~FilmPlane() {

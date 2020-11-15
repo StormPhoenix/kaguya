@@ -7,7 +7,6 @@
 
 #include <memory>
 
-#include <kaguya/scene/Scene.h>
 #include <kaguya/tracer/Tracer.h>
 
 #include <kaguya/core/Core.h>
@@ -19,7 +18,6 @@ namespace kaguya {
     namespace tracer {
 
         using namespace kaguya::core;
-        using kaguya::scene::Scene;
         using kaguya::memory::MemoryArena;
 
 
@@ -77,9 +75,6 @@ namespace kaguya {
             void writeBuffer(const Vector3 &color, int row, int col);
 
         private:
-            // 场景
-            std::shared_ptr<Scene> _scene = nullptr;
-            // TODO 以下参数写入配置文件
             // 最大采样深度
             int _maxDepth = 100;
             // 每个像素采样次数

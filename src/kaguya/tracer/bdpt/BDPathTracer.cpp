@@ -22,8 +22,8 @@ namespace kaguya {
         }
 
         void BDPathTracer::run() {
-            // TODO 临时代码；提取到 class Tracer
-            if (_camera != nullptr && _scene != nullptr) {
+            Tracer::run();
+            if (_scene != nullptr) {
                 int cameraWidth = _camera->getResolutionWidth();
                 int cameraHeight = _camera->getResolutionHeight();
 
@@ -57,12 +57,11 @@ namespace kaguya {
                     }
 #pragma omp critical
                     finishedLine++;
-                    // TODO delete
-                    std::cerr << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "
+                    std::cout << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "
                               << std::flush;
                 }
 
-                _filmPlane->writeImage();
+                _filmPlane->writeImage(Config::imageFilename.c_str());
 
                 delete _filmPlane;
                 _filmPlane = nullptr;
@@ -75,7 +74,7 @@ namespace kaguya {
             _samplePerPixel = Config::samplePerPixel;
             _sampleLightProb = Config::sampleLightProb;
             _maxDepth = Config::maxScatterDepth;
-            _russianRouletteBounce = Config::beginRussianRouletteBounce;
+            _russianRouletteBounce = Config::russianRouletteDepth;
             _russianRoulette = Config::russianRoulette;
         }
 

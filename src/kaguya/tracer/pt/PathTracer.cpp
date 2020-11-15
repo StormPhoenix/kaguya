@@ -27,7 +27,7 @@ namespace kaguya {
             _samplePerPixel = Config::samplePerPixel;
             _sampleLightProb = Config::sampleLightProb;
             _maxDepth = Config::maxScatterDepth;
-            _russianRouletteBounce = Config::beginRussianRouletteBounce;
+            _russianRouletteBounce = Config::russianRouletteDepth;
             _russianRoulette = Config::russianRoulette;
         }
 
@@ -244,13 +244,11 @@ namespace kaguya {
         }
 
         void PathTracer::run() {
-            if (_camera != nullptr && _scene != nullptr) {
+            Tracer::run();
+            if (_scene != nullptr) {
                 int cameraWidth = _camera->getResolutionWidth();
                 int cameraHeight = _camera->getResolutionHeight();
 
-                // TODO 将 bitmap 封装到写入策略模式
-                // TODO 代码移动到 tracer
-                _filmPlane = _camera->buildFilmPlane(SPECTRUM_CHANNEL);
                 double sampleWeight = 1.0 / _samplePerPixel;
                 // 已完成扫描的行数
                 int finishedLine = 0;
@@ -277,13 +275,12 @@ namespace kaguya {
                     }
 #pragma omp critical
                     finishedLine++;
-                    // TODO delete
-                    std::cerr << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "
+                    std::cout << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "
                               << std::flush;
                 }
 
                 // write to image
-                _filmPlane->writeImage();
+                _filmPlane->writeImage(Config::imageFilename.c_str());
 
                 delete _filmPlane;
                 _filmPlane = nullptr;

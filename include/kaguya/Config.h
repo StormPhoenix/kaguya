@@ -8,6 +8,8 @@
 #include <kaguya/scene/Shape.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/tracer/Camera.h>
+
+#include <cstring>
 #include <memory>
 
 namespace kaguya {
@@ -18,7 +20,10 @@ namespace kaguya {
 
     class Config {
     public:
-        static int beginRussianRouletteBounce;
+        // 输出图像名称
+        static std::string imageFilename;
+        // russian roulette 从什么 depth 开始
+        static int russianRouletteDepth;
         // 终止概率
         static double russianRoulette;
         // 最大散射深度

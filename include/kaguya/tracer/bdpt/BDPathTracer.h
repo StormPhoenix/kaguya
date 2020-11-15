@@ -32,7 +32,6 @@ namespace kaguya {
         using kaguya::core::TransportMode;
         using kaguya::material::Material;
         using kaguya::memory::MemoryArena;
-        using kaguya::scene::Scene;
         using kaguya::tracer::Camera;
 
         /**
@@ -140,9 +139,6 @@ namespace kaguya {
             double g(const PathVertex &pre, const PathVertex &next);
 
         private:
-            // 场景
-            std::shared_ptr<Scene> _scene = nullptr;
-            // TODO 以下参数写入配置文件
             // 最大采样深度
             int _maxDepth = 100;
             // 每个像素采样次数

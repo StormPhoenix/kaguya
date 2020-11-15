@@ -14,6 +14,9 @@
 
 ## 已解决问题
 
+- bunny 金属材质下非常不平滑，但是按道理讲，Normal 是进行插值过了的
+    - 切线空间基坐标忘记 normalize，导致计算错误。
+    
 - BSDF.cpp 的构造函数，计算切线空间有误，direction 和 _tanY 如果平行，则 CROSS 计算得到 nan
 
 - 玻璃材质球下面本应该是阴影的地方渲染成了亮白色
@@ -30,7 +33,7 @@
     - depth = 2，s = 1，MIS 默认返回 1：无棱边
         在 MIS = 1 的情况下，除了球体外的场景在视觉上看不出什么区别，唯独是边界位置，使用 MIS 明显很暗淡
     - depth = 2, s = 1，有 MIS，改变光源位置、大小，相机位置，都不会影响边界，但移动球的位置会影响边界
-    - TODO: 将 s = 1 作为限制条件，看是否出现 "边界"。s = 1 的情况相当于 PT 了，
+    - 将 s = 1 作为限制条件，看是否出现 "边界"。s = 1 的情况相当于 PT 了，
         如果继续出现边界说明 randomWalk 有问题了。
     - 已解决：cameraSubPath 起始点 PathVertex 是 Camera 类型，但在创建 camera path vertex 时没有给 PathVertex
         的 point 属性赋值。
@@ -63,6 +66,8 @@
 
 ## 未解决的问题
 
+- ShapeSampler 和 Shape 的功能应该合并，不然现在只能让 class Wall 成为 AreaLight。 
+
 - BDPT 中的点光源，在采样发射光线时没有考虑 distance，那为什么地板下面出现的颜色会暗淡，靠近地板的颜色会很亮呢？
     
 - randomInt 会出现随机到 randomValue = 1.0 的地方，得出的 int 值会让调用者越界
@@ -76,9 +81,6 @@
 - class Light 应该允许 Intersection 操作，这样修改的话需要仔细考虑 class Light 的设计 
 
 - 去掉 Interaction 里面的 frontFace
-
-- bunny 金属材质下非常不平滑，但是按道理讲，Normal 是进行插值过了的
-    > DEBUG：设置成 Lambertian 表面做插值
 
 - bunny 透明材质出现黑块，且整体偏暗；光源面积缩小一倍，提高光源亮度，整个场景变成暗色，出现大量白色燥点；
     参考 [知乎-文刀秋二](https://www.zhihu.com/question/48961286/answer/113580178)

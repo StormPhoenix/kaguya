@@ -21,7 +21,7 @@ namespace kaguya {
 
             double getSpectrum(int row, int col, int channel) const;
 
-            void writeImage() const;
+            void writeImage(char const *filename) const;
 
             ~FilmPlane();
 

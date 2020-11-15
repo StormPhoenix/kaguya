@@ -762,9 +762,6 @@ namespace kaguya {
                                                                         -0.5 * MODEL_SCALE, false,
                                                                         lambertFront);
 
-//            std::shared_ptr<Shape> glassSphere = std::make_shared<Sphere>(
-//                    Vector3(0. * MODEL_SCALE, -0.075 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE, glass);
-
             std::shared_ptr<Shape> glassSphere = std::make_shared<Sphere>(
                     Vector3(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE, glass);
 
@@ -783,8 +780,8 @@ namespace kaguya {
             objects.push_back(bottomWall);
             objects.push_back(topWall);
             objects.push_back(frontWall);
-//            objects.push_back(glassSphere);
-//            objects.push_back(metalSphere);
+            objects.push_back(glassSphere);
+            objects.push_back(metalSphere);
 
             // 给所有 object 赋予 id
             for (long long id = 0; id < objects.size(); id++) {
@@ -855,11 +852,11 @@ namespace kaguya {
             std::shared_ptr<Texture> pink = std::make_shared<ConstantTexture>(pinkSpectrum);
 
             // light spectrum
-            Spectrum areaLightSpectrum = Spectrum(0.0);
+            Spectrum lightSpectrum = Spectrum(0.0);
             double areaLightIntensity = 15;
-            areaLightSpectrum.r(double(249.0) / 255.0 * areaLightIntensity);
-            areaLightSpectrum.g(double(222.0) / 255.0 * areaLightIntensity);
-            areaLightSpectrum.b(double(180.0) / 255.0 * areaLightIntensity);
+            lightSpectrum.r(double(249.0) / 255.0 * areaLightIntensity);
+            lightSpectrum.g(double(222.0) / 255.0 * areaLightIntensity);
+            lightSpectrum.b(double(180.0) / 255.0 * areaLightIntensity);
 
             Spectrum pointLightSpectrum = Spectrum(0.0);
             double pointLightIntensity = 62500;
@@ -901,7 +898,7 @@ namespace kaguya {
 
             // build point light
             std::shared_ptr<PointLight> light = PointLight::buildPointLight(
-                    Vector3(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), areaLightSpectrum);
+                    Vector3(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), lightSpectrum);
             _light = light;
 
             // objects
