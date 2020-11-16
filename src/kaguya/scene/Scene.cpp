@@ -261,8 +261,8 @@ namespace kaguya {
 
 
             // light
-            std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(0.4 * MODEL_SCALE, 0.4 * MODEL_SCALE,
-                                                                               -0.4 * MODEL_SCALE, 0.4 * MODEL_SCALE,
+            std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(-0.2 * MODEL_SCALE, 0.2 * MODEL_SCALE,
+                                                                               -0.2 * MODEL_SCALE, 0.2 * MODEL_SCALE,
                                                                                0.46 * MODEL_SCALE, false,
                                                                                lambertTop);
 

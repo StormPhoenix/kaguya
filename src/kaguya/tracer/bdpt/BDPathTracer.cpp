@@ -293,7 +293,7 @@ namespace kaguya {
         double BDPathTracer::misWeight(PathVertex *cameraSubPath, int t,
                                        PathVertex *lightSubPath, int s,
                                        PathVertex &extraVertex) {
-            if (s + t == 1) {
+            if (s + t == 2) {
                 // t = 1 s = 1
                 return 1;
             }

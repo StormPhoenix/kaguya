@@ -21,11 +21,12 @@ namespace kaguya {
                     assert(si.getBSDF() != nullptr);
                     return si.getBSDF()->f(-si.getDirection(), worldWi);
                 case CAMERA:
-                case LIGHT:
                 case VOLUME:
-                default:
                     // TODO Not supported for now
                     assert(1 == 0);
+                    break;
+                case LIGHT:
+                default:
                     return Spectrum(0.0);
             }
         }

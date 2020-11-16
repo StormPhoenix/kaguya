@@ -144,8 +144,8 @@ namespace kaguya {
                                        INVERSE((*_transformMatrix)) * Vector4(si.getPoint(), 1.0f)
                                                                    : si.getPoint();
             if (transformedPoint.z - 0 <= EPSILON &&
-                transformedPoint.x > -_width / 2 && transformedPoint.x < _width / 2 &&
-                transformedPoint.y > -_height / 2 && transformedPoint.y < _height / 2) {
+                transformedPoint.x >= -_width / 2 && transformedPoint.x <= _width / 2 &&
+                transformedPoint.y >= -_height / 2 && transformedPoint.y <= _height / 2) {
                 return 1.0 / area();
             } else {
                 return 0;
@@ -216,8 +216,8 @@ namespace kaguya {
         double ZXWall::surfacePointPdf(SurfaceInteraction &si) {
             Vector3 samplePoint = si.getPoint();
             if (samplePoint.y - _y < EPSILON &&
-                samplePoint.x > _x0 && samplePoint.x < _x1 &&
-                samplePoint.z > _z0 && samplePoint.z < _z1) {
+                samplePoint.x >= _x0 && samplePoint.x <= _x1 &&
+                samplePoint.z >= _z0 && samplePoint.z <= _z1) {
                 return 1.0 / area();
             } else {
                 return 0;
@@ -296,8 +296,8 @@ namespace kaguya {
         double YZWall::surfacePointPdf(SurfaceInteraction &point) {
             Vector3 samplePoint = point.getPoint();
             if (samplePoint.y - _x < EPSILON &&
-                samplePoint.x > _y0 && samplePoint.x < _y1 &&
-                samplePoint.z > _z0 && samplePoint.z < _z1) {
+                samplePoint.x >= _y0 && samplePoint.x <= _y1 &&
+                samplePoint.z >= _z0 && samplePoint.z <= _z1) {
                 return 1.0 / area();
             } else {
                 return 0;
@@ -372,8 +372,8 @@ namespace kaguya {
         double XYWall::surfacePointPdf(SurfaceInteraction &si) {
             Vector3 samplePoint = si.getPoint();
             if (samplePoint.x - _z < EPSILON &&
-                samplePoint.y > _y0 && samplePoint.x < _y1 &&
-                samplePoint.x > _x0 && samplePoint.z < _x1) {
+                samplePoint.y >= _y0 && samplePoint.x <= _y1 &&
+                samplePoint.x >= _x0 && samplePoint.z <= _x1) {
                 return 1.0 / area();
             } else {
                 return 0;
