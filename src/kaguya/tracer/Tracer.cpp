@@ -5,28 +5,39 @@
 #include <kaguya/Config.h>
 #include <kaguya/tracer/Tracer.h>
 
+#include <iostream>
+
 namespace kaguya {
     namespace tracer {
 
         using kaguya::Config;
 
-        Tracer::Tracer() {
-            _scene = Config::buildScene();
-            _camera = _scene->getCamera();
-        }
+        Tracer::Tracer() {}
 
         void Tracer::run() {
-            assert(_camera != nullptr);
-            _filmPlane = _camera->buildFilmPlane(SPECTRUM_CHANNEL);
+            _scene = Config::nextScene();
 
-            // rendering
-            if (render()) {
-                // write to image
-                _filmPlane->writeImage(Config::imageFilename.c_str());
+            while (_scene != nullptr) {
+                _camera = _scene->getCamera();
+
+                assert(_camera != nullptr);
+                _filmPlane = _camera->buildFilmPlane(SPECTRUM_CHANNEL);
+
+                // rendering
+                if (render()) {
+                    // write to image
+                    std::cout << std::endl << "scene " << _scene->getName() << " completed." << std::endl;
+                    _filmPlane->writeImage((Config::filenamePrefix + "_" +
+                                            _scene->getName() + "_" +
+                                            Config::filenameSufix).c_str());
+                }
+
+                delete _filmPlane;
+                _filmPlane = nullptr;
+
+                _camera = nullptr;
+                _scene = Config::nextScene();
             }
-
-            delete _filmPlane;
-            _filmPlane = nullptr;
         }
     }
 }

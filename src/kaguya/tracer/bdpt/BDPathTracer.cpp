@@ -271,8 +271,8 @@ namespace kaguya {
 
                     // 计算向后 pdfWo
                     // TODO 临时调换下 wo 和 wi 的位置
-//                    pdfWo = bsdf->samplePdf(worldWo, worldWi);
-                    pdfWo = bsdf->samplePdf(worldWi, worldWo);
+                    pdfWo = bsdf->samplePdf(worldWo, worldWi);
+//                    pdfWo = bsdf->samplePdf(worldWi, worldWo);
 
                     // 如果 bsdf 反射含有 delta 成分，则前后 pdf 都赋值为 0
                     if (sampleType & BXDFType::BSDF_SPECULAR) {

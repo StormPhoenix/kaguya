@@ -25,8 +25,6 @@ namespace kaguya {
 
         private:
             std::shared_ptr<Texture> _albedo = nullptr;
-
-            std::shared_ptr<ScatterSampler> _pdf = nullptr;
         };
 
     }

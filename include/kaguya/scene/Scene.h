@@ -31,29 +31,34 @@ namespace kaguya {
         class Scene {
         public:
             /**
+             * 场景测试数据
+             */
+            static std::shared_ptr<Scene> sceneTest();
+
+            /**
              * 构建 Cornel box，加载 bunny 模型
              */
-            void sceneBunnyWithAreaLight();
+            static std::shared_ptr<Scene> sceneBunnyWithAreaLight();
 
             /**
              * 构建 bunny，采用点光源
              */
-            void sceneBunnyWithPointLight();
+            static std::shared_ptr<Scene> sceneBunnyWithPointLight();
 
             /**
              * 构建 two spheres，用区域光源
              */
-            void sceneTwoSpheresWithAreaLight();
+            static std::shared_ptr<Scene> sceneTwoSpheresWithAreaLight();
 
             /**
              * 测试 PointLight
              */
-            void sceneTwoSpheresWithPointLight();
+            static std::shared_ptr<Scene> sceneTwoSpheresWithPointLight();
 
             /**
              * 测试 SpotLight
              */
-            void sceneTwoSpheresWithSpotLight();
+            static std::shared_ptr<Scene> sceneTwoSpheresWithSpotLight();
 
             bool hit(const Ray &ray, SurfaceInteraction &hitRecord);
 
@@ -69,12 +74,18 @@ namespace kaguya {
                 return _light;
             }
 
+            const std::string getName() const {
+                return _sceneName;
+            }
+
             // TODO 增加多个光源选项
 //            const std::vector<std::shared_ptr<DiffuseLight>> &getLights() {
 //                return _lights;
 //            }
 
         protected:
+            // scene name
+            std::string _sceneName;
             // scene objects
             std::shared_ptr<Shape> _world = nullptr;
             // camera

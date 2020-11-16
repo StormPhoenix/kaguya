@@ -67,6 +67,8 @@ namespace kaguya {
                     return vi;
                 case CAMERA:
                     return ei;
+                case LIGHT:
+                    return ei;
                 default:
                     assert(1 == 0);
                     // TODO not support for now

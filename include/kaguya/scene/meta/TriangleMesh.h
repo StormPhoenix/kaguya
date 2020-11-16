@@ -26,6 +26,8 @@ namespace kaguya {
 
             virtual void setId(long long id) override;
 
+            virtual ~TriangleMesh() {}
+
         protected:
             void buildMeshes();
 

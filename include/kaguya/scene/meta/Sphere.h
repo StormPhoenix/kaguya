@@ -33,6 +33,8 @@ namespace kaguya {
 
             const AABB &boundingBox() const override;
 
+            virtual ~Sphere() {}
+
         private:
             /**
              * 计算击中点的法向量

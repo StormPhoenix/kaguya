@@ -26,7 +26,64 @@ namespace kaguya {
         using namespace kaguya::scene::acc;
         using namespace kaguya::core;
 
-        void Scene::sceneBunnyWithPointLight() {
+        std::shared_ptr<Scene> Scene::sceneTest() {
+            const int MODEL_SCALE = 5;
+            // For testing
+
+            // light spectrum
+            Spectrum lightSpectrum = Spectrum(0.0);
+            double lightIntensity = 12;
+            lightSpectrum.r(double(249.0) / 255.0 * lightIntensity);
+            lightSpectrum.g(double(222.0) / 255.0 * lightIntensity);
+            lightSpectrum.b(double(180.0) / 255.0 * lightIntensity);
+
+            std::shared_ptr<Material> metal = std::make_shared<Metal>();
+
+            // load model
+            std::vector<Vertex> bunnyVertexes = kaguya::utils::ObjLoader::loadModel("./resource/objects/bunny.obj");
+
+            std::shared_ptr<Matrix4> transformMatrix = std::make_shared<Matrix4>(1.0f);
+            double scale = 0.4 * MODEL_SCALE;
+            *transformMatrix = TRANSLATE(*transformMatrix, Vector3(0, -scale / 1.5, 0));
+            *transformMatrix = SCALE(*transformMatrix, Vector3(scale, scale, scale));
+            std::shared_ptr<Shape> bunny = std::static_pointer_cast<Shape>(
+                    std::make_shared<TriangleMesh>(bunnyVertexes, metal, transformMatrix));
+
+            // build scene object
+            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+
+            // build point light
+            std::shared_ptr<PointLight> light = PointLight::buildPointLight(
+                    Vector3(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), lightSpectrum);
+            scene->_light = light;
+
+            // objects
+            std::vector<std::shared_ptr<Shape>> objects;
+            objects.push_back(bunny);
+
+            // 给所有 object 赋予 id
+            for (long long id = 0; id < objects.size(); id++) {
+                objects[id]->setId(id);
+            }
+
+            // scene
+            std::shared_ptr<Shape> bvh = std::make_shared<BVH>(objects);
+            scene->_world = bvh;
+
+            // build camera
+            auto eye = Vector3(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
+            auto dir = Vector3(0.0f, 0.0f, -1.0f);
+            std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir);
+            camera->setResolutionWidth(Config::resolutionWidth);
+            camera->setResolutionHeight(Config::resolutionHeight);
+            scene->_camera = camera;
+
+            scene->_sceneName = "bunny-with-point-light";
+
+            return scene;
+        }
+
+        std::shared_ptr<Scene> Scene::sceneBunnyWithPointLight() {
             const int MODEL_SCALE = 5;
             // For testing
             // albedos
@@ -126,10 +183,13 @@ namespace kaguya {
                     std::make_shared<TriangleMesh>(bunnyVertexes, glass, transformMatrix));
 //                    std::make_shared<TriangleMesh>(bunnyVertexes, metal, transformMatrix));
 
+            // build scene object
+            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+
             // build point light
             std::shared_ptr<PointLight> light = PointLight::buildPointLight(
                     Vector3(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), lightSpectrum);
-            _light = light;
+            scene->_light = light;
 
             // objects
             std::vector<std::shared_ptr<Shape>> objects;
@@ -147,7 +207,7 @@ namespace kaguya {
 
             // scene
             std::shared_ptr<Shape> bvh = std::make_shared<BVH>(objects);
-            _world = bvh;
+            scene->_world = bvh;
 
             // build camera
             auto eye = Vector3(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
@@ -155,10 +215,14 @@ namespace kaguya {
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir);
             camera->setResolutionWidth(Config::resolutionWidth);
             camera->setResolutionHeight(Config::resolutionHeight);
-            _camera = camera;
+            scene->_camera = camera;
+
+            scene->_sceneName = "bunny-with-point-light";
+
+            return scene;
         }
 
-        void Scene::sceneBunnyWithAreaLight() {
+        std::shared_ptr<Scene> Scene::sceneBunnyWithAreaLight() {
             const int MODEL_SCALE = 5;
             // For testing
             // albedos
@@ -265,10 +329,12 @@ namespace kaguya {
                                                                                -0.2 * MODEL_SCALE, 0.2 * MODEL_SCALE,
                                                                                0.46 * MODEL_SCALE, false,
                                                                                lambertTop);
+            // build scene object
+            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 
             // build area light
             std::shared_ptr<AreaLight> light = DiffuseAreaLight::buildDiffuseAreaLight(lightSpectrum, lightWall, true);
-            _light = light;
+            scene->_light = light;
 
             // objects
             std::vector<std::shared_ptr<Shape>> objects;
@@ -287,7 +353,7 @@ namespace kaguya {
 
             // scene
             std::shared_ptr<Shape> bvh = std::make_shared<BVH>(objects);
-            _world = bvh;
+            scene->_world = bvh;
 
             // build camera
             auto eye = Vector3(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
@@ -295,10 +361,13 @@ namespace kaguya {
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir);
             camera->setResolutionWidth(Config::resolutionWidth);
             camera->setResolutionHeight(Config::resolutionHeight);
-            _camera = camera;
+            scene->_camera = camera;
+            scene->_sceneName = "bunny-with-area-light";
+
+            return scene;
         }
 
-        void Scene::sceneTwoSpheresWithAreaLight() {
+        std::shared_ptr<Scene> Scene::sceneTwoSpheresWithAreaLight() {
             const int MODEL_SCALE = 5;
             // For testing
             // albedos
@@ -393,14 +462,18 @@ namespace kaguya {
                     Vector3(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE, metal);
 
             // light
-            std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(0.4 * MODEL_SCALE, 0.4 * MODEL_SCALE,
-                                                                               -0.4 * MODEL_SCALE, 0.4 * MODEL_SCALE,
+            std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(-0.2 * MODEL_SCALE, 0.2 * MODEL_SCALE,
+                                                                               -0.2 * MODEL_SCALE, 0.2 * MODEL_SCALE,
                                                                                0.46 * MODEL_SCALE, false,
                                                                                lambertTop);
 
+            // build scene object
+            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+
             // build area light
-            std::shared_ptr<AreaLight> light = DiffuseAreaLight::buildDiffuseAreaLight(areaLightSpectrum, lightWall, true);
-            _light = light;
+            std::shared_ptr<AreaLight> light = DiffuseAreaLight::buildDiffuseAreaLight(areaLightSpectrum, lightWall,
+                                                                                       true);
+            scene->_light = light;
 
             // objects
             std::vector<std::shared_ptr<Shape>> objects;
@@ -420,7 +493,7 @@ namespace kaguya {
 
             // scene
             std::shared_ptr<Shape> bvh = std::make_shared<BVH>(objects);
-            _world = bvh;
+            scene->_world = bvh;
 
             // build camera
             auto eye = Vector3(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
@@ -428,10 +501,13 @@ namespace kaguya {
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir);
             camera->setResolutionWidth(Config::resolutionWidth);
             camera->setResolutionHeight(Config::resolutionHeight);
-            _camera = camera;
+            scene->_camera = camera;
+            scene->_sceneName = "two-spheres-with-area-light";
+
+            return scene;
         }
 
-        void Scene::sceneTwoSpheresWithSpotLight() {
+        std::shared_ptr<Scene> Scene::sceneTwoSpheresWithSpotLight() {
             const int MODEL_SCALE = 5;
             // For testing
             // albedos
@@ -525,12 +601,15 @@ namespace kaguya {
             std::shared_ptr<Shape> metalSphere = std::make_shared<Sphere>(
                     Vector3(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE, metal);
 
+            // build scene object
+            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+
             // build point light
             std::shared_ptr<SpotLight> light = SpotLight::buildSpotLight(
                     Vector3(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), Vector3(0.0, -1, 0.0),
                     spotLightSpectrum);
 
-            _light = light;
+            scene->_light = light;
 
             // objects
             std::vector<std::shared_ptr<Shape>> objects;
@@ -549,7 +628,7 @@ namespace kaguya {
 
             // scene
             std::shared_ptr<Shape> bvh = std::make_shared<BVH>(objects);
-            _world = bvh;
+            scene->_world = bvh;
 
             // build camera
             auto eye = Vector3(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
@@ -557,10 +636,13 @@ namespace kaguya {
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir);
             camera->setResolutionWidth(Config::resolutionWidth);
             camera->setResolutionHeight(Config::resolutionHeight);
-            _camera = camera;
+            scene->_camera = camera;
+            scene->_sceneName = "two-spheres-with-spot-light";
+
+            return scene;
         }
 
-        void Scene::sceneTwoSpheresWithPointLight() {
+        std::shared_ptr<Scene> Scene::sceneTwoSpheresWithPointLight() {
             const int MODEL_SCALE = 5;
             // For testing
             // albedos
@@ -617,12 +699,6 @@ namespace kaguya {
             lightSpectrum.g(double(222.0) / 255.0 * lightIntensity);
             lightSpectrum.b(double(180.0) / 255.0 * lightIntensity);
 
-            Spectrum pointLightSpectrum = Spectrum(0.0);
-            double pointLightIntensity = 62500;
-            pointLightSpectrum.r(double(249.0) / 255.0 * pointLightIntensity);
-            pointLightSpectrum.g(double(222.0) / 255.0 * pointLightIntensity);
-            pointLightSpectrum.b(double(180.0) / 255.0 * pointLightIntensity);
-
             // lambertian materials
             std::shared_ptr<Material> lambertLeft = std::make_shared<Lambertian>(red);
             std::shared_ptr<Material> lambertRight = std::make_shared<Lambertian>(green);
@@ -660,10 +736,13 @@ namespace kaguya {
             std::shared_ptr<Shape> metalSphere = std::make_shared<Sphere>(
                     Vector3(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE, metal);
 
+            // build scene object
+            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+
             // build point light
             std::shared_ptr<PointLight> light = PointLight::buildPointLight(
                     Vector3(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), lightSpectrum);
-            _light = light;
+            scene->_light = light;
             // objects
             std::vector<std::shared_ptr<Shape>> objects;
             objects.push_back(leftWall);
@@ -681,7 +760,7 @@ namespace kaguya {
 
             // scene
             std::shared_ptr<Shape> bvh = std::make_shared<BVH>(objects);
-            _world = bvh;
+            scene->_world = bvh;
 
             // build camera
             auto eye = Vector3(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
@@ -689,7 +768,10 @@ namespace kaguya {
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir);
             camera->setResolutionWidth(Config::resolutionWidth);
             camera->setResolutionHeight(Config::resolutionHeight);
-            _camera = camera;
+            scene->_camera = camera;
+            scene->_sceneName = "two-spheres-with-point-light";
+
+            return scene;
         }
 
         bool Scene::hit(const Ray &ray, SurfaceInteraction &hitRecord) {

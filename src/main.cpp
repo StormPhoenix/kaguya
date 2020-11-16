@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
     string render = "bdpt";
 
     auto cli = (
-            value("output name", Config::imageFilename),
+            value("output name", Config::filenamePrefix),
                     option("-rt", "--render-type") & value("render type", render),
                     option("-ssp", "--sample-per-pixel") & value("sample per pixel", Config::samplePerPixel),
                     option("-d", "--max-depth") & value("max scatter depth", Config::maxScatterDepth),
@@ -35,13 +35,13 @@ int main(int argc, char *argv[]) {
 
     if (parse(argc, argv, cli)) {
         char filenameTemplate[80];
-        sprintf(filenameTemplate, "%s_ssp=%d_max-depth=%d_%dx%d.png",
-                Config::imageFilename.c_str(),
+        sprintf(filenameTemplate, "ssp=%d_max-depth=%d_render-type=%s_%dx%d.png",
                 Config::samplePerPixel,
                 Config::maxScatterDepth,
+                render.c_str(),
                 Config::resolutionWidth,
                 Config::resolutionHeight);
-        Config::imageFilename = string(filenameTemplate);
+        Config::filenameSufix = string(filenameTemplate);
     } else {
         cout << make_man_page(cli, argv[0]);
         return 0;

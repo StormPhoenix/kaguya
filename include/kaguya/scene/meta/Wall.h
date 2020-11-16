@@ -31,6 +31,8 @@ namespace kaguya {
 
             virtual double surfacePointPdf(SurfaceInteraction &si) override;
 
+            virtual ~Wall() {}
+
         protected:
             /**
              * build bounding box

@@ -16,9 +16,7 @@ namespace kaguya {
         using kaguya::core::BSDF;
         using kaguya::core::BXDFLambertianReflection;
 
-        Lambertian::Lambertian(std::shared_ptr<Texture> albedo) : _albedo(albedo) {
-            _pdf = std::make_shared<HemiCosineSampler>();
-        }
+        Lambertian::Lambertian(std::shared_ptr<Texture> albedo) : _albedo(albedo) {}
 
         BSDF *Lambertian::bsdf(SurfaceInteraction &insect, MemoryArena &memoryArena, TransportMode mode) {
             Spectrum albedo = _albedo->sample(insect.getU(), insect.getV());

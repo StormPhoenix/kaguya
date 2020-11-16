@@ -33,6 +33,8 @@ namespace kaguya {
 
             const AABB &boundingBox() const;
 
+            virtual ~Triangle() {}
+
         private:
             /**
              * 初始化内部数据

@@ -5,7 +5,13 @@
 #include <kaguya/Config.h>
 
 namespace kaguya {
-    std::string Config::imageFilename = "render";
+    // 初始化场景
+    int Config::sceneId = 0;
+    bool Config::isScenePrepared = false;
+    std::vector<std::function<std::shared_ptr<Scene>()>> Config::scenes;
+
+    std::string Config::filenamePrefix = "render";
+    std::string Config::filenameSufix = "";
 
     int Config::russianRouletteDepth = 3;
     double Config::russianRoulette = 0.135;
