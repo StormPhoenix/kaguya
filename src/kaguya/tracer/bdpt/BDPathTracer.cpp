@@ -29,28 +29,28 @@ namespace kaguya {
                 double sampleWeight = 1.0 / _samplePerPixel;
                 // 已完成扫描的行数
                 int finishedLine = 0;
-#pragma omp parallel for num_threads(12)
+
                 // 遍历相机成像图案上每个像素
+#pragma omp parallel for num_threads(4)
                 for (int row = cameraHeight - 1; row >= 0; row--) {
-                    MemoryArena arena;
                     for (int col = 0; col < cameraWidth; col++) {
-                        MemoryArena arena;
                         Spectrum ans = {0};
 
                         // 做 _samplePerPixel 次采样
                         for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
+                            MemoryArena arena;
                             auto u = (col + uniformSample()) / double(cameraWidth);
                             auto v = (row + uniformSample()) / double(cameraHeight);
 
                             Ray sampleRay = _camera->sendRay(u, v);
-                            ans += shader(sampleRay, *(_scene.get()), _maxDepth, arena);
-                            // TODO 区分
+                            Spectrum shaderColor = shader(sampleRay, *(_scene.get()), _maxDepth, arena);
+#pragma omp critical (addShaderColor)
+                            ans += shaderColor;
                             arena.clean();
                         }
                         ans *= sampleWeight;
                         _filmPlane->addSpectrum(ans, row, col);
                     }
-#pragma omp critical
                     finishedLine++;
                     std::cout << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "
                               << std::flush;

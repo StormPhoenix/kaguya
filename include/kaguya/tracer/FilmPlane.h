@@ -8,6 +8,8 @@
 #include <kaguya/core/Core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
+#include <mutex>
+
 namespace kaguya {
     namespace tracer {
 
@@ -30,6 +32,7 @@ namespace kaguya {
             int _resolutionHeight = 0;
             int _channel = 0;
             double *_bitmap = nullptr;
+            std::mutex writeLock;
         };
 
     }

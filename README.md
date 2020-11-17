@@ -65,6 +65,13 @@
 - Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法
 
 ## 未解决的问题
+- front 墙壁渲染结果会有一圈曲线
+    - 去掉 openMP，结果正常
+    - 加上 openMP，对访问数据上锁，不正常
+    - 加上 openMP，FilmPlane 的写入函数添加 lock，结果不正常
+    - 调整 openMP 运行线程数，线程数目小，结果会相对正常
+    - TODO: 编写多线程并行，不使用 OpenMP
+
 - 玻璃球黑的不正常
 
 - ShapeSampler 和 Shape 的功能应该合并，不然现在只能让 class Wall 成为 AreaLight。 

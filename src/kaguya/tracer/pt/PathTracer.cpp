@@ -249,7 +249,9 @@ namespace kaguya {
                 double sampleWeight = 1.0 / _samplePerPixel;
                 // 已完成扫描的行数
                 int finishedLine = 0;
-#pragma omp parallel for num_threads(12)
+
+                int kernelCount = omp_get_num_procs();
+#pragma omp parallel for num_threads(kernelCount)
                 // 遍历相机成像图案上每个像素
                 for (int row = cameraHeight - 1; row >= 0; row--) {
                     MemoryArena arena;
