@@ -18,7 +18,8 @@ namespace kaguya {
             return Spectrum(0.0f);
         }
 
-        Spectrum BXDFSpecularReflection::sampleF(const Vector3 &wo, Vector3 *wi, double *pdf) {
+        Spectrum
+        BXDFSpecularReflection::sampleF(const Vector3 &wo, Vector3 *wi, double *pdf, random::Sampler1D *sampler1D) {
             assert(_fresnel != nullptr);
             *wi = Vector3(-wo.x, wo.y, -wo.z);
             *pdf = 1;

@@ -54,7 +54,8 @@ namespace kaguya {
              * @param memoryArena
              * @return
              */
-            Spectrum shader(const Ray &ray, Scene &scene, int maxDepth, MemoryArena &memoryArena);
+            Spectrum shader(const Ray &ray, Scene &scene, int maxDepth,
+                            random::Sampler1D *sampler1D, MemoryArena &memoryArena);
 
             Spectrum shaderOfMyImplemention();
 
@@ -67,7 +68,7 @@ namespace kaguya {
              */
             int generateCameraPath(std::shared_ptr<Scene> scene, const Ray &ray, std::shared_ptr<Camera>,
                                    PathVertex *cameraSubPath, int maxDepth,
-                                   MemoryArena &memoryArena);
+                                   random::Sampler1D *sampler1D, MemoryArena &memoryArena);
 
             /**
              * 生成光照路径
@@ -79,6 +80,7 @@ namespace kaguya {
              */
             int generateLightPath(std::shared_ptr<Scene> scene,
                                   PathVertex *lightSubPath, int maxDepth,
+                                  random::Sampler1D *sampler1D,
                                   MemoryArena &memoryArena);
 
             /**
@@ -94,7 +96,8 @@ namespace kaguya {
              * @return
              */
             int randomWalk(std::shared_ptr<Scene> scene, const Ray &ray, PathVertex *path, int maxDepth,
-                           double pdf, MemoryArena &memoryArena, Spectrum &beta, TransportMode mode);
+                           double pdf, random::Sampler1D *sampler1D, MemoryArena &memoryArena, Spectrum &beta,
+                           TransportMode mode);
 
             /**
              * 连接 Camera 和 Light 两条路径，并返回合成路径的 Radiance
@@ -109,7 +112,8 @@ namespace kaguya {
              * @return
              */
             Spectrum connectPath(Scene &scene, PathVertex *cameraSubPath, int cameraPathLength, int t,
-                                 PathVertex *lightSubPath, int lightPathLength, int s, Point2d *samplePosition);
+                                 PathVertex *lightSubPath, int lightPathLength, int s, Point2d *samplePosition,
+                                 random::Sampler1D *sampler1D);
 
             /**
              * 计算 connect 路径的 pdf

@@ -99,6 +99,7 @@ file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/light/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/material/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/math/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/parallel/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/accumulation/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/meta/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/*.cpp

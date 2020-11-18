@@ -12,6 +12,7 @@ namespace kaguya {
 
         Spectrum PointLight::sampleFromLight(const Interaction &eye,
                                              Vector3 *wi, double *pdf,
+                                             random::Sampler1D *sampler1D,
                                              VisibilityTester *visibilityTester) {
             (*wi) = NORMALIZE(_center - eye.getPoint());
             (*pdf) = 1;
@@ -30,9 +31,10 @@ namespace kaguya {
             return 0.0;
         }
 
-        Spectrum PointLight::randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir) {
+        Spectrum PointLight::randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir,
+                                            random::Sampler1D *sampler1D) {
             // 采样射线
-            Vector3 rayDir = sphereUniformSampling();
+            Vector3 rayDir = sphereUniformSampling(sampler1D);
             ray->setOrigin(_center);
             ray->setDirection(rayDir);
 

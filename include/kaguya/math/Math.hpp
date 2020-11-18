@@ -13,6 +13,7 @@
 
 #include <functional>
 #include <random>
+#include "Sampler.hpp"
 
 // TODO 相关函数分离定义到 core 里面
 
@@ -42,6 +43,8 @@ const double REFRACTION_INDEX_WATER = 1.0f;
 #define NORMALIZE(x) glm::normalize(x)
 #define LENGTH(x) glm::length(x)
 #define CROSS(x, y) glm::cross(x, y)
+
+using namespace kaguya;
 
 inline double degreesToRadians(double degrees) {
     return degrees * PI / 180;
@@ -73,20 +76,12 @@ inline double schlick(double cosine, double ref_idx) {
     return r0 + (1 - r0) * pow((1 - cosine), 5);
 }
 
-inline double uniformSample() {
-    static std::uniform_real_distribution<double> distribution(0.0, 1.0);
-    static std::mt19937 generator;
-    static std::function<double()> rand_generator =
-            std::bind(distribution, generator);
-    return rand_generator();
+inline double randomDouble(double min, double max, random::Sampler1D *sampler1D) {
+    return min + (max - min) * sampler1D->sample();
 }
 
-inline double randomDouble(double min, double max) {
-    return min + (max - min) * uniformSample();
-}
-
-inline int randomInt(int min, int max) {
-    return static_cast<int>(randomDouble(min, max + 1));
+inline int randomInt(int min, int max, random::Sampler1D *sampler1D) {
+    return static_cast<int>(randomDouble(min, max + 1, sampler1D));
 }
 
 inline Vector3 reflect(const Vector3 &v, const Vector3 &normal) {
@@ -126,11 +121,11 @@ inline double misWeight(int nSampleF, double pdfF, int nSampleG, double pdfG) {
  * 从 y > 0 的半球面，按照 cos(theta) / Pi 的概率采样射线
  * @return
  */
-inline Vector3 hemiCosineSampling() {
+inline Vector3 hemiCosineSampling(random::Sampler1D *sampler1D) {
     // fi = 2 * Pi * sampleU
-    double sampleU = uniformSample();
+    double sampleU = sampler1D->sample();
     // sampleV = sin^2(theta)
-    double sampleV = uniformSample();
+    double sampleV = sampler1D->sample();
     // x = sin(theta) * cos(fi)
     double x = sqrt(sampleV) * cos(2 * PI * sampleU);
     // y = cos(theta)
@@ -145,11 +140,11 @@ inline Vector3 hemiCosineSampling() {
  * 在球面做均匀采样，默认 (0, 1, 0) 为法线方向
  * @return
  */
-inline Vector3 sphereUniformSampling() {
+inline Vector3 sphereUniformSampling(random::Sampler1D *sampler1D) {
     // phi = 2 * Pi * sampleU
-    double sampleU = uniformSample();
+    double sampleU = sampler1D->sample();
     // 2 * sampleV = 1 - cos(theta)
-    double sampleV = uniformSample();
+    double sampleV = sampler1D->sample();
 
     // y = 1 - 2 * sampleV
     double y = 1 - 2 * sampleV;
@@ -158,7 +153,9 @@ inline Vector3 sphereUniformSampling() {
     // z = sin(theta) * sin(phi)
     double z = std::sqrt(std::max(0.0, (1 - y * y))) * std::sin(2 * PI * sampleU);
 
-    return NORMALIZE(Vector3(x, y, z));
+    // TODO temp
+//    return NORMALIZE(Vector3(x, y, z));
+    return NORMALIZE(Vector3(z, x, y));
 }
 
 /**
@@ -202,11 +199,11 @@ inline void tangentSpace(Vector3 &tanY, Vector3 *tanX, Vector3 *tanZ) {
  * @param cosThetaMax
  * @return
  */
-inline Vector3 coneUniformSampling(double cosThetaMax) {
+inline Vector3 coneUniformSampling(double cosThetaMax, random::Sampler1D *sampler1D) {
     // phi = 2 * PI * sampleU
-    double sampleU = uniformSample();
+    double sampleU = sampler1D->sample();
     // sampleV = (1 - cos(theta)) / (1 - cos(thetaMax))
-    double sampleV = uniformSample();
+    double sampleV = sampler1D->sample();
 
     // 计算 cos(theta) sin(theta)
     double cosTheta = 1.0 - sampleV + sampleV * cosThetaMax;
@@ -229,11 +226,11 @@ inline Vector3 coneUniformSampling(double cosThetaMax) {
  * 对圆盘做均匀采样
  * @return
  */
-inline Vector2 diskUniformSampling(double radius = 1.) {
+inline Vector2 diskUniformSampling(random::Sampler1D *sampler1D, double radius = 1.) {
     // sampleY = r / Radius
     // sampleX = theta / (2 * PI)
-    double sampleY = uniformSample();
-    double sampleX = uniformSample();
+    double sampleY = sampler1D->sample();
+    double sampleX = sampler1D->sample();
 
     double theta = 2 * PI * sampleX;
     double r = sampleY * radius;

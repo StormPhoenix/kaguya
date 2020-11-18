@@ -643,7 +643,7 @@ namespace kaguya {
         }
 
         std::shared_ptr<Scene> Scene::sceneTwoSpheresWithPointLight() {
-            const int MODEL_SCALE = 5;
+            const int MODEL_SCALE = 6;
             // For testing
             // albedos
             // total white
@@ -725,6 +725,7 @@ namespace kaguya {
                                                                       -0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
                                                                       0.5 * MODEL_SCALE, false,
                                                                       lambertTop);
+
             std::shared_ptr<Shape> frontWall = std::make_shared<XYWall>(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
                                                                         -0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
                                                                         -0.5 * MODEL_SCALE, false,
@@ -741,7 +742,7 @@ namespace kaguya {
 
             // build point light
             std::shared_ptr<PointLight> light = PointLight::buildPointLight(
-                    Vector3(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), lightSpectrum);
+                    Vector3(0.0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), lightSpectrum);
             scene->_light = light;
             // objects
             std::vector<std::shared_ptr<Shape>> objects;

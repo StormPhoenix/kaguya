@@ -58,9 +58,9 @@ namespace kaguya {
                 root = (-halfB + sqrt(discriminant)) / a;
                 if (root >= stepMin && root <= stepMax) {
                     hitRecord.setId(getId());
-                    hitRecord.setStep( root);
+                    hitRecord.setStep(root);
                     hitRecord.setPoint(ray.at(root));
-                    hitRecord.setMaterial( _material.get());
+                    hitRecord.setMaterial(_material.get());
                     hitRecord.setU(0);
                     hitRecord.setV(0);
                     hitRecord.setAreaLight(nullptr);

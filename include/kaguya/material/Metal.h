@@ -9,13 +9,11 @@
 
 #include <kaguya/material/Material.h>
 #include <kaguya/math/Math.hpp>
-#include <kaguya/math/ScatterSampler.h>
 
 namespace kaguya {
     namespace material {
 
         using kaguya::core::Spectrum;
-        using kaguya::math::ScatterSampler;
 
         class Metal : public Material {
         public:

@@ -3,10 +3,11 @@
 //
 
 #include <kaguya/core/bsdf/BXDF.h>
+#include <kaguya/parallel/RenderPool.h>
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
+#include <kaguya/tracer/bdpt/PathVertex.h>
 #include <kaguya/utils/VisibilityTester.h>
 #include <kaguya/utils/ScopeSwapper.hpp>
-#include <kaguya/tracer/bdpt/PathVertex.h>
 
 
 namespace kaguya {
@@ -26,35 +27,28 @@ namespace kaguya {
                 int cameraWidth = _camera->getResolutionWidth();
                 int cameraHeight = _camera->getResolutionHeight();
 
-                double sampleWeight = 1.0 / _samplePerPixel;
-                // 已完成扫描的行数
-                int finishedLine = 0;
+                auto renderFunc = [this](const int row, const int col, random::Sampler1D *sampler1D) -> void {
+                    Spectrum ans = {0};
 
-                // 遍历相机成像图案上每个像素
-#pragma omp parallel for num_threads(4)
-                for (int row = cameraHeight - 1; row >= 0; row--) {
-                    for (int col = 0; col < cameraWidth; col++) {
-                        Spectrum ans = {0};
+                    const double sampleWeight = 1.0 / _samplePerPixel;
+                    // 做 _samplePerPixel 次采样
+                    for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
+                        MemoryArena arena;
+                        auto u = (col + sampler1D->sample()) / double(_camera->getResolutionWidth());
+                        auto v = (row + sampler1D->sample()) / double(_camera->getResolutionHeight());
 
-                        // 做 _samplePerPixel 次采样
-                        for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
-                            MemoryArena arena;
-                            auto u = (col + uniformSample()) / double(cameraWidth);
-                            auto v = (row + uniformSample()) / double(cameraHeight);
+                        Ray sampleRay = _camera->sendRay(u, v);
+                        Spectrum shaderColor = shader(sampleRay, *(_scene.get()), _maxDepth, sampler1D, arena);
 
-                            Ray sampleRay = _camera->sendRay(u, v);
-                            Spectrum shaderColor = shader(sampleRay, *(_scene.get()), _maxDepth, arena);
-#pragma omp critical (addShaderColor)
-                            ans += shaderColor;
-                            arena.clean();
-                        }
+                        ans += shaderColor;
+                        arena.clean();
                         ans *= sampleWeight;
                         _filmPlane->addSpectrum(ans, row, col);
                     }
-                    finishedLine++;
-                    std::cout << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "
-                              << std::flush;
-                }
+                };
+                parallel::RenderPool *pool = parallel::RenderPool::getInstance(8);
+                pool->addRenderTask(renderFunc, cameraWidth, cameraHeight);
+
                 return true;
             } else {
                 return false;
@@ -72,7 +66,7 @@ namespace kaguya {
         Spectrum BDPathTracer::connectPath(Scene &scene,
                                            PathVertex *cameraSubPath, int cameraPathLength, int t,
                                            PathVertex *lightSubPath, int lightPathLength, int s,
-                                           Point2d *samplePosition) {
+                                           Point2d *samplePosition, random::Sampler1D *sampler1D) {
             // 检查 t 和 s 的范围，必须处于 cameraPath 和 lightPathLength 的长度范围之中
             assert(t >= 0 && t <= cameraPathLength);
             assert(s >= 0 && s <= lightPathLength);
@@ -111,7 +105,7 @@ namespace kaguya {
                     VisibilityTester visibilityTester;
                     // 对相机采样
                     Spectrum we = _camera->sampleCameraRay(ps.getInteraction(), &worldWi, &pdf, samplePosition,
-                                                           &visibilityTester);
+                                                           sampler1D, &visibilityTester);
                     if (pdf > 0 && !we.isBlack() && visibilityTester.isVisible(scene)) {
                         Ray newRay = Ray(visibilityTester.getEnd().getPoint(), -worldWi);
                         extraVertex = PathVertex::createCameraVertex(_camera.get(), newRay, we / pdf);
@@ -133,7 +127,7 @@ namespace kaguya {
                     VisibilityTester visibilityTester;
                     // 直接对光源采样，同时 visibilityTester 会保存两端交点
                     Spectrum sampleIntensity = light->sampleFromLight(pt.getInteraction(), &worldWi, &sampleLightPdf,
-                                                                      &visibilityTester);
+                                                                      sampler1D, &visibilityTester);
 
                     if (std::abs(sampleLightPdf - 0) < EPSILON || sampleIntensity.isBlack() ||
                         !visibilityTester.isVisible(scene)) {
@@ -174,7 +168,7 @@ namespace kaguya {
 
         int BDPathTracer::generateCameraPath(std::shared_ptr<Scene> scene, const Ray &ray,
                                              std::shared_ptr<Camera> camera, PathVertex *cameraSubPath,
-                                             int maxDepth, MemoryArena &memoryArena) {
+                                             int maxDepth, random::Sampler1D *sampler1D, MemoryArena &memoryArena) {
             TransportMode mode = TransportMode::RADIANCE;
             assert(cameraSubPath != nullptr);
             // 初始 beta
@@ -186,11 +180,12 @@ namespace kaguya {
             Ray scatterRay = ray;
 
             return randomWalk(scene, scatterRay, cameraSubPath, maxDepth, 1.0,
-                              memoryArena, beta, TransportMode::RADIANCE);
+                              sampler1D, memoryArena, beta, TransportMode::RADIANCE);
         }
 
         int BDPathTracer::generateLightPath(std::shared_ptr<Scene> scene,
                                             PathVertex *lightSubPath, int maxDepth,
+                                            random::Sampler1D *sampler1D,
                                             MemoryArena &memoryArena) {
             assert(lightSubPath != nullptr);
             // TODO 默认只有一个 light
@@ -205,7 +200,8 @@ namespace kaguya {
             // 光源发射光线
             Ray scatterRay;
             // 采样光源发射
-            Spectrum intensity = light->randomLightRay(&scatterRay, &lightNormal, &pdfPos, &pdfDir);
+            Spectrum intensity = light->randomLightRay(&scatterRay, &lightNormal,
+                                                       &pdfPos, &pdfDir, sampler1D);
             // 创建光源点
             // TODO 没有考虑多光源情况
             lightSubPath[0] = PathVertex::createLightVertex(light.get(), scatterRay.getOrigin(),
@@ -214,14 +210,14 @@ namespace kaguya {
 
             Spectrum beta = intensity * std::abs(DOT(scatterRay.getDirection(), lightNormal)) / (pdfPos * pdfDir);
 
-            return randomWalk(scene, scatterRay, lightSubPath, maxDepth, pdfDir, memoryArena, beta,
-                              TransportMode::IMPORTANCE);
+            return randomWalk(scene, scatterRay, lightSubPath, maxDepth, pdfDir,
+                              sampler1D, memoryArena, beta, TransportMode::IMPORTANCE);
         }
 
         int BDPathTracer::randomWalk(std::shared_ptr<Scene> scene, const Ray &ray,
                                      PathVertex *path, int maxDepth, double pdf,
-                                     MemoryArena &memoryArena, Spectrum &beta,
-                                     TransportMode mode) {
+                                     random::Sampler1D *sampler1D, MemoryArena &memoryArena,
+                                     Spectrum &beta, TransportMode mode) {
             // 上个路径点发射射线的 pdf
             double pdfPreWi = pdf;
             double pdfWo = 0;
@@ -252,7 +248,8 @@ namespace kaguya {
                     Vector3 worldWo = -interaction.getDirection();
                     Vector3 worldWi = Vector3(0);
                     BXDFType sampleType;
-                    Spectrum f = bsdf->sampleF(worldWo, &worldWi, &pdfPreWi, BXDFType::BSDF_ALL, &sampleType);
+                    Spectrum f = bsdf->sampleF(worldWo, &worldWi, &pdfPreWi, sampler1D,
+                                               BXDFType::BSDF_ALL, &sampleType);
 
                     // 判断采样是否有效
                     if (std::abs(pdfPreWi) < EPSILON || f.isBlack()) {
@@ -413,16 +410,20 @@ namespace kaguya {
             return cosPre * cosNext / std::pow(dist, 2) * (visibilityTester.isVisible(*_scene) ? 1 : 0);
         }
 
-        Spectrum BDPathTracer::shader(const Ray &ray, Scene &scene, int maxDepth, MemoryArena &memoryArena) {
+
+        Spectrum BDPathTracer::shader(const Ray &ray, Scene &scene, int maxDepth,
+                                      random::Sampler1D *sampler1D, MemoryArena &memoryArena) {
             // 创建临时变量用于存储 camera、light 路径
             PathVertex *cameraSubPath = memoryArena.alloc<PathVertex>(maxDepth + 1, false);
             PathVertex *lightSubPath = memoryArena.alloc<PathVertex>(maxDepth, false);
 
             // 生成相机路径
-            int cameraPathLength = generateCameraPath(_scene, ray, _camera, cameraSubPath, maxDepth + 1, memoryArena);
+            int cameraPathLength = generateCameraPath(_scene, ray, _camera, cameraSubPath, maxDepth + 1,
+                                                      sampler1D, memoryArena);
 
             // 生成光源路径
-            int lightPathLength = generateLightPath(_scene, lightSubPath, maxDepth, memoryArena);
+            int lightPathLength = generateLightPath(_scene, lightSubPath, maxDepth,
+                                                    sampler1D, memoryArena);
 
             Spectrum shaderColor = Spectrum(0.0);
             // 路径连接
@@ -432,7 +433,8 @@ namespace kaguya {
                     if (depth <= maxDepth && depth > 0 && s <= lightPathLength) {
                         Point2d samplePosition;
                         Spectrum value = connectPath(scene, cameraSubPath, cameraPathLength, t,
-                                                     lightSubPath, lightPathLength, s, &samplePosition);
+                                                     lightSubPath, lightPathLength, s,
+                                                     &samplePosition, sampler1D);
 
                         const double INV_WEIGHT = 1.0 / _samplePerPixel;
 

@@ -49,7 +49,7 @@ namespace kaguya {
              * @param pdf 采样概率
              * @return 辐射系数
              */
-            virtual Spectrum sampleF(const Vector3 &wo, Vector3 *wi, double *pdf);
+            virtual Spectrum sampleF(const Vector3 &wo, Vector3 *wi, double *pdf, random::Sampler1D *sampler1D);
 
             /**
              * wo 与 wi 之间的采样 PDF

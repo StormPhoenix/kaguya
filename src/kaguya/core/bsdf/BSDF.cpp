@@ -56,6 +56,7 @@ namespace kaguya {
         }
 
         Spectrum BSDF::sampleF(const Vector3 &worldWo, Vector3 *worldWi, double *pdf,
+                               random::Sampler1D *sampler1D,
                                BXDFType type, BXDFType *sampleType) {
             // 找到符合类型的 BXDF，并随机选择一个做 sampleF
             int matchedCount = 0;
@@ -74,7 +75,7 @@ namespace kaguya {
             } else {
                 BXDF *bxdf = nullptr;
                 // 随机选取 bxdf
-                int bxdfOrder = randomInt(1, matchedCount);
+                int bxdfOrder = randomInt(1, matchedCount, sampler1D);
                 int order = 0;
                 for (int i = 0; i < _bxdfCount; i++) {
                     if (_bxdfs[i] != nullptr && _bxdfs[i]->allIncludeOf(type)) {
@@ -95,7 +96,7 @@ namespace kaguya {
                 Vector3 wo = toObjectSpace(worldWo);
                 Vector3 wi = Vector3(0.0f);
                 double samplePdf;
-                Spectrum f = bxdf->sampleF(wo, &wi, &samplePdf);
+                Spectrum f = bxdf->sampleF(wo, &wi, &samplePdf, sampler1D);
                 // 一般来说 surfacePointPdf = 0 的情况不会发生
                 if (samplePdf == 0) {
                     return Spectrum(0.0);

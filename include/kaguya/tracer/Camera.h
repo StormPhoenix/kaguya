@@ -83,6 +83,7 @@ namespace kaguya {
              * @return
              */
             Spectrum sampleCameraRay(const Interaction &eye, Vector3 *wi, double *pdf, Point2d *filmPosition,
+                                     random::Sampler1D *sampler1D,
                                      VisibilityTester *visibilityTester) const;
 
             /**

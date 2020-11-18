@@ -125,10 +125,10 @@ namespace kaguya {
             return _area;
         }
 
-        SurfaceInteraction Wall::sampleSurfacePoint() {
+        SurfaceInteraction Wall::sampleSurfacePoint(random::Sampler1D *sampler1D) {
             // 随机采样坐标
-            double u = uniformSample();
-            double v = uniformSample();
+            double u = sampler1D->sample();
+            double v = sampler1D->sample();
 
             Vector3 horizontal = (_transformedRightBottom - _transformedLeftBottom) * u;
             Vector3 vertical = (_transformedLeftTop - _transformedLeftBottom) * v;
@@ -200,9 +200,9 @@ namespace kaguya {
             return width * height;
         }
 
-        SurfaceInteraction ZXWall::sampleSurfacePoint() {
-            double u = uniformSample();
-            double v = uniformSample();
+        SurfaceInteraction ZXWall::sampleSurfacePoint(random::Sampler1D *sampler1D) {
+            double u = sampler1D->sample();
+            double v = sampler1D->sample();
 
             double width = abs(_x1 - _x0);
             double height = abs(_z1 - _z0);
@@ -280,9 +280,9 @@ namespace kaguya {
             return width * height;
         }
 
-        SurfaceInteraction YZWall::sampleSurfacePoint() {
-            double u = uniformSample();
-            double v = uniformSample();
+        SurfaceInteraction YZWall::sampleSurfacePoint(random::Sampler1D *sampler1D) {
+            double u = sampler1D->sample();
+            double v = sampler1D->sample();
 
             double width = abs(_z1 - _z0);
             double height = abs(_y1 - _y0);
@@ -356,9 +356,9 @@ namespace kaguya {
             return width * height;
         }
 
-        SurfaceInteraction XYWall::sampleSurfacePoint() {
-            double u = uniformSample();
-            double v = uniformSample();
+        SurfaceInteraction XYWall::sampleSurfacePoint(random::Sampler1D *sampler1D) {
+            double u = sampler1D->sample();
+            double v = sampler1D->sample();
 
             double width = abs(_x1 - _x0);
             double height = abs(_y1 - _y0);

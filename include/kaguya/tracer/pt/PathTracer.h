@@ -39,7 +39,8 @@ namespace kaguya {
              * @param lightPdf 采样概率
              * @return
              */
-            Spectrum evaluateDirectLight(Scene &scene, const Interaction &eye, const BSDF &bsdf);
+            Spectrum
+            evaluateDirectLight(Scene &scene, const Interaction &eye, const BSDF &bsdf, random::Sampler1D *sampler1D);
 
             /**
              * 具体渲染代码，CPU版本
@@ -48,7 +49,9 @@ namespace kaguya {
              * @param depth 反射次数
              * @return 渲染结果
              */
-            Spectrum shaderOfRecursion(const Ray &ray, Scene &scene, int depth, MemoryArena &memoryArena);
+            Spectrum shaderOfRecursion(const Ray &ray, Scene &scene, int depth,
+                                       random::Sampler1D *sampler1D,
+                                       MemoryArena &memoryArena);
 
             /**
              * Path Tracing 渲染代码，渐进式实现
@@ -57,7 +60,9 @@ namespace kaguya {
              * @param memoryArena
              * @return
              */
-            Spectrum shaderOfProgression(const Ray &ray, Scene &scene, MemoryArena &memoryArena);
+            Spectrum shaderOfProgression(const Ray &ray, Scene &scene,
+                                         random::Sampler1D *sampler1D,
+                                         MemoryArena &memoryArena);
 
             /**
              * 获取背景颜色，这里可以用来设置背景贴图

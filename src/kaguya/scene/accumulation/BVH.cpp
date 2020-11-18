@@ -3,6 +3,7 @@
 //
 
 #include <kaguya/scene/accumulation/BVH.h>
+#include <kaguya/math/Sampler.hpp>
 
 namespace kaguya {
     namespace scene {
@@ -55,8 +56,9 @@ namespace kaguya {
 
             void BVH::build(std::vector<std::shared_ptr<Shape>> &objects,
                             size_t start, size_t end) {
+                random::Sampler1D *sampler = random::Sampler1D::newInstance();
                 // 采用最简单的平均分配法
-                int axis = randomInt(0, 2);
+                int axis = randomInt(0, 2, sampler);
                 auto comparator = (axis == 0) ? compareX
                                               : (axis == 1) ? compareY
                                                             : compareZ;
@@ -83,6 +85,8 @@ namespace kaguya {
                 const AABB &rightAABB = _right->boundingBox();
                 mergeBoundingBox(leftAABB, rightAABB);
                 _isValid = true;
+
+                delete sampler;
             }
 
             void BVH::mergeBoundingBox(const AABB &leftBox, const AABB &rightBox) {

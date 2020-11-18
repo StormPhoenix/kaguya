@@ -5,14 +5,11 @@
 #ifndef KAGUYA_DIELECTRIC_H
 #define KAGUYA_DIELECTRIC_H
 
-#include <kaguya/math/ScatterSampler.h>
 #include <kaguya/material/Material.h>
 #include <kaguya/material/Texture.h>
 
 namespace kaguya {
     namespace material {
-
-        using kaguya::math::ScatterSampler;
 
         class Dielectric : public Material {
         public:

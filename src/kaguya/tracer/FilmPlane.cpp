@@ -28,9 +28,12 @@ namespace kaguya {
             }
 
             int offset = (row * _resolutionWidth + col) * _channel;
-            const std::lock_guard<std::mutex> lock(writeLock);
-            for (int channel = 0; channel < _channel; channel++) {
-                *(_bitmap + offset + channel) += spectrum[channel];
+            // lock_guard will release the lock when exits stack
+            {
+                std::lock_guard<std::mutex> lock(writeLock);
+                for (int channel = 0; channel < _channel; channel++) {
+                    *(_bitmap + offset + channel) += spectrum[channel];
+                }
             }
             // writeLock is automatically released when lock goes out of scope
         }

@@ -31,6 +31,7 @@ namespace kaguya {
 
 
         Spectrum PathTracer::shaderOfProgression(const kaguya::tracer::Ray &ray, kaguya::Scene &scene,
+                                                 random::Sampler1D *sampler1D,
                                                  MemoryArena &memoryArena) {
             // 最终渲染结果
             Spectrum shaderColor = Spectrum(0);
@@ -81,7 +82,7 @@ namespace kaguya {
 
                 // 判断是否向光源采样
                 if (bsdf->allIncludeOf(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
-                    shaderColor += (beta * evaluateDirectLight(scene, intersection, (*bsdf)));
+                    shaderColor += (beta * evaluateDirectLight(scene, intersection, (*bsdf), sampler1D));
                 }
 
                 // 计算下一次反射
@@ -92,7 +93,7 @@ namespace kaguya {
                 // p(wi)
                 double samplePdf = 0;
                 // f(p, wo, wi)
-                Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, BSDF_ALL, &bxdfType);
+                Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, sampler1D, BSDF_ALL, &bxdfType);
 
                 // cosine
                 double cosine = std::abs(DOT(intersection.getNormal(), NORMALIZE(worldWi)));
@@ -104,14 +105,16 @@ namespace kaguya {
 
                 isSpecular = (bxdfType & BSDF_SPECULAR) > 0;
 
-                if (bounce > _russianRouletteBounce && uniformSample() < _russianRoulette) {
+                if (bounce > _russianRouletteBounce && sampler1D->sample() < _russianRoulette) {
                     beta /= (1 - _russianRoulette);
                 }
             }
             return shaderColor;
         }
 
-        Spectrum PathTracer::shaderOfRecursion(const Ray &ray, Scene &scene, int depth, MemoryArena &memoryArena) {
+        Spectrum PathTracer::shaderOfRecursion(const Ray &ray, Scene &scene, int depth,
+                                               random::Sampler1D *sampler1D,
+                                               MemoryArena &memoryArena) {
             // TODO 判断采用固定深度还是轮盘赌
             // TODO 添加对光源采样；对光源采样需要计算两个 surfacePointPdf
 
@@ -133,7 +136,7 @@ namespace kaguya {
                             return Spectrum(0.0);
                         }
 
-                        bool gamblingResult = uniformSample() < _sampleLightProb;
+                        bool gamblingResult = sampler1D->sample() < _sampleLightProb;
                         if (gamblingResult) {
                             Vector3 scatterRayDir;
                             double samplePdf = 0;
@@ -141,7 +144,7 @@ namespace kaguya {
 
                             VisibilityTester visibilityTester;
                             Spectrum spectrum = light->sampleFromLight(hitRecord, &scatterRayDir, &samplePdf,
-                                                                       &visibilityTester);
+                                                                       sampler1D, &visibilityTester);
 
                             if (samplePdf > EPSILON && !spectrum.isBlack()) {
                                 // 计算该方向的散射 PDF
@@ -154,9 +157,9 @@ namespace kaguya {
                                 Spectrum shaderColor =
                                         std::abs(DOT(hitRecord.getNormal(), NORMALIZE(scatterRayDir))) * f /
                                         samplePdf *
-                                        ((depth > _russianRoulette && uniformSample() < _russianRoulette) ?
+                                        ((depth > _russianRoulette && sampler1D->sample() < _russianRoulette) ?
                                          Spectrum(0.0) :
-                                         shaderOfRecursion(scatterRay, scene, depth + 1, memoryArena) /
+                                         shaderOfRecursion(scatterRay, scene, depth + 1, sampler1D, memoryArena) /
                                          (1 - _russianRoulette));
                                 return shaderColor + (hitRecord.getAreaLight() != nullptr ?
                                                       hitRecord.getAreaLight()->lightRadiance(hitRecord,
@@ -170,7 +173,7 @@ namespace kaguya {
                     BSDF *bsdf = hitRecord.buildBSDF(memoryArena);
                     Vector3 worldWo = -ray.getDirection();
                     Vector3 worldWi = Vector3(0.0);
-                    Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf);
+                    Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, sampler1D);
                     scatterRay.setOrigin(hitRecord.getPoint());
                     scatterRay.setDirection(NORMALIZE(worldWi));
 
@@ -185,9 +188,9 @@ namespace kaguya {
 
                     double cosine = std::abs(DOT(hitRecord.getNormal(), NORMALIZE(worldWi)));
                     Spectrum shaderColor = cosine * f / samplePdf *
-                                           ((depth > _russianRoulette && uniformSample() < _russianRoulette) ?
+                                           ((depth > _russianRoulette && sampler1D->sample() < _russianRoulette) ?
                                             Spectrum(0.0) :
-                                            shaderOfRecursion(scatterRay, scene, depth + 1, memoryArena) /
+                                            shaderOfRecursion(scatterRay, scene, depth + 1, sampler1D, memoryArena) /
                                             (1 - _russianRoulette));
 
                     return shaderColor + (hitRecord.getAreaLight() != nullptr ?
@@ -204,7 +207,8 @@ namespace kaguya {
         }
 
 
-        Spectrum PathTracer::evaluateDirectLight(Scene &scene, const Interaction &eye, const BSDF &bsdf) {
+        Spectrum PathTracer::evaluateDirectLight(Scene &scene, const Interaction &eye, const BSDF &bsdf,
+                                                 random::Sampler1D *sampler1D) {
             // TODO 目前只考虑单个光源
             auto light = scene.getLight();
             // p(wi)
@@ -216,6 +220,7 @@ namespace kaguya {
             // 对光源采样采样
             Spectrum luminance = light->sampleFromLight(eye, &shadowRayDir,
                                                         &lightPdf,
+                                                        sampler1D,
                                                         &visibilityTester);
 
             // 排除对光源采样贡献为 0 的情况
@@ -255,23 +260,25 @@ namespace kaguya {
                 // 遍历相机成像图案上每个像素
                 for (int row = cameraHeight - 1; row >= 0; row--) {
                     MemoryArena arena;
+                    random::Sampler1D *sampler = random::Sampler1D::newInstance();
                     for (int col = 0; col < cameraWidth; col++) {
                         Spectrum ans = {0};
                         // 做 _samplePerPixel 次采样
                         for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
-                            auto u = (col + uniformSample()) / cameraWidth;
-                            auto v = (row + uniformSample()) / cameraHeight;
+                            auto u = (col + sampler->sample()) / cameraWidth;
+                            auto v = (row + sampler->sample()) / cameraHeight;
 
                             // 发射采样光线，开始渲染
                             Ray sampleRay = _camera->sendRay(u, v);
 //                            ans += shaderOfRecursion(sampleFromLight, *_scene, 0, arena);
-                            ans += shaderOfProgression(sampleRay, *_scene, arena);
+                            ans += shaderOfProgression(sampleRay, *_scene, sampler, arena);
                             arena.clean();
                         }
                         ans *= sampleWeight;
                         _filmPlane->addSpectrum(ans, row, col);
 
                     }
+                    delete sampler;
 #pragma omp critical
                     finishedLine++;
                     std::cout << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "

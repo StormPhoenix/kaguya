@@ -7,6 +7,7 @@
 
 
 #include <kaguya/math/Math.hpp>
+#include <kaguya/math/Sampler.hpp>
 #include <kaguya/tracer/Ray.h>
 #include <kaguya/scene/Shape.h>
 
@@ -40,7 +41,7 @@ namespace kaguya {
              * 在 Shape 表面进行均匀采样
              * @return
              */
-            virtual SurfaceInteraction sampleSurfacePoint() = 0;
+            virtual SurfaceInteraction sampleSurfacePoint(random::Sampler1D *sampler1D) = 0;
 
             /**
              * 计算surface上做均匀采样的概率
@@ -54,7 +55,7 @@ namespace kaguya {
              * @param eye
              * @return
              */
-            virtual SurfaceInteraction sampleRayIntersection(const Interaction &eye);
+            virtual SurfaceInteraction sampleRayIntersection(const Interaction &eye, random::Sampler1D *sampler1D);
 
             /**
              * 计算从 eye 出发，沿 dir 方向击中 Shape 上的点的概率

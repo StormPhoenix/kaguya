@@ -27,7 +27,7 @@ namespace kaguya {
 
             virtual double area() override;
 
-            virtual SurfaceInteraction sampleSurfacePoint() override;
+            virtual SurfaceInteraction sampleSurfacePoint(random::Sampler1D *sampler1D) override;
 
             virtual double surfacePointPdf(SurfaceInteraction &si) override;
 
@@ -83,7 +83,7 @@ namespace kaguya {
 
             virtual double area() override;
 
-            virtual SurfaceInteraction sampleSurfacePoint() override;
+            virtual SurfaceInteraction sampleSurfacePoint(random::Sampler1D *sampler1D) override;
 
             virtual double surfacePointPdf(SurfaceInteraction &si) override;
 
@@ -116,7 +116,7 @@ namespace kaguya {
 
             virtual double area() override;
 
-            virtual SurfaceInteraction sampleSurfacePoint() override;
+            virtual SurfaceInteraction sampleSurfacePoint(random::Sampler1D *sampler1D) override;
 
             virtual double surfacePointPdf(SurfaceInteraction &point) override;
 
@@ -149,7 +149,7 @@ namespace kaguya {
 
             virtual double area() override;
 
-            virtual SurfaceInteraction sampleSurfacePoint() override;
+            virtual SurfaceInteraction sampleSurfacePoint(random::Sampler1D *sampler1D) override;
 
             virtual double surfacePointPdf(SurfaceInteraction &si) override;
 
