@@ -1,16 +1,11 @@
-## 修改成 pbrt 架构
--   不传输 Material 了，改为传输 BSDF，光源的判断 / 光源的发光 / 光源的采样
--   pbrt 中好像是不和光源做求交判断的
+## 效果图
 
+#### path tracing
+![image](https://github.com/StormPhoenix/render-repository-data/blob/master/path-tracing/bunny_lambertian.png)
+![image](https://github.com/StormPhoenix/render-repository-data/blob/master/path-tracing/two-spheres-with-area-light_ssp300_depth15_pt_1000x1000.png)
+![image](https://github.com/StormPhoenix/render-repository-data/blob/master/path-tracing/two-spheres-with-point-light_ssp300_depth%3D15_pt_1000x1000.png)
 
-## 空间变换
-
-## 散射 PDF 与采样 PDF
-    Pdf 采样过程中应该返回一个 surfacePointPdf
-    
-## 对光源采样
-
-## 背景贴图
+#### bidirectional path tracing
 
 ## 已解决问题
 
@@ -105,12 +100,12 @@
     
 - 只考虑了单个光源情况
 
+## 空间变换
+
+## 背景贴图
+
 ## 一些想法
 - 新的光线追踪想法：不需要像 Path Tracing 一次性把 shaderOfRecursion color 求解出来，而是多次迭代。每次迭代只让光线反射一次，迭代 N 轮让
     结果收敛。 
     
 - 编译 PBRT，对 SamplerIntegrator::Render() 做 debug
-
-## 效果图
-
-![image](https://github.com/StormPhoenix/kaguya/blob/master/image/bunny_lambertian.png)
