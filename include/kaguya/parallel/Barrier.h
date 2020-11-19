@@ -5,6 +5,7 @@
 #ifndef KAGUYA_BARRIER_H
 #define KAGUYA_BARRIER_H
 
+#include <cassert>
 #include <condition_variable>
 
 namespace kaguya {

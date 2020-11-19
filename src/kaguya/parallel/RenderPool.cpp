@@ -37,6 +37,7 @@ namespace kaguya {
 
         void RenderPool::shutdown() {
             _shutdown = true;
+            _taskCondition.notify_all();
         }
 
         void RenderPool::renderFunc(const int threadId,

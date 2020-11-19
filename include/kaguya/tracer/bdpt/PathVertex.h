@@ -40,11 +40,9 @@ namespace kaguya {
             // 当前点的前后传输射线是否是 delta 分布
             bool isDelta = false;
             // 交互点
-            struct {
-                SurfaceInteraction si;
-                VolumeInteraction vi;
-                StartEndInteraction ei;
-            };
+            SurfaceInteraction si;
+            VolumeInteraction vi;
+            StartEndInteraction ei;
 
             PathVertex() {}
 
