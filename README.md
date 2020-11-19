@@ -1,13 +1,3 @@
-## 效果图
-
-#### path tracing
-
-<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/path-tracing/bunny_lambertian.png" alt="bunny" width="300" height="300">
-<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/path-tracing/two-spheres-with-area-light_ssp300_depth15_pt_1000x1000.png" alt="bunny" width="300" height="300">
-<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/path-tracing/two-spheres-with-point-light_ssp300_depth%3D15_pt_1000x1000.png" alt="bunny" width="300" height="300">
-
-#### bidirectional path tracing
-
 ## 已解决问题
 
 - front 墙壁材质是 Lambertian，使用 area light 的时候，表面的光照位置光斑会非常亮（BDPT）
@@ -110,3 +100,13 @@
     结果收敛。 
     
 - 编译 PBRT，对 SamplerIntegrator::Render() 做 debug
+
+## 效果图
+
+#### path tracing
+
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/path-tracing/bunny_lambertian.png" alt="bunny" width="50%">
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/path-tracing/two-spheres-with-area-light_ssp300_depth15_pt_1000x1000.png" alt="bunny" width="50%">
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/path-tracing/two-spheres-with-point-light_ssp300_depth%3D15_pt_1000x1000.png" alt="bunny" width="50%">
+
+#### bidirectional path tracing
