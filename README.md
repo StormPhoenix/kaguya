@@ -14,6 +14,20 @@
 
 ## 已解决问题
 
+- front 墙壁渲染结果会有一圈曲线
+    - 去掉 openMP，结果正常
+    - 加上 openMP，对访问数据上锁，不正常
+    - 加上 openMP，FilmPlane 的写入函数添加 lock，结果不正常
+    - 调整 openMP 运行线程数，线程数目小，结果会相对正常
+    - 编写多线程并行，不使用 OpenMP。依然出现白色曲线
+    - 移动墙壁位置，白色曲线位置变化，但形状不变
+    - 移动点光源位置，白色曲线位置变化，但形状不变
+    - 猜测是点光源采样函数有问题，偏向某个方向采样。修改 0-1 均匀采样函数，
+        白色曲线不仅位置变化，形状也变化。
+    - 结果显示 c++ 随机数生成器 std::uniform_distribution 生成点随机数并不随机，只在单线程条件下随机
+        无法在多线程环境下被共享。
+    - 让每个线程使用单独的随机数生成器，结果终于正常。
+
 - bunny 金属材质下非常不平滑，但是按道理讲，Normal 是进行插值过了的
     - 切线空间基坐标忘记 normalize，导致计算错误。
     
@@ -65,19 +79,9 @@
 - Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法
 
 ## 未解决的问题
-- front 墙壁渲染结果会有一圈曲线
-    - 去掉 openMP，结果正常
-    - 加上 openMP，对访问数据上锁，不正常
-    - 加上 openMP，FilmPlane 的写入函数添加 lock，结果不正常
-    - 调整 openMP 运行线程数，线程数目小，结果会相对正常
-    - TODO: 编写多线程并行，不使用 OpenMP
-
-- 玻璃球黑的不正常
 
 - ShapeSampler 和 Shape 的功能应该合并，不然现在只能让 class Wall 成为 AreaLight。 
 
-- BDPT 中的点光源，在采样发射光线时没有考虑 distance，那为什么地板下面出现的颜色会暗淡，靠近地板的颜色会很亮呢？
-    
 - randomInt 会出现随机到 randomValue = 1.0 的地方，得出的 int 值会让调用者越界
 
 - 删除 isFrontFace
@@ -86,38 +90,15 @@
 
 - 多光源问题
 
-- class Light 应该允许 Intersection 操作，这样修改的话需要仔细考虑 class Light 的设计 
-
 - 去掉 Interaction 里面的 frontFace
 
 - bunny 透明材质出现黑块，且整体偏暗；光源面积缩小一倍，提高光源亮度，整个场景变成暗色，出现大量白色燥点；
     参考 [知乎-文刀秋二](https://www.zhihu.com/question/48961286/answer/113580178)
 
-- Triangle 优化 Triangle 内部的矩阵变换效率（提前做变换）
-    > Triangle 中的 Vertex / Normal 坐标向 World Space 的变换提前做好。不同于其他 Shape 将 Ray 转化到 Object Space
-    > 的方法，Triangle 需要做大量 insect 操作，频繁对 Ray 进行变换会损失效率
-    > 这也提醒自己最好将其他 Shape 的 Transformation 修改成对 Ray 的变换
-- Bitmap 的写入策略替换
-
-- OpenMP 到底是什么？应该如何配置
-
-- Shadow Ray 
-   - 先阅读 PBRT 中的 Path Tracing 部分再说
-   - Dielectric 材质，采用自带 PDF 散射
-   - 非 Dielectric
-        - 单光源
-            - 采样 Shadow Ray，Shadow Ray 判定是否可以对光源采样（无遮挡/击中正光面），是：依概率选择是否对光源采样，计算混合 PDF；否：计算自带 PDF
-        - 多光源
-            - 只采样单个光源，则可以随机选取一个光源，按照上述步骤进行即可
-
 - 电解质折射率问题
     无法在光线传输过程中确定碰撞位置两端的折射率。程序采用的是将外界材质的折射率固定设置为空气折射率（1.0）
     
 - 只考虑了单个光源情况
-
-- 添加多种光的类型
-
-- 俄罗斯轮盘赌不只适用于判断何时处理不继续递归问题。还可以根据 BRDF 函数，取消掉一部分 Shadow Ray
 
 ## 一些想法
 - 新的光线追踪想法：不需要像 Path Tracing 一次性把 shaderOfRecursion color 求解出来，而是多次迭代。每次迭代只让光线反射一次，迭代 N 轮让
