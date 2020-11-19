@@ -1,9 +1,10 @@
 ## 效果图
 
 #### path tracing
-![image](https://github.com/StormPhoenix/render-repository-data/blob/master/path-tracing/bunny_lambertian.png)
-![image](https://github.com/StormPhoenix/render-repository-data/blob/master/path-tracing/two-spheres-with-area-light_ssp300_depth15_pt_1000x1000.png)
-![image](https://github.com/StormPhoenix/render-repository-data/blob/master/path-tracing/two-spheres-with-point-light_ssp300_depth%3D15_pt_1000x1000.png)
+
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/path-tracing/bunny_lambertian.png" alt="bunny" width="300" height="300">
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/path-tracing/two-spheres-with-area-light_ssp300_depth15_pt_1000x1000.png" alt="bunny" width="300" height="300">
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/path-tracing/two-spheres-with-point-light_ssp300_depth%3D15_pt_1000x1000.png" alt="bunny" width="300" height="300">
 
 #### bidirectional path tracing
 
