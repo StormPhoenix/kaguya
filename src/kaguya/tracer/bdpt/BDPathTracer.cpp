@@ -68,7 +68,7 @@ namespace kaguya {
                                            PathVertex *lightSubPath, int lightPathLength, int s,
                                            Point2d *samplePosition, random::Sampler1D *sampler1D) {
             // 检查 t 和 s 的范围，必须处于 cameraPath 和 lightPathLength 的长度范围之中
-            assert(t >= 0 && t <= cameraPathLength);
+            assert(t >= 1 && t <= cameraPathLength);
             assert(s >= 0 && s <= lightPathLength);
 
             /* 处理策略
@@ -430,7 +430,7 @@ namespace kaguya {
             for (int t = 1; t <= cameraPathLength; t++) {
                 for (int s = 0; s <= lightPathLength; s++) {
                     int depth = t + s - 1;
-                    if (depth <= maxDepth && depth > 0 && s <= lightPathLength) {
+                    if (depth <= maxDepth && depth > 0 && t <= cameraPathLength && s <= lightPathLength) {
                         Point2d samplePosition;
                         Spectrum value = connectPath(scene, cameraSubPath, cameraPathLength, t,
                                                      lightSubPath, lightPathLength, s,

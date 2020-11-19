@@ -155,7 +155,7 @@ namespace kaguya {
 
             _halfWindowHeight = tan(DEGREES_TO_RADIANS(fov / 2)) * _focal;
             _halfWindowWidth = _halfWindowHeight * aspect;
-            _area = _halfWindowHeight * _halfWindowWidth;
+            _area = 4 * _halfWindowHeight * _halfWindowWidth;
             _leftBottomCorner = _eye + _focal * _front - _halfWindowWidth * _right - _halfWindowHeight * _up;
             _rightTopCorner = _eye + _focal * _front + _halfWindowWidth * _right + _halfWindowHeight * _up;
             _diagonalVector = _rightTopCorner - _leftBottomCorner;

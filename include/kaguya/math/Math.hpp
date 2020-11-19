@@ -153,9 +153,7 @@ inline Vector3 sphereUniformSampling(random::Sampler1D *sampler1D) {
     // z = sin(theta) * sin(phi)
     double z = std::sqrt(std::max(0.0, (1 - y * y))) * std::sin(2 * PI * sampleU);
 
-    // TODO temp
-//    return NORMALIZE(Vector3(x, y, z));
-    return NORMALIZE(Vector3(z, x, y));
+    return NORMALIZE(Vector3(x, y, z));
 }
 
 /**

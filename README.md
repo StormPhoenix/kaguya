@@ -14,7 +14,12 @@
 
 ## 已解决问题
 
-- front 墙壁渲染结果会有一圈曲线
+- front 墙壁材质是 Lambertian，使用 area light 的时候，表面的光照位置光斑会非常亮（BDPT）
+    - 将 BDPT 的 connectPath() 中的 t - s 路径分拆成几个子路径，分别输出结果。
+    - 光斑是 t = 1，s = 2 情况下出现的。推测是 light path 连接 camera vertex 时，beta 计算错误。
+    - 经过检查，发现 Camera 计算成像平面面积时少算了 3/4 的面积，修改过后，结果正确。
+
+- front 墙壁渲染结果会有一圈曲线（BDPT）
     - 去掉 openMP，结果正常
     - 加上 openMP，对访问数据上锁，不正常
     - 加上 openMP，FilmPlane 的写入函数添加 lock，结果不正常

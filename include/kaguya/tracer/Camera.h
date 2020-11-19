@@ -138,7 +138,7 @@ namespace kaguya {
             // 相机成像平面面积
             double _area;
             // 相机光圈大小
-            double _lensRadius = 0.025;
+            double _lensRadius = 0.25;
 
             // 默认焦距为 10
             const double _focal = 10;

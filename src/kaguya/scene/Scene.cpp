@@ -419,7 +419,7 @@ namespace kaguya {
 
             // light spectrum
             Spectrum areaLightSpectrum = Spectrum(0.0);
-            double areaLightIntensity = 20;
+            double areaLightIntensity = 15;
             areaLightSpectrum.r(double(249.0) / 255.0 * areaLightIntensity);
             areaLightSpectrum.g(double(222.0) / 255.0 * areaLightIntensity);
             areaLightSpectrum.b(double(180.0) / 255.0 * areaLightIntensity);
