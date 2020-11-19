@@ -18,8 +18,8 @@ namespace kaguya {
             return Spectrum(0.0f);
         }
 
-        Spectrum
-        BXDFSpecularTransmission::sampleF(const Vector3 &wo, Vector3 *wi, double *pdf, random::Sampler1D *sampler1D) {
+        Spectrum BXDFSpecularTransmission::sampleF(const Vector3 &wo, Vector3 *wi, double *pdf,
+                                                   random::Sampler1D *sampler1D) {
             double refraction;
             if (wo.y > 0) {
                 // 外部射入

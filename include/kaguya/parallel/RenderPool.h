@@ -21,14 +21,15 @@ namespace kaguya {
         public:
             /**
              * single instance
-             * @param threadsCount
              * @return
              */
-            static RenderPool *getInstance(int threadsCount);
+            static RenderPool *getInstance();
 
         public:
             void addRenderTask(std::function<void(int, int, random::Sampler1D *)> func2D,
                                int renderWidth, int renderHeight);
+
+            void shutdown();
 
             // clean all thread resource
             void cleanThreads();
@@ -45,29 +46,29 @@ namespace kaguya {
                                    std::shared_ptr<Barrier> barrier);
 
         private:
-            // is pool shutdown
-            static bool shutdown;
+            // is _pool shutdown
+            static bool _shutdown;
 
-            // pool instance
-            static RenderPool *pool;
+            // _pool instance
+            static RenderPool *_pool;
 
-            // lock for pool creation
-            static std::mutex poolMutex;
+            // lock for _pool creation
+            static std::mutex _poolMutex;
 
             // lock for task queue
-            static std::mutex taskMutex;
+            static std::mutex _taskMutex;
 
             // rendering task queue
-            static RenderTask *taskQueue;
+            static RenderTask *_taskQueue;
 
             // notify condition for task queue
-            static std::condition_variable taskCondition;
+            static std::condition_variable _taskCondition;
 
         private:
             // thread count
             const int _threadCount;
 
-            // thread pool
+            // thread _pool
             std::vector<std::thread> _threads;
 
         };

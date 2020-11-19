@@ -46,7 +46,7 @@ namespace kaguya {
                         _filmPlane->addSpectrum(ans, row, col);
                     }
                 };
-                parallel::RenderPool *pool = parallel::RenderPool::getInstance(8);
+                parallel::RenderPool *pool = parallel::RenderPool::getInstance();
                 pool->addRenderTask(renderFunc, cameraWidth, cameraHeight);
 
                 return true;

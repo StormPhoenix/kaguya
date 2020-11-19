@@ -3,6 +3,7 @@
 //
 
 #include <kaguya/Config.h>
+#include <kaguya/parallel/RenderPool.h>
 #include <kaguya/tracer/Tracer.h>
 
 #include <iostream>
@@ -38,6 +39,8 @@ namespace kaguya {
                 _camera = nullptr;
                 _scene = Config::nextScene();
             }
+
+            parallel::RenderPool::getInstance()->shutdown();
         }
     }
 }

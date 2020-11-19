@@ -29,8 +29,8 @@ namespace kaguya {
 
             virtual Spectrum f(const Vector3 &wo, const Vector3 &wi) const override;
 
-            virtual Spectrum
-            sampleF(const Vector3 &wo, Vector3 *wi, double *pdf, random::Sampler1D *sampler1D) override;
+            virtual Spectrum sampleF(const Vector3 &wo, Vector3 *wi, double *pdf,
+                                     random::Sampler1D *sampler1D) override;
 
             virtual double samplePdf(const Vector3 &wo, const Vector3 &wi) const override;
 

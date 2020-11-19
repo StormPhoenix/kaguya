@@ -3,35 +3,40 @@
 //
 
 #include <kaguya/parallel/RenderPool.h>
-#include <cstdio>
+
+#include <cassert>
 #include <cstdlib>
-#include <ctime>
 
 namespace kaguya {
     namespace parallel {
 
-        bool RenderPool::shutdown = false;
+        bool RenderPool::_shutdown = false;
 
-        RenderPool *RenderPool::pool = nullptr;
+        RenderPool *RenderPool::_pool = nullptr;
 
-        std::mutex RenderPool::poolMutex;
+        std::mutex RenderPool::_poolMutex;
 
-        std::mutex RenderPool::taskMutex;
+        std::mutex RenderPool::_taskMutex;
 
-        std::condition_variable RenderPool::taskCondition;
+        std::condition_variable RenderPool::_taskCondition;
 
-        RenderTask *RenderPool::taskQueue = nullptr;
+        RenderTask *RenderPool::_taskQueue = nullptr;
 
-        RenderPool *RenderPool::getInstance(int threadsCount) {
-            if (pool == nullptr) {
+        RenderPool *RenderPool::getInstance() {
+            const int threadsCount = 4;
+            if (_pool == nullptr) {
                 {
-                    std::lock_guard<std::mutex> poolLock(poolMutex);
-                    if (pool == nullptr) {
-                        pool = new RenderPool(threadsCount);
+                    std::lock_guard<std::mutex> poolLock(_poolMutex);
+                    if (_pool == nullptr) {
+                        _pool = new RenderPool(threadsCount);
                     }
                 }
             }
-            return pool;
+            return _pool;
+        }
+
+        void RenderPool::shutdown() {
+            _shutdown = true;
         }
 
         void RenderPool::renderFunc(const int threadId,
@@ -46,15 +51,15 @@ namespace kaguya {
             // create sampler2d
             random::Sampler1D *sampler1D = random::Sampler1D::newInstance();
 
-            std::unique_lock<std::mutex> lock(taskMutex);
+            std::unique_lock<std::mutex> lock(_taskMutex);
             // running rendering function
-            while (!shutdown) {
-                if (taskQueue == nullptr) {
+            while (!_shutdown) {
+                if (_taskQueue == nullptr) {
                     // sleep
-                    taskCondition.wait(lock);
+                    _taskCondition.wait(lock);
                 } else {
                     // acquire task
-                    RenderTask *task = taskQueue;
+                    RenderTask *task = _taskQueue;
 
                     // get rendering task from task
                     int rowStart, rowEnd, colStart, colEnd;
@@ -74,10 +79,10 @@ namespace kaguya {
                         if (task->isFinished()) {
                             task->notifyMaster();
                             delete task;
-                            taskCondition.notify_all();
+                            _taskCondition.notify_all();
                         }
                     } else {
-                        taskQueue = task->next;
+                        _taskQueue = task->next;
                     }
                 }
             }
@@ -104,12 +109,12 @@ namespace kaguya {
             RenderTask *task = new RenderTask(std::move(func2D), renderWidth, renderHeight);
             {
                 // lock on task queue when add task
-                std::lock_guard<std::mutex> lock(taskMutex);
-                task->next = taskQueue;
-                taskQueue = task;
+                std::lock_guard<std::mutex> lock(_taskMutex);
+                task->next = _taskQueue;
+                _taskQueue = task;
             }
 
-            taskCondition.notify_all();
+            _taskCondition.notify_all();
             task->waitUntilFinished();
         }
     }

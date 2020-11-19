@@ -39,8 +39,8 @@ namespace kaguya {
              * @param lightPdf 采样概率
              * @return
              */
-            Spectrum
-            evaluateDirectLight(Scene &scene, const Interaction &eye, const BSDF &bsdf, random::Sampler1D *sampler1D);
+            Spectrum evaluateDirectLight(Scene &scene, const Interaction &eye, const BSDF &bsdf,
+                                         random::Sampler1D *sampler1D);
 
             /**
              * 具体渲染代码，CPU版本
