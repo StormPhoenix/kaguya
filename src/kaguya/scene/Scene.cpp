@@ -44,7 +44,7 @@ namespace kaguya {
 
             std::shared_ptr<Matrix4> transformMatrix = std::make_shared<Matrix4>(1.0f);
             double scale = 0.4 * MODEL_SCALE;
-            *transformMatrix = TRANSLATE(*transformMatrix, Vector3(0, -scale / 1.5, 0));
+            *transformMatrix = TRANSLATE(*transformMatrix, Vector3(0, -scale / 1.2, 0));
             *transformMatrix = SCALE(*transformMatrix, Vector3(scale, scale, scale));
             std::shared_ptr<Shape> bunny = std::static_pointer_cast<Shape>(
                     std::make_shared<TriangleMesh>(bunnyVertexes, metal, transformMatrix));
@@ -176,7 +176,7 @@ namespace kaguya {
 
             std::shared_ptr<Matrix4> transformMatrix = std::make_shared<Matrix4>(1.0f);
             double scale = 0.4 * MODEL_SCALE;
-            *transformMatrix = TRANSLATE(*transformMatrix, Vector3(0, -scale / 1.5, 0));
+            *transformMatrix = TRANSLATE(*transformMatrix, Vector3(0, -scale / 1.2, 0));
             *transformMatrix = SCALE(*transformMatrix, Vector3(scale, scale, scale));
             std::shared_ptr<Shape> bunny = std::static_pointer_cast<Shape>(
 //                    std::make_shared<TriangleMesh>(bunnyVertexes, lambertTop, transformMatrix));
@@ -315,7 +315,7 @@ namespace kaguya {
 
             std::shared_ptr<Matrix4> transformMatrix = std::make_shared<Matrix4>(1.0f);
             double scale = 0.4 * MODEL_SCALE;
-            *transformMatrix = TRANSLATE(*transformMatrix, Vector3(0, -scale / 1.5, 0));
+            *transformMatrix = TRANSLATE(*transformMatrix, Vector3(0, -scale / 1.2, 0));
             *transformMatrix = SCALE(*transformMatrix, Vector3(scale, scale, scale));
             std::shared_ptr<Shape> bunny = std::static_pointer_cast<Shape>(
 //                    std::make_shared<TriangleMesh>(bunnyVertexes, lambertTop, transformMatrix));
