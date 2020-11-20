@@ -9,6 +9,7 @@
 #include <kaguya/core/Interaction.h>
 // TODO Ray 放到 core
 #include <kaguya/tracer/Ray.h>
+#include <kaguya/core/spectrum/Spectrum.hpp>
 
 namespace kaguya {
     namespace scene {
@@ -29,6 +30,14 @@ namespace kaguya {
             VisibilityTester() {}
 
             VisibilityTester(const Interaction start, const Interaction end);
+
+            /**
+             * MC 采样计算透射率
+             * T(p, p') = exponent^(-shift_{0, (p'-p)} theta_t(t) dt)
+             *
+             * @return
+             */
+            core::Spectrum transmitance() const;
 
             bool isVisible(Scene &scene);
 
