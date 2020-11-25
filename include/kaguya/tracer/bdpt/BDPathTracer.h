@@ -96,7 +96,7 @@ namespace kaguya {
              * @return
              */
             int randomWalk(std::shared_ptr<Scene> scene, const Ray &ray, PathVertex *path, int maxDepth,
-                           double pdf, random::Sampler1D *sampler1D, MemoryArena &memoryArena, Spectrum &beta,
+                           double pdf, const random::Sampler1D *const sampler1D, MemoryArena &memoryArena, Spectrum &beta,
                            TransportMode mode);
 
             /**

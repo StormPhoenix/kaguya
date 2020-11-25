@@ -22,7 +22,7 @@ namespace kaguya {
             buildCameraCoordinate(fov, aspect);
         }
 
-        Ray Camera::sendRay(double u, double v) {
+        Ray Camera::sendRay(double u, double v) const {
             Vector3 samplePoint =
                     _leftBottomCorner + 2 * _halfWindowWidth * u * _right + 2 * _halfWindowHeight * v * _up;
             Vector3 dir = NORMALIZE(samplePoint - _eye);
@@ -33,11 +33,11 @@ namespace kaguya {
             return _eye;
         }
 
-        int Camera::getResolutionHeight() {
+        int Camera::getResolutionHeight() const {
             return _resolutionHeight;
         }
 
-        int Camera::getResolutionWidth() {
+        int Camera::getResolutionWidth() const {
             return _resolutionWidth;
         }
 
@@ -49,14 +49,14 @@ namespace kaguya {
             _resolutionWidth = resolutionWidth;
         }
 
-        FilmPlane *Camera::buildFilmPlane(int channel) {
+        FilmPlane *Camera::buildFilmPlane(int channel) const {
             return new FilmPlane(_resolutionWidth, _resolutionHeight, channel);
         }
 
         Spectrum Camera::sampleCameraRay(const Interaction &eye,
                                          Vector3 *wi, double *pdf,
                                          Point2d *filmPosition,
-                                         random::Sampler1D *sampler1D,
+                                         const random::Sampler1D *const sampler1D,
                                          VisibilityTester *visibilityTester) const {
             // 在相机镜头圆盘上随机采样
             Vector2 diskSample = diskUniformSampling(sampler1D, _lensRadius);
@@ -106,7 +106,7 @@ namespace kaguya {
             pdfDir = (_focal * _focal) / (_area * cosine * cosine * cosine);
         }
 
-        Spectrum Camera::rayImportance(const Ray &ray, Point2d *filmPosition) const {
+        Spectrum Camera::rayImportance(const Ray &ray, Point2d *const filmPosition) const {
             // 计算新射线光栅化位置
             double step = _focal / ABS_DOT(ray.getDirection(), _front);
             Vector3 raster = ray.getOrigin() + ray.getDirection() * step - _leftBottomCorner;
@@ -144,7 +144,7 @@ namespace kaguya {
         }
 
         void Camera::buildCameraCoordinate(float fov, float aspect) {
-            Vector3 worldUp = Vector3(0.0f, 1.0f, 0.0f);
+            const Vector3 worldUp = Vector3(0.0f, 1.0f, 0.0f);
             // 判断 _front 方向是否与 worldUp 重叠
             if (abs(_front.x) < EPSILON && abs(_front.z) < EPSILON) {
                 _right = {1.0f, 0.0f, 0.0f};

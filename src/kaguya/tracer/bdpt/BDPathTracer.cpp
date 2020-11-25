@@ -48,7 +48,6 @@ namespace kaguya {
                 };
                 parallel::RenderPool *pool = parallel::RenderPool::getInstance();
                 pool->addRenderTask(renderFunc, cameraWidth, cameraHeight);
-
                 return true;
             } else {
                 return false;
@@ -216,7 +215,8 @@ namespace kaguya {
 
         int BDPathTracer::randomWalk(std::shared_ptr<Scene> scene, const Ray &ray,
                                      PathVertex *path, int maxDepth, double pdf,
-                                     random::Sampler1D *sampler1D, MemoryArena &memoryArena,
+                                     const random::Sampler1D *const sampler1D,
+                                     MemoryArena &memoryArena,
                                      Spectrum &beta, TransportMode mode) {
             // 上个路径点发射射线的 pdf
             double pdfPreWi = pdf;

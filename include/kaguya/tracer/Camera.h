@@ -49,7 +49,7 @@ namespace kaguya {
              * @param v
              * @return
              */
-            Ray sendRay(double u, double v);
+            Ray sendRay(double u, double v) const;
 
             Vector3 getEye() const;
 
@@ -57,7 +57,7 @@ namespace kaguya {
              * 获得相机成像宽度
              * @return
              */
-            int getResolutionWidth();
+            int getResolutionWidth() const;
 
             void setResolutionWidth(int resolutionWidth);
 
@@ -65,7 +65,7 @@ namespace kaguya {
             * 获得相机成像高度
             * @return
             */
-            int getResolutionHeight();
+            int getResolutionHeight() const;
 
             void setResolutionHeight(int resolutionHeight);
 
@@ -83,7 +83,7 @@ namespace kaguya {
              * @return
              */
             Spectrum sampleCameraRay(const Interaction &eye, Vector3 *wi, double *pdf, Point2d *filmPosition,
-                                     random::Sampler1D *sampler1D,
+                                     const random::Sampler1D *const sampler1D,
                                      VisibilityTester *visibilityTester) const;
 
             /**
@@ -91,7 +91,7 @@ namespace kaguya {
              * @param channel
              * @return
              */
-            FilmPlane *buildFilmPlane(int channel);
+            FilmPlane *buildFilmPlane(int channel) const;
 
             /**
              * 计算相机发射射线 ray 的 importance（pdfPos，pdfDir）
@@ -110,7 +110,7 @@ namespace kaguya {
              * @param filmPosition
              * @return
              */
-            Spectrum rayImportance(const Ray &ray, Point2d *filmPosition) const;
+            Spectrum rayImportance(const Ray &ray, Point2d *const filmPosition) const;
 
             /**
              * 构建相机坐标系
@@ -138,8 +138,7 @@ namespace kaguya {
             // 相机成像平面面积
             double _area;
             // 相机光圈大小
-            double _lensRadius = 0.15;
-
+            double _lensRadius = 0.025;
             // 默认焦距为 10
             const double _focal = 10;
         };

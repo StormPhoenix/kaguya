@@ -113,3 +113,5 @@
 
 <img src="https://github.com/StormPhoenix/render-repository-data/blob/master/bidirectional-path-tracing/scene_two-spheres-with-area-light_ssp=300_max-depth=15_render-type=bdpt_1500x1500.png" alt="two-spheres-area-light" width="50%">
 <img src="https://github.com/StormPhoenix/render-repository-data/blob/master/bidirectional-path-tracing/scene_two-spheres-with-point-light_ssp=300_max-depth=15_render-type=bdpt_1500x1500.png" alt="two-spheres-point-light" width="50%">
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/bidirectional-path-tracing/scene_two-spheres-with-spot-light_ssp=300_max-depth=15_render-type=bdpt_1500x1500.png" alt="two-spheres-spot-light" width="50%">
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/bidirectional-path-tracing/scene_bunny-with-point-light_ssp=300_max-depth=15_render-type=bdpt_1500x1500.png" alt="bunny-glass-point-light" width="50%">

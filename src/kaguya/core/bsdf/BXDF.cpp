@@ -9,7 +9,8 @@ namespace kaguya {
 
         BXDF::BXDF(BXDFType type) : type(type) {}
 
-        Spectrum BXDF::sampleF(const Vector3 &wo, Vector3 *wi, double *pdf, random::Sampler1D *sampler1D) {
+        Spectrum BXDF::sampleF(const Vector3 &wo, Vector3 *wi, double *pdf,
+                               const random::Sampler1D *const sampler1D) {
             // 半球面采样
             *wi = hemiCosineSampling(sampler1D);
             if (wo.y < 0) {

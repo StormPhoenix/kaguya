@@ -5,11 +5,11 @@
 #include <kaguya/Config.h>
 #include <kaguya/core/light/AreaLight.h>
 #include <kaguya/material/Material.h>
+#include <kaguya/parallel/RenderPool.h>
 #include <kaguya/scene/Shape.h>
 #include <kaguya/tracer/pt/PathTracer.h>
 
 #include <iostream>
-#include <omp.h>
 
 namespace kaguya {
     namespace tracer {
@@ -251,39 +251,29 @@ namespace kaguya {
                 int cameraWidth = _camera->getResolutionWidth();
                 int cameraHeight = _camera->getResolutionHeight();
 
-                double sampleWeight = 1.0 / _samplePerPixel;
-                // 已完成扫描的行数
-                int finishedLine = 0;
+                const double sampleWeight = 1.0 / _samplePerPixel;
 
-                int kernelCount = omp_get_num_procs();
-#pragma omp parallel for num_threads(kernelCount)
-                // 遍历相机成像图案上每个像素
-                for (int row = cameraHeight - 1; row >= 0; row--) {
-                    MemoryArena arena;
-                    random::Sampler1D *sampler = random::Sampler1D::newInstance();
-                    for (int col = 0; col < cameraWidth; col++) {
-                        Spectrum ans = {0};
-                        // 做 _samplePerPixel 次采样
-                        for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
-                            auto u = (col + sampler->sample()) / cameraWidth;
-                            auto v = (row + sampler->sample()) / cameraHeight;
+                auto renderFunc = [this](const int row, const int col, random::Sampler1D *sampler1D) -> void {
+                    Spectrum ans = {0};
 
-                            // 发射采样光线，开始渲染
-                            Ray sampleRay = _camera->sendRay(u, v);
-//                            ans += shaderOfRecursion(sampleFromLight, *_scene, 0, arena);
-                            ans += shaderOfProgression(sampleRay, *_scene, sampler, arena);
-                            arena.clean();
-                        }
-                        ans *= sampleWeight;
-                        _filmPlane->addSpectrum(ans, row, col);
+                    const double sampleWeight = 1.0 / _samplePerPixel;
+                    // 做 _samplePerPixel 次采样
+                    for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
+                        MemoryArena arena;
+                        auto u = (col + sampler1D->sample()) / double(_camera->getResolutionWidth());
+                        auto v = (row + sampler1D->sample()) / double(_camera->getResolutionHeight());
 
+                        Ray sampleRay = _camera->sendRay(u, v);
+                        Spectrum shaderColor = shaderOfProgression(sampleRay, *(_scene.get()), sampler1D, arena);
+
+                        ans += shaderColor;
+                        arena.clean();
                     }
-                    delete sampler;
-#pragma omp critical
-                    finishedLine++;
-                    std::cout << "\rScanlines remaining: " << _camera->getResolutionHeight() - finishedLine << "  "
-                              << std::flush;
-                }
+                    ans *= sampleWeight;
+                    _filmPlane->addSpectrum(ans, row, col);
+                };
+                parallel::RenderPool *pool = parallel::RenderPool::getInstance();
+                pool->addRenderTask(renderFunc, cameraWidth, cameraHeight);
                 return true;
             } else {
                 return false;

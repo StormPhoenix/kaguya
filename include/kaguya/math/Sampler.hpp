@@ -20,7 +20,7 @@ namespace kaguya {
                 randGenerator = std::bind(distribution, generator);
             }
 
-            double sample() {
+            double sample() const {
                 return randGenerator();
             }
 
