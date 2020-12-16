@@ -19,14 +19,14 @@ namespace kaguya {
              * @param intensity
              * @return
              */
-            static std::shared_ptr<PointLight> buildPointLight(const Vector3 &center, const Spectrum &intensity,  const MediumBoundary mediumBoundary);
+            static std::shared_ptr<PointLight> buildPointLight(const Vector3 &center, const Spectrum &intensity,  const MediumBound mediumBoundary);
 
             /**
              * 点光源
              * @param center 光源位置
              * @param intensity 光源处，单位立体角的光通量
              */
-            PointLight(const Vector3 &center, const Spectrum &intensity, const MediumBoundary &mediumBoundary);
+            PointLight(const Vector3 &center, const Spectrum &intensity, const MediumBound &mediumBoundary);
 
             virtual Spectrum sampleFromLight(const Interaction &eye,
                                              Vector3 *wi, double *pdf,

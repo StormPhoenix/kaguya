@@ -7,19 +7,19 @@
 
 #include <kaguya/material/Material.h>
 #include <kaguya/scene/Shape.h>
-#include <kaguya/core/medium/MediumBoundary.h>
+#include <kaguya/core/medium/MediumBound.h>
 
 namespace kaguya {
     namespace scene {
 
         using kaguya::material::Material;
-        using kaguya::core::medium::MediumBoundary;
+        using kaguya::core::medium::MediumBound;
 
         class Geometry final : public Shape {
         public:
             Geometry(const std::shared_ptr<Shape> shape,
                      const std::shared_ptr<Material> _material,
-                     const MediumBoundary &mediumBoundary);
+                     const MediumBound &mediumBoundary);
 
             bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) override;
 
@@ -28,7 +28,7 @@ namespace kaguya {
         private:
             const std::shared_ptr<Shape> _shape;
             const std::shared_ptr<Material> _material;
-            MediumBoundary _mediumBoundary;
+            MediumBound _mediumBoundary;
         };
 
     }

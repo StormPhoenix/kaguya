@@ -13,7 +13,7 @@ namespace kaguya {
 
         Interaction::Interaction(const Vector3 &point,
                                  const Vector3 &direction, const Vector3 &normal,
-                                 const MediumBoundary &mediumBoundary, Material *material) :
+                                 const MediumBound &mediumBoundary, Material *material) :
                 _point(point), _direction(direction), _normal(normal),
                 _mediumBoundary(mediumBoundary), _material(material) {}
 
@@ -36,9 +36,14 @@ namespace kaguya {
             return ray;
         }
 
+        MediumInteraction::MediumInteraction(const Vector3 &point, const Vector3 &direction,
+                                             const Medium *medium, const PhaseFunction *phase) :
+                Interaction(point, direction, Vector3(0), medium),
+                _medium(medium), _phase(phase) {}
+
         SurfaceInteraction::SurfaceInteraction(const Vector3 &point, const Vector3 &direction,
                                                const Vector3 &normal,
-                                               MediumBoundary &mediumBoundary,
+                                               MediumBound &mediumBoundary,
                                                double u, double v, Material *material) :
                 Interaction(point, direction, normal, mediumBoundary, material),
                 _u(u), _v(v) {}
@@ -72,7 +77,7 @@ namespace kaguya {
         }
 
         bool MediumInteraction::isValid() const {
-            return phase != nullptr;
+            return _phase != nullptr;
         }
 
     }

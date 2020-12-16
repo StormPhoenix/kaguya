@@ -15,7 +15,7 @@ namespace kaguya {
         public:
             static std::shared_ptr<SpotLight>
             buildSpotLight(const Vector3 &center, const Vector3 &dir, const Spectrum &intensity,
-                           const MediumBoundary &mediumBoundary) {
+                           const MediumBound &mediumBoundary) {
                 std::shared_ptr<SpotLight> light = std::make_shared<SpotLight>(center, dir, intensity, mediumBoundary,
                                                                                15, 20);
                 return light;
@@ -36,7 +36,7 @@ namespace kaguya {
              * @param fallOffRange 聚光灯高光区半角
              * @param totalRange 聚光灯所有区域半角
              */
-            SpotLight(const Vector3 eye, const Vector3 dir, Spectrum intensity, const MediumBoundary &mediumBoundary,
+            SpotLight(const Vector3 eye, const Vector3 dir, Spectrum intensity, const MediumBound &mediumBoundary,
                       double fallOffRange = 30, double totalRange = 45);
 
             virtual Spectrum randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir,

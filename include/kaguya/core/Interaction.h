@@ -7,7 +7,7 @@
 
 #include <kaguya/core/Core.h>
 #include <kaguya/core/phase/PhaseFunction.h>
-#include <kaguya/core/medium/MediumBoundary.h>
+#include <kaguya/core/medium/MediumBound.h>
 #include <kaguya/utils/MemoryArena.h>
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/tracer/Ray.h>
@@ -27,7 +27,7 @@ namespace kaguya {
 
         class Light;
 
-        using medium::MediumBoundary;
+        using medium::MediumBound;
         using kaguya::tracer::Camera;
         using kaguya::tracer::Ray;
         using kaguya::material::Material;
@@ -41,7 +41,7 @@ namespace kaguya {
             Interaction() : _mediumBoundary(nullptr, nullptr) {}
 
             Interaction(const Vector3 &point, const Vector3 &direction, const Vector3 &normal,
-                        const MediumBoundary &mediumBoundary, Material *material = nullptr);
+                        const MediumBound &mediumBoundary, Material *material = nullptr);
 
             const Vector3 getDirection() const {
                 return _direction;
@@ -92,7 +92,7 @@ namespace kaguya {
 
             virtual Ray sendRayTo(const Interaction &it) const;
 
-            void setMediumBoundary(MediumBoundary &mediumBoundary) {
+            void setMediumBoundary(MediumBound &mediumBoundary) {
                 _mediumBoundary = mediumBoundary;
             }
 
@@ -116,7 +116,7 @@ namespace kaguya {
             // 击中物体的 ID
             long long _id = -1;
             // medium boundary
-            MediumBoundary _mediumBoundary;
+            MediumBound _mediumBoundary;
         };
 
         /**
@@ -127,7 +127,7 @@ namespace kaguya {
             SurfaceInteraction() : Interaction() {}
 
             SurfaceInteraction(const Vector3 &point, const Vector3 &direction, const Vector3 &normal,
-                               MediumBoundary &mediumBoundary, double u = 0, double v = 0,
+                               MediumBound &mediumBoundary, double u = 0, double v = 0,
                                Material *material = nullptr);
 
             BSDF *buildBSDF(MemoryArena &memoryArena, TransportMode mode = TransportMode::RADIANCE);
@@ -187,10 +187,14 @@ namespace kaguya {
             AreaLight *_areaLight = nullptr;
         };
 
+        using kaguya::core::medium::Medium;
+
         class MediumInteraction : public Interaction {
         public:
-            MediumInteraction() : Interaction(),
-                                  phase(nullptr) {}
+            MediumInteraction() : Interaction(), _phase(nullptr) {}
+
+            MediumInteraction(const Vector3 &point, const Vector3 &direction,
+                              const Medium *medium, const PhaseFunction *phase);
 
             bool isValid() const;
 
@@ -199,11 +203,12 @@ namespace kaguya {
             }
 
             const PhaseFunction *getPhaseFunction() const {
-                return phase;
+                return _phase;
             }
 
         private:
-            PhaseFunction *phase = nullptr;
+            const Medium *_medium;
+            const PhaseFunction *_phase;
         };
 
         class StartEndInteraction : public Interaction {

@@ -8,7 +8,7 @@ namespace kaguya {
     namespace scene {
         Geometry::Geometry(const std::shared_ptr<Shape> shape,
                            const std::shared_ptr<Material> material,
-                           const MediumBoundary &mediumBoundary) :
+                           const MediumBound &mediumBoundary) :
                 _shape(shape), _material(material), _mediumBoundary(mediumBoundary) {
             assert(_shape != nullptr);
         }

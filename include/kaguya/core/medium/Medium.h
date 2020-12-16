@@ -10,10 +10,13 @@
 #include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/tracer/Ray.h>
 #include <kaguya/math/Sampler.hpp>
+#include <kaguya/utils/MemoryArena.h>
 
 namespace kaguya {
     namespace core {
         namespace medium {
+
+            using kaguya::memory::MemoryArena;
 
             class Medium {
             public:
@@ -24,7 +27,8 @@ namespace kaguya {
                 virtual core::Spectrum sampleInteraction(
                         const tracer::Ray &ray,
                         const random::Sampler1D *sampler1D,
-                        MediumInteraction *mi
+                        MediumInteraction *mi,
+                        MemoryArena &memoryArena
                 ) const = 0;
             };
 

@@ -2,22 +2,22 @@
 // Created by Storm Phoenix on 2020/12/16.
 //
 
-#ifndef KAGUYA_MEDIUMBOUNDARY_H
-#define KAGUYA_MEDIUMBOUNDARY_H
+#ifndef KAGUYA_MEDIUMBOUND_H
+#define KAGUYA_MEDIUMBOUND_H
 
 namespace kaguya {
     namespace core {
         namespace medium {
             class Medium;
 
-            class MediumBoundary {
+            class MediumBound {
             public:
-                MediumBoundary() : _inside(nullptr), _outside(nullptr) {}
+                MediumBound() : _inside(nullptr), _outside(nullptr) {}
 
-                MediumBoundary(const Medium *medium) : _inside(medium), _outside(medium) {}
+                MediumBound(const Medium *medium) : _inside(medium), _outside(medium) {}
 
-                MediumBoundary(const Medium *inside,
-                               const Medium *outside) :
+                MediumBound(const Medium *inside,
+                            const Medium *outside) :
                         _inside(inside), _outside(outside) {}
 
                 const Medium *inside() const {
@@ -36,4 +36,4 @@ namespace kaguya {
     }
 }
 
-#endif //KAGUYA_MEDIUMBOUNDARY_H
+#endif //KAGUYA_MEDIUMBOUND_H

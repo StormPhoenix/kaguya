@@ -8,7 +8,7 @@ namespace kaguya {
     namespace core {
 
         SpotLight::SpotLight(const Vector3 center, const Vector3 dir, Spectrum intensity,
-                             const MediumBoundary &mediumBoundary, double fallOffRange, double totalRange) :
+                             const MediumBound &mediumBoundary, double fallOffRange, double totalRange) :
                 Light(DELTA_POSITION, mediumBoundary),
                 _center(center), _dir(NORMALIZE(dir)),
                 _intensity(intensity) {

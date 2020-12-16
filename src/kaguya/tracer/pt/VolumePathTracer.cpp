@@ -58,7 +58,7 @@ namespace kaguya {
                 // deal with participating medium
                 core::MediumInteraction mi;
                 if (ray.getMedium() != nullptr) {
-                    beta *= ray.getMedium()->sampleInteraction(ray, sampler1D, &mi);
+                    beta *= ray.getMedium()->sampleInteraction(ray, sampler1D, &mi, memoryArena);
                     if (beta.isBlack()) {
                         break;
                     }

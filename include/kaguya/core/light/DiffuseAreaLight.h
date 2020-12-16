@@ -14,7 +14,7 @@ namespace kaguya {
         public:
             DiffuseAreaLight(const Spectrum &intensity,
                              std::shared_ptr<ShapeSampler> shapeSampler,
-                             const MediumBoundary &mediumBoundary,
+                             const MediumBound &mediumBoundary,
                              bool singleSide = true);
 
             Spectrum lightRadiance(const Interaction &interaction, const Vector3 &wo) const override;
@@ -29,7 +29,7 @@ namespace kaguya {
             // 构造漫反射区域灯光
             static std::shared_ptr<AreaLight> buildDiffuseAreaLight(const Spectrum &intensity,
                                                                     std::shared_ptr<ShapeSampler> shapeSampler,
-                                                                    const MediumBoundary &mediumBoundary,
+                                                                    const MediumBound &mediumBoundary,
                                                                     bool singleSide = true);
 
         private:

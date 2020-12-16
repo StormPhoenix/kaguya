@@ -3,12 +3,12 @@
 //
 
 #include <kaguya/tracer/Camera.h>
-#include <kaguya/core/medium/MediumBoundary.h>
+#include <kaguya/core/medium/MediumBound.h>
 
 namespace kaguya {
     namespace tracer {
 
-        using kaguya::core::medium::MediumBoundary;
+        using kaguya::core::medium::MediumBound;
 
         Camera::Camera(const Vector3 &eye, const Vector3 &direction, float fov, float aspect,
                        const core::medium::Medium *medium) : _medium(medium) {

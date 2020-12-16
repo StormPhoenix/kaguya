@@ -7,7 +7,7 @@
 namespace kaguya {
     namespace core {
 
-        PointLight::PointLight(const Vector3 &center, const Spectrum &intensity, const MediumBoundary &mediumBoundary) :
+        PointLight::PointLight(const Vector3 &center, const Spectrum &intensity, const MediumBound &mediumBoundary) :
                 Light(DELTA_POSITION, mediumBoundary), _center(center), _intensity(intensity) {}
 
         Spectrum PointLight::sampleFromLight(const Interaction &eye,
@@ -49,7 +49,7 @@ namespace kaguya {
         }
 
         std::shared_ptr<PointLight> PointLight::buildPointLight(const Vector3 &center, const Spectrum &intensity,
-                                                                const MediumBoundary mediumBoundary) {
+                                                                const MediumBound mediumBoundary) {
             std::shared_ptr<PointLight> light =
                     std::make_shared<PointLight>(center, intensity, mediumBoundary);
             return light;

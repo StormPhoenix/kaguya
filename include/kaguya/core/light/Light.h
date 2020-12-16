@@ -14,7 +14,7 @@ namespace kaguya {
     namespace core {
 
         namespace medium {
-            class MediumBoundary;
+            class MediumBound;
         }
 
         using medium::Medium;
@@ -30,7 +30,7 @@ namespace kaguya {
 
         class Light {
         public:
-            Light(LightType type, const MediumBoundary &mediumBoundary) :
+            Light(LightType type, const MediumBound &mediumBoundary) :
                     _type(type), _mediumBoundary(mediumBoundary) {}
 
             /**
@@ -92,7 +92,7 @@ namespace kaguya {
 
         protected:
             const LightType _type;
-            MediumBoundary _mediumBoundary;
+            MediumBound _mediumBoundary;
         };
 
     }

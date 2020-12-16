@@ -25,6 +25,7 @@ using Matrix3 = glm::dmat3x3;
 
 typedef Vector2 Point2d;
 
+const double maxDouble = std::numeric_limits<double>::max();
 const double infinity = std::numeric_limits<double>::infinity();
 const double PI = 3.1415926535897932385;
 const double INV_PI = 1.0 / PI;
@@ -81,7 +82,7 @@ inline double randomDouble(double min, double max, const random::Sampler1D *cons
 }
 
 inline int randomInt(int min, int max, const random::Sampler1D *const sampler1D) {
-    return static_cast<int>(randomDouble(min, max + 1, sampler1D));
+    return std::min(static_cast<int>(randomDouble(min, max + 1, sampler1D)), max);
 }
 
 inline Vector3 reflect(const Vector3 &v, const Vector3 &normal) {
