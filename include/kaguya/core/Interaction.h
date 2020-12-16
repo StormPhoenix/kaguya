@@ -41,7 +41,7 @@ namespace kaguya {
             Interaction() : _mediumBoundary(nullptr, nullptr) {}
 
             Interaction(const Vector3 &point, const Vector3 &direction, const Vector3 &normal,
-                        double step, const MediumBoundary &mediumBoundary, Material *material = nullptr);
+                        const MediumBoundary &mediumBoundary, Material *material = nullptr);
 
             const Vector3 getDirection() const {
                 return _direction;
@@ -57,14 +57,6 @@ namespace kaguya {
 
             void setNormal(const Vector3 &normal) {
                 _normal = normal;
-            }
-
-            const double getStep() const {
-                return _step;
-            }
-
-            void setStep(double step) {
-                _step = step;
             }
 
             const Material *getMaterial() const {
@@ -96,7 +88,9 @@ namespace kaguya {
              * Generate ray alone @param dir from origin
              * @param dir
              */
-            virtual Ray generateRay(const Vector3 &dir) const;
+            virtual Ray sendRay(const Vector3 &dir) const;
+
+            virtual Ray sendRayTo(const Interaction &it) const;
 
             void setMediumBoundary(MediumBoundary &mediumBoundary) {
                 _mediumBoundary = mediumBoundary;
@@ -117,8 +111,6 @@ namespace kaguya {
             Vector3 _point;
             // 击中点法线方向，发现永远指向物体表面外侧
             Vector3 _normal;
-            // 击中射线步长
-            double _step;
             // 击中材质种类
             Material *_material = nullptr;
             // 击中物体的 ID
@@ -135,7 +127,7 @@ namespace kaguya {
             SurfaceInteraction() : Interaction() {}
 
             SurfaceInteraction(const Vector3 &point, const Vector3 &direction, const Vector3 &normal,
-                               double step, MediumBoundary &mediumBoundary, double u = 0, double v = 0,
+                               MediumBoundary &mediumBoundary, double u = 0, double v = 0,
                                Material *material = nullptr);
 
             BSDF *buildBSDF(MemoryArena &memoryArena, TransportMode mode = TransportMode::RADIANCE);

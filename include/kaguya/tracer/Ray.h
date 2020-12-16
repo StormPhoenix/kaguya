@@ -19,7 +19,7 @@ namespace kaguya {
 
         class Ray {
         public:
-            Ray() : _medium(nullptr) {}
+            Ray() : _medium(nullptr), _minStep(0.001), _step(infinity) {}
 
             /**
              * 射线初始化
@@ -31,21 +31,34 @@ namespace kaguya {
 
             const Vector3 &getDirection() const;
 
-            const void setDirection(const Vector3 &direction);
-
             const Vector3 &getOrigin() const;
-
-            const void setOrigin(const Vector3 &origin);
 
             const void setMedium(core::medium::Medium *medium);
 
-            const core::medium::Medium *getMedium() const;
+            const core::medium::Medium *getMedium() const {
+                return _medium;
+            }
+
+            double getMinStep() const {
+                return _minStep;
+            }
+
+            double getStep() const {
+                return _step;
+            }
+
+            void setStep(double step) {
+                assert(step >= _minStep);
+                _step = step;
+            }
 
             const Vector3 at(double step) const;
 
         private:
             Vector3 _origin;
             Vector3 _direction;
+            double _minStep;
+            double _step;
             const core::medium::Medium *_medium;
         };
 

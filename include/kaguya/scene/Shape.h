@@ -33,7 +33,7 @@ namespace kaguya {
              * @param stepMax 射线步长最大值
              * @return
              */
-            virtual bool insect(const Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) = 0;
+            virtual bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) = 0;
 
             /**
              * 计算 AxisAlignBoundingBox

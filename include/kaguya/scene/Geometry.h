@@ -21,7 +21,7 @@ namespace kaguya {
                      const std::shared_ptr<Material> _material,
                      const MediumBoundary &mediumBoundary);
 
-            bool insect(const Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) override;
+            bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) override;
 
             const AABB &boundingBox() const override;
 

@@ -439,7 +439,8 @@ namespace kaguya {
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 
             // build area light
-            std::shared_ptr<AreaLight> light = DiffuseAreaLight::buildDiffuseAreaLight(areaLightSpectrum, lightWallShape,
+            std::shared_ptr<AreaLight> light = DiffuseAreaLight::buildDiffuseAreaLight(areaLightSpectrum,
+                                                                                       lightWallShape,
                                                                                        nullptr, true);
             scene->_light = light;
 
@@ -745,15 +746,14 @@ namespace kaguya {
         }
         */
 
-        bool Scene::intersect(const Ray &ray, SurfaceInteraction &hitRecord) {
-            return _world->insect(ray, hitRecord, 0.001, infinity);
+        bool Scene::intersect(Ray &ray, SurfaceInteraction &si) {
+            return _world->insect(ray, si, ray.getMinStep(), ray.getStep());
         }
 
         bool Scene::intersectWithMedium(Ray &ray, SurfaceInteraction &si, core::Spectrum &transmittance) {
             transmittance = Spectrum(1.0);
-            bool foundIntersection = false;
             while (true) {
-                foundIntersection = intersect(ray, si);
+                bool foundIntersection = intersect(ray, si);
                 if (ray.getMedium() != nullptr) {
                     transmittance *= ray.getMedium()->transmittance(ray);
                 }
@@ -764,8 +764,7 @@ namespace kaguya {
 
                 // skip the shape without material and generate new ray
                 if (si.getMaterial() == nullptr) {
-                    ray.setOrigin(si.getPoint());
-                    ray.setDirection(ray.getDirection());
+                    ray = si.sendRay(ray.getDirection());
                 } else {
                     return true;
                 }

@@ -83,7 +83,7 @@ namespace kaguya {
             _aabb = AABB(Vector3(minX, minY, minZ), Vector3(maxX, maxY, maxZ));
         }
 
-        bool Triangle::insect(const Ray &ray, SurfaceInteraction &hitRecord,
+        bool Triangle::insect(Ray &ray, SurfaceInteraction &si,
                               double stepMin, double stepMax) {
 
             const Vector3 &dir = ray.getDirection();
@@ -110,18 +110,18 @@ namespace kaguya {
 
                 Vector3 factor = Vector3(alpha, ans[0], ans[1]);
 
-                hitRecord.setStep(step);
-                hitRecord.setPoint(ray.at(step));
+                ray.setStep(step);
+                si.setPoint(ray.at(step));
 
                 Vector3 normal = alpha * _transformedNormal1 +
                                  ans[0] * _transformedNormal2 +
                                  ans[1] * _transformedNormal3;
 
-                hitRecord.setId(getId());
-                hitRecord.setOutwardNormal(normal, dir);
-                hitRecord.setU(DOT(factor, Vector3(_uv1.x, _uv2.x, _uv3.x)));
-                hitRecord.setV(DOT(factor, Vector3(_uv1.y, _uv2.y, _uv3.y)));
-                hitRecord.setAreaLight(nullptr);
+                si.setId(getId());
+                si.setOutwardNormal(normal, dir);
+                si.setU(DOT(factor, Vector3(_uv1.x, _uv2.x, _uv3.x)));
+                si.setV(DOT(factor, Vector3(_uv1.y, _uv2.y, _uv3.y)));
+                si.setAreaLight(nullptr);
                 return true;
             } else {
                 return false;

@@ -12,25 +12,35 @@ namespace kaguya {
         using kaguya::material::Material;
 
         Interaction::Interaction(const Vector3 &point,
-                                 const Vector3 &direction, const Vector3 &normal, double step,
+                                 const Vector3 &direction, const Vector3 &normal,
                                  const MediumBoundary &mediumBoundary, Material *material) :
                 _point(point), _direction(direction), _normal(normal),
-                _mediumBoundary(mediumBoundary),
-                _step(step), _material(material) {}
+                _mediumBoundary(mediumBoundary), _material(material) {}
 
 
-        Ray Interaction::generateRay(const Vector3 &dir) const {
+        Ray Interaction::sendRay(const Vector3 &dir) const {
             // check whether the ray direction is point to outside or inside
             const medium::Medium *medium = (DOT(dir, _normal) > 0 ?
                                             _mediumBoundary.outside() : _mediumBoundary.inside());
             return Ray(_point, dir, medium);
         }
 
+        Ray Interaction::sendRayTo(const Interaction &it) const {
+            const Vector3 dir = (it._point - _point);
+            double step = LENGTH(dir);
+            // check whether the ray direction is point to outside or inside
+            const medium::Medium *medium = (DOT(dir, _normal) > 0 ?
+                                            _mediumBoundary.outside() : _mediumBoundary.inside());
+            Ray ray = Ray(_point, NORMALIZE(dir), medium);
+            ray.setStep(step);
+            return ray;
+        }
+
         SurfaceInteraction::SurfaceInteraction(const Vector3 &point, const Vector3 &direction,
-                                               const Vector3 &normal, double step,
+                                               const Vector3 &normal,
                                                MediumBoundary &mediumBoundary,
                                                double u, double v, Material *material) :
-                Interaction(point, direction, normal, step, mediumBoundary, material),
+                Interaction(point, direction, normal, mediumBoundary, material),
                 _u(u), _v(v) {}
 
 

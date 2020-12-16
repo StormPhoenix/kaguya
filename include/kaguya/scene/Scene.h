@@ -61,10 +61,10 @@ namespace kaguya {
             /**
              * Intersect with scene，record the interaction
              * @param ray
-             * @param hitRecord
+             * @param si
              * @return
              */
-            bool intersect(const Ray &ray, SurfaceInteraction &hitRecord);
+            bool intersect(Ray &ray, SurfaceInteraction &si);
 
             /**
              * Intersect scene with participating medium

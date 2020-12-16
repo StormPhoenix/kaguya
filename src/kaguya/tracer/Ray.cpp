@@ -10,22 +10,14 @@ namespace kaguya {
         Ray::Ray(const Vector3 &origin, const Vector3 &direction,
                  const core::medium::Medium *medium) :
                 _origin(origin), _direction(NORMALIZE(direction)),
-                _medium(medium) {}
+                _medium(medium), _minStep(0.001), _step(infinity) {}
 
         const Vector3 &Ray::getDirection() const {
             return _direction;
         }
 
-        const void Ray::setDirection(const Vector3 &direction) {
-            _direction = direction;
-        }
-
         const Vector3 &Ray::getOrigin() const {
             return _origin;
-        }
-
-        const void Ray::setOrigin(const Vector3 &origin) {
-            _origin = origin;
         }
 
         const Vector3 Ray::at(double step) const {

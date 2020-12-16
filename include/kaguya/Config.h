@@ -51,6 +51,7 @@ namespace kaguya {
         static std::shared_ptr<Scene> nextScene() {
             // 若场景未构建，则线构建场景
             if (!isScenePrepared) {
+                // TODO
 //                scenes.push_back(Scene::sceneTwoSpheresWithPointLight);
                 scenes.push_back(Scene::sceneTwoSpheresWithAreaLight);
 //                scenes.push_back(Scene::sceneTwoSpheresWithSpotLight);

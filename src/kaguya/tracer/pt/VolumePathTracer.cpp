@@ -74,7 +74,7 @@ namespace kaguya {
                     Vector3 worldWo = -scatterRay.getDirection();
                     Vector3 worldWi;
                     mi.getPhaseFunction()->sampleScatter(worldWo, &worldWi);
-                    scatterRay = mi.generateRay(worldWi);
+                    scatterRay = mi.sendRay(worldWi);
                     isSpecular = false;
                 } else {
                     // handle surface interaction
@@ -125,7 +125,7 @@ namespace kaguya {
                     // 计算 beta
                     beta *= (f * cosine / samplePdf);
                     // 设置下一次打击光线
-                    scatterRay = si.generateRay(NORMALIZE(worldWi));
+                    scatterRay = si.sendRay(NORMALIZE(worldWi));
                     isSpecular = (bxdfType & BSDF_SPECULAR) > 0;
                 }
 
@@ -180,7 +180,7 @@ namespace kaguya {
                 }
 
                 if (!f.isBlack()) {
-                    lumi *= visibilityTester.transmittance();
+                    lumi *= visibilityTester.transmittance(scene);
 
                     if (!lumi.isBlack()) {
                         if (light->isDeltaType()) {

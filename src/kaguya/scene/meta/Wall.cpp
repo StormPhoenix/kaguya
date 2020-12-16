@@ -63,7 +63,7 @@ namespace kaguya {
             _area = (transformedWidth * transformedHeight);
         }
 
-        bool Wall::insect(const Ray &ray, SurfaceInteraction &hitRecord,
+        bool Wall::insect(Ray &ray, SurfaceInteraction &si,
                           double stepMin, double stepMax) {
             // 仿照三角形平面求直线交点解法
             Vector3 transformedA = _transformMatrix != nullptr ?
@@ -98,14 +98,14 @@ namespace kaguya {
                 // 判断是否在四边形内部
                 if (checkRange(offsetX, 0, _width)
                     && checkRange(offsetY, 0, _height)) {
-                    hitRecord.setId(getId());
-                    hitRecord.setStep(step);
-                    hitRecord.setPoint(hitPoint);
+                    si.setId(getId());
+                    si.setPoint(hitPoint);
                     Vector3 normal = (*_transformMatrix) * Vector4(_normal, 0.0f);
-                    hitRecord.setOutwardNormal(normal, dir);
-                    hitRecord.setU(offsetX / _width);
-                    hitRecord.setV(offsetY / _height);
-                    hitRecord.setAreaLight(_areaLight.get());
+                    si.setOutwardNormal(normal, dir);
+                    si.setU(offsetX / _width);
+                    si.setV(offsetY / _height);
+                    si.setAreaLight(_areaLight.get());
+                    ray.setStep(step);
                     return true;
                 } else {
                     return false;
@@ -165,7 +165,7 @@ namespace kaguya {
             init();
         }
 
-        bool ZXWall::insect(const Ray &ray, SurfaceInteraction &hitRecord,
+        bool ZXWall::insect(Ray &ray, SurfaceInteraction &si,
                             double stepMin, double stepMax) {
             double step = (_y - ray.getOrigin().y) / ray.getDirection().y;
             if (step >= stepMin && step <= stepMax) {
@@ -173,13 +173,13 @@ namespace kaguya {
                 double x = ray.getOrigin().x + step * ray.getDirection().x;
 
                 if (checkRange(z, _z0, _z1) && checkRange(x, _x0, _x1)) {
-                    hitRecord.setId(getId());
-                    hitRecord.setPoint(ray.at(step));
-                    hitRecord.setStep(step);
-                    hitRecord.setOutwardNormal(_normal, ray.getDirection());
-                    hitRecord.setU((x - _x0) / (_x1 - _x0));
-                    hitRecord.setV((z - _z0) / (_z1 - _z0));
-                    hitRecord.setAreaLight(_areaLight.get());
+                    si.setId(getId());
+                    si.setPoint(ray.at(step));
+                    ray.setStep(step);
+                    si.setOutwardNormal(_normal, ray.getDirection());
+                    si.setU((x - _x0) / (_x1 - _x0));
+                    si.setV((z - _z0) / (_z1 - _z0));
+                    si.setAreaLight(_areaLight.get());
                     return true;
                 } else {
                     return false;
@@ -238,7 +238,7 @@ namespace kaguya {
             init();
         }
 
-        bool YZWall::insect(const Ray &ray, SurfaceInteraction &hitRecord,
+        bool YZWall::insect(Ray &ray, SurfaceInteraction &si,
                             double stepMin, double stepMax) {
             double step = (_x - ray.getOrigin().x) / ray.getDirection().x;
             if (step >= stepMin && step <= stepMax) {
@@ -246,13 +246,13 @@ namespace kaguya {
                 double y = ray.getOrigin().y + step * ray.getDirection().y;
 
                 if (checkRange(z, _z0, _z1) && checkRange(y, _y0, _y1)) {
-                    hitRecord.setId(getId());
-                    hitRecord.setPoint(ray.at(step));
-                    hitRecord.setStep(step);
-                    hitRecord.setOutwardNormal(_normal, ray.getDirection());
-                    hitRecord.setU((z - _z0) / (_z1 - _z0));
-                    hitRecord.setV((y - _y0) / (_y1 - _y0));
-                    hitRecord.setAreaLight(_areaLight.get());
+                    si.setId(getId());
+                    si.setPoint(ray.at(step));
+                    ray.setStep(step);
+                    si.setOutwardNormal(_normal, ray.getDirection());
+                    si.setU((z - _z0) / (_z1 - _z0));
+                    si.setV((y - _y0) / (_y1 - _y0));
+                    si.setAreaLight(_areaLight.get());
                     return true;
                 } else {
                     return false;
@@ -311,7 +311,7 @@ namespace kaguya {
             init();
         }
 
-        bool XYWall::insect(const Ray &ray, SurfaceInteraction &hitRecord,
+        bool XYWall::insect(Ray &ray, SurfaceInteraction &si,
                             double stepMin, double stepMax) {
             double step = (_z - ray.getOrigin().z) / ray.getDirection().z;
             if (step >= stepMin && step <= stepMax) {
@@ -319,13 +319,13 @@ namespace kaguya {
                 double y = ray.getOrigin().y + step * ray.getDirection().y;
 
                 if (checkRange(x, _x0, _x1) && checkRange(y, _y0, _y1)) {
-                    hitRecord.setId(getId());
-                    hitRecord.setPoint(ray.at(step));
-                    hitRecord.setStep(step);
-                    hitRecord.setOutwardNormal(_normal, ray.getDirection());
-                    hitRecord.setU((x - _x0) / (_x1 - _x0));
-                    hitRecord.setV((y - _y0) / (_y1 - _y0));
-                    hitRecord.setAreaLight(_areaLight.get());
+                    si.setId(getId());
+                    si.setPoint(ray.at(step));
+                    ray.setStep(step);
+                    si.setOutwardNormal(_normal, ray.getDirection());
+                    si.setU((x - _x0) / (_x1 - _x0));
+                    si.setV((y - _y0) / (_y1 - _y0));
+                    si.setAreaLight(_areaLight.get());
                     return true;
                 } else {
                     return false;

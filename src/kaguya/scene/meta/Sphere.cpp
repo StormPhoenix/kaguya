@@ -29,7 +29,7 @@ namespace kaguya {
             }
         }
 
-        bool Sphere::insect(const Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) {
+        bool Sphere::insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) {
             Vector3 centerToOrigin = ray.getOrigin() - _transformedCenter;
             double c = DOT(centerToOrigin, centerToOrigin) - _radius * _radius;
             double a = pow(LENGTH(ray.getDirection()), 2);
@@ -42,11 +42,11 @@ namespace kaguya {
                 double root = (-halfB - sqrt(discriminant)) / a;
                 if (root >= stepMin && root <= stepMax) {
                     si.setId(getId());
-                    si.setStep(root);
                     si.setPoint(ray.at(root));
                     si.setU(0);
                     si.setV(0);
                     si.setAreaLight(nullptr);
+                    ray.setStep(root);
 
                     Vector3 outwardNormal = computeNormal(si.getPoint());
                     si.setOutwardNormal(outwardNormal, ray.getDirection());
@@ -56,11 +56,11 @@ namespace kaguya {
                 root = (-halfB + sqrt(discriminant)) / a;
                 if (root >= stepMin && root <= stepMax) {
                     si.setId(getId());
-                    si.setStep(root);
                     si.setPoint(ray.at(root));
                     si.setU(0);
                     si.setV(0);
                     si.setAreaLight(nullptr);
+                    ray.setStep(root);
 
                     Vector3 outwardNormal = computeNormal(si.getPoint());
                     si.setOutwardNormal(outwardNormal, ray.getDirection());

@@ -33,12 +33,11 @@ namespace kaguya {
 
             /**
              * TODO
-             * MC 采样计算透射率
              * T(p, p') = exponent^(-shift_{0, (p'-p)} theta_t(t) dt)
              *
              * @return
              */
-            core::Spectrum transmittance() const;
+            core::Spectrum transmittance(Scene &scene) const;
 
             bool isVisible(Scene &scene);
 

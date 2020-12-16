@@ -13,7 +13,7 @@ namespace kaguya {
             assert(_shape != nullptr);
         }
 
-        bool Geometry::insect(const Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) {
+        bool Geometry::insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) {
             // proxy
             bool ret = _shape->insect(ray, si, stepMin, stepMax);
             if (ret) {

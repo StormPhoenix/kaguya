@@ -29,7 +29,7 @@ namespace kaguya {
             Sphere(const Vector3 &center, double radius, bool outward = true,
                    std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
-            bool insect(const Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) override;
+            bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) override;
 
             const AABB &boundingBox() const override;
 

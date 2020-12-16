@@ -26,8 +26,7 @@ namespace kaguya {
             Vector3 samplePoint = _center;
             Vector3 sampleDir = NORMALIZE(_center - eye.getPoint());
             Vector3 sampleNormal = -sampleDir;
-            double step = LENGTH(_center - eye.getPoint());
-            Interaction interaction = Interaction(samplePoint, sampleDir, sampleNormal, step, _mediumBoundary);
+            Interaction interaction = Interaction(samplePoint, sampleDir, sampleNormal, _mediumBoundary);
 
             (*visibilityTester) = VisibilityTester(eye, interaction);
             return _intensity * fallOffWeight(-(*wi)) / std::pow(LENGTH(_center - eye.getPoint()), 2);
@@ -52,8 +51,7 @@ namespace kaguya {
             Vector3 dirWorld = dirLocal.x * tanX + dirLocal.y * tanY + dirLocal.z * tanZ;
 
             // 设置 ray
-            ray->setOrigin(_center);
-            ray->setDirection(dirWorld);
+            (*ray) = Ray(_center, NORMALIZE(dirWorld));
 
             (*normal) = dirWorld;
             (*pdfPos) = 1.0;

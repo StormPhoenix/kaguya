@@ -20,8 +20,7 @@ namespace kaguya {
             Vector3 samplePoint = _center;
             Vector3 sampleDir = NORMALIZE(_center - eye.getPoint());
             Vector3 sampleNormal = -sampleDir;
-            double step = LENGTH(_center - eye.getPoint());
-            Interaction interaction = Interaction(samplePoint, sampleDir, sampleNormal, step, _mediumBoundary);
+            Interaction interaction = Interaction(samplePoint, sampleDir, sampleNormal, _mediumBoundary);
 
             (*visibilityTester) = VisibilityTester(eye, interaction);
             return _intensity / std::pow(LENGTH(_center - eye.getPoint()), 2);
@@ -35,8 +34,7 @@ namespace kaguya {
                                             random::Sampler1D *sampler1D) {
             // 采样射线
             Vector3 rayDir = sphereUniformSampling(sampler1D);
-            ray->setOrigin(_center);
-            ray->setDirection(rayDir);
+            (*ray) = Ray(_center, rayDir);
 
             *normal = rayDir;
             *pdfPos = 1.0;

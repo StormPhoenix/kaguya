@@ -74,7 +74,7 @@ namespace kaguya {
             (*wi) = NORMALIZE(*wi);
 
             // 创建 Interaction
-            Interaction lensInter = Interaction(lensSample, *wi, _front, dist, _medium);
+            Interaction lensInter = Interaction(lensSample, *wi, _front, _medium);
             // 设置 visibility tester
             (*visibilityTester) = VisibilityTester(eye, lensInter);
 

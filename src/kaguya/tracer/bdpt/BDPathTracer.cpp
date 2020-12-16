@@ -257,8 +257,7 @@ namespace kaguya {
                     }
 
                     // 设置新的散射光线
-                    scatterRay.setOrigin(interaction.getPoint());
-                    scatterRay.setDirection(worldWi);
+                    scatterRay = Ray(interaction.getPoint(), worldWi);
 
                     // TODO cosine 的计算感觉有问题，对于从光源发射的光线，应该用 worldWo
                     // 更新 beta
