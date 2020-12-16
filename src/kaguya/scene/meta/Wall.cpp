@@ -7,10 +7,9 @@
 namespace kaguya {
     namespace scene {
 
-        Wall::Wall(double width, double height, std::shared_ptr<Material> material,
+        Wall::Wall(double width, double height,
                    std::shared_ptr<Matrix4> transformMatrix)
                 : _width(width), _height(height),
-                  _material(material),
                   _transformMatrix(transformMatrix) {
             _leftBottom = {-width / 2, -height / 2, 0.0f};
             _leftTop = {-width / 2, height / 2, 0.0f};
@@ -106,7 +105,6 @@ namespace kaguya {
                     hitRecord.setOutwardNormal(normal, dir);
                     hitRecord.setU(offsetX / _width);
                     hitRecord.setV(offsetY / _height);
-                    hitRecord.setMaterial(_material.get());
                     hitRecord.setAreaLight(_areaLight.get());
                     return true;
                 } else {
@@ -152,14 +150,12 @@ namespace kaguya {
             }
         }
 
-        ZXWall::ZXWall(double z0, double z1, double x0, double x1, double y, bool upward,
-                       std::shared_ptr<Material> material) {
+        ZXWall::ZXWall(double z0, double z1, double x0, double x1, double y, bool upward) {
             _y = y;
             _z0 = z0;
             _z1 = z1;
             _x0 = x0;
             _x1 = x1;
-            _material = material;
 
             if (upward) {
                 _normal = {0, 1, 0};
@@ -178,7 +174,6 @@ namespace kaguya {
 
                 if (checkRange(z, _z0, _z1) && checkRange(x, _x0, _x1)) {
                     hitRecord.setId(getId());
-                    hitRecord.setMaterial(_material.get());
                     hitRecord.setPoint(ray.at(step));
                     hitRecord.setStep(step);
                     hitRecord.setOutwardNormal(_normal, ray.getDirection());
@@ -228,14 +223,12 @@ namespace kaguya {
             _aabb = AABB({_x0, _y - 0.0001, _z0}, {_x1, _y + 0.0001, _z1});
         }
 
-        YZWall::YZWall(double y0, double y1, double z0, double z1, double x, bool rightward,
-                       std::shared_ptr<Material> material) {
+        YZWall::YZWall(double y0, double y1, double z0, double z1, double x, bool rightward) {
             _x = x;
             _y0 = y0;
             _y1 = y1;
             _z0 = z0;
             _z1 = z1;
-            _material = material;
 
             if (rightward) {
                 _normal = {1, 0, 0};
@@ -254,7 +247,6 @@ namespace kaguya {
 
                 if (checkRange(z, _z0, _z1) && checkRange(y, _y0, _y1)) {
                     hitRecord.setId(getId());
-                    hitRecord.setMaterial(_material.get());
                     hitRecord.setPoint(ray.at(step));
                     hitRecord.setStep(step);
                     hitRecord.setOutwardNormal(_normal, ray.getDirection());
@@ -304,14 +296,12 @@ namespace kaguya {
             }
         }
 
-        XYWall::XYWall(double x0, double x1, double y0, double y1, double z, bool frontward,
-                       std::shared_ptr<Material> material) {
+        XYWall::XYWall(double x0, double x1, double y0, double y1, double z, bool frontward) {
             _z = z;
             _x0 = x0;
             _x1 = x1;
             _y0 = y0;
             _y1 = y1;
-            _material = material;
 
             if (frontward) {
                 _normal = {0, 0, -1};
@@ -330,7 +320,6 @@ namespace kaguya {
 
                 if (checkRange(x, _x0, _x1) && checkRange(y, _y0, _y1)) {
                     hitRecord.setId(getId());
-                    hitRecord.setMaterial(_material.get());
                     hitRecord.setPoint(ray.at(step));
                     hitRecord.setStep(step);
                     hitRecord.setOutwardNormal(_normal, ray.getDirection());

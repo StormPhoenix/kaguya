@@ -22,12 +22,12 @@ namespace kaguya {
         class Triangle : public Shape {
         public:
             Triangle(const Vertex &a, const Vertex &b, const Vertex &c,
-                     std::shared_ptr<Material> material, std::shared_ptr<Matrix4> transformMatrix = nullptr);
+                     std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
             Triangle(const Vector3 &a, const Vector3 &b, const Vector3 &c,
                      const Vector3 &normal1, const Vector3 &normal2, const Vector3 &normal3,
                      const Vector2 &uv1, const Vector2 &uv2, const Vector2 &uv3,
-                     std::shared_ptr<Material> material, std::shared_ptr<Matrix4> transformMatrix = nullptr);
+                     std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
             bool insect(const Ray &ray, SurfaceInteraction &hitRecord, double stepMin, double stepMax);
 
@@ -64,7 +64,6 @@ namespace kaguya {
             const Vector2 _uv1;
             const Vector2 _uv2;
             const Vector2 _uv3;
-            std::shared_ptr<Material> _material = nullptr;
             std::shared_ptr<Matrix4> _transformMatrix = nullptr;
             AABB _aabb;
         };

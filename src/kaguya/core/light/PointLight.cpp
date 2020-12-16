@@ -7,8 +7,8 @@
 namespace kaguya {
     namespace core {
 
-        PointLight::PointLight(const Vector3 &center, const Spectrum &intensity) :
-                Light(DELTA_POSITION), _center(center), _intensity(intensity) {}
+        PointLight::PointLight(const Vector3 &center, const Spectrum &intensity, const MediumBoundary &mediumBoundary) :
+                Light(DELTA_POSITION, mediumBoundary), _center(center), _intensity(intensity) {}
 
         Spectrum PointLight::sampleFromLight(const Interaction &eye,
                                              Vector3 *wi, double *pdf,
@@ -21,7 +21,7 @@ namespace kaguya {
             Vector3 sampleDir = NORMALIZE(_center - eye.getPoint());
             Vector3 sampleNormal = -sampleDir;
             double step = LENGTH(_center - eye.getPoint());
-            Interaction interaction = Interaction(samplePoint, sampleDir, sampleNormal, step);
+            Interaction interaction = Interaction(samplePoint, sampleDir, sampleNormal, step, _mediumBoundary);
 
             (*visibilityTester) = VisibilityTester(eye, interaction);
             return _intensity / std::pow(LENGTH(_center - eye.getPoint()), 2);
@@ -50,9 +50,10 @@ namespace kaguya {
             (*pdfDir) = INV_4PI;
         }
 
-        std::shared_ptr<PointLight> PointLight::buildPointLight(const Vector3 &center, const Spectrum &intensity) {
+        std::shared_ptr<PointLight> PointLight::buildPointLight(const Vector3 &center, const Spectrum &intensity,
+                                                                const MediumBoundary mediumBoundary) {
             std::shared_ptr<PointLight> light =
-                    std::make_shared<PointLight>(center, intensity);
+                    std::make_shared<PointLight>(center, intensity, mediumBoundary);
             return light;
         }
 

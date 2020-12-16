@@ -19,7 +19,6 @@ namespace kaguya {
         class TriangleMesh : public BVH {
         public:
             TriangleMesh(std::vector<Vertex> &vertices,
-                         std::shared_ptr<Material> material,
                          std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
             virtual const long long getId() const override;
@@ -34,7 +33,6 @@ namespace kaguya {
         private:
             std::vector<Vertex> &_vertices;
             std::vector<std::shared_ptr<Shape>> _triangles;
-            std::shared_ptr<Material> _material = nullptr;
             std::shared_ptr<Matrix4> _transformMatrix = nullptr;
         };
 

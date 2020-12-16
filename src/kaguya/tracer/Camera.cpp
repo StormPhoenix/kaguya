@@ -3,17 +3,22 @@
 //
 
 #include <kaguya/tracer/Camera.h>
+#include <kaguya/core/medium/MediumBoundary.h>
 
 namespace kaguya {
     namespace tracer {
 
-        Camera::Camera(const Vector3 &eye, const Vector3 &direction, float fov, float aspect) {
+        using kaguya::core::medium::MediumBoundary;
+
+        Camera::Camera(const Vector3 &eye, const Vector3 &direction, float fov, float aspect,
+                       const core::medium::Medium *medium) : _medium(medium) {
             _eye = eye;
             _front = NORMALIZE(direction);
             buildCameraCoordinate(fov, aspect);
         }
 
-        Camera::Camera(const Vector3 &eye, float yaw, float pitch, float fov, float aspect) {
+        Camera::Camera(const Vector3 &eye, float yaw, float pitch, float fov, float aspect,
+                       const core::medium::Medium *medium) : _medium(medium) {
             _eye = eye;
             _front.x = cos(DEGREES_TO_RADIANS(pitch)) * cos(DEGREES_TO_RADIANS(yaw));
             _front.y = sin(DEGREES_TO_RADIANS(pitch));
@@ -26,7 +31,7 @@ namespace kaguya {
             Vector3 samplePoint =
                     _leftBottomCorner + 2 * _halfWindowWidth * u * _right + 2 * _halfWindowHeight * v * _up;
             Vector3 dir = NORMALIZE(samplePoint - _eye);
-            return Ray(_eye, dir);
+            return Ray(_eye, dir, _medium);
         }
 
         Vector3 Camera::getEye() const {
@@ -69,7 +74,7 @@ namespace kaguya {
             (*wi) = NORMALIZE(*wi);
 
             // 创建 Interaction
-            Interaction lensInter = Interaction(lensSample, *wi, _front, dist);
+            Interaction lensInter = Interaction(lensSample, *wi, _front, dist, _medium);
             // 设置 visibility tester
             (*visibilityTester) = VisibilityTester(eye, lensInter);
 

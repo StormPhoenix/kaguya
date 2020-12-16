@@ -10,17 +10,19 @@ namespace kaguya {
 
         std::shared_ptr<AreaLight> DiffuseAreaLight::buildDiffuseAreaLight(const Spectrum &intensity,
                                                                            std::shared_ptr<ShapeSampler> shapeSampler,
+                                                                           const MediumBoundary &mediumBoundary,
                                                                            bool singleSide) {
             std::shared_ptr<AreaLight> light =
-                    std::make_shared<DiffuseAreaLight>(intensity, shapeSampler, singleSide);
+                    std::make_shared<DiffuseAreaLight>(intensity, shapeSampler, mediumBoundary, singleSide);
             shapeSampler->setAreaLight(light);
             return light;
         }
 
         DiffuseAreaLight::DiffuseAreaLight(const Spectrum &intensity,
                                            std::shared_ptr<ShapeSampler> shapeSampler,
+                                           const MediumBoundary &mediumBoundary,
                                            bool singleSide) :
-                AreaLight(intensity, shapeSampler, AREA), _singleSide(singleSide) {}
+                AreaLight(intensity, shapeSampler, AREA, mediumBoundary), _singleSide(singleSide) {}
 
         Spectrum DiffuseAreaLight::randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir,
                                                   random::Sampler1D *sampler1D) {

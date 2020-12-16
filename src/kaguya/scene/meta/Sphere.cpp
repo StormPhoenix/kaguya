@@ -7,13 +7,12 @@
 namespace kaguya {
     namespace scene {
 
-        Sphere::Sphere(const Vector3 &center, double radius, std::shared_ptr<Material> material, bool outward,
+        Sphere::Sphere(const Vector3 &center, double radius, bool outward,
                        std::shared_ptr<Matrix4> transformMatrix) {
             _center = center;
             _transformedCenter =
                     transformMatrix != nullptr ? Vector3((*transformMatrix) * Vector4(_center, 1.0f)) : _center;
             _radius = radius;
-            _material = material;
             _outward = outward;
             _transformMatrix = transformMatrix;
 
@@ -30,7 +29,7 @@ namespace kaguya {
             }
         }
 
-        bool Sphere::insect(const Ray &ray, SurfaceInteraction &hitRecord, double stepMin, double stepMax) {
+        bool Sphere::insect(const Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) {
             Vector3 centerToOrigin = ray.getOrigin() - _transformedCenter;
             double c = DOT(centerToOrigin, centerToOrigin) - _radius * _radius;
             double a = pow(LENGTH(ray.getDirection()), 2);
@@ -42,31 +41,29 @@ namespace kaguya {
             if (discriminant > 0) {
                 double root = (-halfB - sqrt(discriminant)) / a;
                 if (root >= stepMin && root <= stepMax) {
-                    hitRecord.setId(getId());
-                    hitRecord.setStep(root);
-                    hitRecord.setPoint(ray.at(root));
-                    hitRecord.setMaterial(_material.get());
-                    hitRecord.setU(0);
-                    hitRecord.setV(0);
-                    hitRecord.setAreaLight(nullptr);
+                    si.setId(getId());
+                    si.setStep(root);
+                    si.setPoint(ray.at(root));
+                    si.setU(0);
+                    si.setV(0);
+                    si.setAreaLight(nullptr);
 
-                    Vector3 outwardNormal = computeNormal(hitRecord.getPoint());
-                    hitRecord.setOutwardNormal(outwardNormal, ray.getDirection());
+                    Vector3 outwardNormal = computeNormal(si.getPoint());
+                    si.setOutwardNormal(outwardNormal, ray.getDirection());
                     return true;
                 }
 
                 root = (-halfB + sqrt(discriminant)) / a;
                 if (root >= stepMin && root <= stepMax) {
-                    hitRecord.setId(getId());
-                    hitRecord.setStep(root);
-                    hitRecord.setPoint(ray.at(root));
-                    hitRecord.setMaterial(_material.get());
-                    hitRecord.setU(0);
-                    hitRecord.setV(0);
-                    hitRecord.setAreaLight(nullptr);
+                    si.setId(getId());
+                    si.setStep(root);
+                    si.setPoint(ray.at(root));
+                    si.setU(0);
+                    si.setV(0);
+                    si.setAreaLight(nullptr);
 
-                    Vector3 outwardNormal = computeNormal(hitRecord.getPoint());
-                    hitRecord.setOutwardNormal(outwardNormal, ray.getDirection());
+                    Vector3 outwardNormal = computeNormal(si.getPoint());
+                    si.setOutwardNormal(outwardNormal, ray.getDirection());
                     return true;
                 } else {
                     return false;

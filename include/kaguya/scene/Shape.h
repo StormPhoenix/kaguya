@@ -10,12 +10,6 @@
 #include <kaguya/scene/accumulation/AABB.h>
 
 namespace kaguya {
-    namespace material {
-        class Material;
-    }
-}
-
-namespace kaguya {
     namespace tracer {
         class Ray;
     }
@@ -24,7 +18,6 @@ namespace kaguya {
 namespace kaguya {
     namespace scene {
 
-        using kaguya::material::Material;
         using kaguya::scene::acc::AABB;
         using kaguya::tracer::Ray;
         using kaguya::core::SurfaceInteraction;
@@ -35,12 +28,12 @@ namespace kaguya {
             /**
              * 击中判定
              * @param ray
-             * @param hitRecord
+             * @param si
              * @param stepMin 射线步长最小值
              * @param stepMax 射线步长最大值
              * @return
              */
-            virtual bool insect(const Ray &ray, SurfaceInteraction &hitRecord, double stepMin, double stepMax) = 0;
+            virtual bool insect(const Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) = 0;
 
             /**
              * 计算 AxisAlignBoundingBox

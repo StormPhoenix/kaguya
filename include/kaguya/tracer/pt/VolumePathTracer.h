@@ -40,17 +40,6 @@ namespace kaguya {
             Spectrum evaluateDirectLight(Scene &scene, const Interaction &eye, random::Sampler1D *sampler1D);
 
             /**
-             * 具体渲染代码，CPU版本
-             * @param ray 射线
-             * @param scene 场景
-             * @param depth 反射次数
-             * @return 渲染结果
-             */
-            Spectrum shaderOfRecursion(const Ray &ray, Scene &scene, int depth,
-                                       random::Sampler1D *sampler1D,
-                                       MemoryArena &memoryArena);
-
-            /**
              * Path Tracing 渲染代码，渐进式实现
              * @param ray
              * @param scene

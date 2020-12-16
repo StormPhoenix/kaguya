@@ -52,8 +52,8 @@ namespace kaguya {
             // 最多进行 _maxDepth 次数弹射
             for (int bounce = 0; bounce < _maxDepth; bounce++) {
                 // intersect
-                SurfaceInteraction intersection;
-                bool isIntersected = scene.intersect(scatterRay, intersection);
+                SurfaceInteraction si;
+                bool isIntersected = scene.intersect(scatterRay, si);
 
                 // deal with participating medium
                 core::MediumInteraction mi;
@@ -71,25 +71,21 @@ namespace kaguya {
                     shaderColor += beta * evaluateDirectLight(scene, mi, sampler1D);
 
                     /* sample new ray */
-                    Vector3 wo = -scatterRay.getDirection();
-                    Vector3 wi;
-                    mi.getPhaseFunction()->sampleScatter(wo, &wi);
-
-                    scatterRay.setOrigin(mi.getPoint());
-                    scatterRay.setDirection(wi);
-
+                    Vector3 worldWo = -scatterRay.getDirection();
+                    Vector3 worldWi;
+                    mi.getPhaseFunction()->sampleScatter(worldWo, &worldWi);
+                    scatterRay = mi.generateRay(worldWi);
                     isSpecular = false;
                 } else {
                     // handle surface interaction
                     // 此处参考 pbrt 的写法，需要判断 bounce = 0 和 isSpecular 两种特殊情况
                     if (bounce == 0 || isSpecular) {
                         if (isIntersected) {
-                            assert(intersection.getMaterial() != nullptr);
+                            assert(si.getMaterial() != nullptr);
                             // 如果有交点，则直接从交点上取值
-                            if (intersection.getAreaLight() != nullptr) {
-                                shaderColor += (intersection.getAreaLight()->lightRadiance(
-                                        intersection,
-                                        -intersection.getDirection()) * beta);
+                            if (si.getAreaLight() != nullptr) {
+                                shaderColor += (si.getAreaLight()->lightRadiance(
+                                        si, -si.getDirection()) * beta);
                             }
                         } else {
                             shaderColor += (beta * background(scatterRay));
@@ -103,15 +99,15 @@ namespace kaguya {
                         break;
                     }
 
-                    const Material *material = intersection.getMaterial();
+                    const Material *material = si.getMaterial();
                     assert(material != nullptr);
 
-                    BSDF *bsdf = intersection.buildBSDF(memoryArena);
+                    BSDF *bsdf = si.buildBSDF(memoryArena);
                     assert(bsdf != nullptr);
 
                     // 判断是否向光源采样
                     if (bsdf->allIncludeOf(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
-                        shaderColor += (beta * evaluateDirectLight(scene, intersection, (*bsdf), sampler1D));
+                        shaderColor += (beta * evaluateDirectLight(scene, si, sampler1D));
                     }
 
                     // 计算下一次反射
@@ -125,13 +121,11 @@ namespace kaguya {
                     Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, sampler1D, BSDF_ALL, &bxdfType);
 
                     // cosine
-                    double cosine = std::abs(DOT(intersection.getNormal(), NORMALIZE(worldWi)));
+                    double cosine = std::abs(DOT(si.getNormal(), NORMALIZE(worldWi)));
                     // 计算 beta
                     beta *= (f * cosine / samplePdf);
                     // 设置下一次打击光线
-                    scatterRay.setOrigin(intersection.getPoint());
-                    scatterRay.setDirection(NORMALIZE(worldWi));
-
+                    scatterRay = si.generateRay(NORMALIZE(worldWi));
                     isSpecular = (bxdfType & BSDF_SPECULAR) > 0;
                 }
 
@@ -146,103 +140,9 @@ namespace kaguya {
             return shaderColor;
         }
 
-        Spectrum VolumePathTracer::shaderOfRecursion(const Ray &ray, Scene &scene, int depth,
-                                                     random::Sampler1D *sampler1D,
-                                                     MemoryArena &memoryArena) {
-            // TODO 判断采用固定深度还是轮盘赌
-            // TODO 添加对光源采样；对光源采样需要计算两个 surfacePointPdf
-
-            if (depth < _maxDepth) {
-                SurfaceInteraction hitRecord;
-                if (scene.intersect(ray, hitRecord)) {
-                    // 击中，检查击中材质
-                    const Material *material = hitRecord.getMaterial();
-                    // 不发光物体
-                    // 若对光源采样，则记录采样射线
-                    Ray scatterRay;
-                    // 若对光源采样，则记录采样概率
-                    double samplePdf = 0;
-
-                    if (!material->isSpecular()) {
-                        // 不是 Specular 类型，考虑对光源采样
-                        BSDF *bsdf = hitRecord.buildBSDF(memoryArena);
-                        if (bsdf == nullptr) {
-                            return Spectrum(0.0);
-                        }
-
-                        bool gamblingResult = sampler1D->sample() < _sampleLightProb;
-                        if (gamblingResult) {
-                            Vector3 scatterRayDir;
-                            double samplePdf = 0;
-                            auto light = scene.getLight();
-
-                            VisibilityTester visibilityTester;
-                            Spectrum spectrum = light->sampleFromLight(hitRecord, &scatterRayDir, &samplePdf,
-                                                                       sampler1D, &visibilityTester);
-
-                            if (samplePdf > EPSILON && !spectrum.isBlack()) {
-                                // 计算该方向的散射 PDF
-                                double scatterPdf = bsdf->samplePdf(-ray.getDirection(), scatterRayDir);
-                                // 对非光源采样进行加权
-                                samplePdf = _sampleLightProb * samplePdf + (1 - _sampleLightProb) * scatterPdf;
-                                Spectrum f = bsdf->f(NORMALIZE(-ray.getDirection()), NORMALIZE(scatterRayDir));
-                                scatterRay.setOrigin(hitRecord.getPoint());
-                                scatterRay.setDirection(NORMALIZE(scatterRayDir));
-                                Spectrum shaderColor =
-                                        std::abs(DOT(hitRecord.getNormal(), NORMALIZE(scatterRayDir))) * f /
-                                        samplePdf *
-                                        ((depth > _russianRoulette && sampler1D->sample() < _russianRoulette) ?
-                                         Spectrum(0.0) :
-                                         shaderOfRecursion(scatterRay, scene, depth + 1, sampler1D, memoryArena) /
-                                         (1 - _russianRoulette));
-                                return shaderColor + (hitRecord.getAreaLight() != nullptr ?
-                                                      hitRecord.getAreaLight()->lightRadiance(hitRecord,
-                                                                                              -hitRecord.getDirection())
-                                                                                          :
-                                                      Spectrum(0.0));
-                            }
-                        }
-                    }
-
-                    BSDF *bsdf = hitRecord.buildBSDF(memoryArena);
-                    Vector3 worldWo = -ray.getDirection();
-                    Vector3 worldWi = Vector3(0.0);
-                    Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, sampler1D);
-                    scatterRay.setOrigin(hitRecord.getPoint());
-                    scatterRay.setDirection(NORMALIZE(worldWi));
-
-                    if (!material->isSpecular()) {
-                        // TODO 目前只考虑单光源的情况
-                        std::shared_ptr<Light> light = scene.getLight();
-                        Interaction eye;
-                        eye.setPoint(hitRecord.getPoint());
-                        samplePdf = (1 - _sampleLightProb) * samplePdf +
-                                    _sampleLightProb * light->sampleFromLightPdf(eye, scatterRay.getDirection());
-                    }
-
-                    double cosine = std::abs(DOT(hitRecord.getNormal(), NORMALIZE(worldWi)));
-                    Spectrum shaderColor = cosine * f / samplePdf *
-                                           ((depth > _russianRoulette && sampler1D->sample() < _russianRoulette) ?
-                                            Spectrum(0.0) :
-                                            shaderOfRecursion(scatterRay, scene, depth + 1, sampler1D, memoryArena) /
-                                            (1 - _russianRoulette));
-
-                    return shaderColor + (hitRecord.getAreaLight() != nullptr ?
-                                          hitRecord.getAreaLight()->lightRadiance(hitRecord, -hitRecord.getDirection())
-                                                                              : Spectrum(0.0));
-                } else {
-                    // 未击中
-                    return background(ray);
-                }
-            } else {
-                // 停止散射
-                return Spectrum(0.0f);
-            }
-        }
-
-
-        Spectrum
-        VolumePathTracer::evaluateDirectLight(Scene &scene, const Interaction &eye, random::Sampler1D *sampler1D) {
+        Spectrum VolumePathTracer::evaluateDirectLight(
+                Scene &scene, const Interaction &eye,
+                random::Sampler1D *sampler1D) {
             // TODO 目前只考虑单个光源
             auto light = scene.getLight();
             // p(wi)

@@ -13,15 +13,24 @@ namespace kaguya {
 
         Interaction::Interaction(const Vector3 &point,
                                  const Vector3 &direction, const Vector3 &normal, double step,
-                                 Material *material) :
+                                 const MediumBoundary &mediumBoundary, Material *material) :
                 _point(point), _direction(direction), _normal(normal),
+                _mediumBoundary(mediumBoundary),
                 _step(step), _material(material) {}
 
 
+        Ray Interaction::generateRay(const Vector3 &dir) const {
+            // check whether the ray direction is point to outside or inside
+            const medium::Medium *medium = (DOT(dir, _normal) > 0 ?
+                                            _mediumBoundary.outside() : _mediumBoundary.inside());
+            return Ray(_point, dir, medium);
+        }
+
         SurfaceInteraction::SurfaceInteraction(const Vector3 &point, const Vector3 &direction,
-                                               const Vector3 &normal, double step, double u, double v,
-                                               Material *material) :
-                Interaction(point, direction, normal, step, material),
+                                               const Vector3 &normal, double step,
+                                               MediumBoundary &mediumBoundary,
+                                               double u, double v, Material *material) :
+                Interaction(point, direction, normal, step, mediumBoundary, material),
                 _u(u), _v(v) {}
 
 

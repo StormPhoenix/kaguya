@@ -7,8 +7,9 @@
 namespace kaguya {
     namespace core {
 
-        AreaLight::AreaLight(const Spectrum &intensity, std::shared_ptr<ShapeSampler> shapeSampler, LightType type) :
-                Light(LightType(type | AREA)), _intensity(intensity), _shapeSampler(shapeSampler) {}
+        AreaLight::AreaLight(const Spectrum &intensity, std::shared_ptr<ShapeSampler> shapeSampler, LightType type,
+                             const MediumBoundary &mediumBoundary) :
+                Light(LightType(type | AREA), mediumBoundary), _intensity(intensity), _shapeSampler(shapeSampler) {}
 
         Spectrum AreaLight::sampleFromLight(const Interaction &eye, Vector3 *wi, double *pdf,
                                             random::Sampler1D *sampler1D,

@@ -8,8 +8,8 @@ namespace kaguya {
     namespace core {
 
         SpotLight::SpotLight(const Vector3 center, const Vector3 dir, Spectrum intensity,
-                             double fallOffRange, double totalRange) :
-                Light(DELTA_POSITION),
+                             const MediumBoundary &mediumBoundary, double fallOffRange, double totalRange) :
+                Light(DELTA_POSITION, mediumBoundary),
                 _center(center), _dir(NORMALIZE(dir)),
                 _intensity(intensity) {
             _cosFallOffRange = std::cos(DEGREES_TO_RADIANS(fallOffRange));
@@ -27,7 +27,7 @@ namespace kaguya {
             Vector3 sampleDir = NORMALIZE(_center - eye.getPoint());
             Vector3 sampleNormal = -sampleDir;
             double step = LENGTH(_center - eye.getPoint());
-            Interaction interaction = Interaction(samplePoint, sampleDir, sampleNormal, step);
+            Interaction interaction = Interaction(samplePoint, sampleDir, sampleNormal, step, _mediumBoundary);
 
             (*visibilityTester) = VisibilityTester(eye, interaction);
             return _intensity * fallOffWeight(-(*wi)) / std::pow(LENGTH(_center - eye.getPoint()), 2);

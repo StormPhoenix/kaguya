@@ -72,5 +72,5 @@ file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/pt/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/*.cpp)
 
-add_executable(kaguya ${sources})
+add_executable(kaguya ${sources} include/kaguya/core/medium/MediumBoundary.h include/kaguya/scene/Geometry.h src/kaguya/scene/Geometry.cpp)
 target_link_libraries(kaguya pthread)

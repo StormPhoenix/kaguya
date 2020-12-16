@@ -8,22 +8,22 @@ namespace kaguya {
     namespace scene {
 
         Triangle::Triangle(const Vertex &a, const Vertex &b, const Vertex &c,
-                           std::shared_ptr<Material> material, std::shared_ptr<Matrix4> transformMatrix)
+                           std::shared_ptr<Matrix4> transformMatrix)
                 : _position1(a.position), _position2(b.position), _position3(c.position),
                   _normal1(a.normal), _normal2(b.normal), _normal3(c.normal),
                   _uv1(Vector2(a.u, a.v)), _uv2(Vector2(b.u, b.v)), _uv3(Vector2(c.u, c.v)),
-                  _material(material), _transformMatrix(transformMatrix) {
+                  _transformMatrix(transformMatrix) {
             init();
         }
 
         Triangle::Triangle(const Vector3 &a, const Vector3 &b, const Vector3 &c, const Vector3 &normal1,
                            const Vector3 &normal2, const Vector3 &normal3, const Vector2 &uv1, const Vector2 &uv2,
-                           const Vector2 &uv3, std::shared_ptr<Material> material,
+                           const Vector2 &uv3,
                            std::shared_ptr<Matrix4> transformMatrix)
                 : _position1(a), _position2(b), _position3(c),
                   _normal1(normal1), _normal2(normal2), _normal3(normal3),
                   _uv1(uv1), _uv2(uv2), _uv3(uv3),
-                  _material(material), _transformMatrix(transformMatrix) {
+                  _transformMatrix(transformMatrix) {
             init();
         }
 
@@ -121,7 +121,6 @@ namespace kaguya {
                 hitRecord.setOutwardNormal(normal, dir);
                 hitRecord.setU(DOT(factor, Vector3(_uv1.x, _uv2.x, _uv3.x)));
                 hitRecord.setV(DOT(factor, Vector3(_uv1.y, _uv2.y, _uv3.y)));
-                hitRecord.setMaterial(_material.get());
                 hitRecord.setAreaLight(nullptr);
                 return true;
             } else {

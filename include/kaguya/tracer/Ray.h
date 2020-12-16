@@ -19,14 +19,15 @@ namespace kaguya {
 
         class Ray {
         public:
-            Ray() : medium(nullptr) {}
+            Ray() : _medium(nullptr) {}
 
             /**
              * 射线初始化
              * @param origin 射线起点
              * @param direction 射线方向
              */
-            Ray(const Vector3 &origin, const Vector3 &direction);
+            Ray(const Vector3 &origin, const Vector3 &direction,
+                const core::medium::Medium *medium = nullptr);
 
             const Vector3 &getDirection() const;
 
@@ -45,7 +46,7 @@ namespace kaguya {
         private:
             Vector3 _origin;
             Vector3 _direction;
-            core::medium::Medium *medium;
+            const core::medium::Medium *_medium;
         };
 
     }

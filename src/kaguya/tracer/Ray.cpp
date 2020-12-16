@@ -7,7 +7,10 @@
 namespace kaguya {
     namespace tracer {
 
-        Ray::Ray(const Vector3 &origin, const Vector3 &direction) : _origin(origin), _direction(NORMALIZE(direction)) {}
+        Ray::Ray(const Vector3 &origin, const Vector3 &direction,
+                 const core::medium::Medium *medium) :
+                _origin(origin), _direction(NORMALIZE(direction)),
+                _medium(medium) {}
 
         const Vector3 &Ray::getDirection() const {
             return _direction;
@@ -27,14 +30,6 @@ namespace kaguya {
 
         const Vector3 Ray::at(double step) const {
             return _origin + Vector3(_direction.x * step, _direction.y * step, _direction.z * step);
-        }
-
-        const void Ray::setMedium(core::medium::Medium *medium) {
-            this->medium = medium;
-        }
-
-        const core::medium::Medium *Ray::getMedium() const {
-            return this->medium;
         }
     }
 }

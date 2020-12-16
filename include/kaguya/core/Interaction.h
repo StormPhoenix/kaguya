@@ -7,29 +7,27 @@
 
 #include <kaguya/core/Core.h>
 #include <kaguya/core/phase/PhaseFunction.h>
+#include <kaguya/core/medium/MediumBoundary.h>
 #include <kaguya/utils/MemoryArena.h>
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/tracer/Ray.h>
 
 namespace kaguya {
+
     namespace material {
         class Material;
     }
-}
 
-namespace kaguya {
     namespace tracer {
         class Camera;
     }
-}
 
-namespace kaguya {
     namespace core {
-
         class AreaLight;
 
         class Light;
 
+        using medium::MediumBoundary;
         using kaguya::tracer::Camera;
         using kaguya::tracer::Ray;
         using kaguya::material::Material;
@@ -40,10 +38,10 @@ namespace kaguya {
         */
         class Interaction {
         public:
-            Interaction() {}
+            Interaction() : _mediumBoundary(nullptr, nullptr) {}
 
             Interaction(const Vector3 &point, const Vector3 &direction, const Vector3 &normal,
-                        double step, Material *material = nullptr);
+                        double step, const MediumBoundary &mediumBoundary, Material *material = nullptr);
 
             const Vector3 getDirection() const {
                 return _direction;
@@ -94,6 +92,16 @@ namespace kaguya {
                 return false;
             }
 
+            /**
+             * Generate ray alone @param dir from origin
+             * @param dir
+             */
+            virtual Ray generateRay(const Vector3 &dir) const;
+
+            void setMediumBoundary(MediumBoundary &mediumBoundary) {
+                _mediumBoundary = mediumBoundary;
+            }
+
         protected:
             /**
              * 清空 Interaction 中部分属性
@@ -115,6 +123,8 @@ namespace kaguya {
             Material *_material = nullptr;
             // 击中物体的 ID
             long long _id = -1;
+            // medium boundary
+            MediumBoundary _mediumBoundary;
         };
 
         /**
@@ -125,7 +135,8 @@ namespace kaguya {
             SurfaceInteraction() : Interaction() {}
 
             SurfaceInteraction(const Vector3 &point, const Vector3 &direction, const Vector3 &normal,
-                               double step, double u = 0, double v = 0, Material *material = nullptr);
+                               double step, MediumBoundary &mediumBoundary, double u = 0, double v = 0,
+                               Material *material = nullptr);
 
             BSDF *buildBSDF(MemoryArena &memoryArena, TransportMode mode = TransportMode::RADIANCE);
 

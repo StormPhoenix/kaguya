@@ -18,7 +18,7 @@ namespace kaguya {
             Wall() {}
 
             // XY 上的二维片面
-            Wall(double width, double height, std::shared_ptr<Material> material,
+            Wall(double width, double height,
                  std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
             virtual bool insect(const Ray &ray, SurfaceInteraction &hitRecord, double stepMin, double stepMax) override;
@@ -56,7 +56,6 @@ namespace kaguya {
             std::shared_ptr<Matrix4> _transformMatrix = nullptr;
 
         protected:
-            std::shared_ptr<Material> _material = nullptr;
             Vector3 _normal;
             AABB _aabb;
             double _area;
@@ -72,10 +71,8 @@ namespace kaguya {
              * @param x1
              * @param y
              * @param upward
-             * @param material
              */
-            ZXWall(double z0, double z1, double x0, double x1, double y, bool upward,
-                   std::shared_ptr<Material> material);
+            ZXWall(double z0, double z1, double x0, double x1, double y, bool upward);
 
             virtual void init() override;
 
@@ -105,10 +102,8 @@ namespace kaguya {
              * @param z1
              * @param x
              * @param rightward
-             * @param material
              */
-            YZWall(double y0, double y1, double z0, double z1, double x, bool rightward,
-                   std::shared_ptr<Material> material);
+            YZWall(double y0, double y1, double z0, double z1, double x, bool rightward);
 
             virtual void init() override;
 
@@ -138,10 +133,8 @@ namespace kaguya {
              * @param y1
              * @param z
              * @param frontward
-             * @param material
              */
-            XYWall(double x0, double x1, double y0, double y1, double z, bool frontward,
-                   std::shared_ptr<Material> material);
+            XYWall(double x0, double x1, double y0, double y1, double z, bool frontward);
 
             virtual void init() override;
 

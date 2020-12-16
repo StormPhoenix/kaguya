@@ -9,9 +9,9 @@
 namespace kaguya {
     namespace scene {
 
-        TriangleMesh::TriangleMesh(std::vector<Vertex> &vertices, std::shared_ptr<Material> material,
+        TriangleMesh::TriangleMesh(std::vector<Vertex> &vertices,
                                    std::shared_ptr<Matrix4> transformMatrix)
-                : BVH(), _vertices(vertices), _material(material), _transformMatrix(transformMatrix) {
+                : BVH(), _vertices(vertices), _transformMatrix(transformMatrix) {
             buildMeshes();
         }
 
@@ -33,7 +33,7 @@ namespace kaguya {
                 Vertex vertex2 = _vertices[i + 1];
                 Vertex vertex3 = _vertices[i + 2];
                 _triangles.push_back(
-                        std::make_shared<Triangle>(vertex1, vertex2, vertex3, _material, _transformMatrix)
+                        std::make_shared<Triangle>(vertex1, vertex2, vertex3, _transformMatrix)
                 );
             }
             BVH::build(_triangles, 0, _triangles.size());

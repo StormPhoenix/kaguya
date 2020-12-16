@@ -13,6 +13,11 @@
 namespace kaguya {
     namespace core {
 
+        namespace medium {
+            class MediumBoundary;
+        }
+
+        using medium::Medium;
         using kaguya::utils::VisibilityTester;
         using kaguya::tracer::Ray;
 
@@ -25,7 +30,8 @@ namespace kaguya {
 
         class Light {
         public:
-            Light(LightType type) : _type(type) {}
+            Light(LightType type, const MediumBoundary &mediumBoundary) :
+                    _type(type), _mediumBoundary(mediumBoundary) {}
 
             /**
              * 计算对交点 eye 处对辐射量
@@ -54,8 +60,8 @@ namespace kaguya {
              * @param pdfDir 射线方向 pdf
              * @return
              */
-            virtual Spectrum
-            randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir, random::Sampler1D *sampler1D) = 0;
+            virtual Spectrum randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos,
+                                            double *pdfDir, random::Sampler1D *sampler1D) = 0;
 
             /**
              * light 主动发射光线，并计算其 pdf 函数
@@ -86,6 +92,7 @@ namespace kaguya {
 
         protected:
             const LightType _type;
+            MediumBoundary _mediumBoundary;
         };
 
     }

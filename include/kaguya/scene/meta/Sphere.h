@@ -26,10 +26,10 @@ namespace kaguya {
              * @param outward 是否向外
              * @param transformMatrix 变换矩阵
              */
-            Sphere(const Vector3 &center, double radius, std::shared_ptr<Material> material, bool outward = true,
+            Sphere(const Vector3 &center, double radius, bool outward = true,
                    std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
-            bool insect(const Ray &ray, SurfaceInteraction &hitRecord, double stepMin, double stepMax) override;
+            bool insect(const Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) override;
 
             const AABB &boundingBox() const override;
 
@@ -49,7 +49,6 @@ namespace kaguya {
             Vector3 _transformedCenter;
             double _radius;
             bool _outward;
-            std::shared_ptr<Material> _material = nullptr;
             std::shared_ptr<Matrix4> _transformMatrix = nullptr;
             std::shared_ptr<Matrix4> _inverseTransformMatrix = nullptr;
         };

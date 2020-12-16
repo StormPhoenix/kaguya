@@ -12,6 +12,13 @@
 #include <kaguya/utils/VisibilityTester.h>
 
 namespace kaguya {
+
+    namespace core {
+        namespace medium {
+            class Medium;
+        }
+    }
+
     namespace tracer {
 
         using kaguya::core::Interaction;
@@ -28,7 +35,7 @@ namespace kaguya {
              * @param aspect 相机成像平面的宽/高比例
              */
             Camera(const Vector3 &eye = {0.0f, 0.0f, 0.0f}, const Vector3 &direction = {0.0f, 0.0f, -1.0f},
-                   float fov = 60.0, float aspect = 1.0);
+                   float fov = 60.0, float aspect = 1.0, const core::medium::Medium *medium = nullptr);
 
             /**
              * 初始化相机，设计到欧拉角的计算，这和欧拉角具体的转换方式有关。
@@ -41,7 +48,8 @@ namespace kaguya {
              * @param yaw 欧拉角，偏航角
              * @param pitch 欧拉角，俯仰角
              */
-            Camera(const Vector3 &eye, float yaw = -90.0f, float pitch = 0.0f, float fov = 60.0, float aspect = 1.0);
+            Camera(const Vector3 &eye, float yaw = -90.0f, float pitch = 0.0f, float fov = 60.0, float aspect = 1.0,
+                   const core::medium::Medium *medium = nullptr);
 
             /**
              * 获取射线
@@ -141,6 +149,8 @@ namespace kaguya {
             double _lensRadius = 0.025;
             // 默认焦距为 10
             const double _focal = 10;
+
+            const core::medium::Medium *_medium;
         };
 
     }
