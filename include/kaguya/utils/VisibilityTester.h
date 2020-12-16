@@ -32,12 +32,13 @@ namespace kaguya {
             VisibilityTester(const Interaction start, const Interaction end);
 
             /**
+             * TODO
              * MC 采样计算透射率
              * T(p, p') = exponent^(-shift_{0, (p'-p)} theta_t(t) dt)
              *
              * @return
              */
-            core::Spectrum transmitance() const;
+            core::Spectrum transmittance() const;
 
             bool isVisible(Scene &scene);
 

@@ -8,11 +8,18 @@
 #include <kaguya/math/Math.hpp>
 
 namespace kaguya {
+
+    namespace core {
+        namespace medium {
+            class Medium;
+        }
+    }
+
     namespace tracer {
 
         class Ray {
         public:
-            Ray() {}
+            Ray() : medium(nullptr) {}
 
             /**
              * 射线初始化
@@ -29,11 +36,16 @@ namespace kaguya {
 
             const void setOrigin(const Vector3 &origin);
 
+            const void setMedium(core::medium::Medium *medium);
+
+            const core::medium::Medium *getMedium() const;
+
             const Vector3 at(double step) const;
 
         private:
             Vector3 _origin;
             Vector3 _direction;
+            core::medium::Medium *medium;
         };
 
     }

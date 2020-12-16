@@ -6,6 +6,7 @@
 #define KAGUYA_INTERACTION_H
 
 #include <kaguya/core/Core.h>
+#include <kaguya/core/phase/PhaseFunction.h>
 #include <kaguya/utils/MemoryArena.h>
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/tracer/Ray.h>
@@ -85,6 +86,14 @@ namespace kaguya {
                 _id = id;
             }
 
+            /**
+             * 检测是否是体积碰撞
+             * @return
+             */
+            virtual bool isMediumInteraction() const {
+                return false;
+            }
+
         protected:
             /**
              * 清空 Interaction 中部分属性
@@ -94,7 +103,7 @@ namespace kaguya {
             }
 
         protected:
-            // 击中光线方向
+            // 发生 Interaction 的光线的方向
             Vector3 _direction;
             // 击中点
             Vector3 _point;
@@ -175,9 +184,23 @@ namespace kaguya {
             AreaLight *_areaLight = nullptr;
         };
 
-        class VolumeInteraction : public Interaction {
+        class MediumInteraction : public Interaction {
         public:
-            VolumeInteraction() : Interaction() {}
+            MediumInteraction() : Interaction(),
+                                  phase(nullptr) {}
+
+            bool isValid() const;
+
+            virtual bool isMediumInteraction() const override {
+                return true;
+            }
+
+            const PhaseFunction *getPhaseFunction() const {
+                return phase;
+            }
+
+        private:
+            PhaseFunction *phase = nullptr;
         };
 
         class StartEndInteraction : public Interaction {

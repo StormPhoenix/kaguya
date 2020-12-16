@@ -5001,7 +5001,7 @@ private:
                     });
             }
         }
-        //... or an optional blocking param was hit
+        //... or an optional blocking param was intersect
         else if(match->blocking() && !match->required() &&
             npos.level() >= match.base().level())
         {

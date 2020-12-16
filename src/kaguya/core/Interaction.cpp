@@ -52,5 +52,9 @@ namespace kaguya {
             _normal = n;
         }
 
+        bool MediumInteraction::isValid() const {
+            return phase != nullptr;
+        }
+
     }
 }

@@ -52,7 +52,7 @@ namespace kaguya {
              */
             Spectrum sampleF(const Vector3 &worldWo, Vector3 *worldWi, double *pdf,
                              const random::Sampler1D *const sampler1D,
-                             BXDFType type = BSDF_ALL, BXDFType *sampleType = nullptr);
+                             BXDFType type = BSDF_ALL, BXDFType *sampleType = nullptr) const;
 
             /**
              * 计算 worldWi worldWo 的采样概率

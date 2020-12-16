@@ -229,7 +229,7 @@ namespace kaguya {
                 }
 
                 SurfaceInteraction interaction;
-                bool isIntersected = scene->hit(scatterRay, interaction);
+                bool isIntersected = scene->intersect(scatterRay, interaction);
                 if (isIntersected) {
                     // 取出当前点和上一个点
                     PathVertex &vertex = path[depth];

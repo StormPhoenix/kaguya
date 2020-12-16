@@ -7,6 +7,7 @@
 #include <kaguya/core/light/DiffuseAreaLight.h>
 #include <kaguya/core/light/PointLight.h>
 #include <kaguya/core/light/SpotLight.h>
+#include <kaguya/core/medium/Medium.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/Config.h>
 #include <kaguya/scene/accumulation/BVH.h>
@@ -775,8 +776,31 @@ namespace kaguya {
             return scene;
         }
 
-        bool Scene::hit(const Ray &ray, SurfaceInteraction &hitRecord) {
+        bool Scene::intersect(const Ray &ray, SurfaceInteraction &hitRecord) {
             return _world->insect(ray, hitRecord, 0.001, infinity);
+        }
+
+        bool Scene::intersectWithMedium(Ray &ray, SurfaceInteraction &si, core::Spectrum &transmittance) {
+            transmittance = Spectrum(1.0);
+            bool foundIntersection = false;
+            while (true) {
+                foundIntersection = intersect(ray, si);
+                if (ray.getMedium() != nullptr) {
+                    transmittance *= ray.getMedium()->transmittance(ray);
+                }
+
+                if (!foundIntersection) {
+                    return false;
+                }
+
+                // skip the shape without material and generate new ray
+                if (si.getMaterial() == nullptr) {
+                    ray.setOrigin(si.getPoint());
+                    ray.setDirection(ray.getDirection());
+                } else {
+                    return true;
+                }
+            }
         }
     }
 }

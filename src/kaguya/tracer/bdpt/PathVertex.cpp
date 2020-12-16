@@ -24,7 +24,7 @@ namespace kaguya {
                 case VOLUME:
                     // TODO Not supported for now
                     assert(1 == 0);
-                    break;
+                    return Spectrum(0.0);
                 case LIGHT:
                 default:
                     return Spectrum(0.0);

@@ -12,9 +12,7 @@
 
 namespace kaguya {
     namespace core {
-
         class Light;
-
     }
 }
 
@@ -60,7 +58,24 @@ namespace kaguya {
              */
             static std::shared_ptr<Scene> sceneTwoSpheresWithSpotLight();
 
-            bool hit(const Ray &ray, SurfaceInteraction &hitRecord);
+            /**
+             * Intersect with scene，record the interaction
+             * @param ray
+             * @param hitRecord
+             * @return
+             */
+            bool intersect(const Ray &ray, SurfaceInteraction &hitRecord);
+
+            /**
+             * Intersect scene with participating medium
+             *
+             * intersectWithMedium() will skip the shape without material attribute
+             * @param ray
+             * @param si
+             * @param transmittance
+             * @return
+             */
+            bool intersectWithMedium(Ray &ray, SurfaceInteraction &si, core::Spectrum &transmittance);
 
             std::shared_ptr<Shape> getWorld() {
                 return _world;

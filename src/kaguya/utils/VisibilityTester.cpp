@@ -17,7 +17,7 @@ namespace kaguya {
             Ray ray(_start.getPoint(), NORMALIZE(_end.getPoint() - _start.getPoint()));
             // TODO 如何融合 Surface 和 Volume
             SurfaceInteraction interaction;
-            bool isIntersect = scene.hit(ray, interaction);
+            bool isIntersect = scene.intersect(ray, interaction);
 
             return (!isIntersect) || (isIntersect && interaction.getStep() >= (_step - EPSILON));
         }

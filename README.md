@@ -71,6 +71,8 @@
 
 ## 未解决的问题
 
+- Volume 重构到新 namespace
+
 - ShapeSampler 和 Shape 的功能应该合并，不然现在只能让 class Wall 成为 AreaLight。 
 
 - randomInt 会出现随机到 randomValue = 1.0 的地方，得出的 int 值会让调用者越界

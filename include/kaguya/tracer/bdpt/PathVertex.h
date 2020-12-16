@@ -18,7 +18,7 @@ namespace kaguya {
         using kaguya::core::Interaction;
         using kaguya::core::StartEndInteraction;
         using kaguya::core::SurfaceInteraction;
-        using kaguya::core::VolumeInteraction;
+        using kaguya::core::MediumInteraction;
 
         typedef enum PathVertexType {
             CAMERA, LIGHT, SURFACE, VOLUME
@@ -41,7 +41,7 @@ namespace kaguya {
             bool isDelta = false;
             // 交互点
             SurfaceInteraction si;
-            VolumeInteraction vi;
+            MediumInteraction vi;
             StartEndInteraction ei;
 
             PathVertex() {}
@@ -49,7 +49,7 @@ namespace kaguya {
             PathVertex(const SurfaceInteraction &si, const Spectrum &beta) :
                     si(si), beta(beta), point(si.getPoint()), normal(si.getNormal()), type(PathVertexType::SURFACE) {}
 
-            PathVertex(const VolumeInteraction &vi, const Spectrum &beta) :
+            PathVertex(const MediumInteraction &vi, const Spectrum &beta) :
                     vi(vi), beta(beta), point(vi.getPoint()), type(PathVertexType::VOLUME) {}
 
             PathVertex(PathVertexType type, const StartEndInteraction &ei, const Spectrum &beta) :
