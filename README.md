@@ -70,6 +70,9 @@
 - Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法
 
 ## 未解决的问题
+- RenderPool 的线程数量需要用 command parameter 设置
+
+- RenderPool 是由 Tracer 还是 Tracer 的子类管理 ?
 
 - Shape 文件位置重构，Material\AreaLight 属性拆解到 Geometry
     ShapeSampler 和 Shape 合并

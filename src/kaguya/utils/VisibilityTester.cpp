@@ -16,7 +16,7 @@ namespace kaguya {
             _step = LENGTH(_end.getPoint() - _start.getPoint());
         }
 
-        bool VisibilityTester::isVisible(Scene &scene) {
+        bool VisibilityTester::isVisible(Scene &scene) const {
             Ray ray(_start.getPoint(), NORMALIZE(_end.getPoint() - _start.getPoint()));
             // TODO 如何融合 Surface 和 Volume
             SurfaceInteraction interaction;

@@ -3,6 +3,7 @@
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/meta/Vertex.h>
 #include <kaguya/tracer/pt/PathTracer.h>
+#include <kaguya/tracer/pt/VolumePathTracer.h>
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
 
 #include <iostream>
@@ -53,6 +54,8 @@ int main(int argc, char *argv[]) {
         tracer = new BDPathTracer();
     } else if (render == "pt") {
         tracer = new PathTracer();
+    }else if (render == "volpt"){
+        tracer = new VolumePathTracer();
     } else {
         cout << "not support render type: " << render << endl;
     }

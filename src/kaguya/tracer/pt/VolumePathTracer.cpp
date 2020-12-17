@@ -57,8 +57,8 @@ namespace kaguya {
 
                 // deal with participating medium
                 core::MediumInteraction mi;
-                if (ray.getMedium() != nullptr) {
-                    beta *= ray.getMedium()->sampleInteraction(ray, sampler1D, &mi, memoryArena);
+                if (scatterRay.getMedium() != nullptr) {
+                    beta *= scatterRay.getMedium()->sampleInteraction(scatterRay, sampler1D, &mi, memoryArena);
                     if (beta.isBlack()) {
                         break;
                     }
@@ -181,7 +181,6 @@ namespace kaguya {
 
                 if (!f.isBlack()) {
                     lumi *= visibilityTester.transmittance(scene);
-
                     if (!lumi.isBlack()) {
                         if (light->isDeltaType()) {
                             // shader spectrum

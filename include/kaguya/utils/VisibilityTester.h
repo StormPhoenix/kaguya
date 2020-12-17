@@ -39,7 +39,7 @@ namespace kaguya {
              */
             core::Spectrum transmittance(Scene &scene) const;
 
-            bool isVisible(Scene &scene);
+            bool isVisible(Scene &scene) const;
 
             Interaction getStart() {
                 return _start;

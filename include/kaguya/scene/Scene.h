@@ -29,11 +29,6 @@ namespace kaguya {
         class Scene {
         public:
             /**
-             * 场景测试数据
-             */
-            static std::shared_ptr<Scene> sceneTest();
-
-            /**
              * 构建 Cornel box，加载 bunny 模型
              */
             static std::shared_ptr<Scene> sceneBunnyWithAreaLight();

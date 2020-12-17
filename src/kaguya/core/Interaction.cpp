@@ -27,7 +27,9 @@ namespace kaguya {
 
         Ray Interaction::sendRayTo(const Interaction &it) const {
             const Vector3 dir = (it._point - _point);
-            double step = LENGTH(dir);
+            double step = LENGTH(dir) - 1e-6;
+            assert(step > 0);
+
             // check whether the ray direction is point to outside or inside
             const medium::Medium *medium = (DOT(dir, _normal) > 0 ?
                                             _mediumBoundary.outside() : _mediumBoundary.inside());

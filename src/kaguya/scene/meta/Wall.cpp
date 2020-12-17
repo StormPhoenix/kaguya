@@ -131,10 +131,10 @@ namespace kaguya {
             Vector3 horizontal = (_transformedRightBottom - _transformedLeftBottom) * u;
             Vector3 vertical = (_transformedLeftTop - _transformedLeftBottom) * v;
 
-            SurfaceInteraction samplePoint;
-            samplePoint.setPoint(_transformedLeftBottom + horizontal + vertical);
-            samplePoint.setNormal(_transformedNormal);
-            return samplePoint;
+            SurfaceInteraction si;
+            si.setPoint(_transformedLeftBottom + horizontal + vertical);
+            si.setNormal(_transformedNormal);
+            return si;
         }
 
         double Wall::surfacePointPdf(SurfaceInteraction &si) {
