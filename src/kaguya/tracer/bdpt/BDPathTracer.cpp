@@ -3,6 +3,7 @@
 //
 
 #include <kaguya/core/bsdf/BXDF.h>
+#include <kaguya/core/medium/Medium.h>
 #include <kaguya/parallel/RenderPool.h>
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
 #include <kaguya/tracer/bdpt/PathVertex.h>
@@ -14,6 +15,7 @@ namespace kaguya {
     namespace tracer {
 
         using kaguya::core::BXDFType;
+        using kaguya::core::medium::Medium;
         using kaguya::core::TransportMode;
         using kaguya::memory::ScopeSwapper;
         using kaguya::utils::VisibilityTester;
@@ -224,64 +226,84 @@ namespace kaguya {
             Ray scatterRay = ray;
             int vertexCount = 1;
             for (int depth = 1; depth < maxDepth; depth++) {
+                SurfaceInteraction interaction;
+                bool isIntersected = scene->intersect(scatterRay, interaction);
+
+                // sample medium interaction
+                MediumInteraction mi;
+                if (scatterRay.getMedium() != nullptr) {
+                    beta *= scatterRay.getMedium()->sampleInteraction(scatterRay, sampler1D, &mi, memoryArena);
+                }
+
                 if (beta.isBlack()) {
                     break;
                 }
 
-                SurfaceInteraction interaction;
-                bool isIntersected = scene->intersect(scatterRay, interaction);
-                if (isIntersected) {
-                    // 取出当前点和上一个点
-                    PathVertex &vertex = path[depth];
-                    PathVertex &preVertex = path[depth - 1];
+                PathVertex &vertex = path[depth];
+                PathVertex &preVertex = path[depth - 1];
 
-                    // 构建 BSDF
-                    BSDF *bsdf = interaction.buildBSDF(memoryArena, mode);
-                    assert(bsdf != nullptr);
-
-                    // 添加新点 TODO 默认只有 Surface 类型
-                    vertex = PathVertex::createSurfaceVertex(interaction, pdfPreWi, preVertex, beta);
-                    vertex.beta = beta;
+                if (mi.isValid()) {
+                    /* handle medium */
+                    // create medium vertex
+                    vertex = PathVertex::createMediumVertex(mi, pdfPreWi, preVertex, beta);
                     vertexCount++;
 
-                    // 采样下一个射线
-                    Vector3 worldWo = -interaction.getDirection();
-                    Vector3 worldWi = Vector3(0);
-                    BXDFType sampleType;
-                    Spectrum f = bsdf->sampleF(worldWo, &worldWi, &pdfPreWi, sampler1D,
-                                               BXDFType::BSDF_ALL, &sampleType);
+                    // generate next ray
+                    Vector3 worldWo = -scatterRay.getDirection();
+                    Vector3 worldWi;
+                    pdfPreWi = mi.getPhaseFunction()->sampleScatter(worldWo, &worldWi, sampler1D);
+                    scatterRay = mi.sendRay(worldWi);
 
-                    // 判断采样是否有效
-                    if (std::abs(pdfPreWi) < EPSILON || f.isBlack()) {
-                        break;
-                    }
+                    // update backward pdf and density
+                    pdfWo = pdfPreWi;
+                } else {
+                    if (isIntersected) {
+                        // 构建 BSDF
+                        BSDF *bsdf = interaction.buildBSDF(memoryArena, mode);
+                        assert(bsdf != nullptr);
 
-                    // 设置新的散射光线
-                    scatterRay = Ray(interaction.getPoint(), worldWi);
+                        // 添加新点 TODO 默认只有 Surface 类型
+                        vertex = PathVertex::createSurfaceVertex(interaction, pdfPreWi, preVertex, beta);
+                        vertexCount++;
 
-                    // TODO cosine 的计算感觉有问题，对于从光源发射的光线，应该用 worldWo
-                    // 更新 beta
-                    double cosine = std::abs(DOT(interaction.getNormal(), worldWi));
+                        // 采样下一个射线
+                        Vector3 worldWo = -interaction.getDirection();
+                        Vector3 worldWi = Vector3(0);
+                        BXDFType sampleType;
+                        Spectrum f = bsdf->sampleF(worldWo, &worldWi, &pdfPreWi, sampler1D,
+                                                   BXDFType::BSDF_ALL, &sampleType);
 
-                    beta *= (f * cosine / pdfPreWi);
+                        // 判断采样是否有效
+                        if (std::abs(pdfPreWi) < EPSILON || f.isBlack()) {
+                            break;
+                        }
 
-                    // 计算向后 pdfWo
-                    // TODO 临时调换下 wo 和 wi 的位置
-                    pdfWo = bsdf->samplePdf(worldWo, worldWi);
+                        // 设置新的散射光线
+                        scatterRay = interaction.sendRay(worldWi);
+
+                        // TODO cosine 的计算感觉有问题，对于从光源发射的光线，应该用 worldWo
+                        // 更新 beta
+                        double cosine = std::abs(DOT(interaction.getNormal(), worldWi));
+
+                        beta *= (f * cosine / pdfPreWi);
+
+                        // 计算向后 pdfWo
+                        // TODO 临时调换下 wo 和 wi 的位置
+                        pdfWo = bsdf->samplePdf(worldWo, worldWi);
 //                    pdfWo = bsdf->samplePdf(worldWi, worldWo);
 
-                    // 如果 bsdf 反射含有 delta 成分，则前后 pdf 都赋值为 0
-                    if (sampleType & BXDFType::BSDF_SPECULAR) {
-                        pdfWo = 0;
-                        pdfPreWi = 0;
-                        vertex.isDelta = true;
+                        // 如果 bsdf 反射含有 delta 成分，则前后 pdf 都赋值为 0
+                        if (sampleType & BXDFType::BSDF_SPECULAR) {
+                            pdfWo = 0;
+                            pdfPreWi = 0;
+                            vertex.isDelta = true;
+                        }
+                    } else {
+                        break;
                     }
-
-                    // 更新前一个点的 pdfBackward
-                    preVertex.pdfBackward = vertex.computeForwardDensityPdf(pdfWo, preVertex);
-                } else {
-                    break;
                 }
+                // update pre-vertex's backward density
+                preVertex.pdfBackward = vertex.computeForwardDensityPdf(pdfWo, preVertex);
             }
             return vertexCount;
         }

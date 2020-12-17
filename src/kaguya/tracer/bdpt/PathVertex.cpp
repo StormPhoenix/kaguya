@@ -20,11 +20,10 @@ namespace kaguya {
                 case SURFACE:
                     assert(si.getBSDF() != nullptr);
                     return si.getBSDF()->f(-si.getDirection(), worldWi);
+                case MEDIUM:
+                    assert(mi.getPhaseFunction() != nullptr);
+                    return mi.getPhaseFunction()->scatterPdf(-mi.getDirection(), worldWi);
                 case CAMERA:
-                case VOLUME:
-                    // TODO Not supported for now
-                    assert(1 == 0);
-                    return Spectrum(0.0);
                 case LIGHT:
                 default:
                     return Spectrum(0.0);
@@ -63,8 +62,8 @@ namespace kaguya {
             switch (type) {
                 case SURFACE:
                     return si;
-                case VOLUME:
-                    return vi;
+                case MEDIUM:
+                    return mi;
                 case CAMERA:
                     return ei;
                 case LIGHT:
@@ -86,7 +85,7 @@ namespace kaguya {
             if (next.type == PathVertexType::SURFACE) {
                 Vector3 surfaceNormal = next.si.getNormal();
                 Vector3 dirToPre = -next.si.getDirection();
-                pdfFwd *= std::abs(DOT(surfaceNormal, dirToPre));
+                pdfFwd *= ABS_DOT(surfaceNormal, dirToPre);
             }
             return pdfFwd;
         }
@@ -102,10 +101,8 @@ namespace kaguya {
                     // 判断 specular 类型
                     assert(si.getBSDF() != nullptr);
                     return si.getBSDF()->hasAnyOf(BXDFType(BXDFType::BSDF_DIFFUSE | BXDFType::BSDF_GLOSSY)) > 0;
-                case VOLUME:
-                    // TODO 暂时不支持 Volume Rendering
-                    assert(1 == 0);
-                    return false;
+                case MEDIUM:
+                    return true;
                 default:
                     // TODO 暂时不支持
                     assert(1 == 0);
@@ -146,9 +143,9 @@ namespace kaguya {
                 ei.camera->rayImportance(cameraRay, pdfPos, pdf);
             } else if (type == SURFACE) {
                 pdf = si.getBSDF()->samplePdf(wo, wi);
-            } else if (type == VOLUME) {
-                // TODO 暂时不支持
-                assert(1 == 0);
+            } else if (type == MEDIUM) {
+                assert(mi.getPhaseFunction() != nullptr);
+                pdf = mi.getPhaseFunction()->scatterPdf(wo, wi);
             } else {
                 // TODO 暂时不支持
                 assert(1 == 0);

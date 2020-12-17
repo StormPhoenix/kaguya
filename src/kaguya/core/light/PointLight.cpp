@@ -8,7 +8,9 @@ namespace kaguya {
     namespace core {
 
         PointLight::PointLight(const Vector3 &center, const Spectrum &intensity, const MediumBound &mediumBoundary) :
-                Light(DELTA_POSITION, mediumBoundary), _center(center), _intensity(intensity) {}
+                Light(DELTA_POSITION, mediumBoundary), _center(center), _intensity(intensity) {
+            assert(mediumBoundary.inside() == mediumBoundary.outside());
+        }
 
         Spectrum PointLight::sampleFromLight(const Interaction &eye,
                                              Vector3 *wi, double *pdf,
@@ -34,7 +36,7 @@ namespace kaguya {
                                             const Sampler1D *sampler1D) {
             // 采样射线
             Vector3 rayDir = sphereUniformSampling(sampler1D);
-            (*ray) = Ray(_center, rayDir);
+            (*ray) = Ray(_center, rayDir, _mediumBoundary.inside());
 
             *normal = rayDir;
             *pdfPos = 1.0;

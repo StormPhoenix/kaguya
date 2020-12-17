@@ -205,7 +205,7 @@ namespace kaguya {
                     const MediumInteraction &mi = (const MediumInteraction &) eye;
                     assert(mi.getPhaseFunction() != nullptr);
 
-                    scatteringPdf = mi.getPhaseFunction()->sampleScatter(wo, &wi, sampler1D);
+                    scatteringPdf = mi.getPhaseFunction()->scatterPdf(wo, wi);
                     f = Spectrum(scatteringPdf);
                 } else {
                     // handle surface interaction

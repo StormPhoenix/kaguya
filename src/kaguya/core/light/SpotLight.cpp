@@ -12,6 +12,8 @@ namespace kaguya {
                 Light(DELTA_POSITION, mediumBoundary),
                 _center(center), _dir(NORMALIZE(dir)),
                 _intensity(intensity) {
+            assert(_mediumBoundary.inside() == _mediumBoundary.outside());
+
             _cosFallOffRange = std::cos(DEGREES_TO_RADIANS(fallOffRange));
             _cosTotalRange = std::cos(DEGREES_TO_RADIANS(totalRange));
         }
@@ -51,7 +53,7 @@ namespace kaguya {
             Vector3 dirWorld = dirLocal.x * tanX + dirLocal.y * tanY + dirLocal.z * tanZ;
 
             // 设置 ray
-            (*ray) = Ray(_center, NORMALIZE(dirWorld));
+            (*ray) = Ray(_center, NORMALIZE(dirWorld), _mediumBoundary.inside());
 
             (*normal) = dirWorld;
             (*pdfPos) = 1.0;

@@ -21,7 +21,7 @@ namespace kaguya {
         using kaguya::core::MediumInteraction;
 
         typedef enum PathVertexType {
-            CAMERA, LIGHT, SURFACE, VOLUME
+            CAMERA, LIGHT, SURFACE, MEDIUM
         } PathVertexType;
 
         typedef struct PathVertex {
@@ -41,7 +41,7 @@ namespace kaguya {
             bool isDelta = false;
             // 交互点
             SurfaceInteraction si;
-            MediumInteraction vi;
+            MediumInteraction mi;
             StartEndInteraction ei;
 
             PathVertex() {}
@@ -49,8 +49,8 @@ namespace kaguya {
             PathVertex(const SurfaceInteraction &si, const Spectrum &beta) :
                     si(si), beta(beta), point(si.getPoint()), normal(si.getNormal()), type(PathVertexType::SURFACE) {}
 
-            PathVertex(const MediumInteraction &vi, const Spectrum &beta) :
-                    vi(vi), beta(beta), point(vi.getPoint()), type(PathVertexType::VOLUME) {}
+            PathVertex(const MediumInteraction &mi, const Spectrum &beta) :
+                    mi(mi), beta(beta), point(mi.getPoint()), type(PathVertexType::MEDIUM) {}
 
             PathVertex(PathVertexType type, const StartEndInteraction &ei, const Spectrum &beta) :
                     type(type), ei(ei), point(ei.getPoint()), normal(ei.getNormal()), beta(beta) {
@@ -135,6 +135,12 @@ namespace kaguya {
                 return cameraVertex;
             }
 
+            static inline PathVertex createMediumVertex(const MediumInteraction &mi, double forwardDensity,
+                                                        const PathVertex &preVertex, const Spectrum &beta) {
+                PathVertex vertex = PathVertex(mi, beta);
+                vertex.pdfForward = preVertex.computeForwardDensityPdf(forwardDensity, vertex);
+                return vertex;
+            }
 
             static inline PathVertex createLightVertex(const Light *light, const Vector3 &p, const Vector3 &dir,
                                                        const Vector3 &n, const Spectrum &intensity, double pdf) {
