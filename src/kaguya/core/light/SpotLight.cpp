@@ -18,7 +18,7 @@ namespace kaguya {
 
         Spectrum SpotLight::sampleFromLight(const Interaction &eye,
                                             Vector3 *wi, double *pdf,
-                                            random::Sampler1D *sampler1D,
+                                            const Sampler1D *sampler1D,
                                             VisibilityTester *visibilityTester) {
             (*wi) = NORMALIZE(_center - eye.getPoint());
             (*pdf) = 1.0;
@@ -37,7 +37,7 @@ namespace kaguya {
         }
 
         Spectrum SpotLight::randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir,
-                                           random::Sampler1D *sampler1D) {
+                                           const Sampler1D *sampler1D) {
             // 在局部坐标空间中均匀采样射线
             Vector3 dirLocal = coneUniformSampling(_cosTotalRange, sampler1D);
 

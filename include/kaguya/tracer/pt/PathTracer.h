@@ -40,7 +40,7 @@ namespace kaguya {
              * @return
              */
             Spectrum evaluateDirectLight(Scene &scene, const Interaction &eye, const BSDF &bsdf,
-                                         random::Sampler1D *sampler1D);
+                                         const Sampler1D *sampler1D);
 
             /**
              * Path Tracing 渲染代码，渐进式实现
@@ -50,7 +50,7 @@ namespace kaguya {
              * @return
              */
             Spectrum shaderOfProgression(const Ray &ray, Scene &scene,
-                                         random::Sampler1D *sampler1D,
+                                         const Sampler1D *sampler1D,
                                          MemoryArena &memoryArena);
 
             /**

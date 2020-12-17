@@ -19,7 +19,7 @@ namespace kaguya {
         }
 
         Spectrum BXDFSpecularTransmission::sampleF(const Vector3 &wo, Vector3 *wi, double *pdf,
-                                                   const random::Sampler1D *const sampler1D) {
+                                                   const Sampler1D *const sampler1D) {
             double refraction;
             if (wo.y > 0) {
                 // 外部射入

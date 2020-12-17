@@ -50,7 +50,7 @@ namespace kaguya {
             barrier.reset();
 
             // create sampler2d
-            random::Sampler1D *sampler1D = random::Sampler1D::newInstance();
+            Sampler1D *sampler1D = Sampler1D::newInstance();
 
             std::unique_lock<std::mutex> lock(_taskMutex);
             // running rendering function
@@ -103,7 +103,7 @@ namespace kaguya {
             barrier->wait();
         }
 
-        void RenderPool::addRenderTask(std::function<void(const int, const int, random::Sampler1D *)> func2D,
+        void RenderPool::addRenderTask(std::function<void(const int, const int, const Sampler1D *)> func2D,
                                        int renderWidth, int renderHeight) {
             assert(_threadCount > 0);
 

@@ -6,9 +6,12 @@
 #define KAGUYA_PHASEFUNCTION_H
 
 #include <kaguya/core/Core.h>
+#include <kaguya/math/Sampler.hpp>
 
 namespace kaguya {
     namespace core {
+
+        using kaguya::math::random::Sampler1D;
 
         class PhaseFunction {
         public:
@@ -26,7 +29,7 @@ namespace kaguya {
              * @param wi
              * @return
              */
-            virtual double sampleScatter(const Vector3 &wo, Vector3 *wi) const = 0;
+            virtual double sampleScatter(const Vector3 &wo, Vector3 *wi, const Sampler1D *sampler1D) const = 0;
         };
 
     }

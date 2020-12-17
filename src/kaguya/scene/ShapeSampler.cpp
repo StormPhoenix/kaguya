@@ -11,7 +11,7 @@ namespace kaguya {
             return 1 / area();
         }
 
-        SurfaceInteraction ShapeSampler::sampleRayIntersection(const Interaction &eye, random::Sampler1D *sampler1D) {
+        SurfaceInteraction ShapeSampler::sampleRayIntersection(const Interaction &eye, const Sampler1D *sampler1D) {
             return sampleSurfacePoint(sampler1D);
         }
 

@@ -2,14 +2,19 @@
 // Created by Storm Phoenix on 2020/12/16.
 //
 
+#include <kaguya/core/medium/MediumBound.h>
 #include <kaguya/scene/Geometry.h>
 
 namespace kaguya {
     namespace scene {
+
+        using kaguya::core::medium::MediumBound;
+
         Geometry::Geometry(const std::shared_ptr<Shape> shape,
                            const std::shared_ptr<Material> material,
-                           const MediumBound &mediumBoundary) :
-                _shape(shape), _material(material), _mediumBoundary(mediumBoundary) {
+                           const std::shared_ptr<Medium> inside,
+                           const std::shared_ptr<Medium> outside) :
+                _shape(shape), _material(material), _inside(inside), _outside(outside) {
             assert(_shape != nullptr);
         }
 
@@ -18,7 +23,7 @@ namespace kaguya {
             bool ret = _shape->insect(ray, si, stepMin, stepMax);
             if (ret) {
                 // medium
-                si.setMediumBoundary(_mediumBoundary);
+                si.setMediumBoundary(MediumBound(_inside.get(), _outside.get()));
                 // material
                 _material != nullptr ? si.setMaterial(_material.get()) : si.setMaterial(nullptr);
                 // TODO area light

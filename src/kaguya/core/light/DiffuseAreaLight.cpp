@@ -25,7 +25,7 @@ namespace kaguya {
                 AreaLight(intensity, shapeSampler, AREA, mediumBoundary), _singleSide(singleSide) {}
 
         Spectrum DiffuseAreaLight::randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir,
-                                                  random::Sampler1D *sampler1D) {
+                                                  const Sampler1D *sampler1D) {
             assert(_shapeSampler != nullptr);
 
             // 采样位置

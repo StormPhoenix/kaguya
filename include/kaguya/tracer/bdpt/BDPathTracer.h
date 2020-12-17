@@ -55,7 +55,7 @@ namespace kaguya {
              * @return
              */
             Spectrum shader(const Ray &ray, Scene &scene, int maxDepth,
-                            random::Sampler1D *sampler1D, MemoryArena &memoryArena);
+                            const Sampler1D *sampler1D, MemoryArena &memoryArena);
 
             Spectrum shaderOfMyImplemention();
 
@@ -68,7 +68,7 @@ namespace kaguya {
              */
             int generateCameraPath(std::shared_ptr<Scene> scene, const Ray &ray, std::shared_ptr<Camera>,
                                    PathVertex *cameraSubPath, int maxDepth,
-                                   random::Sampler1D *sampler1D, MemoryArena &memoryArena);
+                                   const Sampler1D *sampler1D, MemoryArena &memoryArena);
 
             /**
              * 生成光照路径
@@ -80,7 +80,7 @@ namespace kaguya {
              */
             int generateLightPath(std::shared_ptr<Scene> scene,
                                   PathVertex *lightSubPath, int maxDepth,
-                                  random::Sampler1D *sampler1D,
+                                  const Sampler1D *sampler1D,
                                   MemoryArena &memoryArena);
 
             /**
@@ -96,7 +96,7 @@ namespace kaguya {
              * @return
              */
             int randomWalk(std::shared_ptr<Scene> scene, const Ray &ray, PathVertex *path, int maxDepth,
-                           double pdf, const random::Sampler1D *const sampler1D, MemoryArena &memoryArena, Spectrum &beta,
+                           double pdf, const Sampler1D *const sampler1D, MemoryArena &memoryArena, Spectrum &beta,
                            TransportMode mode);
 
             /**
@@ -113,7 +113,7 @@ namespace kaguya {
              */
             Spectrum connectPath(Scene &scene, PathVertex *cameraSubPath, int cameraPathLength, int t,
                                  PathVertex *lightSubPath, int lightPathLength, int s, Point2d *samplePosition,
-                                 random::Sampler1D *sampler1D);
+                                 const Sampler1D *sampler1D);
 
             /**
              * 计算 connect 路径的 pdf

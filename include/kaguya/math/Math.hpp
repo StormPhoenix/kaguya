@@ -13,7 +13,7 @@
 
 #include <functional>
 #include <random>
-#include "Sampler.hpp"
+#include <kaguya/math/Sampler.hpp>
 
 // TODO 相关函数分离定义到 core 里面
 
@@ -77,11 +77,11 @@ inline double schlick(double cosine, double ref_idx) {
     return r0 + (1 - r0) * pow((1 - cosine), 5);
 }
 
-inline double randomDouble(double min, double max, const random::Sampler1D *const sampler1D) {
+inline double randomDouble(double min, double max, const math::random::Sampler1D *const sampler1D) {
     return min + (max - min) * sampler1D->sample();
 }
 
-inline int randomInt(int min, int max, const random::Sampler1D *const sampler1D) {
+inline int randomInt(int min, int max, const math::random::Sampler1D *const sampler1D) {
     return std::min(static_cast<int>(randomDouble(min, max + 1, sampler1D)), max);
 }
 
@@ -122,7 +122,7 @@ inline double misWeight(int nSampleF, double pdfF, int nSampleG, double pdfG) {
  * 从 y > 0 的半球面，按照 cos(theta) / Pi 的概率采样射线
  * @return
  */
-inline Vector3 hemiCosineSampling(const random::Sampler1D *const sampler1D) {
+inline Vector3 hemiCosineSampling(const math::random::Sampler1D *const sampler1D) {
     // fi = 2 * Pi * sampleU
     double sampleU = sampler1D->sample();
     // sampleV = sin^2(theta)
@@ -141,7 +141,7 @@ inline Vector3 hemiCosineSampling(const random::Sampler1D *const sampler1D) {
  * 在球面做均匀采样，默认 (0, 1, 0) 为法线方向
  * @return
  */
-inline Vector3 sphereUniformSampling(random::Sampler1D *sampler1D) {
+inline Vector3 sphereUniformSampling(const math::random::Sampler1D *sampler1D) {
     // phi = 2 * Pi * sampleU
     double sampleU = sampler1D->sample();
     // 2 * sampleV = 1 - cos(theta)
@@ -198,7 +198,7 @@ inline void tangentSpace(Vector3 &tanY, Vector3 *tanX, Vector3 *tanZ) {
  * @param cosThetaMax
  * @return
  */
-inline Vector3 coneUniformSampling(double cosThetaMax, random::Sampler1D *sampler1D) {
+inline Vector3 coneUniformSampling(double cosThetaMax, const math::random::Sampler1D *sampler1D) {
     // phi = 2 * PI * sampleU
     double sampleU = sampler1D->sample();
     // sampleV = (1 - cos(theta)) / (1 - cos(thetaMax))
@@ -225,7 +225,7 @@ inline Vector3 coneUniformSampling(double cosThetaMax, random::Sampler1D *sample
  * 对圆盘做均匀采样
  * @return
  */
-inline Vector2 diskUniformSampling(const random::Sampler1D *const sampler1D, double radius = 1.) {
+inline Vector2 diskUniformSampling(const math::random::Sampler1D *const sampler1D, double radius = 1.) {
     // sampleY = r / Radius
     // sampleX = theta / (2 * PI)
     double sampleY = sampler1D->sample();

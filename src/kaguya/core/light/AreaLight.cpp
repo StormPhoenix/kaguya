@@ -12,7 +12,7 @@ namespace kaguya {
                 Light(LightType(type | AREA), mediumBoundary), _intensity(intensity), _shapeSampler(shapeSampler) {}
 
         Spectrum AreaLight::sampleFromLight(const Interaction &eye, Vector3 *wi, double *pdf,
-                                            random::Sampler1D *sampler1D,
+                                            const Sampler1D *sampler1D,
                                             VisibilityTester *visibilityTester) {
             assert(_shapeSampler != nullptr);
             // 从 eye 出发采样一条射线，返回与 shape 的交点

@@ -22,6 +22,7 @@ namespace kaguya {
 namespace kaguya {
     namespace scene {
 
+        using kaguya::math::random::Sampler1D;
         using kaguya::tracer::Ray;
         using kaguya::core::AreaLight;
 
@@ -41,7 +42,7 @@ namespace kaguya {
              * 在 Shape 表面进行均匀采样
              * @return
              */
-            virtual SurfaceInteraction sampleSurfacePoint(random::Sampler1D *sampler1D) = 0;
+            virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) = 0;
 
             /**
              * 计算surface上做均匀采样的概率
@@ -55,7 +56,7 @@ namespace kaguya {
              * @param eye
              * @return
              */
-            virtual SurfaceInteraction sampleRayIntersection(const Interaction &eye, random::Sampler1D *sampler1D);
+            virtual SurfaceInteraction sampleRayIntersection(const Interaction &eye, const Sampler1D *sampler1D);
 
             /**
              * 计算从 eye 出发，沿 dir 方向击中 Shape 上的点的概率

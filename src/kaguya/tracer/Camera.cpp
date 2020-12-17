@@ -10,15 +10,15 @@ namespace kaguya {
 
         using kaguya::core::medium::MediumBound;
 
-        Camera::Camera(const Vector3 &eye, const Vector3 &direction, float fov, float aspect,
-                       const core::medium::Medium *medium) : _medium(medium) {
+        Camera::Camera(const Vector3 &eye, const Vector3 &direction, const std::shared_ptr<Medium> medium, float fov,
+                       float aspect) : _medium(medium) {
             _eye = eye;
             _front = NORMALIZE(direction);
             buildCameraCoordinate(fov, aspect);
         }
 
-        Camera::Camera(const Vector3 &eye, float yaw, float pitch, float fov, float aspect,
-                       const core::medium::Medium *medium) : _medium(medium) {
+        Camera::Camera(const Vector3 &eye, float yaw, float pitch,
+                       const std::shared_ptr<Medium> medium, float fov, float aspect) : _medium(medium) {
             _eye = eye;
             _front.x = cos(DEGREES_TO_RADIANS(pitch)) * cos(DEGREES_TO_RADIANS(yaw));
             _front.y = sin(DEGREES_TO_RADIANS(pitch));
@@ -31,7 +31,7 @@ namespace kaguya {
             Vector3 samplePoint =
                     _leftBottomCorner + 2 * _halfWindowWidth * u * _right + 2 * _halfWindowHeight * v * _up;
             Vector3 dir = NORMALIZE(samplePoint - _eye);
-            return Ray(_eye, dir, _medium);
+            return Ray(_eye, dir, _medium.get());
         }
 
         Vector3 Camera::getEye() const {
@@ -61,7 +61,7 @@ namespace kaguya {
         Spectrum Camera::sampleCameraRay(const Interaction &eye,
                                          Vector3 *wi, double *pdf,
                                          Point2d *filmPosition,
-                                         const random::Sampler1D *const sampler1D,
+                                         const Sampler1D *const sampler1D,
                                          VisibilityTester *visibilityTester) const {
             // 在相机镜头圆盘上随机采样
             Vector2 diskSample = diskUniformSampling(sampler1D, _lensRadius);
@@ -74,7 +74,7 @@ namespace kaguya {
             (*wi) = NORMALIZE(*wi);
 
             // 创建 Interaction
-            Interaction lensInter = Interaction(lensSample, *wi, _front, _medium);
+            Interaction lensInter = Interaction(lensSample, *wi, _front, _medium.get());
             // 设置 visibility tester
             (*visibilityTester) = VisibilityTester(eye, lensInter);
 

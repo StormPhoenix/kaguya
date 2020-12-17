@@ -123,7 +123,7 @@ namespace kaguya {
             return _area;
         }
 
-        SurfaceInteraction Wall::sampleSurfacePoint(random::Sampler1D *sampler1D) {
+        SurfaceInteraction Wall::sampleSurfacePoint(const Sampler1D *sampler1D) {
             // 随机采样坐标
             double u = sampler1D->sample();
             double v = sampler1D->sample();
@@ -195,7 +195,7 @@ namespace kaguya {
             return width * height;
         }
 
-        SurfaceInteraction ZXWall::sampleSurfacePoint(random::Sampler1D *sampler1D) {
+        SurfaceInteraction ZXWall::sampleSurfacePoint(const Sampler1D *sampler1D) {
             double u = sampler1D->sample();
             double v = sampler1D->sample();
 
@@ -272,7 +272,7 @@ namespace kaguya {
             return width * height;
         }
 
-        SurfaceInteraction YZWall::sampleSurfacePoint(random::Sampler1D *sampler1D) {
+        SurfaceInteraction YZWall::sampleSurfacePoint(const Sampler1D *sampler1D) {
             double u = sampler1D->sample();
             double v = sampler1D->sample();
 
@@ -345,7 +345,7 @@ namespace kaguya {
             return width * height;
         }
 
-        SurfaceInteraction XYWall::sampleSurfacePoint(random::Sampler1D *sampler1D) {
+        SurfaceInteraction XYWall::sampleSurfacePoint(const Sampler1D *sampler1D) {
             double u = sampler1D->sample();
             double v = sampler1D->sample();
 

@@ -23,6 +23,8 @@ namespace kaguya {
 
         using kaguya::core::Interaction;
         using kaguya::utils::VisibilityTester;
+        using kaguya::core::medium::Medium;
+        using kaguya::math::random::Sampler1D;
 
         class Camera {
         public:
@@ -35,7 +37,7 @@ namespace kaguya {
              * @param aspect 相机成像平面的宽/高比例
              */
             Camera(const Vector3 &eye = {0.0f, 0.0f, 0.0f}, const Vector3 &direction = {0.0f, 0.0f, -1.0f},
-                   float fov = 60.0, float aspect = 1.0, const core::medium::Medium *medium = nullptr);
+                   const std::shared_ptr<Medium> medium = nullptr, float fov = 60.0, float aspect = 1.0);
 
             /**
              * 初始化相机，设计到欧拉角的计算，这和欧拉角具体的转换方式有关。
@@ -48,8 +50,8 @@ namespace kaguya {
              * @param yaw 欧拉角，偏航角
              * @param pitch 欧拉角，俯仰角
              */
-            Camera(const Vector3 &eye, float yaw = -90.0f, float pitch = 0.0f, float fov = 60.0, float aspect = 1.0,
-                   const core::medium::Medium *medium = nullptr);
+            Camera(const Vector3 &eye, float yaw = -90.0f, float pitch = 0.0f,
+                   const std::shared_ptr<Medium> medium = nullptr, float fov = 60.0, float aspect = 1.0);
 
             /**
              * 获取射线
@@ -91,7 +93,7 @@ namespace kaguya {
              * @return
              */
             Spectrum sampleCameraRay(const Interaction &eye, Vector3 *wi, double *pdf, Point2d *filmPosition,
-                                     const random::Sampler1D *const sampler1D,
+                                     const Sampler1D *const sampler1D,
                                      VisibilityTester *visibilityTester) const;
 
             /**
@@ -149,8 +151,8 @@ namespace kaguya {
             double _lensRadius = 0.025;
             // 默认焦距为 10
             const double _focal = 10;
-
-            const core::medium::Medium *_medium;
+            // medium
+            std::shared_ptr<Medium> _medium;
         };
 
     }

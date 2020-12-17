@@ -56,7 +56,7 @@ namespace kaguya {
 
             void BVH::build(std::vector<std::shared_ptr<Shape>> &objects,
                             size_t start, size_t end) {
-                random::Sampler1D *sampler = random::Sampler1D::newInstance();
+                math::random::Sampler1D *sampler = math::random::Sampler1D::newInstance();
                 // 采用最简单的平均分配法
                 int axis = randomInt(0, 2, sampler);
                 auto comparator = (axis == 0) ? compareX

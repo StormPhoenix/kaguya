@@ -31,7 +31,7 @@ namespace kaguya {
 
 
         Spectrum PathTracer::shaderOfProgression(const kaguya::tracer::Ray &ray, kaguya::Scene &scene,
-                                                 random::Sampler1D *sampler1D,
+                                                 const Sampler1D *sampler1D,
                                                  MemoryArena &memoryArena) {
             // 最终渲染结果
             Spectrum shaderColor = Spectrum(0);
@@ -116,7 +116,7 @@ namespace kaguya {
         }
 
         Spectrum PathTracer::evaluateDirectLight(Scene &scene, const Interaction &eye, const BSDF &bsdf,
-                                                 random::Sampler1D *sampler1D) {
+                                                 const Sampler1D *sampler1D) {
             // TODO 目前只考虑单个光源
             auto light = scene.getLight();
             // p(wi)
@@ -161,7 +161,7 @@ namespace kaguya {
 
                 const double sampleWeight = 1.0 / _samplePerPixel;
 
-                auto renderFunc = [this](const int row, const int col, random::Sampler1D *sampler1D) -> void {
+                auto renderFunc = [this](const int row, const int col, const Sampler1D *sampler1D) -> void {
                     Spectrum ans = {0};
 
                     const double sampleWeight = 1.0 / _samplePerPixel;

@@ -34,7 +34,7 @@ namespace kaguya {
 
 
         Spectrum VolumePathTracer::shaderOfProgression(const kaguya::tracer::Ray &ray, kaguya::Scene &scene,
-                                                       random::Sampler1D *sampler1D,
+                                                       const Sampler1D *sampler1D,
                                                        MemoryArena &memoryArena) {
             // 最终渲染结果
             Spectrum shaderColor = Spectrum(0);
@@ -73,7 +73,7 @@ namespace kaguya {
                     /* sample new ray */
                     Vector3 worldWo = -scatterRay.getDirection();
                     Vector3 worldWi;
-                    mi.getPhaseFunction()->sampleScatter(worldWo, &worldWi);
+                    mi.getPhaseFunction()->sampleScatter(worldWo, &worldWi, sampler1D);
                     scatterRay = mi.sendRay(worldWi);
                     isSpecular = false;
                 } else {
@@ -142,7 +142,7 @@ namespace kaguya {
 
         Spectrum VolumePathTracer::evaluateDirectLight(
                 Scene &scene, const Interaction &eye,
-                random::Sampler1D *sampler1D) {
+                const Sampler1D *sampler1D) {
             // TODO 目前只考虑单个光源
             auto light = scene.getLight();
             // p(wi)
@@ -206,7 +206,7 @@ namespace kaguya {
                     const MediumInteraction &mi = (const MediumInteraction &) eye;
                     assert(mi.getPhaseFunction() != nullptr);
 
-                    scatteringPdf = mi.getPhaseFunction()->sampleScatter(wo, &wi);
+                    scatteringPdf = mi.getPhaseFunction()->sampleScatter(wo, &wi, sampler1D);
                     f = Spectrum(scatteringPdf);
                 } else {
                     // handle surface interaction
@@ -257,7 +257,7 @@ namespace kaguya {
 
                 const double sampleWeight = 1.0 / _samplePerPixel;
 
-                auto renderFunc = [this](const int row, const int col, random::Sampler1D *sampler1D) -> void {
+                auto renderFunc = [this](const int row, const int col, const Sampler1D *sampler1D) -> void {
                     Spectrum ans = {0};
 
                     const double sampleWeight = 1.0 / _samplePerPixel;

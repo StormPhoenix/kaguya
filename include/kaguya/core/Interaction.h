@@ -92,7 +92,7 @@ namespace kaguya {
 
             virtual Ray sendRayTo(const Interaction &it) const;
 
-            void setMediumBoundary(MediumBound &mediumBoundary) {
+            void setMediumBoundary(const MediumBound &mediumBoundary) {
                 _mediumBoundary = mediumBoundary;
             }
 
