@@ -75,7 +75,7 @@ namespace kaguya {
             }
         }
 
-        double PathVertex::computeForwardDensityPdf(double pdfWi, const PathVertex &next) const {
+        double PathVertex::convertDensity(double pdfWi, const PathVertex &next) const {
             double distSquare = std::pow(LENGTH(point - next.point), 2);
             if (distSquare == 0) {
                 return 0;
@@ -110,9 +110,9 @@ namespace kaguya {
             }
         }
 
-        double PathVertex::computeDensityPdf(const PathVertex *pre, const PathVertex &next) const {
+        double PathVertex::density(const PathVertex *pre, const PathVertex &next) const {
             if (type == LIGHT) {
-                return computeDensityPdfFromLight(next);
+                return densityByLight(next);
             }
 
             // 计算 wi
@@ -152,10 +152,10 @@ namespace kaguya {
             }
 
             // pdf 转化为基于 area 的 density
-            return computeForwardDensityPdf(pdf, next);
+            return convertDensity(pdf, next);
         }
 
-        double PathVertex::computeDensityPdfFromLight(const PathVertex &next) const {
+        double PathVertex::densityByLight(const PathVertex &next) const {
             // 获取当前 PathVertex 保存的 light 和 areaLight
             const Light *light = (type == LIGHT) ? ei.light : si.getAreaLight();
             assert(light != nullptr);
@@ -179,7 +179,7 @@ namespace kaguya {
             return pdfDir;
         }
 
-        double PathVertex::computeDensityPdfOfLightOrigin(const PathVertex &next) const {
+        double PathVertex::densityLightOrigin(const PathVertex &next) const {
             Vector3 dirToNext = next.point - point;
             dirToNext = NORMALIZE(dirToNext);
 

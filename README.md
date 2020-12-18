@@ -77,6 +77,8 @@
 - Shape 文件位置重构，Material\AreaLight 属性拆解到 Geometry
     ShapeSampler 和 Shape 合并
 
+- 完成 Subsurface Scattering 功能
+
 - Volume 重构到新 namespace
 
 - ShapeSampler 和 Shape 的功能应该合并，不然现在只能让 class Wall 成为 AreaLight。 

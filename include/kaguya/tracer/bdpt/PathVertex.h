@@ -77,7 +77,7 @@ namespace kaguya {
              * @param next 下一个点
              * @return
              */
-            double computeForwardDensityPdf(double pdfWi, const PathVertex &next) const;
+            double convertDensity(double pdfWi, const PathVertex &next) const;
 
             /**
              * 计算 pre -> p -> next 的 density pdf，这个 ，density pdf 是 next 的。
@@ -88,7 +88,7 @@ namespace kaguya {
              * @param next
              * @return
              */
-            double computeDensityPdf(const PathVertex *pre, const PathVertex &next) const;
+            double density(const PathVertex *pre, const PathVertex &next) const;
 
             /**
              * 计算 p -> next 的 density pdf（密度 pdf），这个 density pdf 是 next 的 density pdf，
@@ -97,14 +97,14 @@ namespace kaguya {
              * @param next
              * @return
              */
-            double computeDensityPdfFromLight(const PathVertex &next) const;
+            double densityByLight(const PathVertex &next) const;
 
             /**
              * 当前 PathVertex 作为发光体的时候，计算这个发光体上的发光点的 density pdf
              * @param next
              * @return
              */
-            double computeDensityPdfOfLightOrigin(const PathVertex &next) const;
+            double densityLightOrigin(const PathVertex &next) const;
 
             const Interaction getInteraction() const;
 
@@ -138,7 +138,7 @@ namespace kaguya {
             static inline PathVertex createMediumVertex(const MediumInteraction &mi, double forwardDensity,
                                                         const PathVertex &preVertex, const Spectrum &beta) {
                 PathVertex vertex = PathVertex(mi, beta);
-                vertex.pdfForward = preVertex.computeForwardDensityPdf(forwardDensity, vertex);
+                vertex.pdfForward = preVertex.convertDensity(forwardDensity, vertex);
                 return vertex;
             }
 
@@ -162,7 +162,7 @@ namespace kaguya {
                 // 创建路径点
                 PathVertex v = PathVertex(si, beta);
                 // 计算上个点发射线击中当前点时，当前点对应的概率
-                v.pdfForward = pre.computeForwardDensityPdf(pdfPreWi, v);
+                v.pdfForward = pre.convertDensity(pdfPreWi, v);
                 return v;
             }
 

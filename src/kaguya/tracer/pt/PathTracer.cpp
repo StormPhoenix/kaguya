@@ -3,11 +3,14 @@
 //
 
 #include <kaguya/Config.h>
+#include <kaguya/core/Interaction.h>
 #include <kaguya/core/light/AreaLight.h>
+#include <kaguya/core/medium/Medium.h>
 #include <kaguya/material/Material.h>
 #include <kaguya/parallel/RenderPool.h>
 #include <kaguya/scene/Shape.h>
 #include <kaguya/tracer/pt/PathTracer.h>
+
 
 #include <iostream>
 
@@ -49,60 +52,86 @@ namespace kaguya {
             // 最多进行 _maxDepth 次数弹射
             for (int bounce = 0; bounce < _maxDepth; bounce++) {
                 // intersect
-                SurfaceInteraction intersection;
-                bool isIntersected = scene.intersect(scatterRay, intersection);
+                SurfaceInteraction si;
+                bool isIntersected = scene.intersect(scatterRay, si);
 
-                // 此处参考 pbrt 的写法，需要判断 bounce = 0 和 isSpecular 两种特殊情况
-                if (bounce == 0 || isSpecular) {
-                    if (isIntersected) {
-                        assert(intersection.getMaterial() != nullptr);
-                        // 如果有交点，则直接从交点上取值
-                        if (intersection.getAreaLight() != nullptr) {
-                            shaderColor += (intersection.getAreaLight()->lightRadiance(intersection,
-                                                                                       -intersection.getDirection()) *
-                                            beta);
-                        }
-                    } else {
-                        shaderColor += (beta * background(scatterRay));
+                // deal with participating medium
+                core::MediumInteraction mi;
+                if (scatterRay.getMedium() != nullptr) {
+                    beta *= scatterRay.getMedium()->sampleInteraction(scatterRay, sampler1D, &mi, memoryArena);
+                    if (beta.isBlack()) {
                         break;
                     }
                 }
 
-                // 终止条件判断
-                if (!isIntersected) {
-                    // TODO 添加环境光
-                    break;
+                // check if a medium interaction occurs
+                if (mi.isValid()) {
+                    /* handle medium interaction */
+                    // sample direct light
+                    shaderColor += beta * evaluateDirectLight(scene, mi, sampler1D);
+
+                    /* sample new ray */
+                    Vector3 worldWo = -scatterRay.getDirection();
+                    Vector3 worldWi;
+                    mi.getPhaseFunction()->sampleScatter(worldWo, &worldWi, sampler1D);
+                    scatterRay = mi.sendRay(worldWi);
+                    isSpecular = false;
+                } else {
+                    // handle surface interaction
+                    // 此处参考 pbrt 的写法，需要判断 bounce = 0 和 isSpecular 两种特殊情况
+                    if (bounce == 0 || isSpecular) {
+                        if (isIntersected) {
+                            // TODO 不应该判断 Material 的值
+                            assert(si.getMaterial() != nullptr);
+                            // 如果有交点，则直接从交点上取值
+                            if (si.getAreaLight() != nullptr) {
+                                shaderColor += (si.getAreaLight()->lightRadiance(
+                                        si, -si.getDirection()) * beta);
+                            }
+                        } else {
+                            shaderColor += (beta * background(scatterRay));
+                            break;
+                        }
+                    }
+
+                    // 终止条件判断
+                    if (!isIntersected) {
+                        // TODO 添加环境光
+                        break;
+                    }
+
+                    // TODO 如果 material 为 nullptr，说明边界是 Medium 边界，则应该跳过这个边界，继续发送射线
+                    const Material *material = si.getMaterial();
+                    assert(material != nullptr);
+
+                    BSDF *bsdf = si.buildBSDF(memoryArena);
+                    assert(bsdf != nullptr);
+
+                    // 判断是否向光源采样
+                    if (bsdf->allIncludeOf(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
+                        shaderColor += (beta * evaluateDirectLight(scene, si, sampler1D));
+                    }
+
+                    // 计算下一次反射
+                    Vector3 worldWo = -scatterRay.getDirection();
+                    Vector3 worldWi = Vector3(0.0);
+                    // 材质反射类型
+                    BXDFType bxdfType;
+                    // p(wi)
+                    double samplePdf = 0;
+                    // f(p, wo, wi)
+                    Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, sampler1D, BSDF_ALL, &bxdfType);
+
+                    // cosine
+                    double cosine = std::abs(DOT(si.getNormal(), NORMALIZE(worldWi)));
+                    // 计算 beta
+                    beta *= (f * cosine / samplePdf);
+                    // 设置下一次打击光线
+                    scatterRay = si.sendRay(NORMALIZE(worldWi));
+                    isSpecular = (bxdfType & BSDF_SPECULAR) > 0;
                 }
 
-                const Material *material = intersection.getMaterial();
-                assert(material != nullptr);
-
-                BSDF *bsdf = intersection.buildBSDF(memoryArena);
-                assert(bsdf != nullptr);
-
-                // 判断是否向光源采样
-                if (bsdf->allIncludeOf(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
-                    shaderColor += (beta * evaluateDirectLight(scene, intersection, (*bsdf), sampler1D));
-                }
-
-                // 计算下一次反射
-                Vector3 worldWo = -scatterRay.getDirection();
-                Vector3 worldWi = Vector3(0.0);
-                // 材质反射类型
-                BXDFType bxdfType;
-                // p(wi)
-                double samplePdf = 0;
-                // f(p, wo, wi)
-                Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, sampler1D, BSDF_ALL, &bxdfType);
-
-                // cosine
-                double cosine = std::abs(DOT(intersection.getNormal(), NORMALIZE(worldWi)));
-                // 计算 beta
-                beta *= (f * cosine / samplePdf);
-                // 设置下一次打击光线
-                scatterRay = Ray(intersection.getPoint(), NORMALIZE(worldWi));
-
-                isSpecular = (bxdfType & BSDF_SPECULAR) > 0;
+                // TODO 透明介质透射考虑 折射率 refraction
 
                 // Terminate path tracing with Russian Roulette
                 if (bounce > _russianRouletteBounce) {
@@ -115,43 +144,113 @@ namespace kaguya {
             return shaderColor;
         }
 
-        Spectrum PathTracer::evaluateDirectLight(Scene &scene, const Interaction &eye, const BSDF &bsdf,
-                                                 const Sampler1D *sampler1D) {
+        Spectrum PathTracer::evaluateDirectLight(
+                Scene &scene, const Interaction &eye,
+                const Sampler1D *sampler1D) {
             // TODO 目前只考虑单个光源
             auto light = scene.getLight();
             // p(wi)
             double lightPdf = 0;
             // light dir
-            Vector3 shadowRayDir = Vector3(0.0);
+            Vector3 wi = Vector3(0.0);
             // visibility tester
             VisibilityTester visibilityTester;
             // 对光源采样采样
-            Spectrum luminance = light->sampleFromLight(eye, &shadowRayDir,
-                                                        &lightPdf,
-                                                        sampler1D,
-                                                        &visibilityTester);
+            Spectrum lumi = light->sampleFromLight(eye, &wi,
+                                                   &lightPdf, sampler1D,
+                                                   &visibilityTester);
+
+            Spectrum ret(0);
 
             // 排除对光源采样贡献为 0 的情况
-            if (lightPdf > EPSILON && !luminance.isBlack()) {
-                // 判断 shadowRay 是否击中
-                if (visibilityTester.isVisible(scene)) {
-                    // cosine
-                    double cosine = std::abs(DOT(eye.getNormal(), shadowRayDir));
-                    // f(p, wo, wi)
-                    Spectrum f = bsdf.f(-eye.getDirection(), shadowRayDir);
-                    if (light->isDeltaType()) {
-                        // shader spectrum
-                        return f * cosine / lightPdf * luminance;
-                    } else {
-                        // multiple rayImportance sampling
-                        double scatterPdf = bsdf.samplePdf(-eye.getDirection(), shadowRayDir);
-                        double weight = misWeight(1, lightPdf, 1, scatterPdf);
-                        return f * cosine * weight / lightPdf * luminance;
+            if (lightPdf > EPSILON && !lumi.isBlack()) {
+                Spectrum f;
+                double scatteringPdf = 0.0f;
+                if (eye.isMediumInteraction()) {
+                    // handle medium interaction
+                    const MediumInteraction &mi = (const MediumInteraction &) eye;
+                    assert(mi.getPhaseFunction() != nullptr);
+
+                    scatteringPdf = mi.getPhaseFunction()->scatterPdf(-mi.getDirection(), wi);
+                    f = Spectrum(scatteringPdf);
+                } else {
+                    // handle surface interaction
+                    const SurfaceInteraction &si = (const SurfaceInteraction &) eye;
+                    assert(si.getBSDF() != nullptr);
+
+                    double cosine = ABS_DOT(eye.getNormal(), wi);
+                    scatteringPdf = si.getBSDF()->samplePdf(-eye.getDirection(), wi);
+                    f = si.getBSDF()->f(-eye.getDirection(), wi) * cosine;
+                }
+
+                if (!f.isBlack()) {
+                    lumi *= visibilityTester.transmittance(scene);
+                    if (!lumi.isBlack()) {
+                        if (light->isDeltaType()) {
+                            // shader spectrum
+                            ret += f / lightPdf * lumi;
+                        } else {
+                            // multiple rayImportance sampling
+                            double weight = misWeight(1, lightPdf, 1, scatteringPdf);
+                            ret += f * weight / lightPdf * lumi;
+                        }
+                    }
+                }
+            }
+
+            // multiple importance sampling
+            if (!light->isDeltaType()) {
+                const Vector3 wo = -eye.getDirection();
+                Spectrum f(0);
+                double scatteringPdf = 0;
+                bool sampleSpecular = false;
+                if (eye.isMediumInteraction()) {
+                    // handle medium interaction
+                    const MediumInteraction &mi = (const MediumInteraction &) eye;
+                    assert(mi.getPhaseFunction() != nullptr);
+
+                    scatteringPdf = mi.getPhaseFunction()->scatterPdf(wo, wi);
+                    f = Spectrum(scatteringPdf);
+                } else {
+                    // handle surface interaction
+                    const SurfaceInteraction &si = (const SurfaceInteraction &) eye;
+                    assert(si.getBSDF() != nullptr);
+
+                    BXDFType sampleType;
+                    f = si.getBSDF()->sampleF(wo, &wi, &scatteringPdf, sampler1D, BSDF_ALL, &sampleType);
+                    f *= ABS_DOT(-si.getDirection(), wi);
+                    sampleSpecular = (sampleType & BXDFType::BSDF_SPECULAR) != 0;
+                }
+
+                if (!f.isBlack() && scatteringPdf > 0) {
+                    double weight = 1.0;
+                    if (!sampleSpecular) {
+                        // sample light pdf
+                        lightPdf = light->sampleFromLightPdf(eye, wi);
+                        if (lightPdf == 0) {
+                            return ret;
+                        }
+                        weight = misWeight(1, scatteringPdf, 1, lightPdf);
+                    }
+
+                    // find intersection
+                    SurfaceInteraction misSI;
+                    Spectrum misTr = 1.0;
+                    Ray misRay(eye.getPoint(), wi);
+                    bool foundIntersection = scene.intersectWithMedium(misRay, misSI, misTr);
+                    Spectrum misLumi(0.0);
+                    if (foundIntersection) {
+                        if (misSI.getAreaLight() != nullptr && misSI.getAreaLight() == light.get()) {
+                            misLumi = misSI.getAreaLight()->lightRadiance(misSI, -misRay.getDirection());
+                        }
+                    }
+                    if (!misLumi.isBlack()) {
+                        ret += f * weight * misTr * misLumi / scatteringPdf;
                     }
                 }
             }
             // 没有采样到光源
-            return Spectrum(0.0);
+            return ret;
         }
 
         bool PathTracer::render() {

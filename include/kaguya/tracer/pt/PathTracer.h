@@ -1,5 +1,5 @@
 //
-// Created by Storm Phoenix on 2020/9/29.
+// Created by Storm Phoenix on 2020/12/11.
 //
 
 #ifndef KAGUYA_PATHTRACER_H
@@ -7,11 +7,10 @@
 
 #include <memory>
 
-#include <kaguya/tracer/Tracer.h>
-
 #include <kaguya/core/Core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
+#include <kaguya/tracer/Tracer.h>
 #include <kaguya/utils/MemoryArena.h>
 
 namespace kaguya {
@@ -19,7 +18,6 @@ namespace kaguya {
 
         using namespace kaguya::core;
         using kaguya::memory::MemoryArena;
-
 
         class PathTracer : public Tracer {
         public:
@@ -34,13 +32,11 @@ namespace kaguya {
              * 在 eye 处对光源采样
              * @param scene scene
              * @param eye
-             * @param bsdf
              * @param sampleRay eye 处出发的射线
              * @param lightPdf 采样概率
              * @return
              */
-            Spectrum evaluateDirectLight(Scene &scene, const Interaction &eye, const BSDF &bsdf,
-                                         const Sampler1D *sampler1D);
+            Spectrum evaluateDirectLight(Scene &scene, const Interaction &eye, const Sampler1D *sampler1D);
 
             /**
              * Path Tracing 渲染代码，渐进式实现
@@ -80,6 +76,7 @@ namespace kaguya {
             // 对光源采样概率
             double _sampleLightProb = 0.2;
         };
+
     }
 }
 
