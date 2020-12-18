@@ -80,8 +80,6 @@ namespace kaguya {
                     // 此处参考 pbrt 的写法，需要判断 bounce = 0 和 isSpecular 两种特殊情况
                     if (bounce == 0 || isSpecular) {
                         if (isIntersected) {
-                            // TODO 不应该判断 Material 的值
-                            assert(si.getMaterial() != nullptr);
                             // 如果有交点，则直接从交点上取值
                             if (si.getAreaLight() != nullptr) {
                                 shaderColor += (si.getAreaLight()->lightRadiance(
@@ -99,9 +97,12 @@ namespace kaguya {
                         break;
                     }
 
-                    // TODO 如果 material 为 nullptr，说明边界是 Medium 边界，则应该跳过这个边界，继续发送射线
-                    const Material *material = si.getMaterial();
-                    assert(material != nullptr);
+                    // skip medium boundary
+                    if (si.getMaterial() == nullptr) {
+                        scatterRay = si.sendRay(scatterRay.getDirection());
+                        bounce--;
+                        continue;
+                    }
 
                     BSDF *bsdf = si.buildBSDF(memoryArena);
                     assert(bsdf != nullptr);

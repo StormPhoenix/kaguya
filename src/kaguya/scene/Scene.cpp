@@ -452,6 +452,13 @@ namespace kaguya {
                     MediumBound(airMedium.get(), airMedium.get()),
                     true);
 
+            std::shared_ptr<Shape> mediumSphereShape = std::make_shared<Sphere>(
+                    Vector3(0 * MODEL_SCALE, 0 * MODEL_SCALE, 0 * MODEL_SCALE), 0.1 * MODEL_SCALE);
+            std::shared_ptr<Medium> smokeMedium = std::make_shared<IsotropicMedium>(0.00001, 0.9, 0);
+
+            std::shared_ptr<Geometry> mediumSphere = std::make_shared<Geometry>(mediumSphereShape, nullptr,
+                                                                                smokeMedium, airMedium);
+
             // build scene object
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
             scene->_light = light;
@@ -466,6 +473,7 @@ namespace kaguya {
             objects.push_back(lightWall);
             objects.push_back(glassSphere);
             objects.push_back(metalSphere);
+            objects.push_back(mediumSphere);
 
             // 给所有 object 赋予 id
             for (long long id = 0; id < objects.size(); id++) {
