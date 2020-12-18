@@ -17,7 +17,7 @@ namespace kaguya {
 
         double Shape::surfaceInteractionPdf(const Interaction &eye, const Vector3 &dir) const {
             // build a ray to test interaction
-            Ray ray = Ray(eye.getPoint(), dir);
+            Ray ray = eye.sendRay(dir);
             SurfaceInteraction si;
             bool foundIntersection = insect(ray, si, ray.getMinStep(), ray.getStep());
             if (foundIntersection) {

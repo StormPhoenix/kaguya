@@ -23,6 +23,8 @@ using Vector4 = glm::dvec4;
 using Matrix4 = glm::dmat4x4;
 using Matrix3 = glm::dmat3x3;
 
+using kaguya::math::random::Sampler1D;
+
 typedef Vector2 Point2d;
 
 const double maxDouble = std::numeric_limits<double>::max();
@@ -210,11 +212,35 @@ inline Vector2 diskUniformSampling(const math::random::Sampler1D *const sampler1
 }
 
 /**
+ * Sample barycentric coordinate from triangle
+ *
+ * 1 - u = sqrt(1 - sampleU)
+ * v = sampleV * sqrt(1 - sampleU)
+ *
+ * ->
+ *
+ * 1 - u = sqrt(sampleU)
+ * v = sampleV * sqrt(sampleU)
+ *
+ * @param sampler1D
+ * @return
+ */
+inline Vector2 triangleUniformSampling(const Sampler1D *sampler1D) {
+    double sampleU = sampler1D->sample();
+    double sampleV = sampler1D->sample();
+
+    double u = 1 - std::sqrt(sampleU);
+    double v = sampleV * sqrt(sampleU);
+    return Vector2(u, v);
+}
+
+
+/**
  * 从 cone 空间中均匀采样射线
  * @param cosThetaMax
  * @return
  */
-inline Vector3 coneUniformSampling(double cosThetaMax, const math::random::Sampler1D *sampler1D) {
+inline Vector3 coneUniformSampling(double cosThetaMax, const Sampler1D *sampler1D) {
     // phi = 2 * PI * sampleU
     double sampleU = sampler1D->sample();
     // sampleV = (1 - cos(theta)) / (1 - cos(thetaMax))

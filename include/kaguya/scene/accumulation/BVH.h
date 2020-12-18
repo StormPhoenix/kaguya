@@ -28,6 +28,43 @@ namespace kaguya {
 
                 bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) const override;
 
+                double area() const override {
+                    // Can't be called.
+                    assert(false);
+                    return 0;
+                }
+
+                SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) const override {
+                    // Can't be called.
+                    assert(false);
+                    return SurfaceInteraction();
+                }
+
+                double surfacePointPdf(const SurfaceInteraction &si) const override {
+                    // Can't be called.
+                    assert(false);
+                    return 0;
+                }
+
+                virtual SurfaceInteraction sampleSurfaceInteraction(
+                        const Interaction &eye,
+                        const Sampler1D *sampler1D) const override {
+                    // Can't be called.
+                    assert(false);
+                    return SurfaceInteraction();
+                }
+
+                /**
+            * Get pdf of the ray which origins from @param eye
+            * @return
+            */
+                virtual double surfaceInteractionPdf(const Interaction &eye, const Vector3 &dir) const override {
+                    // Can't be called.
+                    assert(false);
+                    return 0;
+                }
+
+
             protected:
                 /**
                  * 构建 BVH 树

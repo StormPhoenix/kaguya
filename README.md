@@ -11,6 +11,7 @@ A simple physically based render.
 - [ ] Shape 文件位置重构，Material\AreaLight 属性拆解到 Geometry
     - [x] *Geometry* response for set *Material* and *MediumBound*
     - [x] merge *ShapeSampler* and *Shape*
+    - [ ] delete pdf-method in Shape
     - [ ] move Shape and Geometry to namespace::core
     - [ ] when sampling the surface of shape, *Geometry* will set other attrs
 
@@ -33,6 +34,8 @@ A simple physically based render.
 - [ ] Add multiple light source
 
 - [ ] 去掉 Interaction 里面的 frontFace
+
+- [ ] Move *struct Vertex* to new package
 
 - [ ] Bunny 透明材质出现黑块，且整体偏暗；光源面积缩小一倍，提高光源亮度，整个场景变成暗色，出现大量白色燥点；
     参考 [知乎-文刀秋二](https://www.zhihu.com/question/48961286/answer/113580178)

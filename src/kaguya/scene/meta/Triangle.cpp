@@ -128,6 +128,38 @@ namespace kaguya {
             }
         }
 
+        double Triangle::area() const {
+            return 0.5 * LENGTH(CROSS((_transformedPosition2 - _transformedNormal1),
+                                      (_transformedNormal3 - _transformedNormal1)));
+        }
+
+        SurfaceInteraction Triangle::sampleSurfacePoint(const Sampler1D *sampler1D) const {
+            // Uniform sampling triangle
+            Vector2 barycentric = triangleUniformSampling(sampler1D);
+
+            SurfaceInteraction si;
+            Vector3 p = _transformedPosition1 * barycentric[0] +
+                        _transformedPosition2 * barycentric[1] +
+                        _transformedPosition3 * (1 - barycentric[0] - barycentric[1]);
+            si.setPoint(p);
+
+            // geometry normal
+            Vector3 ng = NORMALIZE(CROSS(_transformedPosition2 - _transformedPosition1,
+                                         _transformedPosition3 - _transformedPosition1));
+
+            // shading normal
+            Vector3 ns = _transformedNormal1 * barycentric[0] +
+                         _transformedNormal2 * barycentric[1] +
+                         _transformedNormal3 * (1 - barycentric[0] - barycentric[1]);
+
+            // correct geometry normal
+            if (DOT(ng, ns) < 0) {
+                ng *= -1;
+            }
+            si.setNormal(ng);
+            return si;
+        }
+
         const AABB &Triangle::boundingBox() const {
             return _aabb;
         }

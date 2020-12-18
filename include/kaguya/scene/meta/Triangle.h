@@ -29,9 +29,13 @@ namespace kaguya {
                      const Vector2 &uv1, const Vector2 &uv2, const Vector2 &uv3,
                      std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
-            bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) const;
+            bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) const override;
 
-            const AABB &boundingBox() const;
+            double area() const override;
+
+            SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) const override;
+
+            const AABB &boundingBox() const override;
 
             virtual ~Triangle() {}
 
