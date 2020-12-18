@@ -194,6 +194,22 @@ inline void tangentSpace(Vector3 &tanY, Vector3 *tanX, Vector3 *tanZ) {
 }
 
 /**
+ * 对圆盘做均匀采样
+ * @return
+ */
+inline Vector2 diskUniformSampling(const math::random::Sampler1D *const sampler1D, double radius = 1.) {
+    // sampleY = r / Radius
+    // sampleX = theta / (2 * PI)
+    double sampleY = sampler1D->sample();
+    double sampleX = sampler1D->sample();
+
+    double theta = 2 * PI * sampleX;
+    double r = sampleY * radius;
+
+    return Vector2(r * std::cos(theta), r * std::sin(theta));
+}
+
+/**
  * 从 cone 空间中均匀采样射线
  * @param cosThetaMax
  * @return
@@ -219,22 +235,6 @@ inline Vector3 coneUniformSampling(double cosThetaMax, const math::random::Sampl
     double z = sinTheta * sinPhi;
 
     return NORMALIZE(Vector3(x, y, z));
-}
-
-/**
- * 对圆盘做均匀采样
- * @return
- */
-inline Vector2 diskUniformSampling(const math::random::Sampler1D *const sampler1D, double radius = 1.) {
-    // sampleY = r / Radius
-    // sampleX = theta / (2 * PI)
-    double sampleY = sampler1D->sample();
-    double sampleX = sampler1D->sample();
-
-    double theta = 2 * PI * sampleX;
-    double r = sampleY * radius;
-
-    return Vector2(r * std::cos(theta), r * std::sin(theta));
 }
 
 /**

@@ -1,4 +1,4 @@
-#Kaguya Render
+# Kaguya Render
 
 A simple physically based render.
     
@@ -9,28 +9,32 @@ A simple physically based render.
 
 ## Unsolved
 - [ ] Shape 文件位置重构，Material\AreaLight 属性拆解到 Geometry
-    - [x] **Geometry** response for set **Material** and **MediumBound**
-    - [ ] merge **ShapeSampler** and **Shape**
+    - [x] *Geometry* response for set *Material* and *MediumBound*
+    - [x] merge *ShapeSampler* and *Shape*
+    - [ ] move Shape and Geometry to namespace::core
+    - [ ] when sampling the surface of shape, *Geometry* will set other attrs
 
 - [ ] Volume (smoke etc) rendering
-    - [ ] empty material represents a  **Medium** 
+    - [ ] empty material represents a  *Medium* 
     
-- [ ] add subsurface scattering
+- [ ] Add subsurface scattering
     - [ ] add **BSSRDF**
     - [ ] modify *path tracer*
     - [ ] modify *bd path tracer*  
 
-- [ ] refactor Medium.h to new namespace
+- [ ] Refactor Medium.h to new namespace
+
+- [ ] Sampling strategy for different shape.
 
 - [x] randomInt 会出现随机到 randomValue = 1.0 的地方，得出的 int 值会让调用者越界
 
-- [ ] delete variable *isFrontFace*
+- [ ] Delete variable *isFrontFace*
 
-- [ ] add multiple light source
+- [ ] Add multiple light source
 
 - [ ] 去掉 Interaction 里面的 frontFace
 
-- [ ] bunny 透明材质出现黑块，且整体偏暗；光源面积缩小一倍，提高光源亮度，整个场景变成暗色，出现大量白色燥点；
+- [ ] Bunny 透明材质出现黑块，且整体偏暗；光源面积缩小一倍，提高光源亮度，整个场景变成暗色，出现大量白色燥点；
     参考 [知乎-文刀秋二](https://www.zhihu.com/question/48961286/answer/113580178)
 
 - [ ] 电解质折射率问题

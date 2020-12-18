@@ -6,14 +6,17 @@
 #define KAGUYA_DIFFUSEAREALIGHT_H
 
 #include <kaguya/core/light/AreaLight.h>
+#include <kaguya/scene/Geometry.h>
 
 namespace kaguya {
     namespace core {
 
+        using kaguya::scene::Geometry;
+
         class DiffuseAreaLight : public AreaLight {
         public:
             DiffuseAreaLight(const Spectrum &intensity,
-                             std::shared_ptr<ShapeSampler> shapeSampler,
+                             std::shared_ptr<Shape> shape,
                              const MediumBound &mediumBoundary,
                              bool singleSide = true);
 
@@ -28,7 +31,7 @@ namespace kaguya {
         public:
             // 构造漫反射区域灯光
             static std::shared_ptr<AreaLight> buildDiffuseAreaLight(const Spectrum &intensity,
-                                                                    std::shared_ptr<ShapeSampler> shapeSampler,
+                                                                    std::shared_ptr<Geometry> geometry,
                                                                     const MediumBound &mediumBoundary,
                                                                     bool singleSide = true);
 

@@ -5,7 +5,7 @@
 #ifndef KAGUYA_WALL_H
 #define KAGUYA_WALL_H
 
-#include <kaguya/scene/ShapeSampler.h>
+#include <kaguya/scene/Shape.h>
 #include <kaguya/scene/accumulation/AABB.h>
 
 namespace kaguya {
@@ -13,7 +13,7 @@ namespace kaguya {
 
         using kaguya::scene::acc::AABB;
 
-        class Wall : public ShapeSampler {
+        class Wall : public Shape {
         public:
             Wall() {}
 
@@ -21,15 +21,15 @@ namespace kaguya {
             Wall(double width, double height,
                  std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
-            virtual bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) override;
+            virtual bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) const override;
 
             virtual const AABB &boundingBox() const override;
 
-            virtual double area() override;
+            virtual double area() const override;
 
-            virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) override;
+            virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) const override;
 
-            virtual double surfacePointPdf(SurfaceInteraction &si) override;
+            virtual double surfacePointPdf(const SurfaceInteraction &si) const override;
 
             virtual ~Wall() {}
 
@@ -76,13 +76,13 @@ namespace kaguya {
 
             virtual void init() override;
 
-            virtual bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) override;
+            virtual bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) const override;
 
-            virtual double area() override;
+            virtual double area() const override;
 
-            virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) override;
+            virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) const override;
 
-            virtual double surfacePointPdf(SurfaceInteraction &si) override;
+            virtual double surfacePointPdf(const SurfaceInteraction &si) const override;
 
         protected:
             double _y;
@@ -107,13 +107,13 @@ namespace kaguya {
 
             virtual void init() override;
 
-            virtual bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) override;
+            virtual bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) const override;
 
-            virtual double area() override;
+            virtual double area() const override;
 
-            virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) override;
+            virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) const override;
 
-            virtual double surfacePointPdf(SurfaceInteraction &point) override;
+            virtual double surfacePointPdf(const SurfaceInteraction &point) const override;
 
         protected:
             double _x;
@@ -138,13 +138,13 @@ namespace kaguya {
 
             virtual void init() override;
 
-            virtual bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) override;
+            virtual bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) const override;
 
-            virtual double area() override;
+            virtual double area() const override;
 
-            virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) override;
+            virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) const override;
 
-            virtual double surfacePointPdf(SurfaceInteraction &si) override;
+            virtual double surfacePointPdf(const SurfaceInteraction &si) const override;
 
         protected:
             double _z;

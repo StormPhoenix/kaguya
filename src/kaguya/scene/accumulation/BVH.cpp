@@ -41,7 +41,7 @@ namespace kaguya {
             }
 
             bool BVH::insect(Ray &ray, SurfaceInteraction &si,
-                             double stepMin, double stepMax) {
+                             double stepMin, double stepMax) const {
                 // 在 insect 之前，BVH 必须已经构建完毕
                 assert(_isValid);
 

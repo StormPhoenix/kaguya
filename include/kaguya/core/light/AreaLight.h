@@ -7,22 +7,21 @@
 
 #include <kaguya/core/light/Light.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
-
-#include <kaguya/scene/ShapeSampler.h>
+#include <kaguya/scene/Shape.h>
 
 namespace kaguya {
     namespace core {
 
-        using kaguya::scene::ShapeSampler;
+        using kaguya::scene::Shape;
 
         class AreaLight : public Light {
         public:
             /**
-             * 区域光，从 ShapeSampler 上面采样点进行辐射
+             * Area light，sample radiance from shape surface
              * @param intensity
-             * @param shapeSampler
+             * @param shape
              */
-            AreaLight(const Spectrum &intensity, std::shared_ptr<ShapeSampler> shapeSampler, LightType type, const MediumBound &mediumBoundary);
+            AreaLight(const Spectrum &intensity, std::shared_ptr<Shape> shape, LightType type, const MediumBound &mediumBoundary);
 
             /**
              * 计算 AreaLight 表面某一点 point，方向为 wo 的亮度。
@@ -40,7 +39,7 @@ namespace kaguya {
 
         protected:
             const Spectrum _intensity;
-            std::shared_ptr<ShapeSampler> _shapeSampler;
+            std::shared_ptr<Shape> _shape;
         };
 
     }

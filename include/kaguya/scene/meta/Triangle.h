@@ -29,7 +29,7 @@ namespace kaguya {
                      const Vector2 &uv1, const Vector2 &uv2, const Vector2 &uv3,
                      std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
-            bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax);
+            bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) const;
 
             const AABB &boundingBox() const;
 

@@ -29,7 +29,19 @@ namespace kaguya {
             Sphere(const Vector3 &center, double radius, bool outward = true,
                    std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
-            bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) override;
+            bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) const override;
+
+            virtual double area() const override {
+                return 4 * PI * _radius * _radius;
+            }
+
+            virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) const override;
+
+            virtual SurfaceInteraction
+            sampleSurfaceInteraction(const Interaction &eye, const Sampler1D *sampler1D) const override;
+
+            virtual double surfaceInteractionPdf(const Interaction &eye, const Vector3 &dir) const override;
+
 
             const AABB &boundingBox() const override;
 
@@ -41,7 +53,7 @@ namespace kaguya {
              * @param hitPoint
              * @return
              */
-            virtual Vector3 computeNormal(const Vector3 &hitPoint);
+            virtual Vector3 computeNormal(const Vector3 &hitPoint) const;
 
         private:
             AABB _aabb;

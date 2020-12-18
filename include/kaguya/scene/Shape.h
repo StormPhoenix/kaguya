@@ -35,33 +35,47 @@ namespace kaguya {
              * @param stepMax 射线步长最大值
              * @return
              */
-            virtual bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) = 0;
+            virtual bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) const = 0;
 
             /**
-             * sample a point on shape surface
-             */
-            virtual SurfaceInteraction sampleSurfacePoint(double *pdf, const Sampler1D *sampler1D) const = 0;
-
-            /**
-             * 计算 AxisAlignBoundingBox
+             * Shape area
              * @return
              */
+            virtual double area() const = 0;
+
+            /**
+             * Sample point on shape surface
+             * @return
+             */
+            virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) const = 0;
+
+            /**
+             * Get pdf of point on shape surface
+             * @param si
+             * @return
+             */
+            virtual double surfacePointPdf(const SurfaceInteraction &si) const;
+
+            /**
+             * TODO add parameter pdf
+             * Sample a ray origins from @param eye, let it hit the shape and get the interaction.
+             * @return
+             */
+            virtual SurfaceInteraction sampleSurfaceInteraction(
+                    const Interaction &eye,
+                    const Sampler1D *sampler1D) const;
+
+            /**
+             * Get pdf of the ray which origins from @param eye
+             * @return
+             */
+            virtual double surfaceInteractionPdf(const Interaction &eye, const Vector3 &dir) const;
+
             virtual const AABB &boundingBox() const = 0;
 
-            /**
-             * 获取物体的 ID
-             * @return
-             */
-            virtual const long long getId() const {
-                return _id;
-            }
+            virtual const long long getId() const;
 
-            /**
-             * 设置物体的 ID
-             */
-            virtual void setId(long long id) {
-                _id = id;
-            }
+            virtual void setId(long long id);
 
         protected:
             long long _id = -1;

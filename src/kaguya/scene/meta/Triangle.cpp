@@ -84,7 +84,7 @@ namespace kaguya {
         }
 
         bool Triangle::insect(Ray &ray, SurfaceInteraction &si,
-                              double stepMin, double stepMax) {
+                              double stepMin, double stepMax) const {
 
             const Vector3 &dir = ray.getDirection();
             const Vector3 &eye = Vector3(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);

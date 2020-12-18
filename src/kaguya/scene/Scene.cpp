@@ -280,7 +280,7 @@ namespace kaguya {
 
 
             // light
-            std::shared_ptr<ShapeSampler> lightWall = std::make_shared<ZXWall>(-0.2 * MODEL_SCALE, 0.2 * MODEL_SCALE,
+            std::shared_ptr<Shape> lightWall = std::make_shared<ZXWall>(-0.2 * MODEL_SCALE, 0.2 * MODEL_SCALE,
                                                                                -0.2 * MODEL_SCALE, 0.2 * MODEL_SCALE,
                                                                                0.46 * MODEL_SCALE, false,
                                                                                lambertTop);
@@ -438,7 +438,7 @@ namespace kaguya {
                                                                                nullptr, airMedium);
 
             // light
-            std::shared_ptr<ShapeSampler> lightWallShape = std::make_shared<ZXWall>(-0.2 * MODEL_SCALE,
+            std::shared_ptr<Shape> lightWallShape = std::make_shared<ZXWall>(-0.2 * MODEL_SCALE,
                                                                                     0.2 * MODEL_SCALE,
                                                                                     -0.2 * MODEL_SCALE,
                                                                                     0.2 * MODEL_SCALE,
@@ -446,15 +446,14 @@ namespace kaguya {
             std::shared_ptr<Geometry> lightWall = std::make_shared<Geometry>(lightWallShape, lambertTop,
                                                                              airMedium, airMedium);
 
+            // build area light
+            std::shared_ptr<AreaLight> light = DiffuseAreaLight::buildDiffuseAreaLight(
+                    areaLightSpectrum, lightWall,
+                    MediumBound(airMedium.get(), airMedium.get()),
+                    true);
 
             // build scene object
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-
-            // build area light
-            std::shared_ptr<AreaLight> light = DiffuseAreaLight::buildDiffuseAreaLight(
-                    areaLightSpectrum, lightWallShape,
-                    MediumBound(airMedium.get(), airMedium.get()),
-                    true);
             scene->_light = light;
 
             // objects

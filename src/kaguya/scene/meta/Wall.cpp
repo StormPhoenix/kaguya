@@ -64,7 +64,7 @@ namespace kaguya {
         }
 
         bool Wall::insect(Ray &ray, SurfaceInteraction &si,
-                          double stepMin, double stepMax) {
+                          double stepMin, double stepMax) const {
             // 仿照三角形平面求直线交点解法
             Vector3 transformedA = _transformMatrix != nullptr ?
                                    (*_transformMatrix) * Vector4(_leftTop, 1.0f) : _leftTop;
@@ -104,7 +104,6 @@ namespace kaguya {
                     si.setOutwardNormal(normal, dir);
                     si.setU(offsetX / _width);
                     si.setV(offsetY / _height);
-                    si.setAreaLight(_areaLight.get());
                     ray.setStep(step);
                     return true;
                 } else {
@@ -119,11 +118,11 @@ namespace kaguya {
             return _aabb;
         }
 
-        double Wall::area() {
+        double Wall::area() const {
             return _area;
         }
 
-        SurfaceInteraction Wall::sampleSurfacePoint(const Sampler1D *sampler1D) {
+        SurfaceInteraction Wall::sampleSurfacePoint(const Sampler1D *sampler1D) const {
             // 随机采样坐标
             double u = sampler1D->sample();
             double v = sampler1D->sample();
@@ -137,7 +136,7 @@ namespace kaguya {
             return si;
         }
 
-        double Wall::surfacePointPdf(SurfaceInteraction &si) {
+        double Wall::surfacePointPdf(const SurfaceInteraction &si) const {
             Vector3 transformedPoint = _transformMatrix != nullptr ?
                                        INVERSE((*_transformMatrix)) * Vector4(si.getPoint(), 1.0f)
                                                                    : si.getPoint();
@@ -166,7 +165,7 @@ namespace kaguya {
         }
 
         bool ZXWall::insect(Ray &ray, SurfaceInteraction &si,
-                            double stepMin, double stepMax) {
+                            double stepMin, double stepMax) const {
             double step = (_y - ray.getOrigin().y) / ray.getDirection().y;
             if (step >= stepMin && step <= stepMax) {
                 double z = ray.getOrigin().z + step * ray.getDirection().z;
@@ -179,7 +178,6 @@ namespace kaguya {
                     si.setOutwardNormal(_normal, ray.getDirection());
                     si.setU((x - _x0) / (_x1 - _x0));
                     si.setV((z - _z0) / (_z1 - _z0));
-                    si.setAreaLight(_areaLight.get());
                     return true;
                 } else {
                     return false;
@@ -189,13 +187,13 @@ namespace kaguya {
             }
         }
 
-        double ZXWall::area() {
+        double ZXWall::area() const {
             double width = abs(_x1 - _x0);
             double height = abs(_z1 - _z0);
             return width * height;
         }
 
-        SurfaceInteraction ZXWall::sampleSurfacePoint(const Sampler1D *sampler1D) {
+        SurfaceInteraction ZXWall::sampleSurfacePoint(const Sampler1D *sampler1D) const {
             double u = sampler1D->sample();
             double v = sampler1D->sample();
 
@@ -208,7 +206,7 @@ namespace kaguya {
             return interaction;
         }
 
-        double ZXWall::surfacePointPdf(SurfaceInteraction &si) {
+        double ZXWall::surfacePointPdf(const SurfaceInteraction &si) const {
             Vector3 samplePoint = si.getPoint();
             if (samplePoint.y - _y < EPSILON &&
                 samplePoint.x >= _x0 && samplePoint.x <= _x1 &&
@@ -239,7 +237,7 @@ namespace kaguya {
         }
 
         bool YZWall::insect(Ray &ray, SurfaceInteraction &si,
-                            double stepMin, double stepMax) {
+                            double stepMin, double stepMax) const {
             double step = (_x - ray.getOrigin().x) / ray.getDirection().x;
             if (step >= stepMin && step <= stepMax) {
                 double z = ray.getOrigin().z + step * ray.getDirection().z;
@@ -252,7 +250,6 @@ namespace kaguya {
                     si.setOutwardNormal(_normal, ray.getDirection());
                     si.setU((z - _z0) / (_z1 - _z0));
                     si.setV((y - _y0) / (_y1 - _y0));
-                    si.setAreaLight(_areaLight.get());
                     return true;
                 } else {
                     return false;
@@ -266,13 +263,13 @@ namespace kaguya {
             _aabb = AABB({_x - 0.0001, _y0, _z0}, {_x + 0.0001, _y1, _z1});
         }
 
-        double YZWall::area() {
+        double YZWall::area() const {
             double width = abs(_z1 - _z0);
             double height = abs(_y1 - _y0);
             return width * height;
         }
 
-        SurfaceInteraction YZWall::sampleSurfacePoint(const Sampler1D *sampler1D) {
+        SurfaceInteraction YZWall::sampleSurfacePoint(const Sampler1D *sampler1D) const {
             double u = sampler1D->sample();
             double v = sampler1D->sample();
 
@@ -285,7 +282,7 @@ namespace kaguya {
             return interaction;
         }
 
-        double YZWall::surfacePointPdf(SurfaceInteraction &point) {
+        double YZWall::surfacePointPdf(const SurfaceInteraction &point) const {
             Vector3 samplePoint = point.getPoint();
             if (samplePoint.y - _x < EPSILON &&
                 samplePoint.x >= _y0 && samplePoint.x <= _y1 &&
@@ -312,7 +309,7 @@ namespace kaguya {
         }
 
         bool XYWall::insect(Ray &ray, SurfaceInteraction &si,
-                            double stepMin, double stepMax) {
+                            double stepMin, double stepMax) const {
             double step = (_z - ray.getOrigin().z) / ray.getDirection().z;
             if (step >= stepMin && step <= stepMax) {
                 double x = ray.getOrigin().x + step * ray.getDirection().x;
@@ -325,7 +322,6 @@ namespace kaguya {
                     si.setOutwardNormal(_normal, ray.getDirection());
                     si.setU((x - _x0) / (_x1 - _x0));
                     si.setV((y - _y0) / (_y1 - _y0));
-                    si.setAreaLight(_areaLight.get());
                     return true;
                 } else {
                     return false;
@@ -339,13 +335,13 @@ namespace kaguya {
             _aabb = AABB({_x0, _y0, _z - 0.0001}, {_x1, _y1, _z + 0.0001});
         }
 
-        double XYWall::area() {
+        double XYWall::area() const {
             double width = abs(_x1 - _x0);
             double height = abs(_y1 - _y0);
             return width * height;
         }
 
-        SurfaceInteraction XYWall::sampleSurfacePoint(const Sampler1D *sampler1D) {
+        SurfaceInteraction XYWall::sampleSurfacePoint(const Sampler1D *sampler1D) const {
             double u = sampler1D->sample();
             double v = sampler1D->sample();
 
@@ -358,7 +354,7 @@ namespace kaguya {
             return interaction;
         }
 
-        double XYWall::surfacePointPdf(SurfaceInteraction &si) {
+        double XYWall::surfacePointPdf(const SurfaceInteraction &si) const {
             Vector3 samplePoint = si.getPoint();
             if (samplePoint.x - _z < EPSILON &&
                 samplePoint.y >= _y0 && samplePoint.x <= _y1 &&
