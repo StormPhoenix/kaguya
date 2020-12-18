@@ -42,7 +42,7 @@ namespace kaguya {
             BDPathTracer();
 
         private:
-            virtual bool render() override;
+            virtual std::function<void(const int, const int, const Sampler1D *)> render() override;
 
             virtual void init();
 

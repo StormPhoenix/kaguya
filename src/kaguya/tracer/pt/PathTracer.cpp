@@ -7,7 +7,6 @@
 #include <kaguya/core/light/AreaLight.h>
 #include <kaguya/core/medium/Medium.h>
 #include <kaguya/material/Material.h>
-#include <kaguya/parallel/RenderPool.h>
 #include <kaguya/scene/Shape.h>
 #include <kaguya/tracer/pt/PathTracer.h>
 
@@ -253,18 +252,12 @@ namespace kaguya {
             return ret;
         }
 
-        bool PathTracer::render() {
-            if (_scene != nullptr && _camera != nullptr) {
-                int cameraWidth = _camera->getResolutionWidth();
-                int cameraHeight = _camera->getResolutionHeight();
+        std::function<void(const int, const int, const Sampler1D *)> PathTracer::render() {
+            auto renderFunc = [this](const int row, const int col, const Sampler1D *sampler1D) -> void {
+                Spectrum ans = {0};
 
                 const double sampleWeight = 1.0 / _samplePerPixel;
-
-                auto renderFunc = [this](const int row, const int col, const Sampler1D *sampler1D) -> void {
-                    Spectrum ans = {0};
-
-                    const double sampleWeight = 1.0 / _samplePerPixel;
-                    // 做 _samplePerPixel 次采样
+                // 做 _samplePerPixel 次采样
                     for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
                         MemoryArena arena;
                         auto u = (col + sampler1D->sample()) / double(_camera->getResolutionWidth());
@@ -276,15 +269,11 @@ namespace kaguya {
                         ans += shaderColor;
                         arena.clean();
                     }
-                    ans *= sampleWeight;
-                    _filmPlane->addSpectrum(ans, row, col);
-                };
-                parallel::RenderPool *pool = parallel::RenderPool::getInstance();
-                pool->addRenderTask(renderFunc, cameraWidth, cameraHeight);
-                return true;
-            } else {
-                return false;
-            }
+                ans *= sampleWeight;
+                _filmPlane->addSpectrum(ans, row, col);
+            };
+
+            return renderFunc;
         }
 
         Spectrum PathTracer::background(const Ray &ray) {

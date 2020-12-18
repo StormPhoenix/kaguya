@@ -4,7 +4,6 @@
 
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/core/medium/Medium.h>
-#include <kaguya/parallel/RenderPool.h>
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
 #include <kaguya/tracer/bdpt/PathVertex.h>
 #include <kaguya/utils/VisibilityTester.h>
@@ -24,20 +23,16 @@ namespace kaguya {
             init();
         }
 
-        bool BDPathTracer::render() {
-            if (_scene != nullptr && _camera != nullptr) {
-                int cameraWidth = _camera->getResolutionWidth();
-                int cameraHeight = _camera->getResolutionHeight();
+        std::function<void(const int, const int, const Sampler1D *)> BDPathTracer::render() {
+            auto renderFunc = [this](const int row, const int col, const Sampler1D *sampler1D) -> void {
+                Spectrum ans = {0};
 
-                auto renderFunc = [this](const int row, const int col, const Sampler1D *sampler1D) -> void {
-                    Spectrum ans = {0};
-
-                    const double sampleWeight = 1.0 / _samplePerPixel;
-                    // 做 _samplePerPixel 次采样
-                    for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
-                        MemoryArena arena;
-                        auto u = (col + sampler1D->sample()) / double(_camera->getResolutionWidth());
-                        auto v = (row + sampler1D->sample()) / double(_camera->getResolutionHeight());
+                const double sampleWeight = 1.0 / _samplePerPixel;
+                // 做 _samplePerPixel 次采样
+                for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
+                    MemoryArena arena;
+                    auto u = (col + sampler1D->sample()) / double(_camera->getResolutionWidth());
+                    auto v = (row + sampler1D->sample()) / double(_camera->getResolutionHeight());
 
                         Ray sampleRay = _camera->sendRay(u, v);
                         Spectrum shaderColor = shader(sampleRay, *(_scene.get()), _maxDepth, sampler1D, arena);
@@ -48,12 +43,7 @@ namespace kaguya {
                         _filmPlane->addSpectrum(ans, row, col);
                     }
                 };
-                parallel::RenderPool *pool = parallel::RenderPool::getInstance();
-                pool->addRenderTask(renderFunc, cameraWidth, cameraHeight);
-                return true;
-            } else {
-                return false;
-            }
+            return renderFunc;
         }
 
         void BDPathTracer::init() {

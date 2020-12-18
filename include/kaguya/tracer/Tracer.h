@@ -31,8 +31,8 @@ namespace kaguya {
             }
 
         private:
-            // 渲染实现
-            virtual bool render() = 0;
+            // Rendering implementation
+            virtual std::function<void(const int, const int, const Sampler1D *)> render() = 0;
 
         protected:
             // 场景

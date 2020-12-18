@@ -23,7 +23,7 @@ namespace kaguya {
         public:
             PathTracer();
 
-            virtual bool render() override;
+            virtual std::function<void(const int, const int, const Sampler1D *)> render() override;
 
         private:
             virtual void init();

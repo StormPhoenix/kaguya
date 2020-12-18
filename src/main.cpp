@@ -29,6 +29,7 @@ int main(int argc, char *argv[]) {
                     option("-d", "--max-depth") & value("max scatter depth", Config::maxScatterDepth),
                     option("-rb", "--russian-prob") & value("russian roulette probability", Config::russianRoulette),
                     option("-rd", "--russian-depth") & value("russian roulette depth", Config::russianRouletteDepth),
+                    option("-kn", "--kernel") & value("rendering kernel count", Config::kernelCount),
                     option("-h", "--height") & value("image height", Config::resolutionHeight),
                     option("-w", "--width") & value("image width", Config::resolutionWidth)
     );

@@ -28,6 +28,8 @@ namespace kaguya {
         static std::string filenameSufix;
         // russian roulette 从什么 depth 开始
         static int russianRouletteDepth;
+        // rendering kernel count
+        static int kernelCount;
         // 终止概率
         static double russianRoulette;
         // 最大散射深度

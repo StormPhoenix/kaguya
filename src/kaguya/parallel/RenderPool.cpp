@@ -2,6 +2,7 @@
 // Created by Storm Phoenix on 2020/11/17.
 //
 
+#include <kaguya/Config.h>
 #include <kaguya/parallel/RenderPool.h>
 
 #include <cassert>
@@ -23,7 +24,7 @@ namespace kaguya {
         RenderTask *RenderPool::_taskQueue = nullptr;
 
         RenderPool *RenderPool::getInstance() {
-            const int threadsCount = 12;
+            const int threadsCount = Config::kernelCount;
             if (_pool == nullptr) {
                 {
                     std::lock_guard<std::mutex> poolLock(_poolMutex);
@@ -117,6 +118,15 @@ namespace kaguya {
 
             _taskCondition.notify_all();
             task->waitUntilFinished();
+        }
+
+        RenderPool::~RenderPool() {
+            RenderTask *task = nullptr;
+            while (_taskQueue != nullptr) {
+                task = _taskQueue->next;
+                delete _taskQueue;
+                _taskQueue = task;
+            }
         }
     }
 }

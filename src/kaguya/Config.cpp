@@ -16,7 +16,7 @@ namespace kaguya {
     int Config::russianRouletteDepth = 3;
     double Config::russianRoulette = 0.135;
     double Config::sampleLightProb = 0.3f;
-
+    int Config::kernelCount = 1;
     int Config::maxScatterDepth = 15;
     int Config::samplePerPixel = 10;
 
