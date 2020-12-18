@@ -1,4 +1,42 @@
-## 已解决问题
+#Kaguya Render
+
+A simple physically based render.
+    
+## TODO
+- [ ] Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法
+- [ ] Better space transformation
+- [ ] Background texture mapping
+
+## Unsolved
+- [ ] Shape 文件位置重构，Material\AreaLight 属性拆解到 Geometry
+    - [x] **Geometry** response for set **Material** and **MediumBound**
+    - [ ] merge **ShapeSampler** and **Shape**
+
+- [ ] Volume (smoke etc) rendering
+    - [ ] empty material represents a  **Medium** 
+    
+- [ ] add subsurface scattering
+    - [ ] add **BSSRDF**
+    - [ ] modify *path tracer*
+    - [ ] modify *bd path tracer*  
+
+- [ ] refactor Medium.h to new namespace
+
+- [x] randomInt 会出现随机到 randomValue = 1.0 的地方，得出的 int 值会让调用者越界
+
+- [ ] delete variable *isFrontFace*
+
+- [ ] add multiple light source
+
+- [ ] 去掉 Interaction 里面的 frontFace
+
+- [ ] bunny 透明材质出现黑块，且整体偏暗；光源面积缩小一倍，提高光源亮度，整个场景变成暗色，出现大量白色燥点；
+    参考 [知乎-文刀秋二](https://www.zhihu.com/question/48961286/answer/113580178)
+
+- [ ] 电解质折射率问题
+    无法在光线传输过程中确定碰撞位置两端的折射率。程序采用的是将外界材质的折射率固定设置为空气折射率（1.0）
+    
+## Solved
 
 - front 墙壁材质是 Lambertian，使用 area light 的时候，表面的光照位置光斑会非常亮（BDPT）
     - 将 BDPT 的 connectPath() 中的 t - s 路径分拆成几个子路径，分别输出结果。
@@ -65,53 +103,13 @@
 - 条带
     图像中心出现十字条带(修改切线空间后消失，不清楚是不是这个原因)
     Debug：不知道修改了什么，这个现象消失了
-    
-## TODO
-- Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法
-
-## 未解决的问题
-- Shape 文件位置重构，Material\AreaLight 属性拆解到 Geometry
-    ShapeSampler 和 Shape 合并
-
-- 完成 Subsurface Scattering 功能
-
-- Volume 重构到新 namespace
-
-- ShapeSampler 和 Shape 的功能应该合并，不然现在只能让 class Wall 成为 AreaLight。 
-
-- randomInt 会出现随机到 randomValue = 1.0 的地方，得出的 int 值会让调用者越界
-
-- 删除 isFrontFace
-
-- 烟雾体积渲染
-
-- 多光源问题
-
-- 去掉 Interaction 里面的 frontFace
-
-- bunny 透明材质出现黑块，且整体偏暗；光源面积缩小一倍，提高光源亮度，整个场景变成暗色，出现大量白色燥点；
-    参考 [知乎-文刀秋二](https://www.zhihu.com/question/48961286/answer/113580178)
-
-- 电解质折射率问题
-    无法在光线传输过程中确定碰撞位置两端的折射率。程序采用的是将外界材质的折射率固定设置为空气折射率（1.0）
-    
-- 只考虑了单个光源情况
-
-## 空间变换
-
-## 背景贴图
 
 ## 一些想法
 - 新的光线追踪想法：不需要像 Path Tracing 一次性把 shaderOfRecursion color 求解出来，而是多次迭代。每次迭代只让光线反射一次，迭代 N 轮让
     结果收敛。 
     
-- 编译 PBRT，对 SamplerIntegrator::Render() 做 debug
+- Compile PBRT，and debug SamplerIntegrator::Render()
 
-## 效果图
-
-### Path Tracing
-
-
-### Bidirectional Path Tracing
+## Result
 
 <img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/scene_glass-bunny-with-point-light_ssp=300_max-depth=15_render-type=bdpt_1500x1500.jpg" alt="bunny-glass-point-light" width="40%">

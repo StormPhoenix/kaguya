@@ -7,6 +7,7 @@
 
 #include <kaguya/core/Interaction.h>
 #include <kaguya/math/Math.hpp>
+#include <kaguya/math/Sampler.hpp>
 #include <kaguya/scene/accumulation/AABB.h>
 
 namespace kaguya {
@@ -18,6 +19,7 @@ namespace kaguya {
 namespace kaguya {
     namespace scene {
 
+        using kaguya::math::random::Sampler1D;
         using kaguya::scene::acc::AABB;
         using kaguya::tracer::Ray;
         using kaguya::core::SurfaceInteraction;
@@ -34,6 +36,11 @@ namespace kaguya {
              * @return
              */
             virtual bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) = 0;
+
+            /**
+             * sample a point on shape surface
+             */
+            virtual SurfaceInteraction sampleSurfacePoint(double *pdf, const Sampler1D *sampler1D) const = 0;
 
             /**
              * 计算 AxisAlignBoundingBox
