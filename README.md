@@ -11,6 +11,8 @@ A simple physically based render.
 - [ ] Regular tracing, ray marching, delta tracking article
 
 ## Unsolved
+- [ ] Add information for each *assert* phrase
+
 - [ ] Shape 文件位置重构，Material \ AreaLight 属性拆解到 Geometry
     - [x] *Geometry* response for set *Material* and *MediumBound*
     - [x] merge *ShapeSampler* and *Shape*
