@@ -19,7 +19,7 @@ namespace kaguya {
 
         class Ray {
         public:
-            Ray() : _medium(nullptr), _minStep(0.001), _step(infinity) {}
+            Ray() : _medium(nullptr), _minStep(0.), _step(infinity) {}
 
             /**
              * 射线初始化
@@ -48,7 +48,7 @@ namespace kaguya {
             }
 
             void setStep(double step) {
-                assert(step >= _minStep);
+                assert(step > _minStep);
                 _step = step;
             }
 

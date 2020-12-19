@@ -122,7 +122,6 @@ namespace kaguya {
 
 
         std::shared_ptr<Scene> Scene::sceneBunnyWithPointLight() {
-            const int MODEL_SCALE = 5;
             // For testing
             // albedos
             // total white
@@ -241,7 +240,6 @@ namespace kaguya {
 
 
         std::shared_ptr<Scene> Scene::sceneBunnyWithAreaLight() {
-            const int MODEL_SCALE = 5;
             // For testing
             // albedos
             // total white
@@ -373,7 +371,6 @@ namespace kaguya {
         }
 
         std::shared_ptr<Scene> Scene::sceneTwoSpheresWithAreaLight() {
-            const int MODEL_SCALE = 5;
             // For testing
             // albedos
             // total white
@@ -513,7 +510,6 @@ namespace kaguya {
         }
 
         std::shared_ptr<Scene> Scene::sceneTwoSpheresWithSpotLight() {
-            const int MODEL_SCALE = 5;
             // For testing
             // albedos
             // total white
@@ -646,7 +642,6 @@ namespace kaguya {
         }
 
         std::shared_ptr<Scene> Scene::sceneTwoSpheresWithPointLight() {
-            const int MODEL_SCALE = 6;
             // For testing
             // albedos
             // total white

@@ -5,8 +5,10 @@ A simple physically based render.
 ## TODO
 - [ ] Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法，写成文档记录下来
 - [ ] Triangle sampling strategy 计算方法记录。
-- [ ] Better space transformation
-- [ ] Background texture mapping
+- [ ] Medium sampling method.
+- [ ] Better space transformation.
+- [ ] Background texture mapping.
+- [ ] Regular tracing, ray marching, delta tracking article
 
 ## Unsolved
 - [ ] Shape 文件位置重构，Material \ AreaLight 属性拆解到 Geometry

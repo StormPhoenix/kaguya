@@ -167,7 +167,7 @@ namespace kaguya {
         bool ZXWall::insect(Ray &ray, SurfaceInteraction &si,
                             double stepMin, double stepMax) const {
             double step = (_y - ray.getOrigin().y) / ray.getDirection().y;
-            if (step >= stepMin && step <= stepMax) {
+            if (step > stepMin && step < stepMax) {
                 double z = ray.getOrigin().z + step * ray.getDirection().z;
                 double x = ray.getOrigin().x + step * ray.getDirection().x;
 
@@ -239,7 +239,7 @@ namespace kaguya {
         bool YZWall::insect(Ray &ray, SurfaceInteraction &si,
                             double stepMin, double stepMax) const {
             double step = (_x - ray.getOrigin().x) / ray.getDirection().x;
-            if (step >= stepMin && step <= stepMax) {
+            if (step > stepMin && step < stepMax) {
                 double z = ray.getOrigin().z + step * ray.getDirection().z;
                 double y = ray.getOrigin().y + step * ray.getDirection().y;
 
@@ -311,7 +311,7 @@ namespace kaguya {
         bool XYWall::insect(Ray &ray, SurfaceInteraction &si,
                             double stepMin, double stepMax) const {
             double step = (_z - ray.getOrigin().z) / ray.getDirection().z;
-            if (step >= stepMin && step <= stepMax) {
+            if (step > stepMin && step < stepMax) {
                 double x = ray.getOrigin().x + step * ray.getDirection().x;
                 double y = ray.getOrigin().y + step * ray.getDirection().y;
 

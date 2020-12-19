@@ -42,7 +42,7 @@ namespace kaguya {
             // 判别一元二次方程的根数量
             if (discriminant > 0) {
                 double root = (-halfB - sqrt(discriminant)) / a;
-                if (root >= stepMin && root <= stepMax) {
+                if (root > stepMin && root < stepMax) {
                     si.setId(getId());
                     si.setPoint(ray.at(root));
                     si.setU(0);
@@ -56,7 +56,7 @@ namespace kaguya {
                 }
 
                 root = (-halfB + sqrt(discriminant)) / a;
-                if (root >= stepMin && root <= stepMax) {
+                if (root > stepMin && root < stepMax) {
                     si.setId(getId());
                     si.setPoint(ray.at(root));
                     si.setU(0);
