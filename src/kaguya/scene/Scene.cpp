@@ -473,7 +473,7 @@ namespace kaguya {
             objects.push_back(lightWall);
             objects.push_back(glassSphere);
             objects.push_back(metalSphere);
-            objects.push_back(mediumSphere);
+//            objects.push_back(mediumSphere);
 
             // 给所有 object 赋予 id
             for (long long id = 0; id < objects.size(); id++) {

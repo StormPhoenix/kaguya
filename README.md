@@ -3,12 +3,13 @@
 A simple physically based render.
     
 ## TODO
-- [ ] Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法
+- [ ] Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法，写成文档记录下来
+- [ ] Triangle sampling strategy 计算方法记录。
 - [ ] Better space transformation
 - [ ] Background texture mapping
 
 ## Unsolved
-- [ ] Shape 文件位置重构，Material\AreaLight 属性拆解到 Geometry
+- [ ] Shape 文件位置重构，Material \ AreaLight 属性拆解到 Geometry
     - [x] *Geometry* response for set *Material* and *MediumBound*
     - [x] merge *ShapeSampler* and *Shape*
     - [ ] delete pdf-method in Shape
@@ -16,7 +17,8 @@ A simple physically based render.
     - [ ] when sampling the surface of shape, *Geometry* will set other attrs
 
 - [ ] Volume (smoke etc) rendering
-    - [ ] empty material represents a  *Medium* 
+    - [x] add medium boundary to path tracing
+    - [ ] add medium boundary to bi-directional path tracing
     
 - [ ] Add subsurface scattering
     - [ ] add **BSSRDF**
@@ -24,6 +26,8 @@ A simple physically based render.
     - [ ] modify *bd path tracer*  
 
 - [ ] Refactor Medium.h to new namespace
+
+- [ ] Add background light.
 
 - [ ] Sampling strategy for different shape.
 

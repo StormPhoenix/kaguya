@@ -216,8 +216,8 @@ namespace kaguya {
             Ray scatterRay = ray;
             int vertexCount = 1;
             for (int depth = 1; depth < maxDepth; depth++) {
-                SurfaceInteraction interaction;
-                bool isIntersected = scene->intersect(scatterRay, interaction);
+                SurfaceInteraction si;
+                bool isIntersected = scene->intersect(scatterRay, si);
 
                 // sample medium interaction
                 MediumInteraction mi;
@@ -248,16 +248,23 @@ namespace kaguya {
                     pdfWo = pdfPreWi;
                 } else {
                     if (isIntersected) {
-                        // 构建 BSDF
-                        BSDF *bsdf = interaction.buildBSDF(memoryArena, mode);
+                        // skip medium boundary
+                        if (si.getMaterial() == nullptr) {
+                            scatterRay = si.sendRay(scatterRay.getDirection());
+                            depth --;
+                            continue;
+                        }
+
+                        // build BSDF
+                        BSDF *bsdf = si.buildBSDF(memoryArena, mode);
                         assert(bsdf != nullptr);
 
                         // 添加新点 TODO 默认只有 Surface 类型
-                        vertex = PathVertex::createSurfaceVertex(interaction, pdfPreWi, preVertex, beta);
+                        vertex = PathVertex::createSurfaceVertex(si, pdfPreWi, preVertex, beta);
                         vertexCount++;
 
                         // 采样下一个射线
-                        Vector3 worldWo = -interaction.getDirection();
+                        Vector3 worldWo = -si.getDirection();
                         Vector3 worldWi = Vector3(0);
                         BXDFType sampleType;
                         Spectrum f = bsdf->sampleF(worldWo, &worldWi, &pdfPreWi, sampler1D,
@@ -269,11 +276,11 @@ namespace kaguya {
                         }
 
                         // 设置新的散射光线
-                        scatterRay = interaction.sendRay(worldWi);
+                        scatterRay = si.sendRay(worldWi);
 
                         // TODO cosine 的计算感觉有问题，对于从光源发射的光线，应该用 worldWo
                         // 更新 beta
-                        double cosine = std::abs(DOT(interaction.getNormal(), worldWi));
+                        double cosine = std::abs(DOT(si.getNormal(), worldWi));
 
                         beta *= (f * cosine / pdfPreWi);
 
@@ -289,6 +296,7 @@ namespace kaguya {
                             vertex.isDelta = true;
                         }
                     } else {
+                        // TODO create background light
                         break;
                     }
                 }
