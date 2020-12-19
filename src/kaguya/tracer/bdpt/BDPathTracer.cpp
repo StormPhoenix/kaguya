@@ -98,11 +98,16 @@ namespace kaguya {
                     Spectrum we = _camera->sampleCameraRay(ps.getInteraction(), &worldWi, &pdf, samplePosition,
                                                            sampler1D, &visibilityTester);
                     if (pdf > 0 && !we.isBlack() && visibilityTester.isVisible(scene)) {
-                        Ray newRay = Ray(visibilityTester.getEnd().getPoint(), -worldWi);
+                        Ray newRay = visibilityTester.getEnd().sendRay(-worldWi);
                         extraVertex = PathVertex::createCameraVertex(_camera.get(), newRay, we / pdf);
                         ret = ps.beta * ps.f(extraVertex) * extraVertex.beta;
                         if (ps.type == PathVertexType::SURFACE) {
                             ret *= ABS_DOT(ps.normal, worldWi);
+                        }
+
+                        // transmittance
+                        if (!ret.isBlack()) {
+                            ret *= visibilityTester.transmittance(scene);
                         }
                     }
                 }
@@ -136,6 +141,11 @@ namespace kaguya {
                         ret = pt.beta * pt.f(extraVertex) * extraVertex.beta;
                         if (pt.type == PathVertexType::SURFACE) {
                             ret *= std::abs(DOT(pt.normal, worldWi));
+                        }
+
+                        // transmittance
+                        if (!ret.isBlack()) {
+                            ret *= visibilityTester.transmittance(scene);
                         }
                     }
                 }
@@ -410,7 +420,7 @@ namespace kaguya {
             return 1 / (sumRi + 1);
         }
 
-        double BDPathTracer::g(const PathVertex &pre, const PathVertex &next) {
+        Spectrum BDPathTracer::g(const PathVertex &pre, const PathVertex &next) {
             Vector3 dirToNext = next.point - pre.point;
             double dist = LENGTH(dirToNext);
             dirToNext = NORMALIZE(dirToNext);
@@ -426,7 +436,7 @@ namespace kaguya {
             }
 
             VisibilityTester visibilityTester = VisibilityTester(pre.getInteraction(), next.getInteraction());
-            return cosPre * cosNext / std::pow(dist, 2) * (visibilityTester.isVisible(*_scene) ? 1 : 0);
+            return cosPre * cosNext / std::pow(dist, 2) * visibilityTester.transmittance(*_scene);
         }
 
 

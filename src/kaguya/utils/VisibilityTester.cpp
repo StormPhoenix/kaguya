@@ -17,12 +17,21 @@ namespace kaguya {
         }
 
         bool VisibilityTester::isVisible(Scene &scene) const {
-            Ray ray(_start.getPoint(), NORMALIZE(_end.getPoint() - _start.getPoint()));
-            // TODO 如何融合 Surface 和 Volume
-            SurfaceInteraction interaction;
-            bool isIntersect = scene.intersect(ray, interaction);
+            Ray ray = _start.sendRayTo(_end);
+            while (true) {
+                SurfaceInteraction si;
+                bool foundIntersection = scene.intersect(ray, si);
 
-            return (!isIntersect) || (isIntersect && ray.getStep() >= (_step - EPSILON));
+                if (foundIntersection && si.getMaterial() != nullptr) {
+                    return false;
+                }
+
+                if (!foundIntersection) {
+                    return true;
+                } else {
+                    ray = si.sendRayTo(_end);
+                }
+            }
         }
 
         bool VisibilityTester::pointMatch(const Vector3 &a, const Vector3 &b) {

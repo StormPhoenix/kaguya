@@ -137,7 +137,7 @@ namespace kaguya {
              * @param next
              * @return
              */
-            double g(const PathVertex &pre, const PathVertex &next);
+            Spectrum g(const PathVertex &pre, const PathVertex &next);
 
         private:
             // 最大采样深度
