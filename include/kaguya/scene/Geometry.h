@@ -23,7 +23,7 @@ namespace kaguya {
                      const std::shared_ptr<Material> material,
                      const std::shared_ptr<Medium> inside = nullptr,
                      const std::shared_ptr<Medium> outside = nullptr,
-                     std::shared_ptr<AreaLight> areaLight = nullptr);
+                     const std::shared_ptr<AreaLight> areaLight = nullptr);
 
             virtual bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) const override;
 

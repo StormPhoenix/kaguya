@@ -10,6 +10,33 @@
 #include <kaguya/tracer/Camera.h>
 #include <memory>
 
+#define TEST_SCENE
+#ifdef TEST_SCENE
+
+#include <kaguya/core/medium/Medium.h>
+#include <kaguya/core/medium/IsotropicMedium.h>
+
+using namespace kaguya::core::medium;
+
+#include <kaguya/material/Material.h>
+
+using namespace kaguya::material;
+
+#include <kaguya/core/light/Light.h>
+#include <kaguya/core/light/AreaLight.h>
+#include <kaguya/core/light/DiffuseAreaLight.h>
+#include <kaguya/core/light/PointLight.h>
+#include <kaguya/core/light/SpotLight.h>
+
+using namespace kaguya::core;
+
+#include <kaguya/core/spectrum/Spectrum.hpp>
+
+using kaguya::core::Spectrum;
+const int MODEL_SCALE = 5;
+
+#endif
+
 namespace kaguya {
     namespace core {
         class Light;
@@ -28,6 +55,55 @@ namespace kaguya {
          */
         class Scene {
         public:
+
+#ifdef TEST_SCENE
+
+            static std::shared_ptr<Medium> testAirMedium() {
+                Spectrum sigmaA(0.0001);
+//                sigmaA.r(0.0011f);
+//                sigmaA.g(0.0024f);
+//                sigmaA.b(0.014f);
+                std::shared_ptr<Medium> airMedium = std::make_shared<IsotropicMedium>(sigmaA, 0.1, 0);
+                return airMedium;
+            }
+
+            static std::shared_ptr<Medium> testSmokeMedium() {
+                return std::make_shared<IsotropicMedium>(0.00001, 0.9, 0);
+            }
+
+            static std::shared_ptr<Shape> testLeftWall(const std::shared_ptr<Material> material,
+                                                       const std::shared_ptr<Medium> insideMedium,
+                                                       const std::shared_ptr<Medium> outsideMedium);
+
+            static std::shared_ptr<Shape> testRightWall(const std::shared_ptr<Material> material,
+                                                        const std::shared_ptr<Medium> insideMedium,
+                                                        const std::shared_ptr<Medium> outsideMedium);
+
+            static std::shared_ptr<Shape> testBottomWall(const std::shared_ptr<Material> material,
+                                                         const std::shared_ptr<Medium> insideMedium,
+                                                         const std::shared_ptr<Medium> outsideMedium);
+
+            static std::shared_ptr<Shape> testTopWall(const std::shared_ptr<Material> material,
+                                                      const std::shared_ptr<Medium> insideMedium,
+                                                      const std::shared_ptr<Medium> outsideMedium);
+
+            static std::shared_ptr<Shape> testFrontWall(const std::shared_ptr<Material> material,
+                                                        const std::shared_ptr<Medium> insideMedium,
+                                                        const std::shared_ptr<Medium> outsideMedium);
+
+            static std::shared_ptr<Shape> testBunny(const std::shared_ptr<Material> material,
+                                                    const std::shared_ptr<Medium> inside = nullptr,
+                                                    const std::shared_ptr<Medium> outside = nullptr,
+                                                    const std::shared_ptr<AreaLight> areaLight = nullptr);
+
+            static std::shared_ptr<AreaLight> testDiffuseAreaLight(const Spectrum &spectrum,
+                                                                   const std::shared_ptr<Geometry> geometry,
+                                                                   const std::shared_ptr<Medium> inside,
+                                                                   const std::shared_ptr<Medium> outside,
+                                                                   bool singleSide);
+
+#endif
+
             /**
              * 构建 Cornel box，加载 bunny 模型
              */

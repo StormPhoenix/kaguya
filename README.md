@@ -16,9 +16,9 @@ A simple physically based render.
     - [ ] move Shape and Geometry to namespace::core
     - [ ] when sampling the surface of shape, *Geometry* will set other attrs
 
-- [ ] Volume (smoke etc) rendering
+- [x] Volume (smoke etc) rendering
     - [x] add medium boundary to path tracing
-    - [ ] add medium boundary to bi-directional path tracing
+    - [x] add medium boundary to bi-directional path tracing
     
 - [ ] Add subsurface scattering
     - [ ] add **BSSRDF**
