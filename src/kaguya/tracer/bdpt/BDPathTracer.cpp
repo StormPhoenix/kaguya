@@ -107,7 +107,7 @@ namespace kaguya {
 
                         // transmittance
                         if (!ret.isBlack()) {
-                            ret *= visibilityTester.transmittance(scene);
+                            ret *= visibilityTester.transmittance(scene, sampler1D);
                         }
                     }
                 }
@@ -145,7 +145,7 @@ namespace kaguya {
 
                         // transmittance
                         if (!ret.isBlack()) {
-                            ret *= visibilityTester.transmittance(scene);
+                            ret *= visibilityTester.transmittance(scene, sampler1D);
                         }
                     }
                 }
@@ -156,7 +156,7 @@ namespace kaguya {
                 if (pt.isConnectible() && ps.isConnectible()) {
                     // 调用 pt.f() 和 ps.f，计算 pt 和 ps 连接起来的 pdf，其中 g 包含了 visible 项
                     // TODO 我不知道这里为什么没有除以 MC 采样的 pdf
-                    ret = pt.beta * pt.f(ps) * ps.f(pt) * ps.beta * g(pt, ps);
+                    ret = pt.beta * pt.f(ps) * ps.f(pt) * ps.beta * g(pt, ps, sampler1D);
                 } else {
                     ret = Spectrum(0.0);
                 }
@@ -420,7 +420,7 @@ namespace kaguya {
             return 1 / (sumRi + 1);
         }
 
-        Spectrum BDPathTracer::g(const PathVertex &pre, const PathVertex &next) {
+        Spectrum BDPathTracer::g(const PathVertex &pre, const PathVertex &next, const Sampler1D *sampler1D) {
             Vector3 dirToNext = next.point - pre.point;
             double dist = LENGTH(dirToNext);
             dirToNext = NORMALIZE(dirToNext);
@@ -436,7 +436,7 @@ namespace kaguya {
             }
 
             VisibilityTester visibilityTester = VisibilityTester(pre.getInteraction(), next.getInteraction());
-            return cosPre * cosNext / std::pow(dist, 2) * visibilityTester.transmittance(*_scene);
+            return cosPre * cosNext / std::pow(dist, 2) * visibilityTester.transmittance(*_scene, sampler1D);
         }
 
 

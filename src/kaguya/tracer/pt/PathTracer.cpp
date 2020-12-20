@@ -184,7 +184,7 @@ namespace kaguya {
                 }
 
                 if (!f.isBlack()) {
-                    lumi *= visibilityTester.transmittance(scene);
+                    lumi *= visibilityTester.transmittance(scene, sampler1D);
                     if (!lumi.isBlack()) {
                         if (light->isDeltaType()) {
                             // shader spectrum
@@ -237,7 +237,7 @@ namespace kaguya {
                     SurfaceInteraction misSI;
                     Spectrum misTr = 1.0;
                     Ray misRay(eye.getPoint(), wi);
-                    bool foundIntersection = scene.intersectWithMedium(misRay, misSI, misTr);
+                    bool foundIntersection = scene.intersectWithMedium(misRay, misSI, misTr, sampler1D);
                     Spectrum misLumi(0.0);
                     if (foundIntersection) {
                         if (misSI.getAreaLight() != nullptr && misSI.getAreaLight() == light.get()) {

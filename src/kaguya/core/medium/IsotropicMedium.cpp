@@ -8,7 +8,7 @@ namespace kaguya {
     namespace core {
         namespace medium {
 
-            core::Spectrum IsotropicMedium::transmittance(const tracer::Ray &ray) const {
+            core::Spectrum IsotropicMedium::transmittance(const tracer::Ray &ray, const Sampler1D *sampler1D) const {
                 // e^{-\sigma_t * dist}
                 return exp(-_totalSigma * std::min(ray.getStep() * LENGTH(ray.getDirection()), maxDouble));
             }
@@ -26,7 +26,7 @@ namespace kaguya {
                 // check whether sample the surface or medium
                 bool sampleMedium = step < ray.getStep();
                 if (sampleMedium) {
-                    (*mi) = MediumInteraction(ray.at(step), ray.getDirection(), this,
+                    (*mi) = MediumInteraction(ray.at(step), -ray.getDirection(), this,
                                               ALLOC(memoryArena, HenyeyGreensteinFunction)(_g));
                 } else {
                     step = ray.getStep();

@@ -90,7 +90,8 @@ namespace kaguya {
             // 检查射线范围
             if (step < stepMax && step > stepMin) {
                 Vector3 hitPoint = ray.at(step);
-                Vector3 modelPoint = INVERSE(*_transformMatrix) * Vector4(hitPoint, 1.0f);
+                Vector3 modelPoint = _transformMatrix != nullptr ?
+                                     INVERSE(*_transformMatrix) * Vector4(hitPoint, 1.0f) : hitPoint;
 
                 double offsetX = modelPoint.x - (-_width / 2);
                 double offsetY = modelPoint.y - (-_height / 2);

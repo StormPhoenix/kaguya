@@ -40,7 +40,7 @@ namespace kaguya {
                    std::abs(a.z - b.z) < EPSILON;
         }
 
-        core::Spectrum VisibilityTester::transmittance(Scene &scene) const {
+        core::Spectrum VisibilityTester::transmittance(Scene &scene, const Sampler1D *sampler1D) const {
             Ray ray = _start.sendRayTo(_end);
             core::Spectrum tr(1.0);
             while (true) {
@@ -53,7 +53,7 @@ namespace kaguya {
                 }
 
                 if (ray.getMedium() != nullptr) {
-                    tr *= ray.getMedium()->transmittance(ray);
+                    tr *= ray.getMedium()->transmittance(ray, sampler1D);
                 }
 
                 if (!foundIntersection) {

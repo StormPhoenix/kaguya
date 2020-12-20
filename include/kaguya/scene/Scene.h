@@ -35,6 +35,13 @@ using namespace kaguya::core;
 using kaguya::core::Spectrum;
 const int MODEL_SCALE = 5;
 
+// smoke data
+const int gridz = 192;
+const int gridy = 256;
+const int gridx = 192;
+
+const std::string path = "./resource/volume/density_big_0084.pbrt";
+
 #endif
 
 namespace kaguya {
@@ -58,8 +65,10 @@ namespace kaguya {
 
 #ifdef TEST_SCENE
 
+            static float *testSmokeData();
+
             static std::shared_ptr<Medium> testAirMedium() {
-                Spectrum sigmaA(0.0001);
+                Spectrum sigmaA(0.001);
 //                sigmaA.r(0.0011f);
 //                sigmaA.g(0.0024f);
 //                sigmaA.b(0.014f);
@@ -68,7 +77,7 @@ namespace kaguya {
             }
 
             static std::shared_ptr<Medium> testSmokeMedium() {
-                return std::make_shared<IsotropicMedium>(0.00001, 0.9, 0);
+                return std::make_shared<IsotropicMedium>(0.00001, 0.1, 0);
             }
 
             static std::shared_ptr<Shape> testLeftWall(const std::shared_ptr<Material> material,
@@ -101,6 +110,8 @@ namespace kaguya {
                                                                    const std::shared_ptr<Medium> inside,
                                                                    const std::shared_ptr<Medium> outside,
                                                                    bool singleSide);
+
+            static std::shared_ptr<Scene> sceneSmoke();
 
 #endif
 
@@ -146,7 +157,8 @@ namespace kaguya {
              * @param transmittance
              * @return
              */
-            bool intersectWithMedium(Ray &ray, SurfaceInteraction &si, core::Spectrum &transmittance);
+            bool intersectWithMedium(Ray &ray, SurfaceInteraction &si, core::Spectrum &transmittance,
+                                     const Sampler1D *sampler1D);
 
             std::shared_ptr<Shape> getWorld() {
                 return _world;

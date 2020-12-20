@@ -63,6 +63,10 @@ inline bool checkRange(double num, double min, double max) {
     return num >= min && num <= max;
 }
 
+inline double linearInterpolation(double t, double a, double b) {
+    return (1 - t) * a + t * b;
+}
+
 inline double schlick(double cosine, double ref_idx) {
     if (cosine < 0) {
         ref_idx = 1 / ref_idx;

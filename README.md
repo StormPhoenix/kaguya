@@ -8,7 +8,9 @@ A simple physically based render.
 - [ ] Medium sampling method.
 - [ ] Better space transformation.
 - [ ] Background texture mapping.
-- [ ] Regular tracing, ray marching, delta tracking article
+- [ ] Regular tracing, ray marching, delta tracking, ratio tracking article
+    - [ ] Delta tracing - reject sampling, Delta tracing's sampling strategy is a little different 
+            from reject sampling.
 
 ## Unsolved
 - [ ] Add information for each *assert* phrase

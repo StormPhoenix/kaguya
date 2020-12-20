@@ -58,7 +58,8 @@ namespace kaguya {
 //                scenes.push_back(Scene::sceneTwoSpheresWithAreaLight);
 //                scenes.push_back(Scene::sceneTwoSpheresWithSpotLight);
 //                scenes.push_back(Scene::sceneBunnyWithPointLight);
-                scenes.push_back(Scene::sceneBunnyWithAreaLight);
+//                scenes.push_back(Scene::sceneBunnyWithAreaLight);
+                scenes.push_back(Scene::sceneSmoke);
                 isScenePrepared = true;
             }
 

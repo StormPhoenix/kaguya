@@ -58,7 +58,7 @@ namespace kaguya {
 
             /**
              * TODO add parameter pdf
-             * Sample a ray origins from @param eye, let it hit the shape and get the interaction.
+             * Sample a ray origins from @param eye, let it insect the shape and get the interaction.
              * @return
              */
             virtual SurfaceInteraction sampleSurfaceInteraction(

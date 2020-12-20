@@ -23,7 +23,9 @@ namespace kaguya {
 
                 AxisAlignBoundingBox(const Vector3 min, const Vector3 max);
 
-                bool hit(const Ray &ray, double minStep, double maxStep) const;
+                bool insect(const Ray &ray, double minStep, double maxStep) const;
+
+                bool insectPoint(const Ray &ray, double *minStep, double *maxStep) const;
 
                 const Vector3 &min() const {
                     return _min;

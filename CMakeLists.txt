@@ -62,6 +62,7 @@ file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/bsdf/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/light/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/phase/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/medium/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/material/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/math/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/parallel/*.cpp
@@ -73,5 +74,5 @@ file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/pt/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/*.cpp)
 
-add_executable(kaguya ${sources} include/kaguya/core/medium/MediumBound.h include/kaguya/scene/Geometry.h src/kaguya/scene/Geometry.cpp include/kaguya/core/medium/IsotropicMedium.h src/kaguya/core/medium/IsotropicMedium.cpp src/kaguya/scene/Shape.cpp)
+add_executable(kaguya ${sources} src/kaguya/core/medium/GridDensityMedium.cpp include/kaguya/scene/meta/Box.h)
 target_link_libraries(kaguya pthread)

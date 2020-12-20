@@ -6,7 +6,6 @@
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
 
 #include <iostream>
-#include <cstring>
 #include <clipp.h>
 
 using namespace kaguya;
