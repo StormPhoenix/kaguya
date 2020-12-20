@@ -13,6 +13,12 @@ A simple physically based render.
             from reject sampling.
 
 ## Unsolved
+- [ ] Smoke 的渲染改进
+    - [ ] Smoke 会在地板下面透射一个方形的影子，这个很不正常
+    - [ ] Smoke 的体积坐标变换有 bug，和场景的围墙不匹配
+    - [ ] 创建 Box Shape，代替围墙 Wall
+
+
 - [ ] Add information for each *assert* phrase
 
 - [ ] Shape 文件位置重构，Material \ AreaLight 属性拆解到 Geometry

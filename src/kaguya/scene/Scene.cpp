@@ -51,7 +51,6 @@ namespace kaguya {
 
             std::fstream fr(path.c_str(), std::ios::in);
             while (fr >> density) {
-                // TODO delete
                 (*p) = density * 15;
                 maxDensity = maxDensity <= density ? density : maxDensity;
                 gridCount++;

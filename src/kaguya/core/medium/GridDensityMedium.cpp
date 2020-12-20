@@ -6,9 +6,6 @@
 #include <kaguya/core/phase/HenyeyGreensteinFunction.h>
 #include <kaguya/scene/accumulation/AABB.h>
 
-// TODO delete
-#include <iostream>
-
 namespace kaguya {
     namespace core {
         namespace medium {
@@ -37,7 +34,6 @@ namespace kaguya {
             }
 
             GridDensityMedium::~GridDensityMedium() {
-                // TODO delete densities
                 delete _densities;
             }
 
@@ -70,11 +66,6 @@ namespace kaguya {
                         break;
                     } else {
                         float d = density(transformedRay.at(step));
-                        // TODO delete
-                        if (d > 0) {
-                            int a = 0;
-                            a++;
-                        }
                         transmittance *= 1. - std::max(0., (double) d * _maxInvDensity);
                     }
                 }
@@ -110,13 +101,6 @@ namespace kaguya {
                             return Spectrum(1.);
                         } else {
                             float d = density(transformedRay.at(step));
-
-                            // TODO delete
-                            if (d > 0) {
-                                int a = 0;
-                                a++;
-                            }
-
                             // Sample by probability
                             if (std::max(0., (double) d * _maxInvDensity)
                                 > sampler1D->sample()) {
@@ -171,13 +155,7 @@ namespace kaguya {
                 // x3 - x4
                 float y2 = linearInterpolation(interValue.y, x3, x4);
                 /* Interpolation for z-axis */
-                // TODO delete
-                float d = linearInterpolation(interValue.z, y1, y2);
-                if (d > 0.5) {
-                    int a = 0;
-                    a ++;
-                }
-                return d;
+                return linearInterpolation(interValue.z, y1, y2);
             }
         }
     }
