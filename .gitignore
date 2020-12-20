@@ -2,7 +2,7 @@
 /cmake-build-debug
 /cmake-build-release
 /output
-#/resource
+/resource
 
 # IDE
 /.idea
