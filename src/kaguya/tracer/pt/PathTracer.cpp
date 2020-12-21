@@ -236,7 +236,7 @@ namespace kaguya {
                     // find intersection
                     SurfaceInteraction misSI;
                     Spectrum misTr = 1.0;
-                    Ray misRay(eye.getPoint(), wi);
+                    Ray misRay(eye.getPoint(), NORMALIZE(wi));
                     bool foundIntersection = scene.intersectWithMedium(misRay, misSI, misTr, sampler1D);
                     Spectrum misLumi(0.0);
                     if (foundIntersection) {

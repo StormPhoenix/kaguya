@@ -9,7 +9,7 @@ namespace kaguya {
 
         Ray::Ray(const Vector3 &origin, const Vector3 &direction,
                  const core::medium::Medium *medium) :
-                _origin(origin), _direction(NORMALIZE(direction)),
+                _origin(origin), _direction(direction),
                 _medium(medium), _minStep(0.0001), _step(infinity) {}
 
         const Vector3 &Ray::getDirection() const {

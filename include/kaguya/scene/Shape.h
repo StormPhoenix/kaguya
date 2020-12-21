@@ -11,12 +11,11 @@
 #include <kaguya/scene/accumulation/AABB.h>
 
 namespace kaguya {
+
     namespace tracer {
         class Ray;
     }
-}
 
-namespace kaguya {
     namespace scene {
 
         using kaguya::math::random::Sampler1D;

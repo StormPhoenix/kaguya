@@ -43,7 +43,7 @@ namespace kaguya {
                                        INVERSE(*_transformMatrix) * Vector4(ray.getOrigin(), 1.0) : ray.getOrigin();
 
                 const Vector3 dir = _transformMatrix != nullptr ?
-                                    INVERSE(*_transformMatrix) * Vector4(ray.getDirection(), 1.0) : ray.getDirection();
+                                    INVERSE(*_transformMatrix) * Vector4(ray.getDirection(), 0.0) : ray.getDirection();
                 Ray transformedRay = Ray(origin, dir, ray.getMedium());
 
                 // calculate intersection
@@ -72,6 +72,7 @@ namespace kaguya {
                 return Spectrum(transmittance);
             }
 
+
             core::Spectrum GridDensityMedium::sampleInteraction(const tracer::Ray &ray, const Sampler1D *sampler1D,
                                                                 MediumInteraction *mi, MemoryArena &memoryArena) const {
                 // transform ray from world space to medium space
@@ -79,8 +80,9 @@ namespace kaguya {
                                        INVERSE(*_transformMatrix) * Vector4(ray.getOrigin(), 1.0) : ray.getOrigin();
 
                 const Vector3 dir = _transformMatrix != nullptr ?
-                                    INVERSE(*_transformMatrix) * Vector4(ray.getDirection(), 1.0) : ray.getDirection();
+                                    INVERSE(*_transformMatrix) * Vector4(ray.getDirection(), 0.0) : ray.getDirection();
                 Ray transformedRay = Ray(origin, dir, ray.getMedium());
+                transformedRay.setStep(ray.getStep());
 
                 // calculate intersection
                 AABB aabb(Vector3(0, 0, 0), Vector3(1, 1, 1));
@@ -88,7 +90,7 @@ namespace kaguya {
                 double minStep = 0, maxStep = transformedRay.getStep();
                 bool foundIntersection = aabb.insectPoint(transformedRay, &minStep, &maxStep);
                 if (!foundIntersection) {
-                    return Spectrum(1.0);
+                    return Spectrum(1.);
                 } else {
                     // loop for sampling interaction and transmittance
                     double step = minStep;

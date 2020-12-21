@@ -36,7 +36,7 @@ namespace kaguya {
                                             const Sampler1D *sampler1D) {
             // 采样射线
             Vector3 rayDir = sphereUniformSampling(sampler1D);
-            (*ray) = Ray(_center, rayDir, _mediumBoundary.inside());
+            (*ray) = Ray(_center, NORMALIZE(rayDir), _mediumBoundary.inside());
 
             *normal = rayDir;
             *pdfPos = 1.0;

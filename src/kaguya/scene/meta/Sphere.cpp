@@ -121,7 +121,7 @@ namespace kaguya {
                 Vector3 dirWorld = dir.x * tanX + dir.y * tanY + dir.z * tanZ;
 
                 SurfaceInteraction si;
-                Ray sampleRay = Ray(eye.getPoint(), dirWorld);
+                Ray sampleRay = Ray(eye.getPoint(), NORMALIZE(dirWorld));
                 bool isInsect = insect(sampleRay, si, sampleRay.getMinStep(), sampleRay.getStep());
                 assert(isInsect);
 

@@ -74,5 +74,5 @@ file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/pt/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/*.cpp)
 
-add_executable(kaguya ${sources} src/kaguya/core/medium/GridDensityMedium.cpp include/kaguya/scene/meta/Box.h)
+add_executable(kaguya ${sources} src/kaguya/core/medium/GridDensityMedium.cpp include/kaguya/scene/Box.h include/kaguya/core/Transform.h src/kaguya/core/Transform.cpp src/kaguya/scene/meta/Box.cpp include/kaguya/scene/Aggregation.h)
 target_link_libraries(kaguya pthread)

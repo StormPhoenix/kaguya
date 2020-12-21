@@ -67,6 +67,33 @@ inline double linearInterpolation(double t, double a, double b) {
     return (1 - t) * a + t * b;
 }
 
+inline bool intersectBound(const Vector3 &origin, const Vector3 &direction,
+                           const Vector3 &boundMin, const Vector3 &boundMax,
+                           double *minStep, double *maxStep) {
+    assert(minStep != nullptr && maxStep != nullptr);
+
+    double t0 = *minStep, t1 = *maxStep;
+    for (int axis = 0; axis < 3; ++axis) {
+        double invStep = 1 / direction[axis];
+        double near = (boundMin[axis] - origin[axis]) * invStep;
+        double far = (boundMax[axis] - origin[axis]) * invStep;
+
+        if (near > far) {
+            std::swap(near, far);
+        }
+
+        t0 = near > t0 ? near : t0;
+        t1 = far < t1 ? far : t1;
+        if (t0 > t1) {
+            return false;
+        }
+    }
+
+    *minStep = t0;
+    *maxStep = t1;
+    return true;
+}
+
 inline double schlick(double cosine, double ref_idx) {
     if (cosine < 0) {
         ref_idx = 1 / ref_idx;
@@ -88,7 +115,12 @@ inline double randomDouble(double min, double max, const math::random::Sampler1D
 }
 
 inline int randomInt(int min, int max, const math::random::Sampler1D *const sampler1D) {
-    return std::min(static_cast<int>(randomDouble(min, max + 1, sampler1D)), max);
+    int ret = std::min(static_cast<int>(randomDouble(min, max + 1, sampler1D)), max);
+    if (ret <= max) {
+        return ret;
+    } else {
+        return randomInt(min, max, sampler1D);
+    }
 }
 
 inline Vector3 reflect(const Vector3 &v, const Vector3 &normal) {
