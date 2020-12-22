@@ -12,6 +12,10 @@ A simple physically based render.
             from reject sampling.
 
 ## Unsolved
+- [ ] 考虑该如何设计 Ray 重的 minStep。当前问题是 Ray 的 minSte 不能为 0，否则会出现渲染错误。
+
+- [ ] 添加新的 Aggregation 后，BDPT 无法收敛。
+
 - [ ] 重新调整 Shape, Geometry, Aggregation 结构
     - [ ] 重新定义 Shape, Geometry, Aggregation
     - [ ] Shape 子类命名空间调整

@@ -223,13 +223,11 @@ namespace kaguya {
 
             // smoke data
             std::shared_ptr<Matrix4> transformMatrix = std::make_shared<Matrix4>(1.0f);
-            double scale = 0.5 * MODEL_SCALE;
-            double offsetY = -scale;
-            *transformMatrix = TRANSLATE(*transformMatrix, Vector3(-scale * 0.5, offsetY, -scale * 0.5));
-            *transformMatrix = SCALE(*transformMatrix, Vector3(scale, scale, scale));
+            double scale = 0.6 * MODEL_SCALE;
+            *transformMatrix = TRANSLATE(*transformMatrix, Vector3(-scale * 0.5, -MODEL_SCALE * 0.5 + 0.0001, -scale * 0.5));
+            *transformMatrix = SCALE(*transformMatrix, Vector3(scale * 1.2, MODEL_SCALE * 0.90, scale * 1.2));
 
             float *smoke = testSmokeData();
-//            std::shared_ptr<Medium> smokeMedium = testSmokeMedium();
             std::shared_ptr<Medium> smokeMedium = std::make_shared<GridDensityMedium>(0.002, 2.3, 0, gridx, gridy, gridz,
                                                                                       smoke, transformMatrix);
 
@@ -262,15 +260,16 @@ namespace kaguya {
 
             // objects
             std::vector<std::shared_ptr<Shape>> objects;
+
+            std::vector<std::shared_ptr<Shape>> boxes = smokeWrapper.aggregation();
+            objects.insert(objects.end(), boxes.begin(), boxes.end());
+
             objects.push_back(leftWall);
             objects.push_back(rightWall);
             objects.push_back(bottomWall);
             objects.push_back(topWall);
             objects.push_back(frontWall);
             objects.push_back(lightWall);
-
-            std::vector<std::shared_ptr<Shape>> boxes = smokeWrapper.aggregation();
-            objects.insert(objects.end(), boxes.begin(), boxes.end());
 
             // 给所有 object 赋予 id
             for (long long id = 0; id < objects.size(); id++) {
@@ -485,7 +484,8 @@ namespace kaguya {
             sigmaA.g(0.0024f);
             sigmaA.b(0.014f);
 
-            std::shared_ptr<Medium> airMedium = testAirMedium();
+//            std::shared_ptr<Medium> airMedium = testAirMedium();
+            std::shared_ptr<Medium> airMedium = nullptr;
             // walls
             std::shared_ptr<Shape> leftWall = testLeftWall(lambertLeft, airMedium, airMedium);
             std::shared_ptr<Shape> rightWall = testRightWall(lambertRight, airMedium, airMedium);

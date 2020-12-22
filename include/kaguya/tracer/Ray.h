@@ -19,6 +19,7 @@ namespace kaguya {
 
         class Ray {
         public:
+//  TODO          Ray() : _medium(nullptr), _minStep(0.), _step(infinity) {}
             Ray() : _medium(nullptr), _minStep(0.0001), _step(infinity) {}
 
             /**
