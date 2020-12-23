@@ -16,13 +16,9 @@ A simple physically based render.
 - [ ] 编写实时展现渲染进度的功能。
 
 ## Unsolved
-- [ ] 考虑该如何设计 Ray 重的 minStep。当前问题是 Ray 的 minSte 不能为 0。如果设置成 0，就会遇到浮点误差问题。
-    例如：在表面 A 向外发射射线 x，由于浮点误差 x 不在 A 的表面，而是在稍微下面一点的地方，这样导致 x 又会和表面 A 相交。 
-
-- [ ] 重新调整 Shape, Geometry, Aggregation 结构
-    - [ ] 重新定义 Shape, Geometry, Aggregation
-    - [ ] Shape 子类命名空间调整
-    - [ ] TriangleMesh 在新架构下重构
+- [ ] 考虑该如何设计 Ray 重的 minStep。当前问题是 Ray 的 minStep 不能为 0。如果设置成 0，就会遇到浮点误差问题。
+    例如：在表面 A 向外发射射线 x，由于浮点误差 x 不在 A 的表面，而是在稍微下面一点的地方，这样导致 x 又会和表面 A 相交。
+    - [ ] modify the method which applied for triangle intersection, and calculate the error bound. 
 
 - [ ] Better space transformation
     - [ ] Transform class
@@ -71,6 +67,11 @@ A simple physically based render.
     无法在光线传输过程中确定碰撞位置两端的折射率。程序采用的是将外界材质的折射率固定设置为空气折射率（1.0）
     
 ## Solved
+
+- [x] 重新调整 Shape, Geometry, Aggregation 结构
+    - [x] 重新定义 Shape, Geometry, Aggregation
+    - [x] Shape 子类命名空间调整
+    - [x] TriangleMesh 在新架构下重构
 
 - [x] Smoke 的渲染改进
     - [x] Smoke 会在地板下面透射一个方形的影子，这个很不正常
