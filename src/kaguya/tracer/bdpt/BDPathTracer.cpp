@@ -261,7 +261,7 @@ namespace kaguya {
                         // skip medium boundary
                         if (si.getMaterial() == nullptr) {
                             scatterRay = si.sendRay(scatterRay.getDirection());
-                            depth --;
+                            depth--;
                             continue;
                         }
 

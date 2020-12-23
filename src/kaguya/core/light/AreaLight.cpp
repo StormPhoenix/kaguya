@@ -7,20 +7,20 @@
 namespace kaguya {
     namespace core {
 
-        AreaLight::AreaLight(const Spectrum &intensity, std::shared_ptr<Shape> shape, LightType type,
+        AreaLight::AreaLight(const Spectrum &intensity, std::shared_ptr<Geometry> shape, LightType type,
                              const MediumBound &mediumBoundary) :
-                Light(LightType(type | AREA), mediumBoundary), _intensity(intensity), _shape(shape) {}
+                Light(LightType(type | AREA), mediumBoundary), _intensity(intensity), _geometry(shape) {}
 
         Spectrum AreaLight::sampleFromLight(const Interaction &eye, Vector3 *wi, double *pdf,
                                             const Sampler1D *sampler1D,
                                             VisibilityTester *visibilityTester) {
-            assert(_shape != nullptr);
+            assert(_geometry != nullptr);
             // 从 eye 出发采样一条射线，返回与 shape 的交点
-            SurfaceInteraction intersection = _shape->sampleSurfaceInteraction(eye, sampler1D);
+            SurfaceInteraction intersection = _geometry->getShape()->sampleSurfaceInteraction(eye, sampler1D);
             // 射线方向
             (*wi) = NORMALIZE(intersection.getPoint() - eye.getPoint());
             // 该射线方向的 PDF
-            (*pdf) = _shape->surfaceInteractionPdf(eye, *wi);
+            (*pdf) = _geometry->getShape()->surfaceInteractionPdf(eye, *wi);
             // 可见性判断
             (*visibilityTester) = VisibilityTester(eye, intersection);
             // 计算返回的 Spectrum
@@ -28,8 +28,8 @@ namespace kaguya {
         }
 
         double AreaLight::sampleFromLightPdf(const Interaction &eye, const Vector3 &dir) {
-            assert(_shape != nullptr);
-            return _shape->surfaceInteractionPdf(eye, dir);
+            assert(_geometry != nullptr);
+            return _geometry->getShape()->surfaceInteractionPdf(eye, dir);
         }
 
 

@@ -6,12 +6,18 @@
 #define KAGUYA_BOX_H
 
 #include <kaguya/core/Transform.h>
+#include <kaguya/core/medium/Medium.h>
+#include <kaguya/material/Material.h>
 #include <kaguya/scene/Aggregation.h>
+#include <kaguya/scene/Geometry.h>
 
 #include <map>
 
 namespace kaguya {
     namespace scene {
+
+        using kaguya::core::medium::Medium;
+        using kaguya::material::Material;
 
         class Box : public Aggregation {
         public:
@@ -20,10 +26,12 @@ namespace kaguya {
                 const std::shared_ptr<Medium> outside = nullptr,
                 const std::shared_ptr<Matrix4> transform = nullptr);
 
-            virtual std::vector<std::shared_ptr<Shape>> aggregation() override;
+            virtual const AABB &boundingBox() const override;
+
+            virtual const std::vector<std::shared_ptr<Intersectable>> aggregation() const override;
 
         private:
-            void buildBox();
+            void build();
 
         private:
             // transform matrix
@@ -31,8 +39,9 @@ namespace kaguya {
             const std::shared_ptr<Material> _material;
             const std::shared_ptr<Medium> _inside;
             const std::shared_ptr<Medium> _outside;
+            std::vector<std::shared_ptr<Intersectable>> _objects;
 
-            std::vector<std::shared_ptr<Shape>> objects;
+            AABB _aabb;
         };
 
     }

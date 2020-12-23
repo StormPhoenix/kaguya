@@ -7,12 +7,17 @@
 
 #include <kaguya/core/light/Light.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
-#include <kaguya/scene/Shape.h>
+#include <kaguya/scene/Geometry.h>
 
 namespace kaguya {
+
+    namespace scene {
+        class Geometry;
+    }
+
     namespace core {
 
-        using kaguya::scene::Shape;
+        using scene::Geometry;
 
         class AreaLight : public Light {
         public:
@@ -21,7 +26,7 @@ namespace kaguya {
              * @param intensity
              * @param shape
              */
-            AreaLight(const Spectrum &intensity, std::shared_ptr<Shape> shape, LightType type, const MediumBound &mediumBoundary);
+            AreaLight(const Spectrum &intensity, std::shared_ptr<Geometry> shape, LightType type, const MediumBound &mediumBoundary);
 
             /**
              * 计算 AreaLight 表面某一点 point，方向为 wo 的亮度。
@@ -39,7 +44,7 @@ namespace kaguya {
 
         protected:
             const Spectrum _intensity;
-            std::shared_ptr<Shape> _shape;
+            std::shared_ptr<Geometry> _geometry;
         };
 
     }

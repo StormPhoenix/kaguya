@@ -5,7 +5,7 @@
 #ifndef KAGUYA_TRIANGLEMESH_H
 #define KAGUYA_TRIANGLEMESH_H
 
-#include <kaguya/scene/Shape.h>
+#include <kaguya/scene/meta/Shape.h>
 #include <kaguya/scene/meta/Vertex.h>
 #include <kaguya/scene/accumulation/BVH.h>
 
@@ -19,11 +19,11 @@ namespace kaguya {
         class TriangleMesh : public BVH {
         public:
             TriangleMesh(std::vector<Vertex> &vertices,
+                         const std::shared_ptr<Material> material,
+                         const std::shared_ptr<Medium> inside = nullptr,
+                         const std::shared_ptr<Medium> outside = nullptr,
+                         const std::shared_ptr<AreaLight> areaLight = nullptr,
                          std::shared_ptr<Matrix4> transformMatrix = nullptr);
-
-            virtual const long long getId() const override;
-
-            virtual void setId(long long id) override;
 
             virtual ~TriangleMesh() {}
 
@@ -32,7 +32,11 @@ namespace kaguya {
 
         private:
             std::vector<Vertex> &_vertices;
-            std::vector<std::shared_ptr<Shape>> _triangles;
+            std::vector<std::shared_ptr<Intersectable>> _triangles;
+            const std::shared_ptr<Material> _material;
+            const std::shared_ptr<Medium> _inside;
+            const std::shared_ptr<Medium> _outside;
+            const std::shared_ptr<AreaLight> _areaLight;
             std::shared_ptr<Matrix4> _transformMatrix = nullptr;
         };
 

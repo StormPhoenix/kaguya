@@ -5,7 +5,7 @@
 #ifndef KAGUYA_CONFIG_H
 #define KAGUYA_CONFIG_H
 
-#include <kaguya/scene/Shape.h>
+#include <kaguya/scene/meta/Shape.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/tracer/Camera.h>
 
@@ -17,7 +17,7 @@
 namespace kaguya {
 
     using kaguya::tracer::Camera;
-    using kaguya::scene::Shape;
+    using kaguya::scene::meta::Shape;
     using kaguya::scene::Scene;
 
     class Config {

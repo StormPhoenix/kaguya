@@ -10,7 +10,7 @@ namespace kaguya {
 
         using kaguya::core::medium::MediumBound;
 
-        Geometry::Geometry(const std::shared_ptr<Shape> shape,
+        Geometry::Geometry(const std::shared_ptr<meta::Shape> shape,
                            const std::shared_ptr<Material> material,
                            const std::shared_ptr<Medium> inside,
                            const std::shared_ptr<Medium> outside,
@@ -19,9 +19,9 @@ namespace kaguya {
             assert(_shape != nullptr);
         }
 
-        bool Geometry::insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) const {
+        bool Geometry::intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const {
             // proxy
-            bool ret = _shape->insect(ray, si, stepMin, stepMax);
+            bool ret = _shape->intersect(ray, si, minStep, maxStep);
             if (ret) {
                 // medium
                 si.setMediumBoundary(MediumBound(_inside.get(), _outside.get()));
@@ -33,33 +33,16 @@ namespace kaguya {
             return ret;
         }
 
-        double Geometry::area() const {
-            return _shape->area();
-        }
-
-        SurfaceInteraction Geometry::sampleSurfacePoint(const Sampler1D *sampler1D) const {
-            return _shape->sampleSurfacePoint(sampler1D);
-        }
-
-        double Geometry::surfacePointPdf(const SurfaceInteraction &si) const {
-            return _shape->surfacePointPdf(si);
-        }
-
-        SurfaceInteraction Geometry::sampleSurfaceInteraction(const Interaction &eye,
-                                                              const Sampler1D *sampler1D) const {
-            return _shape->sampleSurfaceInteraction(eye, sampler1D);
-        }
-
-        double Geometry::surfaceInteractionPdf(const Interaction &eye, const Vector3 &dir) const {
-            return _shape->surfaceInteractionPdf(eye, dir);
-        }
-
         const AABB &Geometry::boundingBox() const {
-            return _shape->boundingBox();
+            return _shape->bound();
         }
 
-        void Geometry::setId(long long id) {
-            _shape->setId(id);
+        void Geometry::setAreaLight(const std::shared_ptr<AreaLight> areaLight) {
+            _areaLight = areaLight;
+        }
+
+        const std::shared_ptr<meta::Shape> Geometry::getShape() const {
+            return _shape;
         }
     }
 }

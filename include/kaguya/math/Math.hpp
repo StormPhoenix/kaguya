@@ -69,10 +69,10 @@ inline double linearInterpolation(double t, double a, double b) {
 
 inline bool intersectBound(const Vector3 &origin, const Vector3 &direction,
                            const Vector3 &boundMin, const Vector3 &boundMax,
-                           double *minStep, double *maxStep) {
-    assert(minStep != nullptr && maxStep != nullptr);
+                           double *stepMin, double *maxStep) {
+    assert(stepMin != nullptr && maxStep != nullptr);
 
-    double t0 = *minStep, t1 = *maxStep;
+    double t0 = *stepMin, t1 = *maxStep;
     for (int axis = 0; axis < 3; ++axis) {
         double invStep = 1 / direction[axis];
         double near = (boundMin[axis] - origin[axis]) * invStep;
@@ -89,7 +89,7 @@ inline bool intersectBound(const Vector3 &origin, const Vector3 &direction,
         }
     }
 
-    *minStep = t0;
+    *stepMin = t0;
     *maxStep = t1;
     return true;
 }

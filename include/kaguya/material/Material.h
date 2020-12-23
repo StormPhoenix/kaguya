@@ -9,7 +9,7 @@
 #include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/math/Math.hpp>
-#include <kaguya/scene/Shape.h>
+#include <kaguya/scene/meta/Shape.h>
 #include <kaguya/utils/MemoryArena.h>
 
 namespace kaguya {

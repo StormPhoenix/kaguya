@@ -19,21 +19,21 @@ namespace kaguya {
         }
 
         DiffuseAreaLight::DiffuseAreaLight(const Spectrum &intensity,
-                                           std::shared_ptr<Shape> shape,
+                                           std::shared_ptr<Geometry> shape,
                                            const MediumBound &mediumBoundary,
                                            bool singleSide) :
                 AreaLight(intensity, shape, AREA, mediumBoundary), _singleSide(singleSide) {}
 
         Spectrum DiffuseAreaLight::randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir,
                                                   const Sampler1D *sampler1D) {
-            assert(_shape != nullptr);
+            assert(_geometry != nullptr);
 
             // 采样位置
-            SurfaceInteraction si = _shape->sampleSurfacePoint(sampler1D);
+            SurfaceInteraction si = _geometry->getShape()->sampleSurfacePoint(sampler1D);
             *normal = si.getNormal();
 
             // 采样位置 pdf
-            *pdfPos = _shape->surfacePointPdf(si);
+            *pdfPos = _geometry->getShape()->surfacePointPdf(si);
 
             Vector3 dirLocal;
             // 判断区域光是否是双面发光
@@ -71,11 +71,11 @@ namespace kaguya {
 
         void DiffuseAreaLight::randomLightRayPdf(const Ray &ray, const Vector3 &normal,
                                                  double *pdfPos, double *pdfDir) const {
-            assert(_shape != nullptr);
+            assert(_geometry != nullptr);
             // 创建 SurfaceInteraction
             SurfaceInteraction si;
             si.setPoint(ray.getOrigin());
-            (*pdfPos) = _shape->surfacePointPdf(si);
+            (*pdfPos) = _geometry->getShape()->surfacePointPdf(si);
             double cosTheta = ABS_DOT(normal, ray.getDirection());
             (*pdfDir) = _singleSide ? hemiCosineSamplePdf(cosTheta) : 0.5 * hemiCosineSamplePdf(cosTheta);
         }

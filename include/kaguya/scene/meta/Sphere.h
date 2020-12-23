@@ -7,64 +7,64 @@
 
 #include <kaguya/scene/accumulation/AABB.h>
 #include <kaguya/math/Math.hpp>
-#include <kaguya/scene/Shape.h>
+#include <kaguya/scene/meta/Shape.h>
 #include <memory>
 
 namespace kaguya {
     namespace scene {
+        namespace meta {
+            using kaguya::scene::acc::AABB;
 
-        using kaguya::scene::acc::AABB;
+            class Sphere : public Shape {
+            public:
 
-        class Sphere : public Shape {
-        public:
+                /**
+                 * 球体
+                 * @param center 中心
+                 * @param radius 半径
+                 * @param material 材质
+                 * @param outward 是否向外
+                 * @param transformMatrix 变换矩阵
+                 */
+                Sphere(const Vector3 &center, double radius, bool outward = true,
+                       std::shared_ptr<Matrix4> transformMatrix = nullptr);
 
-            /**
-             * 球体
-             * @param center 中心
-             * @param radius 半径
-             * @param material 材质
-             * @param outward 是否向外
-             * @param transformMatrix 变换矩阵
-             */
-            Sphere(const Vector3 &center, double radius, bool outward = true,
-                   std::shared_ptr<Matrix4> transformMatrix = nullptr);
+                bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
 
-            bool insect(Ray &ray, SurfaceInteraction &si, double stepMin, double stepMax) const override;
+                virtual double area() const override {
+                    return 4 * PI * _radius * _radius;
+                }
 
-            virtual double area() const override {
-                return 4 * PI * _radius * _radius;
-            }
+                virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) const override;
 
-            virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) const override;
+                virtual SurfaceInteraction
+                sampleSurfaceInteraction(const Interaction &eye, const Sampler1D *sampler1D) const override;
 
-            virtual SurfaceInteraction
-            sampleSurfaceInteraction(const Interaction &eye, const Sampler1D *sampler1D) const override;
-
-            virtual double surfaceInteractionPdf(const Interaction &eye, const Vector3 &dir) const override;
+                virtual double surfaceInteractionPdf(const Interaction &eye, const Vector3 &dir) const override;
 
 
-            const AABB &boundingBox() const override;
+                virtual const AABB &bound() const override;
 
-            virtual ~Sphere() {}
+                virtual ~Sphere() {}
 
-        private:
-            /**
-             * 计算击中点的法向量
-             * @param hitPoint
-             * @return
-             */
-            virtual Vector3 computeNormal(const Vector3 &hitPoint) const;
+            private:
+                /**
+                 * 计算击中点的法向量
+                 * @param hitPoint
+                 * @return
+                 */
+                virtual Vector3 computeNormal(const Vector3 &hitPoint) const;
 
-        private:
-            AABB _aabb;
-            Vector3 _center;
-            Vector3 _transformedCenter;
-            double _radius;
-            bool _outward;
-            std::shared_ptr<Matrix4> _transformMatrix = nullptr;
-            std::shared_ptr<Matrix4> _inverseTransformMatrix = nullptr;
-        };
-
+            private:
+                AABB _aabb;
+                Vector3 _center;
+                Vector3 _transformedCenter;
+                double _radius;
+                bool _outward;
+                std::shared_ptr<Matrix4> _transformMatrix = nullptr;
+                std::shared_ptr<Matrix4> _inverseTransformMatrix = nullptr;
+            };
+        }
     }
 }
 

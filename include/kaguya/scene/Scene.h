@@ -6,7 +6,8 @@
 #define KAGUYA_SCENE_H
 
 #include <kaguya/core/Interaction.h>
-#include <kaguya/scene/Shape.h>
+#include <kaguya/scene/meta/Shape.h>
+#include <kaguya/scene/Aggregation.h>
 #include <kaguya/tracer/Camera.h>
 #include <memory>
 
@@ -80,27 +81,27 @@ namespace kaguya {
                 return std::make_shared<IsotropicMedium>(0.00001, 0.1, 0);
             }
 
-            static std::shared_ptr<Shape> testLeftWall(const std::shared_ptr<Material> material,
+            static std::shared_ptr<Geometry> testLeftWall(const std::shared_ptr<Material> material,
                                                        const std::shared_ptr<Medium> insideMedium,
                                                        const std::shared_ptr<Medium> outsideMedium);
 
-            static std::shared_ptr<Shape> testRightWall(const std::shared_ptr<Material> material,
+            static std::shared_ptr<Geometry> testRightWall(const std::shared_ptr<Material> material,
                                                         const std::shared_ptr<Medium> insideMedium,
                                                         const std::shared_ptr<Medium> outsideMedium);
 
-            static std::shared_ptr<Shape> testBottomWall(const std::shared_ptr<Material> material,
+            static std::shared_ptr<Geometry> testBottomWall(const std::shared_ptr<Material> material,
                                                          const std::shared_ptr<Medium> insideMedium,
                                                          const std::shared_ptr<Medium> outsideMedium);
 
-            static std::shared_ptr<Shape> testTopWall(const std::shared_ptr<Material> material,
+            static std::shared_ptr<Geometry> testTopWall(const std::shared_ptr<Material> material,
                                                       const std::shared_ptr<Medium> insideMedium,
                                                       const std::shared_ptr<Medium> outsideMedium);
 
-            static std::shared_ptr<Shape> testFrontWall(const std::shared_ptr<Material> material,
+            static std::shared_ptr<Geometry> testFrontWall(const std::shared_ptr<Material> material,
                                                         const std::shared_ptr<Medium> insideMedium,
                                                         const std::shared_ptr<Medium> outsideMedium);
 
-            static std::shared_ptr<Shape> testBunny(const std::shared_ptr<Material> material,
+            static std::shared_ptr<Aggregation> testBunny(const std::shared_ptr<Material> material,
                                                     const std::shared_ptr<Medium> inside = nullptr,
                                                     const std::shared_ptr<Medium> outside = nullptr,
                                                     const std::shared_ptr<AreaLight> areaLight = nullptr);
@@ -160,7 +161,7 @@ namespace kaguya {
             bool intersectWithMedium(Ray &ray, SurfaceInteraction &si, core::Spectrum &transmittance,
                                      const Sampler1D *sampler1D);
 
-            std::shared_ptr<Shape> getWorld() {
+            std::shared_ptr<Intersectable> getWorld() {
                 return _world;
             }
 
@@ -185,7 +186,7 @@ namespace kaguya {
             // scene name
             std::string _sceneName;
             // scene objects
-            std::shared_ptr<Shape> _world = nullptr;
+            std::shared_ptr<Intersectable> _world = nullptr;
             // camera
             std::shared_ptr<Camera> _camera = nullptr;
             // TODO 单个光源 用于测试

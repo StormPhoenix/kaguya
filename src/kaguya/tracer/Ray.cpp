@@ -7,11 +7,12 @@
 namespace kaguya {
     namespace tracer {
 
+        Ray::Ray() : _medium(nullptr), _minStep(0.00001), _step(infinity) {}
+
         Ray::Ray(const Vector3 &origin, const Vector3 &direction,
                  const core::medium::Medium *medium) :
                 _origin(origin), _direction(direction),
-// TODO                _medium(medium), _minStep(0.), _step(infinity) {}
-                _medium(medium), _minStep(0.0001), _step(infinity) {}
+                _medium(medium), _minStep(0.00001), _step(infinity) {}
 
         const Vector3 &Ray::getDirection() const {
             return _direction;

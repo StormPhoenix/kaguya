@@ -71,11 +71,6 @@ namespace kaguya {
                 _point = point;
             }
 
-            void setId(long long id) {
-//                reset();
-                _id = id;
-            }
-
             /**
              * 检测是否是体积碰撞
              * @return

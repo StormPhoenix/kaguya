@@ -7,7 +7,7 @@
 #include <kaguya/core/light/AreaLight.h>
 #include <kaguya/core/medium/Medium.h>
 #include <kaguya/material/Material.h>
-#include <kaguya/scene/Shape.h>
+#include <kaguya/scene/meta/Shape.h>
 #include <kaguya/tracer/pt/PathTracer.h>
 
 

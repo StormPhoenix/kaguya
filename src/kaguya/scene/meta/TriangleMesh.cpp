@@ -4,26 +4,20 @@
 
 #include <kaguya/math/Math.hpp>
 #include <kaguya/scene/meta/Triangle.h>
-#include <kaguya/scene/meta/TriangleMesh.h>
+#include <kaguya/scene/aggregation/TriangleMesh.h>
 
 namespace kaguya {
     namespace scene {
 
         TriangleMesh::TriangleMesh(std::vector<Vertex> &vertices,
+                                   const std::shared_ptr<Material> material,
+                                   const std::shared_ptr<Medium> inside,
+                                   const std::shared_ptr<Medium> outside,
+                                   const std::shared_ptr<AreaLight> areaLight,
                                    std::shared_ptr<Matrix4> transformMatrix)
-                : BVH(), _vertices(vertices), _transformMatrix(transformMatrix) {
+                : BVH(), _vertices(vertices), _material(material), _inside(inside),
+                  _outside(outside), _areaLight(areaLight), _transformMatrix(transformMatrix) {
             buildMeshes();
-        }
-
-        void TriangleMesh::setId(long long id) {
-            for (auto it = _triangles.begin(); it != _triangles.end(); it++) {
-                (*it)->setId(id);
-            }
-            _id = id;
-        }
-
-        const long long TriangleMesh::getId() const {
-            return _id;
         }
 
         void TriangleMesh::buildMeshes() {
@@ -32,9 +26,11 @@ namespace kaguya {
                 Vertex vertex1 = _vertices[i];
                 Vertex vertex2 = _vertices[i + 1];
                 Vertex vertex3 = _vertices[i + 2];
-                _triangles.push_back(
-                        std::make_shared<Triangle>(vertex1, vertex2, vertex3, _transformMatrix)
-                );
+                std::shared_ptr<meta::Shape> triangle = std::make_shared<meta::Triangle>(vertex1, vertex2, vertex3,
+                                                                             _transformMatrix);
+                std::shared_ptr<Geometry> trig = std::make_shared<Geometry>(triangle, _material, _inside, _outside,
+                                                                            _areaLight);
+                _triangles.push_back(trig);
             }
             BVH::build(_triangles, 0, _triangles.size());
         }

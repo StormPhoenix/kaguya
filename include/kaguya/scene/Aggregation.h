@@ -12,9 +12,17 @@
 namespace kaguya {
     namespace scene {
 
-        class Aggregation {
+        class Aggregation : public Intersectable {
         public:
-            virtual std::vector<std::shared_ptr<Shape>> aggregation() = 0;
+            virtual bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
+
+            virtual const std::vector<std::shared_ptr<Intersectable>> aggregation() const = 0;
+
+        protected:
+
+            AABB mergeAABB(const AABB &a, const AABB &b) const;
+
+            AABB mergeBoundingBox(const std::vector<std::shared_ptr<Intersectable>> &objects) const;
         };
 
     }

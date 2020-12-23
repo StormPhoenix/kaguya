@@ -10,12 +10,12 @@
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/Geometry.h>
 #include <kaguya/Config.h>
-#include <kaguya/scene/Box.h>
+#include <kaguya/scene/aggregation/Box.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/accumulation/BVH.h>
 #include <kaguya/scene/meta/Sphere.h>
 #include <kaguya/scene/meta/Wall.h>
-#include <kaguya/scene/meta/TriangleMesh.h>
+#include <kaguya/scene/aggregation/TriangleMesh.h>
 #include <kaguya/material/Dielectric.h>
 #include <kaguya/material/Lambertian.h>
 #include <kaguya/material/Metal.h>
@@ -43,6 +43,7 @@ namespace kaguya {
 #ifdef TEST_SCENE
 
         float *Scene::testSmokeData() {
+            std::cout << "load smoke data ... " << std::endl;
             float density;
             float maxDensity = 0;
             long gridCount = 0;
@@ -58,17 +59,18 @@ namespace kaguya {
                 p++;
             }
             fr.close();
-            std::cout << "max density: " << maxDensity << " grid count: " << gridCount << std::endl;
-            std::cout << "pre-defined grid count: " << gridx * gridy * gridz << std::endl;
+            std::cout << "  max density: " << maxDensity << std::endl
+                      << "  grid count: " << gridCount << std::endl
+                      << "completed!" << std::endl;
 
             return smokeData;
         }
 
-        std::shared_ptr<Shape>
+        std::shared_ptr<Geometry>
         Scene::testLeftWall(const std::shared_ptr<Material> material,
                             const std::shared_ptr<Medium> insideMedium,
                             const std::shared_ptr<Medium> outsideMedium) {
-            std::shared_ptr<Shape> leftWallShape = std::make_shared<YZWall>(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
+            std::shared_ptr<Shape> leftWallShape = std::make_shared<meta::YZWall>(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
                                                                             -0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
                                                                             -0.5 * MODEL_SCALE, true);
             std::shared_ptr<Geometry> leftWall = std::make_shared<Geometry>(leftWallShape, material,
@@ -76,10 +78,10 @@ namespace kaguya {
             return leftWall;
         }
 
-        std::shared_ptr<Shape> Scene::testRightWall(const std::shared_ptr<Material> material,
-                                                    const std::shared_ptr<Medium> insideMedium,
-                                                    const std::shared_ptr<Medium> outsideMedium) {
-            std::shared_ptr<Shape> wallShape = std::make_shared<YZWall>(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
+        std::shared_ptr<Geometry> Scene::testRightWall(const std::shared_ptr<Material> material,
+                                                       const std::shared_ptr<Medium> insideMedium,
+                                                       const std::shared_ptr<Medium> outsideMedium) {
+            std::shared_ptr<Shape> wallShape = std::make_shared<meta::YZWall>(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
                                                                         -0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
                                                                         0.5 * MODEL_SCALE, false);
             std::shared_ptr<Geometry> wall = std::make_shared<Geometry>(wallShape, material,
@@ -87,10 +89,10 @@ namespace kaguya {
             return wall;
         }
 
-        std::shared_ptr<Shape> Scene::testBottomWall(const std::shared_ptr<Material> material,
-                                                     const std::shared_ptr<Medium> insideMedium,
-                                                     const std::shared_ptr<Medium> outsideMedium) {
-            std::shared_ptr<Shape> wallShape = std::make_shared<ZXWall>(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
+        std::shared_ptr<Geometry> Scene::testBottomWall(const std::shared_ptr<Material> material,
+                                                        const std::shared_ptr<Medium> insideMedium,
+                                                        const std::shared_ptr<Medium> outsideMedium) {
+            std::shared_ptr<Shape> wallShape = std::make_shared<meta::ZXWall>(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
                                                                         -0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
                                                                         -0.5 * MODEL_SCALE, true);
 
@@ -99,10 +101,10 @@ namespace kaguya {
             return wall;
         }
 
-        std::shared_ptr<Shape> Scene::testTopWall(const std::shared_ptr<Material> material,
-                                                  const std::shared_ptr<Medium> insideMedium,
-                                                  const std::shared_ptr<Medium> outsideMedium) {
-            std::shared_ptr<Shape> wallShape = std::make_shared<ZXWall>(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
+        std::shared_ptr<Geometry> Scene::testTopWall(const std::shared_ptr<Material> material,
+                                                     const std::shared_ptr<Medium> insideMedium,
+                                                     const std::shared_ptr<Medium> outsideMedium) {
+            std::shared_ptr<Shape> wallShape = std::make_shared<meta::ZXWall>(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
                                                                         -0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
                                                                         0.5 * MODEL_SCALE, false);
 
@@ -111,10 +113,10 @@ namespace kaguya {
             return wall;
         }
 
-        std::shared_ptr<Shape> Scene::testFrontWall(const std::shared_ptr<Material> material,
-                                                    const std::shared_ptr<Medium> insideMedium,
-                                                    const std::shared_ptr<Medium> outsideMedium) {
-            std::shared_ptr<Shape> wallShape = std::make_shared<XYWall>(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
+        std::shared_ptr<Geometry> Scene::testFrontWall(const std::shared_ptr<Material> material,
+                                                       const std::shared_ptr<Medium> insideMedium,
+                                                       const std::shared_ptr<Medium> outsideMedium) {
+            std::shared_ptr<Shape> wallShape = std::make_shared<meta::XYWall>(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
                                                                         -0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE,
                                                                         -0.5 * MODEL_SCALE, false);
 
@@ -124,20 +126,18 @@ namespace kaguya {
         }
 
 
-        std::shared_ptr<Shape> Scene::testBunny(const std::shared_ptr<Material> material,
-                                                const std::shared_ptr<Medium> inside,
-                                                const std::shared_ptr<Medium> outside,
-                                                const std::shared_ptr<AreaLight> areaLight) {
+        std::shared_ptr<Aggregation> Scene::testBunny(const std::shared_ptr<Material> material,
+                                                      const std::shared_ptr<Medium> inside,
+                                                      const std::shared_ptr<Medium> outside,
+                                                      const std::shared_ptr<AreaLight> areaLight) {
             std::vector<Vertex> bunnyVertexes = kaguya::utils::ObjLoader::loadModel("./resource/objects/bunny.obj");
 
             std::shared_ptr<Matrix4> transformMatrix = std::make_shared<Matrix4>(1.0f);
             double scale = 0.4 * MODEL_SCALE;
             *transformMatrix = TRANSLATE(*transformMatrix, Vector3(0, -scale / 1.2, 0));
             *transformMatrix = SCALE(*transformMatrix, Vector3(scale, scale, scale));
-            std::shared_ptr<Shape> bunnyShape = std::static_pointer_cast<Shape>(
-                    std::make_shared<TriangleMesh>(bunnyVertexes, transformMatrix));
-            std::shared_ptr<Geometry> bunny = std::make_shared<Geometry>(bunnyShape, material, inside, outside,
-                                                                         areaLight);
+            std::shared_ptr<Aggregation> bunny = std::make_shared<TriangleMesh>(bunnyVertexes, material, inside, outside,
+                                                                            areaLight, transformMatrix);
             return bunny;
         }
 
@@ -224,25 +224,27 @@ namespace kaguya {
             // smoke data
             std::shared_ptr<Matrix4> transformMatrix = std::make_shared<Matrix4>(1.0f);
             double scale = 0.6 * MODEL_SCALE;
-            *transformMatrix = TRANSLATE(*transformMatrix, Vector3(-scale * 0.5, -MODEL_SCALE * 0.5 + 0.0001, -scale * 0.5));
+            *transformMatrix = TRANSLATE(*transformMatrix,
+                                         Vector3(-scale * 0.6, -MODEL_SCALE * 0.5 + 0.0001, -scale * 0.5));
             *transformMatrix = SCALE(*transformMatrix, Vector3(scale * 1.2, MODEL_SCALE * 0.90, scale * 1.2));
 
             float *smoke = testSmokeData();
-            std::shared_ptr<Medium> smokeMedium = std::make_shared<GridDensityMedium>(0.002, 2.3, 0, gridx, gridy, gridz,
+            std::shared_ptr<Medium> smokeMedium = std::make_shared<GridDensityMedium>(0.002, 2.3, 0, gridx, gridy,
+                                                                                      gridz,
                                                                                       smoke, transformMatrix);
 
             // tiny box wrap smoke
             Box smokeWrapper = Box(nullptr, smokeMedium, airMedium, transformMatrix);
 
             // walls
-            std::shared_ptr<Shape> leftWall = testLeftWall(lambertLeft, airMedium, airMedium);
-            std::shared_ptr<Shape> rightWall = testRightWall(lambertRight, airMedium, airMedium);
-            std::shared_ptr<Shape> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
-            std::shared_ptr<Shape> topWall = testTopWall(lambertTop, airMedium, airMedium);
-            std::shared_ptr<Shape> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
+            std::shared_ptr<Geometry> leftWall = testLeftWall(lambertLeft, airMedium, airMedium);
+            std::shared_ptr<Geometry> rightWall = testRightWall(lambertRight, airMedium, airMedium);
+            std::shared_ptr<Geometry> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
+            std::shared_ptr<Geometry> topWall = testTopWall(lambertTop, airMedium, airMedium);
+            std::shared_ptr<Geometry> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
 
             // light
-            std::shared_ptr<Shape> lightWallShape = std::make_shared<ZXWall>(-0.2 * MODEL_SCALE,
+            std::shared_ptr<Shape> lightWallShape = std::make_shared<meta::ZXWall>(-0.2 * MODEL_SCALE,
                                                                              0.2 * MODEL_SCALE,
                                                                              -0.2 * MODEL_SCALE,
                                                                              0.2 * MODEL_SCALE,
@@ -259,9 +261,9 @@ namespace kaguya {
             scene->_light = light;
 
             // objects
-            std::vector<std::shared_ptr<Shape>> objects;
+            std::vector<std::shared_ptr<Intersectable>> objects;
 
-            std::vector<std::shared_ptr<Shape>> boxes = smokeWrapper.aggregation();
+            std::vector<std::shared_ptr<Intersectable>> boxes = smokeWrapper.aggregation();
             objects.insert(objects.end(), boxes.begin(), boxes.end());
 
             objects.push_back(leftWall);
@@ -271,13 +273,8 @@ namespace kaguya {
             objects.push_back(frontWall);
             objects.push_back(lightWall);
 
-            // 给所有 object 赋予 id
-            for (long long id = 0; id < objects.size(); id++) {
-                objects[id]->setId(id);
-            }
-
             // scene
-            std::shared_ptr<Shape> bvh = std::make_shared<BVH>(objects);
+            std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);
             scene->_world = bvh;
 
             // build camera
@@ -287,7 +284,7 @@ namespace kaguya {
             camera->setResolutionWidth(Config::resolutionWidth);
             camera->setResolutionHeight(Config::resolutionHeight);
             scene->_camera = camera;
-            scene->_sceneName = "two-spheres-with-area-light";
+            scene->_sceneName = "smoke-with-area-light";
 
             return scene;
         }
@@ -363,14 +360,14 @@ namespace kaguya {
             std::shared_ptr<Medium> airMedium = testAirMedium();
 
             // walls
-            std::shared_ptr<Shape> leftWall = testLeftWall(lambertLeft, airMedium, airMedium);
-            std::shared_ptr<Shape> rightWall = testRightWall(lambertRight, airMedium, airMedium);
-            std::shared_ptr<Shape> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
-            std::shared_ptr<Shape> topWall = testTopWall(lambertTop, airMedium, airMedium);
-            std::shared_ptr<Shape> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
+            std::shared_ptr<Intersectable> leftWall = testLeftWall(lambertLeft, airMedium, airMedium);
+            std::shared_ptr<Intersectable> rightWall = testRightWall(lambertRight, airMedium, airMedium);
+            std::shared_ptr<Intersectable> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
+            std::shared_ptr<Intersectable> topWall = testTopWall(lambertTop, airMedium, airMedium);
+            std::shared_ptr<Intersectable> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
 
             // load model
-            std::shared_ptr<Shape> bunny = testBunny(glass, nullptr, airMedium, nullptr);
+            std::shared_ptr<Intersectable> bunny = testBunny(glass, nullptr, airMedium, nullptr);
 
             // build scene object
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
@@ -382,7 +379,7 @@ namespace kaguya {
             scene->_light = light;
 
             // objects
-            std::vector<std::shared_ptr<Shape>> objects;
+            std::vector<std::shared_ptr<Intersectable>> objects;
             objects.push_back(leftWall);
             objects.push_back(rightWall);
             objects.push_back(bottomWall);
@@ -390,13 +387,8 @@ namespace kaguya {
             objects.push_back(frontWall);
             objects.push_back(bunny);
 
-            // 给所有 object 赋予 id
-            for (long long id = 0; id < objects.size(); id++) {
-                objects[id]->setId(id);
-            }
-
             // scene
-            std::shared_ptr<Shape> bvh = std::make_shared<BVH>(objects);
+            std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);
             scene->_world = bvh;
 
             // build camera
@@ -487,18 +479,18 @@ namespace kaguya {
 //            std::shared_ptr<Medium> airMedium = testAirMedium();
             std::shared_ptr<Medium> airMedium = nullptr;
             // walls
-            std::shared_ptr<Shape> leftWall = testLeftWall(lambertLeft, airMedium, airMedium);
-            std::shared_ptr<Shape> rightWall = testRightWall(lambertRight, airMedium, airMedium);
-            std::shared_ptr<Shape> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
-            std::shared_ptr<Shape> topWall = testTopWall(lambertTop, airMedium, airMedium);
-            std::shared_ptr<Shape> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
+            std::shared_ptr<Intersectable> leftWall = testLeftWall(lambertLeft, airMedium, airMedium);
+            std::shared_ptr<Intersectable> rightWall = testRightWall(lambertRight, airMedium, airMedium);
+            std::shared_ptr<Intersectable> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
+            std::shared_ptr<Intersectable> topWall = testTopWall(lambertTop, airMedium, airMedium);
+            std::shared_ptr<Intersectable> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
 
             // load model
-            std::shared_ptr<Shape> bunny = testBunny(glass, nullptr, airMedium, nullptr);
+            std::shared_ptr<Intersectable> bunny = testBunny(glass, nullptr, airMedium, nullptr);
 
 
             // light
-            std::shared_ptr<Shape> lightWallShape = std::make_shared<ZXWall>(-0.2 * MODEL_SCALE,
+            std::shared_ptr<Shape> lightWallShape = std::make_shared<meta::ZXWall>(-0.2 * MODEL_SCALE,
                                                                              0.2 * MODEL_SCALE,
                                                                              -0.2 * MODEL_SCALE,
                                                                              0.2 * MODEL_SCALE,
@@ -515,7 +507,7 @@ namespace kaguya {
             scene->_light = light;
 
             // objects
-            std::vector<std::shared_ptr<Shape>> objects;
+            std::vector<std::shared_ptr<Intersectable>> objects;
             objects.push_back(leftWall);
             objects.push_back(rightWall);
             objects.push_back(bottomWall);
@@ -524,13 +516,8 @@ namespace kaguya {
             objects.push_back(lightWall);
             objects.push_back(bunny);
 
-            // 给所有 object 赋予 id
-            for (long long id = 0; id < objects.size(); id++) {
-                objects[id]->setId(id);
-            }
-
             // scene
-            std::shared_ptr<Shape> bvh = std::make_shared<BVH>(objects);
+            std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);
             scene->_world = bvh;
 
             // build camera
@@ -614,24 +601,24 @@ namespace kaguya {
             std::shared_ptr<Medium> airMedium = nullptr;
 
             // walls
-            std::shared_ptr<Shape> leftWall = testLeftWall(lambertLeft, airMedium, airMedium);
-            std::shared_ptr<Shape> rightWall = testRightWall(lambertRight, airMedium, airMedium);
-            std::shared_ptr<Shape> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
-            std::shared_ptr<Shape> topWall = testTopWall(lambertTop, airMedium, airMedium);
-            std::shared_ptr<Shape> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
+            std::shared_ptr<Intersectable> leftWall = testLeftWall(lambertLeft, airMedium, airMedium);
+            std::shared_ptr<Intersectable> rightWall = testRightWall(lambertRight, airMedium, airMedium);
+            std::shared_ptr<Intersectable> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
+            std::shared_ptr<Intersectable> topWall = testTopWall(lambertTop, airMedium, airMedium);
+            std::shared_ptr<Intersectable> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
 
-            std::shared_ptr<Shape> glassSphereShape = std::make_shared<Sphere>(
+            std::shared_ptr<Shape> glassSphereShape = std::make_shared<meta::Sphere>(
                     Vector3(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
             std::shared_ptr<Geometry> glassSphere = std::make_shared<Geometry>(glassSphereShape, glass,
                                                                                nullptr, airMedium);
 
-            std::shared_ptr<Shape> metalSphereShape = std::make_shared<Sphere>(
+            std::shared_ptr<Shape> metalSphereShape = std::make_shared<meta::Sphere>(
                     Vector3(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE);
             std::shared_ptr<Geometry> metalSphere = std::make_shared<Geometry>(metalSphereShape, metal,
                                                                                nullptr, airMedium);
 
             // light
-            std::shared_ptr<Shape> lightWallShape = std::make_shared<ZXWall>(-0.2 * MODEL_SCALE,
+            std::shared_ptr<Shape> lightWallShape = std::make_shared<meta::ZXWall>(-0.2 * MODEL_SCALE,
                                                                              0.2 * MODEL_SCALE,
                                                                              -0.2 * MODEL_SCALE,
                                                                              0.2 * MODEL_SCALE,
@@ -642,7 +629,7 @@ namespace kaguya {
             // build area light
             std::shared_ptr<AreaLight> light = testDiffuseAreaLight(areaLightSpectrum, lightWall, airMedium, airMedium, true);
 
-            std::shared_ptr<Shape> mediumSphereShape = std::make_shared<Sphere>(
+            std::shared_ptr<Shape> mediumSphereShape = std::make_shared<meta::Sphere>(
                     Vector3(0 * MODEL_SCALE, 0 * MODEL_SCALE, 0 * MODEL_SCALE), 0.1 * MODEL_SCALE);
             std::shared_ptr<Medium> smokeMedium = testSmokeMedium();
 
@@ -653,7 +640,7 @@ namespace kaguya {
             scene->_light = light;
 
             // objects
-            std::vector<std::shared_ptr<Shape>> objects;
+            std::vector<std::shared_ptr<Intersectable>> objects;
             objects.push_back(leftWall);
             objects.push_back(rightWall);
             objects.push_back(bottomWall);
@@ -664,13 +651,8 @@ namespace kaguya {
             objects.push_back(metalSphere);
             objects.push_back(mediumSphere);
 
-            // 给所有 object 赋予 id
-            for (long long id = 0; id < objects.size(); id++) {
-                objects[id]->setId(id);
-            }
-
             // scene
-            std::shared_ptr<Shape> bvh = std::make_shared<BVH>(objects);
+            std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);
             scene->_world = bvh;
 
             // build camera
@@ -759,19 +741,19 @@ namespace kaguya {
             std::shared_ptr<Medium> airMedium = testAirMedium();
 
             // walls
-            std::shared_ptr<Shape> leftWall = testLeftWall(lambertLeft, airMedium, airMedium);
-            std::shared_ptr<Shape> rightWall = testRightWall(lambertRight, airMedium, airMedium);
-            std::shared_ptr<Shape> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
-            std::shared_ptr<Shape> topWall = testTopWall(lambertTop, airMedium, airMedium);
-            std::shared_ptr<Shape> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
+            std::shared_ptr<Intersectable> leftWall = testLeftWall(lambertLeft, airMedium, airMedium);
+            std::shared_ptr<Intersectable> rightWall = testRightWall(lambertRight, airMedium, airMedium);
+            std::shared_ptr<Intersectable> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
+            std::shared_ptr<Intersectable> topWall = testTopWall(lambertTop, airMedium, airMedium);
+            std::shared_ptr<Intersectable> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
 
-            std::shared_ptr<Shape> glassSphereShape = std::make_shared<Sphere>(
+            std::shared_ptr<Shape> glassSphereShape = std::make_shared<meta::Sphere>(
                     Vector3(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
             std::shared_ptr<Geometry> glassSphere = std::make_shared<Geometry>(glassSphereShape, glass,
                                                                                nullptr, airMedium);
 
 
-            std::shared_ptr<Shape> metalSphereShape = std::make_shared<Sphere>(
+            std::shared_ptr<Shape> metalSphereShape = std::make_shared<meta::Sphere>(
                     Vector3(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE);
             std::shared_ptr<Geometry> metalSphere = std::make_shared<Geometry>(metalSphereShape, metal,
                                                                                nullptr, airMedium);
@@ -787,7 +769,7 @@ namespace kaguya {
             scene->_light = light;
 
             // objects
-            std::vector<std::shared_ptr<Shape>> objects;
+            std::vector<std::shared_ptr<Intersectable>> objects;
             objects.push_back(leftWall);
             objects.push_back(rightWall);
             objects.push_back(bottomWall);
@@ -796,13 +778,8 @@ namespace kaguya {
             objects.push_back(glassSphere);
             objects.push_back(metalSphere);
 
-            // 给所有 object 赋予 id
-            for (long long id = 0; id < objects.size(); id++) {
-                objects[id]->setId(id);
-            }
-
             // scene
-            std::shared_ptr<Shape> bvh = std::make_shared<BVH>(objects);
+            std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);
             scene->_world = bvh;
 
             // build camera
@@ -885,18 +862,18 @@ namespace kaguya {
             std::shared_ptr<Medium> airMedium = testAirMedium();
 
             // walls
-            std::shared_ptr<Shape> leftWall = testLeftWall(lambertLeft, airMedium, airMedium);
-            std::shared_ptr<Shape> rightWall = testRightWall(lambertRight, airMedium, airMedium);
-            std::shared_ptr<Shape> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
-            std::shared_ptr<Shape> topWall = testTopWall(lambertTop, airMedium, airMedium);
-            std::shared_ptr<Shape> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
+            std::shared_ptr<Intersectable> leftWall = testLeftWall(lambertLeft, airMedium, airMedium);
+            std::shared_ptr<Intersectable> rightWall = testRightWall(lambertRight, airMedium, airMedium);
+            std::shared_ptr<Intersectable> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
+            std::shared_ptr<Intersectable> topWall = testTopWall(lambertTop, airMedium, airMedium);
+            std::shared_ptr<Intersectable> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
 
-            std::shared_ptr<Shape> glassSphereShape = std::make_shared<Sphere>(
+            std::shared_ptr<Shape> glassSphereShape = std::make_shared<meta::Sphere>(
                     Vector3(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
             std::shared_ptr<Geometry> glassSphere = std::make_shared<Geometry>(glassSphereShape, glass,
                                                                                nullptr, airMedium);
 
-            std::shared_ptr<Shape> metalSphereShape = std::make_shared<Sphere>(
+            std::shared_ptr<Shape> metalSphereShape = std::make_shared<meta::Sphere>(
                     Vector3(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE);
             std::shared_ptr<Geometry> metalSphere = std::make_shared<Geometry>(metalSphereShape, metal,
                                                                                nullptr, airMedium);
@@ -910,7 +887,7 @@ namespace kaguya {
                     MediumBound(airMedium.get(), airMedium.get()));
             scene->_light = light;
             // objects
-            std::vector<std::shared_ptr<Shape>> objects;
+            std::vector<std::shared_ptr<Intersectable>> objects;
             objects.push_back(leftWall);
             objects.push_back(rightWall);
             objects.push_back(bottomWall);
@@ -919,13 +896,8 @@ namespace kaguya {
             objects.push_back(glassSphere);
             objects.push_back(metalSphere);
 
-            // 给所有 object 赋予 id
-            for (long long id = 0; id < objects.size(); id++) {
-                objects[id]->setId(id);
-            }
-
             // scene
-            std::shared_ptr<Shape> bvh = std::make_shared<BVH>(objects);
+            std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);
             scene->_world = bvh;
 
             // build camera
@@ -941,7 +913,7 @@ namespace kaguya {
         }
 
         bool Scene::intersect(Ray &ray, SurfaceInteraction &si) {
-            return _world->insect(ray, si, ray.getMinStep(), ray.getStep());
+            return _world->intersect(ray, si, ray.getMinStep(), ray.getStep());
         }
 
         bool Scene::intersectWithMedium(Ray &ray, SurfaceInteraction &si, core::Spectrum &transmittance,

@@ -16,7 +16,7 @@ namespace kaguya {
         class DiffuseAreaLight : public AreaLight {
         public:
             DiffuseAreaLight(const Spectrum &intensity,
-                             std::shared_ptr<Shape> shape,
+                             std::shared_ptr<Geometry> shape,
                              const MediumBound &mediumBoundary,
                              bool singleSide = true);
 
