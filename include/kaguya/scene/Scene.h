@@ -34,7 +34,7 @@ using namespace kaguya::core;
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
 using kaguya::core::Spectrum;
-const int MODEL_SCALE = 5;
+const int MODEL_SCALE = 50;
 
 // smoke data
 const int gridz = 192;
@@ -44,6 +44,8 @@ const int gridx = 192;
 const std::string path = "./resource/volume/density_big_0084.pbrt";
 
 #endif
+
+#include <vector>
 
 namespace kaguya {
     namespace core {
@@ -81,17 +83,18 @@ namespace kaguya {
                 return std::make_shared<IsotropicMedium>(0.00001, 0.1, 0);
             }
 
-            static std::shared_ptr<Geometry> testLeftWall(const std::shared_ptr<Material> material,
-                                                       const std::shared_ptr<Medium> insideMedium,
-                                                       const std::shared_ptr<Medium> outsideMedium);
+            static std::vector<std::shared_ptr<Geometry>>
+            testLeftWall(const std::shared_ptr<Material> material,
+                         const std::shared_ptr<Medium> insideMedium,
+                         const std::shared_ptr<Medium> outsideMedium);
 
             static std::shared_ptr<Geometry> testRightWall(const std::shared_ptr<Material> material,
-                                                        const std::shared_ptr<Medium> insideMedium,
-                                                        const std::shared_ptr<Medium> outsideMedium);
+                                                           const std::shared_ptr<Medium> insideMedium,
+                                                           const std::shared_ptr<Medium> outsideMedium);
 
             static std::shared_ptr<Geometry> testBottomWall(const std::shared_ptr<Material> material,
-                                                         const std::shared_ptr<Medium> insideMedium,
-                                                         const std::shared_ptr<Medium> outsideMedium);
+                                                            const std::shared_ptr<Medium> insideMedium,
+                                                            const std::shared_ptr<Medium> outsideMedium);
 
             static std::shared_ptr<Geometry> testTopWall(const std::shared_ptr<Material> material,
                                                       const std::shared_ptr<Medium> insideMedium,

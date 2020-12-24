@@ -89,45 +89,103 @@ namespace kaguya {
             bool Triangle::intersect(Ray &ray, SurfaceInteraction &si,
                                      double minStep, double maxStep) const {
 
-                const Vector3 &dir = ray.getDirection();
-                const Vector3 &eye = Vector3(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
-                Matrix3 equationParam(Vector3(_transformedPosition1 - _transformedPosition2),
-                                      Vector3(_transformedPosition1 - _transformedPosition3),
-                                      dir);
+                /* transform the ray direction, let it to point to z-axis */
+                // move ray's origin to (0, 0, 0)
+                Vector3 p0 = _transformedPosition1 - ray.getOrigin();
+                Vector3 p1 = _transformedPosition2 - ray.getOrigin();
+                Vector3 p2 = _transformedPosition3 - ray.getOrigin();
 
-                if (abs(DETERMINANT(equationParam)) < EPSILON) {
+                // swap axis
+                int zAxis = maxAbsAxis(ray.getDirection());
+                int xAxis = zAxis + 1 == 3 ? 0 : zAxis + 1;
+                int yAxis = xAxis + 1 == 3 ? 0 : xAxis + 1;
+
+                Vector3 dir = swapAxis(ray.getDirection(), xAxis, yAxis, zAxis);
+                p0 = swapAxis(p0, xAxis, yAxis, zAxis);
+                p1 = swapAxis(p1, xAxis, yAxis, zAxis);
+                p2 = swapAxis(p2, xAxis, yAxis, zAxis);
+
+                // shear direction to z-axis
+                double shearX = -dir[0] / dir[2];
+                double shearY = -dir[1] / dir[2];
+
+                p0[0] += shearX * p0[2];
+                p0[1] += shearY * p0[2];
+
+                p1[0] += shearX * p1[2];
+                p1[1] += shearY * p1[2];
+
+                p2[0] += shearX * p2[2];
+                p2[1] += shearY * p2[2];
+
+                // calculate barycentric
+                double e0 = p1.y * p0.x - p1.x * p0.y;
+                double e1 = p2.y * p1.x - p2.x * p1.y;
+                double e2 = p0.y * p2.x - p0.x * p2.y;
+
+                if ((e0 > 0 || e1 > 0 || e2 > 0) && (e0 < 0 || e1 < 0 || e2 < 0)) {
+                    // intersection point doesn't fall in triangle area.
                     return false;
                 }
 
-                Vector3 equationResult = _transformedPosition1 - eye;
-                Vector3 ans = INVERSE(equationParam) * equationResult;
-                double step = ans[2];
-                double alpha = 1 - ans[0] - ans[1];
-
-                // 检查射线范围、击中点是否在三角形内部
-                if (step < maxStep &&
-                    step > minStep &&
-                    checkRange(alpha, 0, 1) &&
-                    checkRange(ans[0], 0, 1) &&
-                    checkRange(ans[1], 0, 1)) {
-
-                    Vector3 factor = Vector3(alpha, ans[0], ans[1]);
-
-                    ray.setStep(step);
-                    si.setPoint(ray.at(step));
-
-                    Vector3 normal = alpha * _transformedNormal1 +
-                                     ans[0] * _transformedNormal2 +
-                                     ans[1] * _transformedNormal3;
-
-                    si.setOutwardNormal(normal, dir);
-                    si.setU(DOT(factor, Vector3(_uv1.x, _uv2.x, _uv3.x)));
-                    si.setV(DOT(factor, Vector3(_uv1.y, _uv2.y, _uv3.y)));
-                    si.setAreaLight(nullptr);
-                    return true;
-                } else {
+                double sum = e0 + e1 + e2;
+                if (sum == 0) {
                     return false;
                 }
+
+                // interpolate step * sum
+                double shearZ = 1 / dir[2];
+                p0[2] *= shearZ;
+                p1[2] *= shearZ;
+                p2[2] *= shearZ;
+                double sumMulStep = e0 * p2.z + e1 * p0.z + e2 * p1.z;
+
+                // make sure step > 0 and step < t_max
+                if (sum > 0 && (sumMulStep <= 0 || sumMulStep >= sum * maxStep)) {
+                    return false;
+                } else if (sum < 0 && (sumMulStep >= 0 || sumMulStep <= sum * maxStep)) {
+                    return false;
+                }
+
+                double invSum = 1. / sum;
+                double step = sumMulStep * invSum;
+                double b0 = e0 * invSum;
+                double b1 = e1 * invSum;
+                double b2 = e2 * invSum;
+
+                // calculate float-error
+                double zError = gamma(7) * (std::abs(b0 * p2.z) + std::abs(b1 * p0.z) + std::abs(b2 * p1.z));
+                double xError = gamma(7) * (std::abs(b0 * p2.x) + std::abs(b1 * p0.x) + std::abs(b2 * p1.x));
+                double yError = gamma(7) * (std::abs(b0 * p2.y) + std::abs(b1 * p0.y) + std::abs(b2 * p1.y));
+                Vector3 error = Vector3(xError, yError, zError);
+
+                ray.setStep(step);
+                si.setPoint(ray.at(step));
+
+                Vector3 normal = b0 * _transformedNormal3 +
+                                 b1 * _transformedNormal1 +
+                                 b2 * _transformedNormal2;
+
+                si.setOutwardNormal(normal, ray.getDirection());
+                si.setU(_uv1.x * b1 + _uv2.x * b2 + _uv3.x * b0);
+                si.setV(_uv1.y * b1 + _uv2.y * b2 + _uv3.y * b0);
+                si.setError(error);
+                si.setAreaLight(nullptr);
+                return true;
+
+                /**
+                if ((sum > 0 && sumMulStep <= 0) || (sum < 0 && sumMulStep >= 0)) {
+                    return false;
+                }
+
+                // make sure step < t_max
+                if (sum > 0 && sumMulStep > sum * maxStep) {
+                    return false;
+                }
+
+                if (sum < 0 && sumMulStep < sum * maxStep) {
+                    return false;
+                }*/
             }
 
             double Triangle::area() const {

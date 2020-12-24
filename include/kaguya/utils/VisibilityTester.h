@@ -50,9 +50,6 @@ namespace kaguya {
             }
 
         private:
-            bool pointMatch(const Vector3 &a, const Vector3 &b);
-
-        private:
             Interaction _start;
             Interaction _end;
             double _step;

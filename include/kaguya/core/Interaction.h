@@ -33,6 +33,10 @@ namespace kaguya {
         using kaguya::material::Material;
         using kaguya::memory::MemoryArena;
 
+        inline Vector3 offsetOrigin(const Vector3 &origin, const Vector3 &error,
+                                    const Vector3 &normal, const Vector3 &direction);
+
+
         /**
         * Ray 与 Scene 的交点记录
         */
@@ -55,6 +59,10 @@ namespace kaguya {
                 return _normal;
             }
 
+            const Vector3 getError() const {
+                return _error;
+            }
+
             void setNormal(const Vector3 &normal) {
                 _normal = normal;
             }
@@ -69,6 +77,10 @@ namespace kaguya {
 
             void setPoint(const Vector3 &point) {
                 _point = point;
+            }
+
+            void setError(const Vector3 &error) {
+                _error = error;
             }
 
             /**
@@ -105,13 +117,13 @@ namespace kaguya {
             // 击中点
             Vector3 _point;
             // 击中点法线方向，发现永远指向物体表面外侧
-            Vector3 _normal;
+            Vector3 _normal = Vector3(0., 0., 0.);
             // 击中材质种类
             Material *_material = nullptr;
-            // 击中物体的 ID
-            long long _id = -1;
             // medium boundary
             MediumBound _mediumBoundary;
+            // Error range
+            Vector3 _error = Vector3(0., 0., 0.);
         };
 
         /**
@@ -182,7 +194,7 @@ namespace kaguya {
             AreaLight *_areaLight = nullptr;
         };
 
-        using kaguya::core::medium::Medium;
+        using medium::Medium;
 
         class MediumInteraction : public Interaction {
         public:

@@ -47,10 +47,7 @@ namespace kaguya {
                 return _step;
             }
 
-            void setStep(double step) {
-                assert(step > _minStep);
-                _step = step;
-            }
+            void setStep(double step);
 
             const Vector3 at(double step) const;
 

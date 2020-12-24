@@ -9,6 +9,36 @@
 namespace kaguya {
     namespace core {
 
+        Vector3 offsetOrigin(const Vector3 &origin, const Vector3 &error,
+                             const Vector3 &normal, const Vector3 &direction) {
+            double dist = DOT(ABS(normal), error);
+            Vector3 offset = dist * normal;
+            if (DOT(normal, direction) < 0) {
+                offset = -offset;
+            }
+
+            Vector3 o = origin + offset;
+
+            for (int i = 0; i < 3; i++) {
+                if (offset[i] > 0) {
+                    o[i] = doubleUp(o[i]);
+                } else if (offset[i] < 0) {
+                    o[i] = doubleDown(o[i]);
+                }
+            }
+
+            return o;
+
+            // Round offset point _po_ away from _p_
+//            for (int i = 0; i < 3; ++i) {
+//                if (offset[i] > 0)
+//                    po[i] = NextFloatUp(po[i]);
+//                else if (offset[i] < 0)
+//                    po[i] = NextFloatDown(po[i]);
+//            }
+//            return po;
+        }
+
         using kaguya::material::Material;
 
         Interaction::Interaction(const Vector3 &point,
@@ -22,18 +52,23 @@ namespace kaguya {
             // check whether the ray direction is point to outside or inside
             const medium::Medium *medium = (DOT(dir, _normal) > 0 ?
                                             _mediumBoundary.outside() : _mediumBoundary.inside());
-            return Ray(_point, NORMALIZE(dir), medium);
+            Vector3 origin = offsetOrigin(_point, _error, _normal, dir);
+            return Ray(origin, NORMALIZE(dir), medium);
         }
 
         Ray Interaction::sendRayTo(const Interaction &it) const {
-            const Vector3 dir = (it._point - _point);
+            // check whether the ray direction is point to outside or inside
+            Vector3 origin = offsetOrigin(_point, _error, _normal, _direction);
+            Vector3 target = offsetOrigin(it.getPoint(), it.getError(), it.getNormal(), it.getDirection());
+
+            const Vector3 dir = (target - origin);
+            const medium::Medium *medium = (DOT(dir, _normal) > 0 ?
+                                            _mediumBoundary.outside() : _mediumBoundary.inside());
+
             double step = LENGTH(dir);
             assert(step > 0);
 
-            // check whether the ray direction is point to outside or inside
-            const medium::Medium *medium = (DOT(dir, _normal) > 0 ?
-                                            _mediumBoundary.outside() : _mediumBoundary.inside());
-            Ray ray = Ray(_point, NORMALIZE(dir), medium);
+            Ray ray = Ray(origin, NORMALIZE(dir), medium);
             ray.setStep(step);
             return ray;
         }

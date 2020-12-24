@@ -23,12 +23,16 @@ using Vector4 = glm::dvec4;
 using Matrix4 = glm::dmat4x4;
 using Matrix3 = glm::dmat3x3;
 
+typedef Vector3 Normal3;
+typedef Vector3 Point3;
+
 using kaguya::math::random::Sampler1D;
 
 typedef Vector2 Point2d;
 
 const double maxDouble = std::numeric_limits<double>::max();
 const double infinity = std::numeric_limits<double>::infinity();
+constexpr double epsilon = std::numeric_limits<float>::epsilon() * 0.5;
 const double PI = 3.1415926535897932385;
 const double INV_PI = 1.0 / PI;
 const double INV_4PI = 1.0 / (4 * PI);
@@ -42,6 +46,7 @@ const double REFRACTION_INDEX_WATER = 1.0f;
 #define INVERSE_TRANSPOSE(matrix) glm::inverseTranspose(matrix)
 #define DETERMINANT(x) glm::determinant(x)
 #define DOT(x, y) glm::dot(x, y)
+#define ABS(x) glm::abs(x)
 #define ABS_DOT(x, y) std::abs(glm::dot(x, y))
 #define NORMALIZE(x) glm::normalize(x)
 #define LENGTH(x) glm::length(x)
@@ -123,6 +128,22 @@ inline int randomInt(int min, int max, const math::random::Sampler1D *const samp
     }
 }
 
+inline int maxAbsAxis(const Vector3 v) {
+    double maxValue = std::abs(v[0]);
+    int axis = 0;
+    for (int i = 1; i < 3; i++) {
+        if (std::abs(v[i]) > maxValue) {
+            maxValue = std::abs(v[i]);
+            axis = i;
+        }
+    }
+    return axis;
+}
+
+inline Vector3 swapAxis(const Vector3 v, int x, int y, int z) {
+    return Vector3(v[x], v[y], v[z]);
+}
+
 inline Vector3 reflect(const Vector3 &v, const Vector3 &normal) {
     return v - 2 * DOT(v, NORMALIZE(normal)) * normal;
 }
@@ -147,6 +168,10 @@ inline bool refract(const Vector3 &wo, const Vector3 &normal, double refraction,
     double cosineThetaT = std::sqrt(std::max(0.0, 1 - sineThetaT * sineThetaT));
     *wi = refraction * (-wo) + (refraction * cosineThetaI - cosineThetaT) * normal;
     return true;
+}
+
+inline double gamma(int n) {
+    return (n * epsilon) / (1 - n * epsilon);
 }
 
 inline double misWeight(int nSampleF, double pdfF, int nSampleG, double pdfG) {
@@ -306,6 +331,54 @@ inline Vector3 coneUniformSampling(double cosThetaMax, const Sampler1D *sampler1
  */
 inline double coneUniformSamplePdf(double cosThetaMax) {
     return 1 / (2 * PI * (1 - cosThetaMax));
+}
+
+inline uint64_t double2bits(double v) {
+    uint64_t bits;
+    memcpy(&bits, &v, sizeof(double));
+    return bits;
+}
+
+inline double bits2double(uint64_t bits) {
+    double d;
+    memcpy(&d, &bits, sizeof(uint64_t));
+    return d;
+}
+
+inline double doubleUp(double a) {
+    if (std::isinf(a) && a > 0) {
+        return a;
+    }
+
+    if (a == -0.) {
+        a = 0.;
+    }
+
+    uint64_t bits = double2bits(a);
+    if (bits >= 0) {
+        bits ++;
+    } else {
+        bits --;
+    }
+    return bits2double(bits);
+}
+
+inline double doubleDown(double a) {
+    if (std::isinf(a) && a < 0) {
+        return a;
+    }
+
+    if (a == 0.) {
+        a = -0.;
+    }
+
+    uint64_t bits = double2bits(a);
+    if (bits > 0) {
+        bits --;
+    } else {
+        bits ++;
+    }
+    return bits2double(bits);
 }
 
 #define DEGREES_TO_RADIANS(degrees) degreesToRadians(degrees)

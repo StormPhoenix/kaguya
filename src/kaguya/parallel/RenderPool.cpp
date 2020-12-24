@@ -92,7 +92,7 @@ namespace kaguya {
         }
 
         RenderPool::RenderPool(int threadCount) : _threadCount(threadCount) {
-            assert(_threadCount >= 0);
+            assert(_threadCount > 0);
 
             std::shared_ptr<Barrier> barrier = std::make_shared<Barrier>(_threadCount + 1);
             // initialize threads
