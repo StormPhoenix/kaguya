@@ -43,10 +43,16 @@ namespace kaguya {
                 if (discriminant > 0) {
                     double root = (-halfB - sqrt(discriminant)) / a;
                     if (root > minStep && root < maxStep) {
-                        si.setPoint(ray.at(root));
+                        Vector3 origin = ray.at(root);
+                        origin *= _radius / LENGTH(origin - _center);
+                        si.setPoint(origin);
                         si.setU(0);
                         si.setV(0);
                         si.setAreaLight(nullptr);
+
+                        Vector3 error = gamma(5) * ABS(origin);
+                        si.setError(error);
+
                         ray.setStep(root);
 
                         Vector3 outwardNormal = computeNormal(si.getPoint());
@@ -56,10 +62,14 @@ namespace kaguya {
 
                     root = (-halfB + sqrt(discriminant)) / a;
                     if (root > minStep && root < maxStep) {
-                        si.setPoint(ray.at(root));
+                        Vector3 origin = ray.at(root);
+                        origin *= _radius / LENGTH(origin - _center);
+                        si.setPoint(origin);
                         si.setU(0);
                         si.setV(0);
                         si.setAreaLight(nullptr);
+                        Vector3 error = gamma(5) * ABS(origin);
+                        si.setError(error);
                         ray.setStep(root);
 
                         Vector3 outwardNormal = computeNormal(si.getPoint());

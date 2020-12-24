@@ -52,7 +52,6 @@ namespace kaguya {
         private:
             Interaction _start;
             Interaction _end;
-            double _step;
         };
 
     }

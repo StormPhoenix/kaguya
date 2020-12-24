@@ -13,7 +13,6 @@ namespace kaguya {
 
         VisibilityTester::VisibilityTester(const kaguya::core::Interaction start, const kaguya::core::Interaction end) :
                 _start(start), _end(end) {
-            _step = LENGTH(_end.getPoint() - _start.getPoint());
         }
 
         bool VisibilityTester::isVisible(Scene &scene) const {

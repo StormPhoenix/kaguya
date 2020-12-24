@@ -88,26 +88,27 @@ namespace kaguya {
                          const std::shared_ptr<Medium> insideMedium,
                          const std::shared_ptr<Medium> outsideMedium);
 
-            static std::shared_ptr<Geometry> testRightWall(const std::shared_ptr<Material> material,
-                                                           const std::shared_ptr<Medium> insideMedium,
-                                                           const std::shared_ptr<Medium> outsideMedium);
+            static std::vector<std::shared_ptr<Geometry>>
+            testRightWall(const std::shared_ptr<Material> material,
+                          const std::shared_ptr<Medium> insideMedium,
+                          const std::shared_ptr<Medium> outsideMedium);
 
-            static std::shared_ptr<Geometry> testBottomWall(const std::shared_ptr<Material> material,
-                                                            const std::shared_ptr<Medium> insideMedium,
-                                                            const std::shared_ptr<Medium> outsideMedium);
+            static std::vector<std::shared_ptr<Geometry>> testBottomWall(const std::shared_ptr<Material> material,
+                                                                         const std::shared_ptr<Medium> insideMedium,
+                                                                         const std::shared_ptr<Medium> outsideMedium);
 
-            static std::shared_ptr<Geometry> testTopWall(const std::shared_ptr<Material> material,
-                                                      const std::shared_ptr<Medium> insideMedium,
-                                                      const std::shared_ptr<Medium> outsideMedium);
+            static std::vector<std::shared_ptr<Geometry>> testTopWall(const std::shared_ptr<Material> material,
+                                                                      const std::shared_ptr<Medium> insideMedium,
+                                                                      const std::shared_ptr<Medium> outsideMedium);
 
-            static std::shared_ptr<Geometry> testFrontWall(const std::shared_ptr<Material> material,
-                                                        const std::shared_ptr<Medium> insideMedium,
-                                                        const std::shared_ptr<Medium> outsideMedium);
+            static std::vector<std::shared_ptr<Geometry>> testFrontWall(const std::shared_ptr<Material> material,
+                                                                        const std::shared_ptr<Medium> insideMedium,
+                                                                        const std::shared_ptr<Medium> outsideMedium);
 
             static std::shared_ptr<Aggregation> testBunny(const std::shared_ptr<Material> material,
-                                                    const std::shared_ptr<Medium> inside = nullptr,
-                                                    const std::shared_ptr<Medium> outside = nullptr,
-                                                    const std::shared_ptr<AreaLight> areaLight = nullptr);
+                                                          const std::shared_ptr<Medium> inside = nullptr,
+                                                          const std::shared_ptr<Medium> outside = nullptr,
+                                                          const std::shared_ptr<AreaLight> areaLight = nullptr);
 
             static std::shared_ptr<AreaLight> testDiffuseAreaLight(const Spectrum &spectrum,
                                                                    const std::shared_ptr<Geometry> geometry,

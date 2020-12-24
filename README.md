@@ -16,6 +16,7 @@ A simple physically based render.
     
 - [ ] 编写实时展现渲染进度的功能。
 
+
 ## Unsolved
 - [ ] 考虑该如何设计 Ray 重的 minStep。当前问题是 Ray 的 minStep 不能为 0。如果设置成 0，就会遇到浮点误差问题。
     例如：在表面 A 向外发射射线 x，由于浮点误差 x 不在 A 的表面，而是在稍微下面一点的地方，这样导致 x 又会和表面 A 相交。
@@ -26,7 +27,8 @@ A simple physically based render.
 - [ ] Better space transformation
     - [ ] Transform class
     - [ ] Replace all occurrence.
-    
+
+- [ ] Ray direction 和 step 的关系，direction 长度可以不为 1。    
 
 - [ ] Add information for each *assert* phrase
 

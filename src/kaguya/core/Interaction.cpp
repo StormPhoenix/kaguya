@@ -58,18 +58,19 @@ namespace kaguya {
 
         Ray Interaction::sendRayTo(const Interaction &it) const {
             // check whether the ray direction is point to outside or inside
-            Vector3 origin = offsetOrigin(_point, _error, _normal, _direction);
-            Vector3 target = offsetOrigin(it.getPoint(), it.getError(), it.getNormal(), it.getDirection());
 
+            Vector3 origin = offsetOrigin(_point, _error, _normal, it.getPoint() - _point);
+            Vector3 target = offsetOrigin(it.getPoint(), it.getError(), it.getNormal(), origin - it.getPoint());
             const Vector3 dir = (target - origin);
             const medium::Medium *medium = (DOT(dir, _normal) > 0 ?
                                             _mediumBoundary.outside() : _mediumBoundary.inside());
 
-            double step = LENGTH(dir);
-            assert(step > 0);
+            // TODO delete
+//            double step = LENGTH(dir);
+//            assert(step > 0);
 
-            Ray ray = Ray(origin, NORMALIZE(dir), medium);
-            ray.setStep(step);
+            Ray ray = Ray(origin, dir, medium);
+            ray.setStep(1. - shadowEpsilon);
             return ray;
         }
 

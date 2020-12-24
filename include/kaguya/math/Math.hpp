@@ -33,6 +33,7 @@ typedef Vector2 Point2d;
 const double maxDouble = std::numeric_limits<double>::max();
 const double infinity = std::numeric_limits<double>::infinity();
 constexpr double epsilon = std::numeric_limits<float>::epsilon() * 0.5;
+constexpr float shadowEpsilon = 0.0001;
 const double PI = 3.1415926535897932385;
 const double INV_PI = 1.0 / PI;
 const double INV_4PI = 1.0 / (4 * PI);
