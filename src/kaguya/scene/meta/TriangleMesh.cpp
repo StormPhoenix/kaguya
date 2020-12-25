@@ -14,7 +14,7 @@ namespace kaguya {
                                    const std::shared_ptr<Medium> inside,
                                    const std::shared_ptr<Medium> outside,
                                    const std::shared_ptr<AreaLight> areaLight,
-                                   std::shared_ptr<Matrix4> transformMatrix)
+                                   std::shared_ptr<Transform> transformMatrix)
                 : BVH(), _vertices(vertices), _material(material), _inside(inside),
                   _outside(outside), _areaLight(areaLight), _transformMatrix(transformMatrix) {
             buildMeshes();

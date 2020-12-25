@@ -15,18 +15,21 @@ namespace kaguya {
 
             class Transform {
             public:
-                Transform(std::shared_ptr<Matrix4> transformMatrix);
+                Transform();
 
-                Vector3 transformPoint(const Vector3 &point) const;
+                Transform(Matrix4 transformMatrix);
 
-                Vector3 transformVector(const Vector3 &vector) const;
+                Vector3 transformPoint(const Vector3 &p) const;
 
-                Vector3 transformNormal(const Vector3 &vector3) const;
+                Vector3 transformVector(const Vector3 &v) const;
 
-                std::shared_ptr<Transform> & inverse() const;
+                Vector3 transformNormal(const Vector3 &n) const;
+
+                std::shared_ptr<Transform> inverse() const;
 
             private:
-                std::shared_ptr<Matrix4> _transformMatrix;
+                bool _identity = false;
+                Matrix4 _transformMatrix;
             };
 
         }

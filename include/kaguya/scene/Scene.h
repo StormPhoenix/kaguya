@@ -118,6 +118,7 @@ namespace kaguya {
 
             static std::shared_ptr<Scene> sceneSmoke();
 
+            static std::shared_ptr<Scene> sceneLightThroughAir();
 #endif
 
             /**

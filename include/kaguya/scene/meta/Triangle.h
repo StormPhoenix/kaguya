@@ -4,6 +4,7 @@
 #ifndef KAGUYA_TRIANGLE_H
 #define KAGUYA_TRIANGLE_H
 
+#include <kaguya/core/Transform.h>
 #include <kaguya/material/Material.h>
 #include <kaguya/math/Math.hpp>
 #include <kaguya/scene/meta/Shape.h>
@@ -15,6 +16,7 @@
 namespace kaguya {
     namespace scene {
         namespace meta {
+            using core::transform::Transform;
             using kaguya::material::Material;
             using kaguya::scene::acc::AABB;
 
@@ -22,12 +24,12 @@ namespace kaguya {
             class Triangle : public Shape {
             public:
                 Triangle(const Vertex &a, const Vertex &b, const Vertex &c,
-                         std::shared_ptr<Matrix4> transformMatrix = nullptr);
+                         std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
                 Triangle(const Vector3 &a, const Vector3 &b, const Vector3 &c,
                          const Vector3 &normal1, const Vector3 &normal2, const Vector3 &normal3,
                          const Vector2 &uv1, const Vector2 &uv2, const Vector2 &uv3,
-                         std::shared_ptr<Matrix4> transformMatrix = nullptr);
+                         std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
                 bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
 
@@ -68,7 +70,7 @@ namespace kaguya {
                 const Vector2 _uv1;
                 const Vector2 _uv2;
                 const Vector2 _uv3;
-                std::shared_ptr<Matrix4> _transformMatrix = nullptr;
+                std::shared_ptr<Transform> _transformMatrix = nullptr;
                 AABB _aabb;
             };
         }

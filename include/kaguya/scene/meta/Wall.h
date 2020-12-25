@@ -5,12 +5,14 @@
 #ifndef KAGUYA_WALL_H
 #define KAGUYA_WALL_H
 
+#include <kaguya/core/Transform.h>
 #include <kaguya/scene/meta/Shape.h>
 #include <kaguya/scene/accumulation/AABB.h>
 
 namespace kaguya {
     namespace scene {
         namespace meta {
+            using core::transform::Transform;
             using kaguya::scene::acc::AABB;
 
             class Wall : public Shape {
@@ -19,7 +21,7 @@ namespace kaguya {
 
                 // XY 上的二维片面
                 Wall(double width, double height,
-                     std::shared_ptr<Matrix4> transformMatrix = nullptr);
+                     std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
                 virtual bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
 
@@ -53,7 +55,8 @@ namespace kaguya {
                 Vector3 _transformedLeftTop;
                 Vector3 _transformedNormal;
 
-                std::shared_ptr<Matrix4> _transformMatrix = nullptr;
+                std::shared_ptr<Transform> _transformMatrix = nullptr;
+                std::shared_ptr<Transform> _invTransformMatrix = nullptr;
 
             protected:
                 Vector3 _normal;

@@ -5,11 +5,14 @@
 #ifndef KAGUYA_GRIDDENSITYMEDIUM_H
 #define KAGUYA_GRIDDENSITYMEDIUM_H
 
+#include <kaguya/core/Transform.h>
 #include <kaguya/core/medium/Medium.h>
 
 namespace kaguya {
     namespace core {
         namespace medium {
+
+            using core::transform::Transform;
 
             class GridDensityMedium : public Medium {
             public:
@@ -17,7 +20,7 @@ namespace kaguya {
                                   const Spectrum &scatteringSigma,
                                   double g, int axisXGrid, int axisYGrid, int axisZGrid,
                                   float *densities,
-                                  std::shared_ptr<Matrix4> transformMatrix = nullptr);
+                                  std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
                 virtual core::Spectrum transmittance(const tracer::Ray &ray, const Sampler1D *sampler1D) const override;
 
@@ -49,7 +52,8 @@ namespace kaguya {
                 double _totalSigma;
                 double _g;
                 float *_densities = nullptr;
-                std::shared_ptr<Matrix4> _transformMatrix = nullptr;
+                std::shared_ptr<Transform> _transformMatrix = nullptr;
+                std::shared_ptr<Transform> _invTransformMatrix = nullptr;
                 float _maxInvDensity;
                 float _maxDensity;
                 int _gridX;

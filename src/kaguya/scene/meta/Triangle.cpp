@@ -8,48 +8,37 @@ namespace kaguya {
     namespace scene {
         namespace meta {
             Triangle::Triangle(const Vertex &a, const Vertex &b, const Vertex &c,
-                               std::shared_ptr<Matrix4> transformMatrix)
+                               std::shared_ptr<Transform> transformMatrix)
                     : _position1(a.position), _position2(b.position), _position3(c.position),
                       _normal1(a.normal), _normal2(b.normal), _normal3(c.normal),
                       _uv1(Vector2(a.u, a.v)), _uv2(Vector2(b.u, b.v)), _uv3(Vector2(c.u, c.v)),
                       _transformMatrix(transformMatrix) {
+                assert(transformMatrix != nullptr);
                 init();
             }
 
             Triangle::Triangle(const Vector3 &a, const Vector3 &b, const Vector3 &c, const Vector3 &normal1,
                                const Vector3 &normal2, const Vector3 &normal3, const Vector2 &uv1, const Vector2 &uv2,
                                const Vector2 &uv3,
-                               std::shared_ptr<Matrix4> transformMatrix)
+                               std::shared_ptr<Transform> transformMatrix)
                     : _position1(a), _position2(b), _position3(c),
                       _normal1(normal1), _normal2(normal2), _normal3(normal3),
                       _uv1(uv1), _uv2(uv2), _uv3(uv3),
                       _transformMatrix(transformMatrix) {
+                assert(transformMatrix != nullptr);
                 init();
             }
 
             void Triangle::init() {
                 // 创建 AABB
-                _transformedPosition1 = _transformMatrix != nullptr ?
-                                        (*_transformMatrix) * Vector4(_position1, 1.0f) : _position1;
-                _transformedPosition2 = _transformMatrix != nullptr ?
-                                        (*_transformMatrix) * Vector4(_position2, 1.0f) : _position2;
-                _transformedPosition3 = _transformMatrix != nullptr ?
-                                        (*_transformMatrix) * Vector4(_position3, 1.0f) : _position3;
+                _transformedPosition1 = _transformMatrix->transformPoint(_position1);
+                _transformedPosition2 = _transformMatrix->transformPoint(_position2);
+                _transformedPosition3 = _transformMatrix->transformPoint(_position3);
 
                 // 计算变换后的法线，参考 https://blog.csdn.net/lawest/article/details/98328127
-                _transformedNormal1 = _transformMatrix != nullptr ?
-                                      NORMALIZE(Vector3(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal1, 0.0f)))
-                                                                  :
-                                      NORMALIZE(_normal1);
-                _transformedNormal2 = _transformMatrix != nullptr ?
-                                      NORMALIZE(Vector3(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal2, 0.0f)))
-                                                                  :
-                                      NORMALIZE(_normal2);
-                _transformedNormal3 = _transformMatrix != nullptr ?
-                                      NORMALIZE(Vector3(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal3, 0.0f)))
-                                                                  :
-                                      NORMALIZE(_normal3);
-
+                _transformedNormal1 = _transformMatrix->transformNormal(_normal1);
+                _transformedNormal2 = _transformMatrix->transformNormal(_normal2);
+                _transformedNormal3 = _transformMatrix->transformNormal(_normal3);
 
                 double minX =
                         std::min(

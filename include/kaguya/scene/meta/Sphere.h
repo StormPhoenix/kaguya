@@ -5,6 +5,7 @@
 #ifndef KAGUYA_SPHERE_H
 #define KAGUYA_SPHERE_H
 
+#include <kaguya/core/Transform.h>
 #include <kaguya/scene/accumulation/AABB.h>
 #include <kaguya/math/Math.hpp>
 #include <kaguya/scene/meta/Shape.h>
@@ -13,6 +14,7 @@
 namespace kaguya {
     namespace scene {
         namespace meta {
+            using core::transform::Transform;
             using kaguya::scene::acc::AABB;
 
             class Sphere : public Shape {
@@ -27,7 +29,7 @@ namespace kaguya {
                  * @param transformMatrix 变换矩阵
                  */
                 Sphere(const Vector3 &center, double radius, bool outward = true,
-                       std::shared_ptr<Matrix4> transformMatrix = nullptr);
+                       std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
                 bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
 
@@ -61,8 +63,8 @@ namespace kaguya {
                 Vector3 _transformedCenter;
                 double _radius;
                 bool _outward;
-                std::shared_ptr<Matrix4> _transformMatrix = nullptr;
-                std::shared_ptr<Matrix4> _inverseTransformMatrix = nullptr;
+                std::shared_ptr<Transform> _transformMatrix = nullptr;
+                std::shared_ptr<Transform> _inverseTransformMatrix = nullptr;
             };
         }
     }

@@ -16,6 +16,7 @@
 namespace kaguya {
     namespace scene {
 
+        using core::transform::Transform;
         using kaguya::core::medium::Medium;
         using kaguya::material::Material;
 
@@ -24,7 +25,7 @@ namespace kaguya {
             Box(const std::shared_ptr<Material> material = nullptr,
                 const std::shared_ptr<Medium> inside = nullptr,
                 const std::shared_ptr<Medium> outside = nullptr,
-                const std::shared_ptr<Matrix4> transform = nullptr);
+                const std::shared_ptr<Transform> transform = nullptr);
 
             virtual const AABB &boundingBox() const override;
 
@@ -35,7 +36,7 @@ namespace kaguya {
 
         private:
             // transform matrix
-            std::shared_ptr<Matrix4> _transform;
+            std::shared_ptr<Transform> _transform;
             const std::shared_ptr<Material> _material;
             const std::shared_ptr<Medium> _inside;
             const std::shared_ptr<Medium> _outside;

@@ -82,15 +82,13 @@ namespace kaguya {
 
             std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
                                                                                  n, n, n,
-                                                                                 default_uv, default_uv, default_uv,
-                                                                                 nullptr);
+                                                                                 default_uv, default_uv, default_uv);
             std::shared_ptr<Geometry> gt1 = std::make_shared<Geometry>(tri1, material, insideMedium, outsideMedium,
                                                                        nullptr);
 
             std::shared_ptr<meta::Shape> tri2 = std::make_shared<meta::Triangle>(a1, a2, a3,
                                                                                  n, n, n,
-                                                                                 default_uv, default_uv, default_uv,
-                                                                                 nullptr);
+                                                                                 default_uv, default_uv, default_uv);
             std::shared_ptr<Geometry> gt2 = std::make_shared<Geometry>(tri2, material, insideMedium, outsideMedium,
                                                                        nullptr);
             std::vector<std::shared_ptr<Geometry>> v;
@@ -114,15 +112,13 @@ namespace kaguya {
 
             std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
                                                                                  n, n, n,
-                                                                                 default_uv, default_uv, default_uv,
-                                                                                 nullptr);
+                                                                                 default_uv, default_uv, default_uv);
             std::shared_ptr<Geometry> gt1 = std::make_shared<Geometry>(tri1, material, insideMedium, outsideMedium,
                                                                        nullptr);
 
             std::shared_ptr<meta::Shape> tri2 = std::make_shared<meta::Triangle>(a1, a2, a3,
                                                                                  n, n, n,
-                                                                                 default_uv, default_uv, default_uv,
-                                                                                 nullptr);
+                                                                                 default_uv, default_uv, default_uv);
             std::shared_ptr<Geometry> gt2 = std::make_shared<Geometry>(tri2, material, insideMedium, outsideMedium,
                                                                        nullptr);
             std::vector<std::shared_ptr<Geometry>> v;
@@ -145,15 +141,13 @@ namespace kaguya {
 
             std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
                                                                                  n, n, n,
-                                                                                 default_uv, default_uv, default_uv,
-                                                                                 nullptr);
+                                                                                 default_uv, default_uv, default_uv);
             std::shared_ptr<Geometry> gt1 = std::make_shared<Geometry>(tri1, material, insideMedium, outsideMedium,
                                                                        nullptr);
 
             std::shared_ptr<meta::Shape> tri2 = std::make_shared<meta::Triangle>(a1, a2, a3,
                                                                                  n, n, n,
-                                                                                 default_uv, default_uv, default_uv,
-                                                                                 nullptr);
+                                                                                 default_uv, default_uv, default_uv);
             std::shared_ptr<Geometry> gt2 = std::make_shared<Geometry>(tri2, material, insideMedium, outsideMedium,
                                                                        nullptr);
             std::vector<std::shared_ptr<Geometry>> v;
@@ -175,15 +169,13 @@ namespace kaguya {
 
             std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
                                                                                  n, n, n,
-                                                                                 default_uv, default_uv, default_uv,
-                                                                                 nullptr);
+                                                                                 default_uv, default_uv, default_uv);
             std::shared_ptr<Geometry> gt1 = std::make_shared<Geometry>(tri1, material, insideMedium, outsideMedium,
                                                                        nullptr);
 
             std::shared_ptr<meta::Shape> tri2 = std::make_shared<meta::Triangle>(a1, a2, a3,
                                                                                  n, n, n,
-                                                                                 default_uv, default_uv, default_uv,
-                                                                                 nullptr);
+                                                                                 default_uv, default_uv, default_uv);
             std::shared_ptr<Geometry> gt2 = std::make_shared<Geometry>(tri2, material, insideMedium, outsideMedium,
                                                                        nullptr);
             std::vector<std::shared_ptr<Geometry>> v;
@@ -206,15 +198,13 @@ namespace kaguya {
 
             std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
                                                                                  n, n, n,
-                                                                                 default_uv, default_uv, default_uv,
-                                                                                 nullptr);
+                                                                                 default_uv, default_uv, default_uv);
             std::shared_ptr<Geometry> gt1 = std::make_shared<Geometry>(tri1, material, insideMedium, outsideMedium,
                                                                        nullptr);
 
             std::shared_ptr<meta::Shape> tri2 = std::make_shared<meta::Triangle>(a1, a2, a3,
                                                                                  n, n, n,
-                                                                                 default_uv, default_uv, default_uv,
-                                                                                 nullptr);
+                                                                                 default_uv, default_uv, default_uv);
             std::shared_ptr<Geometry> gt2 = std::make_shared<Geometry>(tri2, material, insideMedium, outsideMedium,
                                                                        nullptr);
             std::vector<std::shared_ptr<Geometry>> v;
@@ -230,12 +220,14 @@ namespace kaguya {
                                                       const std::shared_ptr<AreaLight> areaLight) {
             std::vector<Vertex> bunnyVertexes = kaguya::utils::ObjLoader::loadModel("./resource/objects/bunny.obj");
 
-            std::shared_ptr<Matrix4> transformMatrix = std::make_shared<Matrix4>(1.0f);
             double scale = 0.4 * MODEL_SCALE;
-            *transformMatrix = TRANSLATE(*transformMatrix, Vector3(0, -scale / 1.2, 0));
-            *transformMatrix = SCALE(*transformMatrix, Vector3(scale, scale, scale));
-            std::shared_ptr<Aggregation> bunny = std::make_shared<TriangleMesh>(bunnyVertexes, material, inside, outside,
-                                                                            areaLight, transformMatrix);
+            Matrix4 mat(1.0f);
+            mat = TRANSLATE(mat, Vector3(0, -scale / 1.2, 0));
+            mat = SCALE(mat, Vector3(scale, scale, scale));
+            std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(mat);
+            std::shared_ptr<Aggregation> bunny = std::make_shared<TriangleMesh>(bunnyVertexes, material, inside,
+                                                                                outside,
+                                                                                areaLight, transformMatrix);
             return bunny;
         }
 
@@ -320,11 +312,11 @@ namespace kaguya {
             std::shared_ptr<Medium> airMedium = nullptr;
 
             // smoke data
-            std::shared_ptr<Matrix4> transformMatrix = std::make_shared<Matrix4>(1.0f);
             double scale = 0.6 * MODEL_SCALE;
-            *transformMatrix = TRANSLATE(*transformMatrix,
-                                         Vector3(-scale * 0.6, -MODEL_SCALE * 0.5 + 0.0001, -scale * 0.5));
-            *transformMatrix = SCALE(*transformMatrix, Vector3(scale * 1.2, MODEL_SCALE * 0.90, scale * 1.2));
+            Matrix4 mat(1.0f);
+            mat = TRANSLATE(mat, Vector3(-scale * 0.6, -MODEL_SCALE * 0.5 + 0.0001, -scale * 0.5));
+            mat = SCALE(mat, Vector3(scale * 1.2, MODEL_SCALE * 0.90, scale * 1.2));
+            std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(mat);
 
             float *smoke = testSmokeData();
             std::shared_ptr<Medium> smokeMedium = std::make_shared<GridDensityMedium>(0.002, 2.3, 0, gridx, gridy,
@@ -1052,6 +1044,129 @@ namespace kaguya {
             camera->setResolutionHeight(Config::resolutionHeight);
             scene->_camera = camera;
             scene->_sceneName = "two-spheres-with-point-light";
+
+            return scene;
+        }
+
+        std::shared_ptr<Scene> Scene::sceneLightThroughAir() {
+            // For testing
+            // albedos
+            // total white
+            Spectrum totalWhiteSpectrum = Spectrum(1.0);
+            std::shared_ptr<Texture> totalWhite = std::make_shared<ConstantTexture>(totalWhiteSpectrum);
+
+            // white
+            Spectrum whiteSpectrum = Spectrum(0.0);
+            whiteSpectrum.r(0.73);
+            whiteSpectrum.g(0.73);
+            whiteSpectrum.b(0.73);
+            std::shared_ptr<Texture> white = std::make_shared<ConstantTexture>(whiteSpectrum);
+
+            // red
+            Spectrum redSpectrum = Spectrum(0.0);
+            redSpectrum.r(0.65);
+            redSpectrum.g(0.05);
+            redSpectrum.b(0.05);
+            std::shared_ptr<Texture> red = std::make_shared<ConstantTexture>(redSpectrum);
+
+            // lake blue
+            Spectrum lakeBlueSpectrum = Spectrum(0.0);
+            lakeBlueSpectrum.r(30.0 / 255);
+            lakeBlueSpectrum.g(144.0 / 255);
+            lakeBlueSpectrum.b(200.0 / 255);
+            std::shared_ptr<Texture> lakeBlue = std::make_shared<ConstantTexture>(lakeBlueSpectrum);
+
+            // green
+            Spectrum greenSpectrum = Spectrum(0.0);
+            greenSpectrum.r(0.12);
+            greenSpectrum.g(0.45);
+            greenSpectrum.b(0.15);
+            std::shared_ptr<Texture> green = std::make_shared<ConstantTexture>(greenSpectrum);
+
+            // blue
+            Spectrum blueSpectrum = Spectrum(0.0);
+            blueSpectrum.r(0);
+            blueSpectrum.g(0);
+            blueSpectrum.b(1.0);
+            std::shared_ptr<Texture> blue = std::make_shared<ConstantTexture>(blueSpectrum);
+
+            // pink
+            Spectrum pinkSpectrum = Spectrum(0.0);
+            pinkSpectrum.r(255.0 / 255);
+            pinkSpectrum.g(192.0 / 255);
+            pinkSpectrum.b(203.0 / 255);
+            std::shared_ptr<Texture> pink = std::make_shared<ConstantTexture>(pinkSpectrum);
+
+            // light spectrum
+            Spectrum pointLightSpectrum = Spectrum(0.0);
+            double lightIntensity = 15;
+            pointLightSpectrum.r(double(249.0) / 255.0 * lightIntensity);
+            pointLightSpectrum.g(double(222.0) / 255.0 * lightIntensity);
+            pointLightSpectrum.b(double(180.0) / 255.0 * lightIntensity);
+
+            // lambertian materials
+            std::shared_ptr<Material> lambertLeft = std::make_shared<Lambertian>(red);
+            std::shared_ptr<Material> lambertRight = std::make_shared<Lambertian>(green);
+            std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
+            std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
+            std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
+            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
+            std::shared_ptr<Material> metal = std::make_shared<Metal>();
+
+            // medium
+            std::shared_ptr<Medium> airMedium = testAirMedium();
+//            std::shared_ptr<Medium> airMedium = nullptr;
+
+            // objects
+            std::vector<std::shared_ptr<Intersectable>> objects;
+
+            // walls
+            std::vector<std::shared_ptr<Geometry>> leftWall =
+                    testLeftWall(lambertLeft, airMedium, airMedium);
+            objects.insert(objects.end(), leftWall.begin(), leftWall.end());
+
+            std::vector<std::shared_ptr<Geometry>> rightWall =
+                    testRightWall(lambertRight, airMedium, airMedium);
+            objects.insert(objects.end(), rightWall.begin(), rightWall.end());
+
+            std::vector<std::shared_ptr<Geometry>> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
+            objects.insert(objects.end(), bottomWall.begin(), bottomWall.end());
+
+
+            std::vector<std::shared_ptr<Geometry>> topWall = testTopWall(lambertTop, airMedium, airMedium);
+            objects.insert(objects.end(), topWall.begin(), topWall.end());
+
+            std::vector<std::shared_ptr<Geometry>> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
+            objects.insert(objects.end(), frontWall.begin(), frontWall.end());
+
+            std::shared_ptr<Shape> glassSphereShape = std::make_shared<meta::Sphere>(
+                    Vector3(0.10 * MODEL_SCALE, 0.15 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
+            std::shared_ptr<Geometry> glassSphere = std::make_shared<Geometry>(glassSphereShape, glass,
+                                                                               nullptr, airMedium);
+
+            // build scene object
+            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+
+            // build point light
+            std::shared_ptr<PointLight> light = PointLight::buildPointLight(
+                    Vector3(0.0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), pointLightSpectrum,
+                    MediumBound(airMedium.get(), airMedium.get()));
+            scene->_light = light;
+
+            objects.push_back(glassSphere);
+
+            // scene
+            std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);
+            scene->_world = bvh;
+
+            // build camera
+            auto eye = Vector3(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
+            auto dir = Vector3(0.0f, 0.0f, -1.0f);
+            std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
+            camera->setResolutionWidth(Config::resolutionWidth);
+            camera->setResolutionHeight(Config::resolutionHeight);
+            scene->_camera = camera;
+            scene->_sceneName = "light_through-air";
 
             return scene;
         }

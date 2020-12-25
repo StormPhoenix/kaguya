@@ -8,12 +8,11 @@ namespace kaguya {
     namespace scene {
         namespace meta {
             Sphere::Sphere(const Vector3 &center, double radius, bool outward,
-                           std::shared_ptr<Matrix4> transformMatrix) {
+                           std::shared_ptr<Transform> transformMatrix) {
                 assert(radius > 0);
 
                 _center = center;
-                _transformedCenter =
-                        transformMatrix != nullptr ? Vector3((*transformMatrix) * Vector4(_center, 1.0f)) : _center;
+                _transformedCenter = transformMatrix->transformPoint(_center);
                 _radius = radius;
                 _outward = outward;
                 _transformMatrix = transformMatrix;
@@ -88,7 +87,7 @@ namespace kaguya {
                 // sample outward normal
                 Vector3 normal = math::sphereUniformSampling(sampler1D);
                 if (_transformMatrix != nullptr) {
-                    normal = NORMALIZE(Vector3(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(normal, 0.0f)));
+                    normal = _transformMatrix->transformNormal(normal);
                 }
 
                 SurfaceInteraction si;

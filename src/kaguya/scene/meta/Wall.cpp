@@ -8,9 +8,10 @@ namespace kaguya {
     namespace scene {
         namespace meta {
             Wall::Wall(double width, double height,
-                       std::shared_ptr<Matrix4> transformMatrix)
+                       std::shared_ptr<Transform> transformMatrix)
                     : _width(width), _height(height),
-                      _transformMatrix(transformMatrix) {
+                      _transformMatrix(transformMatrix),
+                      _invTransformMatrix(transformMatrix->inverse()) {
                 _leftBottom = {-width / 2, -height / 2, 0.0f};
                 _leftTop = {-width / 2, height / 2, 0.0f};
                 _rightBottom = {width / 2, -height / 2, 0.0f};
@@ -22,18 +23,11 @@ namespace kaguya {
 
             void Wall::init() {
                 // build bounding box
-                _transformedLeftBottom = _transformMatrix != nullptr ?
-                                         (*_transformMatrix) * Vector4(_leftBottom, 1.0f) : _leftBottom;
-                _transformedRightBottom = _transformMatrix != nullptr ?
-                                          (*_transformMatrix) * Vector4(_rightBottom, 1.0f) : _rightBottom;
-                _transformedRightTop = _transformMatrix != nullptr ?
-                                       (*_transformMatrix) * Vector4(_rightTop, 1.0f) : _rightTop;
-                _transformedLeftTop = _transformMatrix != nullptr ?
-                                      (*_transformMatrix) * Vector4(_leftTop, 1.0f) : _leftTop;
-
-                _transformedNormal = _transformMatrix != nullptr ?
-                                     NORMALIZE(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(_normal, 0.0f)) :
-                                     _normal;
+                _transformedLeftBottom = _transformMatrix->transformPoint(_leftBottom);
+                _transformedRightBottom = _transformMatrix->transformPoint(_rightBottom);
+                _transformedRightTop = _transformMatrix->transformPoint(_rightTop);
+                _transformedLeftTop = _transformMatrix->transformPoint(_leftTop);
+                _transformedNormal = _transformMatrix->transformNormal(_normal);
 
                 double minX = std::min(
                         std::min(std::min(_transformedLeftBottom[0], _transformedRightBottom[0]),
@@ -72,12 +66,9 @@ namespace kaguya {
             bool Wall::intersect(Ray &ray, SurfaceInteraction &si,
                                  double minStep, double maxStep) const {
                 // 仿照三角形平面求直线交点解法
-                Vector3 transformedA = _transformMatrix != nullptr ?
-                                       (*_transformMatrix) * Vector4(_leftTop, 1.0f) : _leftTop;
-                Vector3 transformedB = _transformMatrix != nullptr ?
-                                       (*_transformMatrix) * Vector4(_leftBottom, 1.0f) : _leftBottom;
-                Vector3 transformedC = _transformMatrix != nullptr ?
-                                       (*_transformMatrix) * Vector4(_rightBottom, 1.0f) : _rightBottom;
+                Vector3 transformedA = _transformMatrix->transformPoint(_leftTop);
+                Vector3 transformedB = _transformMatrix->transformPoint(_leftBottom);
+                Vector3 transformedC = _transformMatrix->transformPoint(_rightBottom);
 
                 const Vector3 &dir = ray.getDirection();
                 const Vector3 &eye = Vector3(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
@@ -96,8 +87,7 @@ namespace kaguya {
                 // 检查射线范围
                 if (step < maxStep && step > minStep) {
                     Vector3 hitPoint = ray.at(step);
-                    Vector3 modelPoint = _transformMatrix != nullptr ?
-                                         INVERSE(*_transformMatrix) * Vector4(hitPoint, 1.0f) : hitPoint;
+                    Vector3 modelPoint = _invTransformMatrix->transformPoint(hitPoint);
 
                     double offsetX = modelPoint.x - (-_width / 2);
                     double offsetY = modelPoint.y - (-_height / 2);
@@ -106,7 +96,7 @@ namespace kaguya {
                     if (math::checkRange(offsetX, 0, _width)
                         && math::checkRange(offsetY, 0, _height)) {
                         si.setPoint(hitPoint);
-                        Vector3 normal = (*_transformMatrix) * Vector4(_normal, 0.0f);
+                        Vector3 normal = _transformMatrix->transformNormal(_normal);
                         si.setOutwardNormal(normal, dir);
                         si.setU(offsetX / _width);
                         si.setV(offsetY / _height);
@@ -143,9 +133,8 @@ namespace kaguya {
             }
 
             double Wall::surfacePointPdf(const SurfaceInteraction &si) const {
-                Vector3 transformedPoint = _transformMatrix != nullptr ?
-                                           INVERSE((*_transformMatrix)) * Vector4(si.getPoint(), 1.0f)
-                                                                       : si.getPoint();
+                Vector3 transformedPoint = _invTransformMatrix->transformPoint(si.getPoint());
+
                 if (transformedPoint.z - 0 <= math::EPSILON &&
                     transformedPoint.x >= -_width / 2 && transformedPoint.x <= _width / 2 &&
                     transformedPoint.y >= -_height / 2 && transformedPoint.y <= _height / 2) {

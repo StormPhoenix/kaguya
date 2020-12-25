@@ -15,10 +15,11 @@ namespace kaguya {
 
             GridDensityMedium::GridDensityMedium(const Spectrum &absorptionSigma, const Spectrum &scatteringSigma,
                                                  double g, int axisXGrid, int axisYGrid, int axisZGrid,
-                                                 float *densities, std::shared_ptr<Matrix4> transformMatrix) :
+                                                 float *densities, std::shared_ptr<Transform> transformMatrix) :
                     _absorptionSigma(absorptionSigma), _scatteringSigma(scatteringSigma),
                     _g(g), _gridX(axisXGrid), _gridY(axisYGrid), _gridZ(axisZGrid),
-                    _densities(densities), _transformMatrix(transformMatrix) {
+                    _densities(densities), _transformMatrix(transformMatrix),
+                    _invTransformMatrix(transformMatrix->inverse()) {
                 _totalSigma = (_absorptionSigma + _scatteringSigma)[0];
 
                 assert(Spectrum(_totalSigma) == (_absorptionSigma + _scatteringSigma));
@@ -39,11 +40,8 @@ namespace kaguya {
 
             core::Spectrum GridDensityMedium::transmittance(const tracer::Ray &ray, const Sampler1D *sampler1D) const {
                 // transform ray from world space to medium space
-                const Vector3 origin = _transformMatrix != nullptr ?
-                                       INVERSE(*_transformMatrix) * Vector4(ray.getOrigin(), 1.0) : ray.getOrigin();
-
-                const Vector3 dir = _transformMatrix != nullptr ?
-                                    INVERSE(*_transformMatrix) * Vector4(ray.getDirection(), 0.0) : ray.getDirection();
+                const Vector3 origin =_invTransformMatrix->transformPoint(ray.getOrigin());
+                const Vector3 dir = _invTransformMatrix->transformVector(ray.getDirection());
                 Ray transformedRay = Ray(origin, dir, ray.getMedium());
 
                 // calculate intersection
@@ -76,11 +74,8 @@ namespace kaguya {
             core::Spectrum GridDensityMedium::sampleInteraction(const tracer::Ray &ray, const Sampler1D *sampler1D,
                                                                 MediumInteraction *mi, MemoryArena &memoryArena) const {
                 // transform ray from world space to medium space
-                const Vector3 origin = _transformMatrix != nullptr ?
-                                       INVERSE(*_transformMatrix) * Vector4(ray.getOrigin(), 1.0) : ray.getOrigin();
-
-                const Vector3 dir = _transformMatrix != nullptr ?
-                                    INVERSE(*_transformMatrix) * Vector4(ray.getDirection(), 0.0) : ray.getDirection();
+                const Vector3 origin =_invTransformMatrix->transformPoint(ray.getOrigin());
+                const Vector3 dir = _invTransformMatrix->transformVector(ray.getDirection());
                 Ray transformedRay = Ray(origin, dir, ray.getMedium());
                 transformedRay.setStep(ray.getStep());
 

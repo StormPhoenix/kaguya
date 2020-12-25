@@ -13,7 +13,7 @@ namespace kaguya {
         Box::Box(const std::shared_ptr<Material> material,
                  const std::shared_ptr<Medium> inside,
                  const std::shared_ptr<Medium> outside,
-                 const std::shared_ptr<Matrix4> transform) :
+                 const std::shared_ptr<Transform> transform) :
                 _transform(transform),
                 _inside(inside),
                 _outside(outside),

@@ -5,6 +5,7 @@
 #ifndef KAGUYA_TRIANGLEMESH_H
 #define KAGUYA_TRIANGLEMESH_H
 
+#include <kaguya/core/Transform.h>
 #include <kaguya/scene/meta/Shape.h>
 #include <kaguya/scene/meta/Vertex.h>
 #include <kaguya/scene/accumulation/BVH.h>
@@ -15,6 +16,7 @@ namespace kaguya {
     namespace scene {
 
         using kaguya::scene::acc::BVH;
+        using kaguya::core::transform::Transform;
 
         class TriangleMesh : public BVH {
         public:
@@ -23,7 +25,7 @@ namespace kaguya {
                          const std::shared_ptr<Medium> inside = nullptr,
                          const std::shared_ptr<Medium> outside = nullptr,
                          const std::shared_ptr<AreaLight> areaLight = nullptr,
-                         std::shared_ptr<Matrix4> transformMatrix = nullptr);
+                         std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
             virtual ~TriangleMesh() {}
 
@@ -37,7 +39,7 @@ namespace kaguya {
             const std::shared_ptr<Medium> _inside;
             const std::shared_ptr<Medium> _outside;
             const std::shared_ptr<AreaLight> _areaLight;
-            std::shared_ptr<Matrix4> _transformMatrix = nullptr;
+            std::shared_ptr<Transform> _transformMatrix = nullptr;
         };
 
     }
