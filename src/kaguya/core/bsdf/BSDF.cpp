@@ -13,8 +13,8 @@ namespace kaguya {
              * 暂时用入射光线和法线来构造切线空间*/
             _tanY = NORMALIZE(insect.getNormal());
             _tanZ = NORMALIZE(CROSS(insect.getDirection(), _tanY));
-            if (!isValid(_tanZ)) {
-                tangentSpace(_tanY, &_tanX, &_tanZ);
+            if (!math::isValid(_tanZ)) {
+                math::tangentSpace(_tanY, &_tanX, &_tanZ);
             } else {
                 _tanX = NORMALIZE(CROSS(_tanY, _tanZ));
             }
@@ -75,7 +75,7 @@ namespace kaguya {
             } else {
                 BXDF *bxdf = nullptr;
                 // 随机选取 bxdf
-                int bxdfOrder = randomInt(1, matchedCount, sampler1D);
+                int bxdfOrder = math::randomInt(1, matchedCount, sampler1D);
                 int order = 0;
                 for (int i = 0; i < _bxdfCount; i++) {
                     if (_bxdfs[i] != nullptr && _bxdfs[i]->allIncludeOf(type)) {
@@ -143,7 +143,7 @@ namespace kaguya {
             }
             Vector3 wo = toObjectSpace(worldWo);
             Vector3 wi = toObjectSpace(worldWi);
-            if (std::abs(wo.y - 0) < EPSILON) {
+            if (std::abs(wo.y - 0) < math::EPSILON) {
                 return 0.0;
             }
             double pdf = 0.0f;

@@ -21,9 +21,9 @@ namespace kaguya {
 
             for (int i = 0; i < 3; i++) {
                 if (offset[i] > 0) {
-                    o[i] = doubleUp(o[i]);
+                    o[i] = math::doubleUp(o[i]);
                 } else if (offset[i] < 0) {
-                    o[i] = doubleDown(o[i]);
+                    o[i] = math::doubleDown(o[i]);
                 }
             }
 
@@ -65,12 +65,8 @@ namespace kaguya {
             const medium::Medium *medium = (DOT(dir, _normal) > 0 ?
                                             _mediumBoundary.outside() : _mediumBoundary.inside());
 
-            // TODO delete
-//            double step = LENGTH(dir);
-//            assert(step > 0);
-
             Ray ray = Ray(origin, dir, medium);
-            ray.setStep(1. - shadowEpsilon);
+            ray.setStep(1. - math::shadowEpsilon);
             return ray;
         }
 

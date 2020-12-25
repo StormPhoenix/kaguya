@@ -54,13 +54,13 @@ namespace kaguya {
                 for (int col = 0; col < _resolutionWidth; col++) {
                     int offset = ((_resolutionHeight - 1 - row) * _resolutionWidth + col) * _channel;
                     (image + offset)[0] = static_cast<unsigned char>(256 *
-                                                                     clamp(std::sqrt(getSpectrum(row, col, 0)), 0.0,
+                            math::clamp(std::sqrt(getSpectrum(row, col, 0)), 0.0,
                                                                            0.999));
                     (image + offset)[1] = static_cast<unsigned char>(256 *
-                                                                     clamp(std::sqrt(getSpectrum(row, col, 1)), 0.0,
+                            math::clamp(std::sqrt(getSpectrum(row, col, 1)), 0.0,
                                                                            0.999));
                     (image + offset)[2] = static_cast<unsigned char>(256 *
-                                                                     clamp(std::sqrt(getSpectrum(row, col, 2)), 0.0,
+                            math::clamp(std::sqrt(getSpectrum(row, col, 2)), 0.0,
                                                                            0.999));
                 }
             }

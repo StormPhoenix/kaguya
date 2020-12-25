@@ -125,7 +125,7 @@ namespace kaguya {
                     Spectrum sampleIntensity = light->sampleFromLight(pt.getInteraction(), &worldWi, &sampleLightPdf,
                                                                       sampler1D, &visibilityTester);
 
-                    if (std::abs(sampleLightPdf - 0) < EPSILON || sampleIntensity.isBlack() ||
+                    if (std::abs(sampleLightPdf - 0) < math::EPSILON || sampleIntensity.isBlack() ||
                         !visibilityTester.isVisible(scene)) {
                         // 没有任何光源亮度贡献的情况，直接返回 0
                         ret = Spectrum(0.0);
@@ -281,7 +281,7 @@ namespace kaguya {
                                                    BXDFType::BSDF_ALL, &sampleType);
 
                         // 判断采样是否有效
-                        if (std::abs(pdfPreWi) < EPSILON || f.isBlack()) {
+                        if (std::abs(pdfPreWi) < math::EPSILON || f.isBlack()) {
                             break;
                         }
 
@@ -295,9 +295,7 @@ namespace kaguya {
                         beta *= (f * cosine / pdfPreWi);
 
                         // 计算向后 pdfWo
-                        // TODO 临时调换下 wo 和 wi 的位置
-                        pdfWo = bsdf->samplePdf(worldWo, worldWi);
-//                    pdfWo = bsdf->samplePdf(worldWi, worldWo);
+                        pdfWo = bsdf->samplePdf(worldWi, worldWo);
 
                         // 如果 bsdf 反射含有 delta 成分，则前后 pdf 都赋值为 0
                         if (sampleType & BXDFType::BSDF_SPECULAR) {

@@ -96,14 +96,14 @@ namespace kaguya {
                 Vector3 p2 = _transformedPosition3 - ray.getOrigin();
 
                 // swap axis
-                int zAxis = maxAbsAxis(ray.getDirection());
+                int zAxis = math::maxAbsAxis(ray.getDirection());
                 int xAxis = zAxis + 1 == 3 ? 0 : zAxis + 1;
                 int yAxis = xAxis + 1 == 3 ? 0 : xAxis + 1;
 
-                Vector3 dir = swapAxis(ray.getDirection(), xAxis, yAxis, zAxis);
-                p0 = swapAxis(p0, xAxis, yAxis, zAxis);
-                p1 = swapAxis(p1, xAxis, yAxis, zAxis);
-                p2 = swapAxis(p2, xAxis, yAxis, zAxis);
+                Vector3 dir = math::swapAxis(ray.getDirection(), xAxis, yAxis, zAxis);
+                p0 = math::swapAxis(p0, xAxis, yAxis, zAxis);
+                p1 = math::swapAxis(p1, xAxis, yAxis, zAxis);
+                p2 = math::swapAxis(p2, xAxis, yAxis, zAxis);
 
                 // shear direction to z-axis
                 double shearX = -dir[0] / dir[2];
@@ -154,9 +154,9 @@ namespace kaguya {
                 double b2 = e2 * invSum;
 
                 // calculate float-error
-                double zError = gamma(7) * (std::abs(b0 * p2.z) + std::abs(b1 * p0.z) + std::abs(b2 * p1.z));
-                double xError = gamma(7) * (std::abs(b0 * p2.x) + std::abs(b1 * p0.x) + std::abs(b2 * p1.x));
-                double yError = gamma(7) * (std::abs(b0 * p2.y) + std::abs(b1 * p0.y) + std::abs(b2 * p1.y));
+                double zError = math::gamma(7) * (std::abs(b0 * p2.z) + std::abs(b1 * p0.z) + std::abs(b2 * p1.z));
+                double xError = math::gamma(7) * (std::abs(b0 * p2.x) + std::abs(b1 * p0.x) + std::abs(b2 * p1.x));
+                double yError = math::gamma(7) * (std::abs(b0 * p2.y) + std::abs(b1 * p0.y) + std::abs(b2 * p1.y));
                 Vector3 error = Vector3(xError, yError, zError);
 
                 ray.setStep(step);
@@ -195,7 +195,7 @@ namespace kaguya {
 
             SurfaceInteraction Triangle::sampleSurfacePoint(const Sampler1D *sampler1D) const {
                 // Uniform sampling triangle
-                Vector2 barycentric = triangleUniformSampling(sampler1D);
+                Vector2 barycentric = math::triangleUniformSampling(sampler1D);
 
                 SurfaceInteraction si;
                 Vector3 p = _transformedPosition1 * barycentric[0] +

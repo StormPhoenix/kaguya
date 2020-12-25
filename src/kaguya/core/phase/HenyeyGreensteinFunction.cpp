@@ -22,7 +22,7 @@ namespace kaguya {
             double sampleU = sampler1D->sample();
             double term1 = (1 - _g * _g) / (1 + _g * (2 * sampleU - 1));
             double cosTheta;
-            if (std::abs(_g) < EPSILON) {
+            if (std::abs(_g) < math::EPSILON) {
                 cosTheta = 1 - 2 * sampleU;
             } else {
                 cosTheta = (1 + _g * _g - term1 * term1) / (2 * _g);
@@ -31,7 +31,7 @@ namespace kaguya {
 
             // \phi
             double sampleV = sampler1D->sample();
-            double phi = 2 * PI * sampleV;
+            double phi = 2 * math::PI * sampleV;
             double cosPhi = std::cos(phi);
             double sinPhi = std::sin(phi);
 
@@ -39,7 +39,7 @@ namespace kaguya {
             Vector3 tanY = NORMALIZE(wo);
             Vector3 tanX;
             Vector3 tanZ;
-            tangentSpace(tanY, &tanX, &tanZ);
+            math::tangentSpace(tanY, &tanX, &tanZ);
 
             // calculate coordinate
             double y = cosTheta;
@@ -53,7 +53,7 @@ namespace kaguya {
         double HenyeyGreensteinFunction::henyeyGreensteinPdf(double cosTheta, double g) const {
             double denominator = (1 + g * g + 2 * g * cosTheta);
             denominator = denominator * std::sqrt(denominator);
-            return INV_4PI * (1 - g * g) / denominator;
+            return math::INV_4PI * (1 - g * g) / denominator;
         }
 
     }

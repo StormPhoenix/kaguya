@@ -22,7 +22,7 @@ namespace kaguya {
             // 计算反射概率
             double reflectProb = fresnelDielectric(cosine, _thetaI, _thetaT);
             // Fresnel 的近似计算
-//            double reflectProb = schlick(cosine, _thetaI / _thetaT);
+//            double reflectProb = math::schlick(cosine, _thetaI / _thetaT);
 
             // 随机采样是否反射
             double random = sampler1D->sample();
@@ -47,7 +47,7 @@ namespace kaguya {
                     normal.y *= -1;
                 }
 
-                if (!refract(wo, normal, refraction, wi)) {
+                if (!math::refract(wo, normal, refraction, wi)) {
                     // 全反射
                     return 0;
                 }

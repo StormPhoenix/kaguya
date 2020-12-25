@@ -14,8 +14,8 @@ namespace kaguya {
                 _intensity(intensity) {
             assert(_mediumBoundary.inside() == _mediumBoundary.outside());
 
-            _cosFallOffRange = std::cos(DEGREES_TO_RADIANS(fallOffRange));
-            _cosTotalRange = std::cos(DEGREES_TO_RADIANS(totalRange));
+            _cosFallOffRange = std::cos(math::DEGREES_TO_RADIANS(fallOffRange));
+            _cosTotalRange = std::cos(math::DEGREES_TO_RADIANS(totalRange));
         }
 
         Spectrum SpotLight::sampleFromLight(const Interaction &eye,
@@ -41,13 +41,13 @@ namespace kaguya {
         Spectrum SpotLight::randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir,
                                            const Sampler1D *sampler1D) {
             // 在局部坐标空间中均匀采样射线
-            Vector3 dirLocal = coneUniformSampling(_cosTotalRange, sampler1D);
+            Vector3 dirLocal = math::coneUniformSampling(_cosTotalRange, sampler1D);
 
             // 计算切线空间
             Vector3 tanY = _dir;
             Vector3 tanX;
             Vector3 tanZ;
-            tangentSpace(tanY, &tanX, &tanZ);
+            math::tangentSpace(tanY, &tanX, &tanZ);
 
             // 计算世界坐标系中射线方向
             Vector3 dirWorld = dirLocal.x * tanX + dirLocal.y * tanY + dirLocal.z * tanZ;
@@ -57,7 +57,7 @@ namespace kaguya {
 
             (*normal) = dirWorld;
             (*pdfPos) = 1.0;
-            (*pdfDir) = coneUniformSamplePdf(_cosTotalRange);
+            (*pdfDir) = math::coneUniformSamplePdf(_cosTotalRange);
 
             return _intensity * fallOffWeight(dirWorld);
         }
@@ -66,7 +66,7 @@ namespace kaguya {
                                           double *pdfPos, double *pdfDir) const {
             (*pdfPos) = 0;
             (*pdfDir) = std::cos(DOT(ray.getDirection(), _dir)) >= _cosTotalRange ?
-                        coneUniformSamplePdf(_cosTotalRange) : 0;
+                        math::coneUniformSamplePdf(_cosTotalRange) : 0;
         }
 
         Spectrum SpotLight::fallOffWeight(const Vector3 &wo) {

@@ -34,7 +34,7 @@ using namespace kaguya::core;
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
 using kaguya::core::Spectrum;
-const int MODEL_SCALE = 50;
+const int MODEL_SCALE = 5;
 
 // smoke data
 const int gridz = 192;

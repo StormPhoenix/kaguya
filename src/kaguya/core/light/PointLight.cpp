@@ -35,19 +35,19 @@ namespace kaguya {
         Spectrum PointLight::randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir,
                                             const Sampler1D *sampler1D) {
             // 采样射线
-            Vector3 rayDir = sphereUniformSampling(sampler1D);
+            Vector3 rayDir = math::sphereUniformSampling(sampler1D);
             (*ray) = Ray(_center, NORMALIZE(rayDir), _mediumBoundary.inside());
 
             *normal = rayDir;
             *pdfPos = 1.0;
-            *pdfDir = INV_4PI;
+            *pdfDir = math::INV_4PI;
             return _intensity;
         }
 
         void PointLight::randomLightRayPdf(const Ray &ray, const Vector3 &normal,
                                            double *pdfPos, double *pdfDir) const {
             (*pdfPos) = 0.0;
-            (*pdfDir) = INV_4PI;
+            (*pdfDir) = math::INV_4PI;
         }
 
         std::shared_ptr<PointLight> PointLight::buildPointLight(const Vector3 &center, const Spectrum &intensity,

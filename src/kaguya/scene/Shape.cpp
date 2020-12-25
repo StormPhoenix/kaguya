@@ -25,7 +25,7 @@ namespace kaguya {
                     // convert density to pdf
                     double distance = LENGTH(si.getPoint() - ray.getOrigin());
                     double cosine = ABS_DOT(dir, si.getNormal());
-                    if (std::abs(cosine - 0) < EPSILON) {
+                    if (std::abs(cosine - 0) < math::EPSILON) {
                         return 0;
                     }
                     return pow(distance, 2) / (cosine * area());

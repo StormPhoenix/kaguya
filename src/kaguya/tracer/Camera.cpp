@@ -20,9 +20,9 @@ namespace kaguya {
         Camera::Camera(const Vector3 &eye, float yaw, float pitch,
                        const std::shared_ptr<Medium> medium, float fov, float aspect) : _medium(medium) {
             _eye = eye;
-            _front.x = cos(DEGREES_TO_RADIANS(pitch)) * cos(DEGREES_TO_RADIANS(yaw));
-            _front.y = sin(DEGREES_TO_RADIANS(pitch));
-            _front.z = cos(DEGREES_TO_RADIANS(pitch)) * sin(DEGREES_TO_RADIANS(yaw));
+            _front.x = cos(math::DEGREES_TO_RADIANS(pitch)) * cos(math::DEGREES_TO_RADIANS(yaw));
+            _front.y = sin(math::DEGREES_TO_RADIANS(pitch));
+            _front.z = cos(math::DEGREES_TO_RADIANS(pitch)) * sin(math::DEGREES_TO_RADIANS(yaw));
             _front = NORMALIZE(_front);
             buildCameraCoordinate(fov, aspect);
         }
@@ -64,7 +64,7 @@ namespace kaguya {
                                          const Sampler1D *const sampler1D,
                                          VisibilityTester *visibilityTester) const {
             // 在相机镜头圆盘上随机采样
-            Vector2 diskSample = diskUniformSampling(sampler1D, _lensRadius);
+            Vector2 diskSample = math::diskUniformSampling(sampler1D, _lensRadius);
             // 计算相机镜头采样点 3D 坐标
             Vector3 lensSample = _right * diskSample.x + _up * diskSample.y + _eye;
 
@@ -79,7 +79,7 @@ namespace kaguya {
             (*visibilityTester) = VisibilityTester(eye, lensInter);
 
             // lensInter 向 eye 发射射线的 pdf
-            double lensArea = PI * _lensRadius * _lensRadius;
+            double lensArea = math::PI * _lensRadius * _lensRadius;
             // 从 eye 位置对相机成像平面采样 pdf
             (*pdf) = (dist * dist) / (lensArea * ABS_DOT(lensInter.getNormal(), *wi));
 
@@ -107,7 +107,7 @@ namespace kaguya {
             }
 
             // 计算 pdfPos pdfDir
-            pdfPos = 1 / (PI * _lensRadius * _lensRadius);
+            pdfPos = 1 / (math::PI * _lensRadius * _lensRadius);
             pdfDir = (_focal * _focal) / (_area * cosine * cosine * cosine);
         }
 
@@ -144,21 +144,21 @@ namespace kaguya {
             double weight = pW / (PI * _lensRadius * _lensRadius * cosine);
              */
             double weight = (_focal * _focal) /
-                            (_area * PI * _lensRadius * _lensRadius * std::pow(cosine, 4));
+                            (_area * math::PI * _lensRadius * _lensRadius * std::pow(cosine, 4));
             return Spectrum(weight);
         }
 
         void Camera::buildCameraCoordinate(float fov, float aspect) {
             const Vector3 worldUp = Vector3(0.0f, 1.0f, 0.0f);
             // 判断 _front 方向是否与 worldUp 重叠
-            if (abs(_front.x) < EPSILON && abs(_front.z) < EPSILON) {
+            if (abs(_front.x) < math::EPSILON && abs(_front.z) < math::EPSILON) {
                 _right = {1.0f, 0.0f, 0.0f};
             } else {
                 _right = NORMALIZE(CROSS(_front, worldUp));
             }
             _up = NORMALIZE(CROSS(_right, _front));
 
-            _halfWindowHeight = tan(DEGREES_TO_RADIANS(fov / 2)) * _focal;
+            _halfWindowHeight = tan(math::DEGREES_TO_RADIANS(fov / 2)) * _focal;
             _halfWindowWidth = _halfWindowHeight * aspect;
             _area = 4 * _halfWindowHeight * _halfWindowWidth;
             _leftBottomCorner = _eye + _focal * _front - _halfWindowWidth * _right - _halfWindowHeight * _up;

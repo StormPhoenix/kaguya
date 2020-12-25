@@ -163,7 +163,7 @@ namespace kaguya {
             Spectrum ret(0);
 
             // 排除对光源采样贡献为 0 的情况
-            if (lightPdf > EPSILON && !lumi.isBlack()) {
+            if (lightPdf > math::EPSILON && !lumi.isBlack()) {
                 Spectrum f;
                 double scatteringPdf = 0.0f;
                 if (eye.isMediumInteraction()) {
@@ -191,7 +191,7 @@ namespace kaguya {
                             ret += f / lightPdf * lumi;
                         } else {
                             // multiple rayImportance sampling
-                            double weight = misWeight(1, lightPdf, 1, scatteringPdf);
+                            double weight = math::misWeight(1, lightPdf, 1, scatteringPdf);
                             ret += f * weight / lightPdf * lumi;
                         }
                     }
@@ -230,7 +230,7 @@ namespace kaguya {
                         if (lightPdf == 0) {
                             return ret;
                         }
-                        weight = misWeight(1, scatteringPdf, 1, lightPdf);
+                        weight = math::misWeight(1, scatteringPdf, 1, lightPdf);
                     }
 
                     // find intersection

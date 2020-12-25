@@ -67,9 +67,9 @@ namespace kaguya {
                         vector.z = mesh->mNormals[idx].z;
                     }
 
-                    if (std::abs(vector.x - 0) < EPSILON &&
-                        std::abs(vector.y - 0) < EPSILON &&
-                        std::abs(vector.z - 0) < EPSILON) {
+                    if (std::abs(vector.x - 0) < math::EPSILON &&
+                        std::abs(vector.y - 0) < math::EPSILON &&
+                        std::abs(vector.z - 0) < math::EPSILON) {
                         vector.x = 0;
                         vector.y = 1;
                         vector.z = 0;

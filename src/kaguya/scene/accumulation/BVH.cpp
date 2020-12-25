@@ -59,7 +59,7 @@ namespace kaguya {
                             size_t start, size_t end) {
                 math::random::Sampler1D *sampler = math::random::Sampler1D::newInstance();
                 // 采用最简单的平均分配法
-                int axis = randomInt(0, 2, sampler);
+                int axis = math::randomInt(0, 2, sampler);
                 auto comparator = (axis == 0) ? compareX
                                               : (axis == 1) ? compareY
                                                             : compareZ;

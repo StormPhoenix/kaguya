@@ -31,7 +31,7 @@ namespace kaguya {
          * @return
          */
         inline double fresnelDielectric(double cosineI, double thetaI, double thetaT) {
-            cosineI = clamp(cosineI, -1, 1);
+            cosineI = math::clamp(cosineI, -1, 1);
             if (cosineI < 0) {
                 // 内部射入
                 cosineI = std::abs(cosineI);
@@ -57,7 +57,7 @@ namespace kaguya {
 
         inline Spectrum fresnelConductor(double cosineI, const Spectrum &thetaI,
                                          const Spectrum &thetaT, const Spectrum &k) {
-            cosineI = clamp(cosineI, -1, 1);
+            cosineI = math::clamp(cosineI, -1, 1);
             Spectrum theta = thetaT / thetaI;
             Spectrum thetaK = k / thetaI;
 

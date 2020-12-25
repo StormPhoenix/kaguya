@@ -103,8 +103,8 @@ namespace kaguya {
                     double offsetY = modelPoint.y - (-_height / 2);
 
                     // 判断是否在四边形内部
-                    if (checkRange(offsetX, 0, _width)
-                        && checkRange(offsetY, 0, _height)) {
+                    if (math::checkRange(offsetX, 0, _width)
+                        && math::checkRange(offsetY, 0, _height)) {
                         si.setPoint(hitPoint);
                         Vector3 normal = (*_transformMatrix) * Vector4(_normal, 0.0f);
                         si.setOutwardNormal(normal, dir);
@@ -146,7 +146,7 @@ namespace kaguya {
                 Vector3 transformedPoint = _transformMatrix != nullptr ?
                                            INVERSE((*_transformMatrix)) * Vector4(si.getPoint(), 1.0f)
                                                                        : si.getPoint();
-                if (transformedPoint.z - 0 <= EPSILON &&
+                if (transformedPoint.z - 0 <= math::EPSILON &&
                     transformedPoint.x >= -_width / 2 && transformedPoint.x <= _width / 2 &&
                     transformedPoint.y >= -_height / 2 && transformedPoint.y <= _height / 2) {
                     return 1.0 / area();
@@ -177,7 +177,7 @@ namespace kaguya {
                     double z = ray.getOrigin().z + step * ray.getDirection().z;
                     double x = ray.getOrigin().x + step * ray.getDirection().x;
 
-                    if (checkRange(z, _z0, _z1) && checkRange(x, _x0, _x1)) {
+                    if (math::checkRange(z, _z0, _z1) && math::checkRange(x, _x0, _x1)) {
                         si.setPoint(ray.at(step));
                         ray.setStep(step);
                         si.setOutwardNormal(_normal, ray.getDirection());
@@ -213,7 +213,7 @@ namespace kaguya {
 
             double ZXWall::surfacePointPdf(const SurfaceInteraction &si) const {
                 Vector3 samplePoint = si.getPoint();
-                if (samplePoint.y - _y < EPSILON &&
+                if (samplePoint.y - _y < math::EPSILON &&
                     samplePoint.x >= _x0 && samplePoint.x <= _x1 &&
                     samplePoint.z >= _z0 && samplePoint.z <= _z1) {
                     return 1.0 / area();
@@ -248,7 +248,7 @@ namespace kaguya {
                     double z = ray.getOrigin().z + step * ray.getDirection().z;
                     double y = ray.getOrigin().y + step * ray.getDirection().y;
 
-                    if (checkRange(z, _z0, _z1) && checkRange(y, _y0, _y1)) {
+                    if (math::checkRange(z, _z0, _z1) && math::checkRange(y, _y0, _y1)) {
                         si.setPoint(ray.at(step));
                         ray.setStep(step);
                         si.setOutwardNormal(_normal, ray.getDirection());
@@ -288,7 +288,7 @@ namespace kaguya {
 
             double YZWall::surfacePointPdf(const SurfaceInteraction &point) const {
                 Vector3 samplePoint = point.getPoint();
-                if (samplePoint.y - _x < EPSILON &&
+                if (samplePoint.y - _x < math::EPSILON &&
                     samplePoint.x >= _y0 && samplePoint.x <= _y1 &&
                     samplePoint.z >= _z0 && samplePoint.z <= _z1) {
                     return 1.0 / area();
@@ -319,7 +319,7 @@ namespace kaguya {
                     double x = ray.getOrigin().x + step * ray.getDirection().x;
                     double y = ray.getOrigin().y + step * ray.getDirection().y;
 
-                    if (checkRange(x, _x0, _x1) && checkRange(y, _y0, _y1)) {
+                    if (math::checkRange(x, _x0, _x1) && math::checkRange(y, _y0, _y1)) {
                         si.setPoint(ray.at(step));
                         ray.setStep(step);
                         si.setOutwardNormal(_normal, ray.getDirection());
@@ -359,7 +359,7 @@ namespace kaguya {
 
             double XYWall::surfacePointPdf(const SurfaceInteraction &si) const {
                 Vector3 samplePoint = si.getPoint();
-                if (samplePoint.x - _z < EPSILON &&
+                if (samplePoint.x - _z < math::EPSILON &&
                     samplePoint.y >= _y0 && samplePoint.x <= _y1 &&
                     samplePoint.x >= _x0 && samplePoint.z <= _x1) {
                     return 1.0 / area();

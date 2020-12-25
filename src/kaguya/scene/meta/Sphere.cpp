@@ -50,7 +50,7 @@ namespace kaguya {
                         si.setV(0);
                         si.setAreaLight(nullptr);
 
-                        Vector3 error = gamma(5) * ABS(origin);
+                        Vector3 error = math::gamma(5) * ABS(origin);
                         si.setError(error);
 
                         ray.setStep(root);
@@ -68,7 +68,7 @@ namespace kaguya {
                         si.setU(0);
                         si.setV(0);
                         si.setAreaLight(nullptr);
-                        Vector3 error = gamma(5) * ABS(origin);
+                        Vector3 error = math::gamma(5) * ABS(origin);
                         si.setError(error);
                         ray.setStep(root);
 
@@ -86,7 +86,7 @@ namespace kaguya {
 
             SurfaceInteraction Sphere::sampleSurfacePoint(const Sampler1D *sampler1D) const {
                 // sample outward normal
-                Vector3 normal = sphereUniformSampling(sampler1D);
+                Vector3 normal = math::sphereUniformSampling(sampler1D);
                 if (_transformMatrix != nullptr) {
                     normal = NORMALIZE(Vector3(INVERSE_TRANSPOSE(*_transformMatrix) * Vector4(normal, 0.0f)));
                 }
@@ -119,12 +119,12 @@ namespace kaguya {
                     double cosThetaMax = std::sqrt(std::max(0., 1 - sinThetaMax2));
 
                     // cone sampling
-                    const Vector3 dir = coneUniformSampling(cosThetaMax, sampler1D);
+                    const Vector3 dir = math::coneUniformSampling(cosThetaMax, sampler1D);
 
                     // build coordinate system
                     Vector3 tanY = NORMALIZE(_transformedCenter - eye.getPoint());
                     Vector3 tanX, tanZ;
-                    tangentSpace(tanY, &tanX, &tanZ);
+                    math::tangentSpace(tanY, &tanX, &tanZ);
 
                     // 计算世界坐标系中射线方向
                     Vector3 dirWorld = dir.x * tanX + dir.y * tanY + dir.z * tanZ;
@@ -162,7 +162,7 @@ namespace kaguya {
                     double sinThetaMax2 = (_radius * _radius) / (dist * dist);
                     double cosThetaMax = std::sqrt(std::max(0., 1 - sinThetaMax2));
 
-                    pdf = coneUniformSamplePdf(cosThetaMax);
+                    pdf = math::coneUniformSamplePdf(cosThetaMax);
                 }
                 return pdf;
             }

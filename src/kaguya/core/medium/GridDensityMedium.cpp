@@ -140,24 +140,24 @@ namespace kaguya {
 
                 /* Interpolation for x-axis */
                 // (x, y, z) - (x + 1, y, z)
-                float x1 = linearInterpolation(interValue.x, d(coordi), d(coordi + Vector3(1, 0, 0)));
+                float x1 = math::linearInterpolation(interValue.x, d(coordi), d(coordi + Vector3(1, 0, 0)));
                 // (x, y + 1, z) - (x + 1, y + 1, z)
-                float x2 = linearInterpolation(interValue.x, d(coordi + Vector3(0, 1, 0)),
+                float x2 = math::linearInterpolation(interValue.x, d(coordi + Vector3(0, 1, 0)),
                                                d(coordi + Vector3(1, 1, 0)));
                 // (x, y, z + 1) - (x + 1, y, z + 1)
-                float x3 = linearInterpolation(interValue.x, d(coordi + Vector3(0, 0, 1)),
+                float x3 = math::linearInterpolation(interValue.x, d(coordi + Vector3(0, 0, 1)),
                                                d(coordi + Vector3(1, 0, 1)));
                 // (x, y + 1, z + 1) - (x + 1, y + 1, z + 1)
-                float x4 = linearInterpolation(interValue.x, d(coordi + Vector3(0, 1, 1)),
+                float x4 = math::linearInterpolation(interValue.x, d(coordi + Vector3(0, 1, 1)),
                                                d(coordi + Vector3(1, 1, 1)));
 
                 /* Interpolation for y-axis */
                 // x1 - x2
-                float y1 = linearInterpolation(interValue.y, x1, x2);
+                float y1 = math::linearInterpolation(interValue.y, x1, x2);
                 // x3 - x4
-                float y2 = linearInterpolation(interValue.y, x3, x4);
+                float y2 = math::linearInterpolation(interValue.y, x3, x4);
                 /* Interpolation for z-axis */
-                return linearInterpolation(interValue.z, y1, y2);
+                return math::linearInterpolation(interValue.z, y1, y2);
             }
         }
     }

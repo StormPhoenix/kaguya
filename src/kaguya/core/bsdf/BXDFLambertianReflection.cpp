@@ -15,7 +15,7 @@ namespace kaguya {
              * Lambertian 的吸收率是 _albedo，这个值等于半球面所有方向的入射辐射超某一个方向辐射出的反射率，
              * 我们假设 reflectance = C 是一个常量，带入积分方程可以解出 C = albedo / PI
              */
-            return _albedo * INV_PI;
+            return _albedo * math::INV_PI;
         }
 
     }

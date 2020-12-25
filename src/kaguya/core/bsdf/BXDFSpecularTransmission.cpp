@@ -34,7 +34,7 @@ namespace kaguya {
                 normal.y = -1;
             }
 
-            if (!refract(wo, normal, refraction, wi)) {
+            if (!math::refract(wo, normal, refraction, wi)) {
                 // 发射了全反射，无法折射
                 return 0;
             }

@@ -18,11 +18,6 @@ A simple physically based render.
 
 
 ## Unsolved
-- [ ] 考虑该如何设计 Ray 重的 minStep。当前问题是 Ray 的 minStep 不能为 0。如果设置成 0，就会遇到浮点误差问题。
-    例如：在表面 A 向外发射射线 x，由于浮点误差 x 不在 A 的表面，而是在稍微下面一点的地方，这样导致 x 又会和表面 A 相交。
-    - [ ] modify the method which applied for triangle intersection, and calculate the error bound. 
-
-- [ ] Math.hpp function 加入 namespace，否则会与 glm 冲突
 
 - [ ] Better space transformation
     - [ ] Transform class
@@ -31,34 +26,18 @@ A simple physically based render.
 - [ ] Ray direction 和 step 的关系，direction 长度可以不为 1。    
 
 - [ ] Add information for each *assert* phrase
-
-- [ ] Shape 文件位置重构，Material \ AreaLight 属性拆解到 Geometry
-    - [x] *Geometry* response for set *Material* and *MediumBound*
-    - [x] merge *ShapeSampler* and *Shape*
-    - [ ] delete pdf-method in Shape
-    - [ ] move Shape and Geometry to namespace::core
-    - [ ] when sampling the surface of shape, *Geometry* will set other attrs
-
-- [x] Volume (smoke etc) rendering
-    - [x] add medium boundary to path tracing
-    - [x] add medium boundary to bi-directional path tracing
     
 - [ ] Add subsurface scattering
     - [ ] add **BSSRDF**
     - [ ] modify *path tracer*
     - [ ] modify *bd path tracer*  
 
-- [ ] Refactor Medium.h to new namespace
-
 - [ ] Add background light.
-
-- [ ] Sampling strategy for different shape.
-
-- [x] randomInt 会出现随机到 randomValue = 1.0 的地方，得出的 int 值会让调用者越界
 
 - [ ] Delete variable *isFrontFace*
 
 - [ ] Add multiple light source
+    - [ ] Delete Wall.h
 
 - [ ] 去掉 Interaction 里面的 frontFace
 
@@ -71,6 +50,23 @@ A simple physically based render.
     无法在光线传输过程中确定碰撞位置两端的折射率。程序采用的是将外界材质的折射率固定设置为空气折射率（1.0）
     
 ## Solved
+- [x] Volume (smoke etc) rendering
+    - [x] add medium boundary to path tracing
+    - [x] add medium boundary to bi-directional path tracing
+    
+- [x] Shape 文件位置重构，Material \ AreaLight 属性拆解到 Geometry
+    - [x] *Geometry* response for set *Material* and *MediumBound*
+    - [x] merge *ShapeSampler* and *Shape*
+    - [x] delete pdf-method in Shape
+    - [x] when sampling the surface of shape, *Geometry* will set other attrs
+    
+- [x] Math.hpp function 加入 namespace，否则会与 glm 冲突
+
+- [x] 考虑该如何设计 Ray 重的 minStep。当前问题是 Ray 的 minStep 不能为 0。如果设置成 0，就会遇到浮点误差问题。
+    例如：在表面 A 向外发射射线 x，由于浮点误差 x 不在 A 的表面，而是在稍微下面一点的地方，这样导致 x 又会和表面 A 相交。
+    - [x] modify the method which applied for triangle intersection, and calculate the error bound. 
+    
+- [x] randomInt 会出现随机到 randomValue = 1.0 的地方，得出的 int 值会让调用者越界
 
 - [x] 重新调整 Shape, Geometry, Aggregation 结构
     - [x] 重新定义 Shape, Geometry, Aggregation

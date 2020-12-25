@@ -32,7 +32,6 @@ namespace kaguya {
             VisibilityTester(const Interaction start, const Interaction end);
 
             /**
-             * TODO
              * T(p, p') = exponent^(-shift_{0, (p'-p)} theta_t(t) dt)
              *
              * @return

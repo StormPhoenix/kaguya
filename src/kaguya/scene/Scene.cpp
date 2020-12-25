@@ -9,13 +9,13 @@
 #include <kaguya/core/light/SpotLight.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/meta/Triangle.h>
+#include <kaguya/scene/meta/Wall.h>
 #include <kaguya/scene/Geometry.h>
 #include <kaguya/Config.h>
 #include <kaguya/scene/aggregation/Box.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/accumulation/BVH.h>
 #include <kaguya/scene/meta/Sphere.h>
-#include <kaguya/scene/meta/Wall.h>
 #include <kaguya/scene/aggregation/TriangleMesh.h>
 #include <kaguya/material/Dielectric.h>
 #include <kaguya/material/Lambertian.h>
@@ -331,11 +331,13 @@ namespace kaguya {
                                                                                       gridz,
                                                                                       smoke, transformMatrix);
 
-            // tiny box wrap smoke
-            Box smokeWrapper = Box(nullptr, smokeMedium, airMedium, transformMatrix);
-
             // objects
             std::vector<std::shared_ptr<Intersectable>> objects;
+
+            // tiny box wrap smoke
+            Box smokeWrapper = Box(nullptr, smokeMedium, airMedium, transformMatrix);
+            std::vector<std::shared_ptr<Intersectable>> boxes = smokeWrapper.aggregation();
+            objects.insert(objects.end(), boxes.begin(), boxes.end());
 
             // walls
             std::vector<std::shared_ptr<Geometry>> leftWall =
@@ -369,15 +371,12 @@ namespace kaguya {
             // build area light
             std::shared_ptr<AreaLight> light = testDiffuseAreaLight(areaLightSpectrum, lightWall, airMedium, airMedium,
                                                                     true);
+            objects.push_back(lightWall);
 
             // build scene object
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
             scene->_light = light;
 
-            std::vector<std::shared_ptr<Intersectable>> boxes = smokeWrapper.aggregation();
-//            objects.insert(objects.end(), boxes.begin(), boxes.end());
-
-            objects.push_back(lightWall);
 
             // scene
             std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);

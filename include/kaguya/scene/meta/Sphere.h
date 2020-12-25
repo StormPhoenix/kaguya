@@ -32,7 +32,7 @@ namespace kaguya {
                 bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
 
                 virtual double area() const override {
-                    return 4 * PI * _radius * _radius;
+                    return 4 * math::PI * _radius * _radius;
                 }
 
                 virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) const override;

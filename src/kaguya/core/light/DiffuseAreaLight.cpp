@@ -39,12 +39,12 @@ namespace kaguya {
             // 判断区域光是否是双面发光
             if (_singleSide) {
                 // 单面发光，按照 cosine 方式采样
-                dirLocal = hemiCosineSampling(sampler1D);
-                (*pdfDir) = hemiCosineSamplePdf(dirLocal);
+                dirLocal = math::hemiCosineSampling(sampler1D);
+                (*pdfDir) = math::hemiCosineSamplePdf(dirLocal);
             } else {
                 // 双面发光，按照 cosine 方式在两边采样
-                dirLocal = hemiCosineSampling(sampler1D);
-                (*pdfDir) = hemiCosineSamplePdf(dirLocal) * 0.5;
+                dirLocal = math::hemiCosineSampling(sampler1D);
+                (*pdfDir) = math::hemiCosineSamplePdf(dirLocal) * 0.5;
 
                 // 按照 0.5 的概率确认在上/下球面做 cosine / PI 采样
                 double prob = sampler1D->sample();
@@ -57,7 +57,7 @@ namespace kaguya {
             Vector3 tanY = *normal;
             Vector3 tanX;
             Vector3 tanZ;
-            tangentSpace(tanY, &tanX, &tanZ);
+            math::tangentSpace(tanY, &tanX, &tanZ);
 
             // 射线方向从局部坐标系转化到世界坐标系
             Vector3 dirWorld = dirLocal.x * tanX + dirLocal.y * tanY + dirLocal.z * tanZ;
@@ -77,7 +77,7 @@ namespace kaguya {
             si.setPoint(ray.getOrigin());
             (*pdfPos) = _geometry->getShape()->surfacePointPdf(si);
             double cosTheta = ABS_DOT(normal, ray.getDirection());
-            (*pdfDir) = _singleSide ? hemiCosineSamplePdf(cosTheta) : 0.5 * hemiCosineSamplePdf(cosTheta);
+            (*pdfDir) = _singleSide ? math::hemiCosineSamplePdf(cosTheta) : 0.5 * math::hemiCosineSamplePdf(cosTheta);
         }
 
         Spectrum DiffuseAreaLight::lightRadiance(const Interaction &interaction, const Vector3 &wo) const {
