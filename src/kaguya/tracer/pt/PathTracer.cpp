@@ -33,7 +33,7 @@ namespace kaguya {
 
 
         Spectrum PathTracer::shaderOfProgression(const kaguya::tracer::Ray &ray, kaguya::Scene &scene,
-                                                 const Sampler1D *sampler1D,
+                                                 const Sampler *sampler1D,
                                                  MemoryArena &memoryArena) {
             // 最终渲染结果
             Spectrum shaderColor = Spectrum(0);
@@ -66,10 +66,10 @@ namespace kaguya {
                 // check if a medium interaction occurs
                 if (mi.isValid()) {
                     /* handle medium interaction */
-                    // sample direct light
+                    // sample1d direct light
                     shaderColor += beta * evaluateDirectLight(scene, mi, sampler1D);
 
-                    /* sample new ray */
+                    /* sample1d new ray */
                     Vector3 worldWo = -scatterRay.getDirection();
                     Vector3 worldWi;
                     mi.getPhaseFunction()->sampleScatter(worldWo, &worldWi, sampler1D);
@@ -135,7 +135,7 @@ namespace kaguya {
 
                 // Terminate path tracing with Russian Roulette
                 if (bounce > _russianRouletteBounce) {
-                    if (sampler1D->sample() < _russianRoulette) {
+                    if (sampler1D->sample1d() < _russianRoulette) {
                         break;
                     }
                     beta /= (1 - _russianRoulette);
@@ -146,7 +146,7 @@ namespace kaguya {
 
         Spectrum PathTracer::evaluateDirectLight(
                 Scene &scene, const Interaction &eye,
-                const Sampler1D *sampler1D) {
+                const Sampler *sampler1D) {
             // TODO 目前只考虑单个光源
             auto light = scene.getLight();
             // p(wi)
@@ -225,7 +225,7 @@ namespace kaguya {
                 if (!f.isBlack() && scatteringPdf > 0) {
                     double weight = 1.0;
                     if (!sampleSpecular) {
-                        // sample light pdf
+                        // sample1d light pdf
                         lightPdf = light->sampleFromLightPdf(eye, wi);
                         if (lightPdf == 0) {
                             return ret;
@@ -253,16 +253,16 @@ namespace kaguya {
             return ret;
         }
 
-        std::function<void(const int, const int, const Sampler1D *)> PathTracer::render() {
-            auto renderFunc = [this](const int row, const int col, const Sampler1D *sampler1D) -> void {
+        std::function<void(const int, const int, const Sampler *)> PathTracer::render() {
+            auto renderFunc = [this](const int row, const int col, const Sampler *sampler1D) -> void {
                 Spectrum ans = {0};
 
                 const double sampleWeight = 1.0 / _samplePerPixel;
                 // 做 _samplePerPixel 次采样
                     for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
                         MemoryArena arena;
-                        auto u = (col + sampler1D->sample()) / double(_camera->getResolutionWidth());
-                        auto v = (row + sampler1D->sample()) / double(_camera->getResolutionHeight());
+                        auto u = (col + sampler1D->sample1d()) / double(_camera->getResolutionWidth());
+                        auto v = (row + sampler1D->sample1d()) / double(_camera->getResolutionHeight());
 
                         Ray sampleRay = _camera->sendRay(u, v);
                         Spectrum shaderColor = shaderOfProgression(sampleRay, *(_scene.get()), sampler1D, arena);

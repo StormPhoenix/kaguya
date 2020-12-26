@@ -164,7 +164,7 @@ namespace kaguya {
              * @return
              */
             bool intersectWithMedium(Ray &ray, SurfaceInteraction &si, core::Spectrum &transmittance,
-                                     const Sampler1D *sampler1D);
+                                     const Sampler *sampler1D);
 
             std::shared_ptr<Intersectable> getWorld() {
                 return _world;

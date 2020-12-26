@@ -37,10 +37,10 @@ namespace kaguya {
                     return 4 * math::PI * _radius * _radius;
                 }
 
-                virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) const override;
+                virtual SurfaceInteraction sampleSurfacePoint(const Sampler *sampler1D) const override;
 
                 virtual SurfaceInteraction
-                sampleSurfaceInteraction(const Interaction &eye, const Sampler1D *sampler1D) const override;
+                sampleSurfaceInteraction(const Interaction &eye, const Sampler *sampler1D) const override;
 
                 virtual double surfaceInteractionPdf(const Interaction &eye, const Vector3 &dir) const override;
 

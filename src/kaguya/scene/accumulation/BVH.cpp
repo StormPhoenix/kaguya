@@ -57,7 +57,7 @@ namespace kaguya {
 
             void BVH::build(std::vector<std::shared_ptr<Intersectable>> &objects,
                             size_t start, size_t end) {
-                math::random::Sampler1D *sampler = math::random::Sampler1D::newInstance();
+                math::random::Sampler *sampler = math::random::Sampler::newInstance();
                 // 采用最简单的平均分配法
                 int axis = math::randomInt(0, 2, sampler);
                 auto comparator = (axis == 0) ? compareX

@@ -1176,7 +1176,7 @@ namespace kaguya {
         }
 
         bool Scene::intersectWithMedium(Ray &ray, SurfaceInteraction &si, core::Spectrum &transmittance,
-                                        const Sampler1D *sampler1D) {
+                                        const Sampler *sampler1D) {
             transmittance = Spectrum(1.0);
             while (true) {
                 bool foundIntersection = intersect(ray, si);

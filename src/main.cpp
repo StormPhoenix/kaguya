@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     auto cli = (
             value("output name", Config::filenamePrefix),
                     option("-rt", "--render-type") & value("render type", render),
-                    option("-ssp", "--sample-per-pixel") & value("sample per pixel", Config::samplePerPixel),
+                    option("-ssp", "--sample1d-per-pixel") & value("sample1d per pixel", Config::samplePerPixel),
                     option("-d", "--max-depth") & value("max scatter depth", Config::maxScatterDepth),
                     option("-rb", "--russian-prob") & value("russian roulette probability", Config::russianRoulette),
                     option("-rd", "--russian-depth") & value("russian roulette depth", Config::russianRouletteDepth),

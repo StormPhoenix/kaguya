@@ -61,7 +61,7 @@ namespace kaguya {
         Spectrum Camera::sampleCameraRay(const Interaction &eye,
                                          Vector3 *wi, double *pdf,
                                          Point2d *filmPosition,
-                                         const Sampler1D *const sampler1D,
+                                         const Sampler *const sampler1D,
                                          VisibilityTester *visibilityTester) const {
             // 在相机镜头圆盘上随机采样
             Vector2 diskSample = math::diskUniformSampling(sampler1D, _lensRadius);

@@ -14,12 +14,12 @@ namespace kaguya {
         }
 
         double HenyeyGreensteinFunction::sampleScatter(const Vector3 &wo, Vector3 *wi,
-                                                       const Sampler1D *sampler1D) const {
+                                                       const Sampler *sampler1D) const {
             // Henyey-Greenstein phase function
             assert(sampler1D != nullptr);
 
             // \cos(\theta) \sin(\theta)
-            double sampleU = sampler1D->sample();
+            double sampleU = sampler1D->sample1d();
             double term1 = (1 - _g * _g) / (1 + _g * (2 * sampleU - 1));
             double cosTheta;
             if (std::abs(_g) < math::EPSILON) {
@@ -30,7 +30,7 @@ namespace kaguya {
             double sinTheta = std::sqrt(std::max(0.0, 1 - cosTheta * cosTheta));
 
             // \phi
-            double sampleV = sampler1D->sample();
+            double sampleV = sampler1D->sample1d();
             double phi = 2 * math::PI * sampleV;
             double cosPhi = std::cos(phi);
             double sinPhi = std::sin(phi);

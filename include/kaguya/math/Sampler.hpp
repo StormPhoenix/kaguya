@@ -12,21 +12,21 @@ namespace kaguya {
     namespace math {
         namespace random {
 
-            class Sampler1D {
+            class Sampler {
             public:
-                Sampler1D() {
+                Sampler() {
                     std::random_device rd;  //Will be used to obtain a seed for the random number engine
                     generator = std::mt19937(rd());
                     distribution = std::uniform_real_distribution<double>(0.0, 1.0);
                     randGenerator = std::bind(distribution, generator);
                 }
 
-                double sample() const {
+                double sample1d() const {
                     return randGenerator();
                 }
 
-                static Sampler1D *newInstance() {
-                    return new Sampler1D();
+                static Sampler *newInstance() {
+                    return new Sampler();
                 }
 
             private:

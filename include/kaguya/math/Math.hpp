@@ -8,7 +8,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
-#include <math.h>
+
+#include <cstring>
+#include <cmath>
 #include <algorithm>
 
 #include <functional>
@@ -24,7 +26,7 @@ using Matrix3 = glm::dmat3x3;
 typedef Vector3 Normal3;
 typedef Vector3 Point3;
 
-using kaguya::math::random::Sampler1D;
+using kaguya::math::random::Sampler;
 
 typedef Vector2 Point2d;
 
@@ -116,11 +118,11 @@ namespace kaguya {
             return r0 + (1 - r0) * pow((1 - cosine), 5);
         }
 
-        inline double randomDouble(double min, double max, const math::random::Sampler1D *const sampler1D) {
-            return min + (max - min) * sampler1D->sample();
+        inline double randomDouble(double min, double max, const math::random::Sampler *const sampler1D) {
+            return min + (max - min) * sampler1D->sample1d();
         }
 
-        inline int randomInt(int min, int max, const math::random::Sampler1D *const sampler1D) {
+        inline int randomInt(int min, int max, const math::random::Sampler *const sampler1D) {
             int ret = std::min(static_cast<int>(randomDouble(min, max + 1, sampler1D)), max);
             if (ret <= max) {
                 return ret;
@@ -186,11 +188,11 @@ namespace kaguya {
  * 从 y > 0 的半球面，按照 cos(theta) / Pi 的概率采样射线
  * @return
  */
-        inline Vector3 hemiCosineSampling(const math::random::Sampler1D *const sampler1D) {
+        inline Vector3 hemiCosineSampling(const math::random::Sampler *const sampler1D) {
             // fi = 2 * Pi * sampleU
-            double sampleU = sampler1D->sample();
+            double sampleU = sampler1D->sample1d();
             // sampleV = sin^2(theta)
-            double sampleV = sampler1D->sample();
+            double sampleV = sampler1D->sample1d();
             // x = sin(theta) * cos(fi)
             double x = sqrt(sampleV) * cos(2 * PI * sampleU);
             // y = cos(theta)
@@ -205,11 +207,11 @@ namespace kaguya {
  * 在球面做均匀采样，默认 (0, 1, 0) 为法线方向
  * @return
  */
-        inline Vector3 sphereUniformSampling(const math::random::Sampler1D *sampler1D) {
+        inline Vector3 sphereUniformSampling(const math::random::Sampler *sampler1D) {
             // phi = 2 * Pi * sampleU
-            double sampleU = sampler1D->sample();
+            double sampleU = sampler1D->sample1d();
             // 2 * sampleV = 1 - cos(theta)
-            double sampleV = sampler1D->sample();
+            double sampleV = sampler1D->sample1d();
 
             // y = 1 - 2 * sampleV
             double y = 1 - 2 * sampleV;
@@ -223,7 +225,7 @@ namespace kaguya {
 
 /**
  * （局部坐标系）
- * 计算 sample 在 hemi-sphere cosine 分布下的 pdf
+ * 计算 sample1d 在 hemi-sphere cosine 分布下的 pdf
  * @param sample
  * @return
  */
@@ -261,11 +263,11 @@ namespace kaguya {
  * 对圆盘做均匀采样
  * @return
  */
-        inline Vector2 diskUniformSampling(const math::random::Sampler1D *const sampler1D, double radius = 1.) {
+        inline Vector2 diskUniformSampling(const math::random::Sampler *const sampler1D, double radius = 1.) {
             // sampleY = r / Radius
             // sampleX = theta / (2 * PI)
-            double sampleY = sampler1D->sample();
-            double sampleX = sampler1D->sample();
+            double sampleY = sampler1D->sample1d();
+            double sampleX = sampler1D->sample1d();
 
             double theta = 2 * PI * sampleX;
             double r = sampleY * radius;
@@ -287,9 +289,9 @@ namespace kaguya {
  * @param sampler1D
  * @return
  */
-        inline Vector2 triangleUniformSampling(const Sampler1D *sampler1D) {
-            double sampleU = sampler1D->sample();
-            double sampleV = sampler1D->sample();
+        inline Vector2 triangleUniformSampling(const Sampler *sampler1D) {
+            double sampleU = sampler1D->sample1d();
+            double sampleV = sampler1D->sample1d();
 
             double u = 1 - std::sqrt(sampleU);
             double v = sampleV * sqrt(sampleU);
@@ -302,11 +304,11 @@ namespace kaguya {
  * @param cosThetaMax
  * @return
  */
-        inline Vector3 coneUniformSampling(double cosThetaMax, const Sampler1D *sampler1D) {
+        inline Vector3 coneUniformSampling(double cosThetaMax, const Sampler *sampler1D) {
             // phi = 2 * PI * sampleU
-            double sampleU = sampler1D->sample();
+            double sampleU = sampler1D->sample1d();
             // sampleV = (1 - cos(theta)) / (1 - cos(thetaMax))
-            double sampleV = sampler1D->sample();
+            double sampleV = sampler1D->sample1d();
 
             // 计算 cos(theta) sin(theta)
             double cosTheta = 1.0 - sampleV + sampleV * cosThetaMax;

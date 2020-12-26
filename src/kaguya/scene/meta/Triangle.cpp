@@ -182,7 +182,7 @@ namespace kaguya {
                                           (_transformedNormal3 - _transformedNormal1)));
             }
 
-            SurfaceInteraction Triangle::sampleSurfacePoint(const Sampler1D *sampler1D) const {
+            SurfaceInteraction Triangle::sampleSurfacePoint(const Sampler *sampler1D) const {
                 // Uniform sampling triangle
                 Vector2 barycentric = math::triangleUniformSampling(sampler1D);
 

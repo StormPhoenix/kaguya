@@ -11,7 +11,7 @@
 namespace kaguya {
     namespace core {
 
-        using kaguya::math::random::Sampler1D;
+        using kaguya::math::random::Sampler;
 
         typedef enum TransportMode {
             IMPORTANCE,
@@ -52,7 +52,7 @@ namespace kaguya {
              * @return 辐射系数
              */
             virtual Spectrum sampleF(const Vector3 &wo, Vector3 *wi, double *pdf,
-                                     const Sampler1D *const sampler1D);
+                                     const Sampler *const sampler1D);
 
             /**
              * wo 与 wi 之间的采样 PDF

@@ -38,7 +38,7 @@ namespace kaguya {
                 delete _densities;
             }
 
-            core::Spectrum GridDensityMedium::transmittance(const tracer::Ray &ray, const Sampler1D *sampler1D) const {
+            core::Spectrum GridDensityMedium::transmittance(const tracer::Ray &ray, const Sampler *sampler1D) const {
                 // transform ray from world space to medium space
                 const Vector3 origin =_invTransformMatrix->transformPoint(ray.getOrigin());
                 const Vector3 dir = _invTransformMatrix->transformVector(ray.getDirection());
@@ -57,7 +57,7 @@ namespace kaguya {
                 double transmittance = 1.0;
                 while (true) {
                     // Sample a travel distance
-                    step -= std::log(1 - sampler1D->sample()) / (_totalSigma * _maxDensity);
+                    step -= std::log(1 - sampler1D->sample1d()) / (_totalSigma * _maxDensity);
 
                     // If ray > maxStep then break
                     if (step >= maxStep) {
@@ -71,7 +71,7 @@ namespace kaguya {
             }
 
 
-            core::Spectrum GridDensityMedium::sampleInteraction(const tracer::Ray &ray, const Sampler1D *sampler1D,
+            core::Spectrum GridDensityMedium::sampleInteraction(const tracer::Ray &ray, const Sampler *sampler1D,
                                                                 MediumInteraction *mi, MemoryArena &memoryArena) const {
                 // transform ray from world space to medium space
                 const Vector3 origin =_invTransformMatrix->transformPoint(ray.getOrigin());
@@ -91,7 +91,7 @@ namespace kaguya {
                     double step = minStep;
                     while (true) {
                         // Sample a travel distance
-                        step -= std::log(1 - sampler1D->sample()) / (_totalSigma * _maxDensity);
+                        step -= std::log(1 - sampler1D->sample1d()) / (_totalSigma * _maxDensity);
 
                         // Is ray hit AABB boundary ?
                         if (step >= maxStep) {
@@ -100,7 +100,7 @@ namespace kaguya {
                             float d = density(transformedRay.at(step));
                             // Sample by probability
                             if (std::max(0., (double) d * _maxInvDensity)
-                                > sampler1D->sample()) {
+                                > sampler1D->sample1d()) {
                                 (*mi) = MediumInteraction(ray.at(step), -ray.getDirection(), this,
                                                           ALLOC(memoryArena, HenyeyGreensteinFunction)(_g));
                                 return _scatteringSigma / _totalSigma;

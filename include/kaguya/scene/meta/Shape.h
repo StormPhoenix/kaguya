@@ -19,7 +19,7 @@ namespace kaguya {
 
     namespace scene {
         namespace meta {
-            using kaguya::math::random::Sampler1D;
+            using kaguya::math::random::Sampler;
             using kaguya::scene::acc::AABB;
             using kaguya::tracer::Ray;
             using kaguya::core::SurfaceInteraction;
@@ -33,12 +33,12 @@ namespace kaguya {
 
                 virtual double area() const = 0;
 
-                virtual SurfaceInteraction sampleSurfacePoint(const Sampler1D *sampler1D) const = 0;
+                virtual SurfaceInteraction sampleSurfacePoint(const Sampler *sampler1D) const = 0;
 
                 virtual double surfacePointPdf(const SurfaceInteraction &si) const;
 
                 virtual SurfaceInteraction sampleSurfaceInteraction(
-                        const Interaction &eye, const Sampler1D *sampler1D) const;
+                        const Interaction &eye, const Sampler *sampler1D) const;
 
                 virtual double surfaceInteractionPdf(const Interaction &eye, const Vector3 &dir) const;
             };

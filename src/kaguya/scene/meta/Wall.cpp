@@ -118,10 +118,10 @@ namespace kaguya {
                 return _area;
             }
 
-            SurfaceInteraction Wall::sampleSurfacePoint(const Sampler1D *sampler1D) const {
+            SurfaceInteraction Wall::sampleSurfacePoint(const Sampler *sampler1D) const {
                 // 随机采样坐标
-                double u = sampler1D->sample();
-                double v = sampler1D->sample();
+                double u = sampler1D->sample1d();
+                double v = sampler1D->sample1d();
 
                 Vector3 horizontal = (_transformedRightBottom - _transformedLeftBottom) * u;
                 Vector3 vertical = (_transformedLeftTop - _transformedLeftBottom) * v;
@@ -187,9 +187,9 @@ namespace kaguya {
                 return width * height;
             }
 
-            SurfaceInteraction ZXWall::sampleSurfacePoint(const Sampler1D *sampler1D) const {
-                double u = sampler1D->sample();
-                double v = sampler1D->sample();
+            SurfaceInteraction ZXWall::sampleSurfacePoint(const Sampler *sampler1D) const {
+                double u = sampler1D->sample1d();
+                double v = sampler1D->sample1d();
 
                 double width = abs(_x1 - _x0);
                 double height = abs(_z1 - _z0);
@@ -262,9 +262,9 @@ namespace kaguya {
                 return width * height;
             }
 
-            SurfaceInteraction YZWall::sampleSurfacePoint(const Sampler1D *sampler1D) const {
-                double u = sampler1D->sample();
-                double v = sampler1D->sample();
+            SurfaceInteraction YZWall::sampleSurfacePoint(const Sampler *sampler1D) const {
+                double u = sampler1D->sample1d();
+                double v = sampler1D->sample1d();
 
                 double width = abs(_z1 - _z0);
                 double height = abs(_y1 - _y0);
@@ -333,9 +333,9 @@ namespace kaguya {
                 return width * height;
             }
 
-            SurfaceInteraction XYWall::sampleSurfacePoint(const Sampler1D *sampler1D) const {
-                double u = sampler1D->sample();
-                double v = sampler1D->sample();
+            SurfaceInteraction XYWall::sampleSurfacePoint(const Sampler *sampler1D) const {
+                double u = sampler1D->sample1d();
+                double v = sampler1D->sample1d();
 
                 double width = abs(_x1 - _x0);
                 double height = abs(_y1 - _y0);

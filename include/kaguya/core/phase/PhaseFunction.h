@@ -11,7 +11,7 @@
 namespace kaguya {
     namespace core {
 
-        using kaguya::math::random::Sampler1D;
+        using kaguya::math::random::Sampler;
 
         class PhaseFunction {
         public:
@@ -29,7 +29,7 @@ namespace kaguya {
              * @param wi
              * @return
              */
-            virtual double sampleScatter(const Vector3 &wo, Vector3 *wi, const Sampler1D *sampler1D) const = 0;
+            virtual double sampleScatter(const Vector3 &wo, Vector3 *wi, const Sampler *sampler1D) const = 0;
         };
 
     }

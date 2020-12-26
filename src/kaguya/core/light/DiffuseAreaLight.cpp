@@ -25,7 +25,7 @@ namespace kaguya {
                 AreaLight(intensity, shape, AREA, mediumBoundary), _singleSide(singleSide) {}
 
         Spectrum DiffuseAreaLight::randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir,
-                                                  const Sampler1D *sampler1D) {
+                                                  const Sampler *sampler1D) {
             assert(_geometry != nullptr);
 
             // 采样位置
@@ -47,7 +47,7 @@ namespace kaguya {
                 (*pdfDir) = math::hemiCosineSamplePdf(dirLocal) * 0.5;
 
                 // 按照 0.5 的概率确认在上/下球面做 cosine / PI 采样
-                double prob = sampler1D->sample();
+                double prob = sampler1D->sample1d();
                 if (prob < 0.5) {
                     dirLocal.y *= -1;
                 }

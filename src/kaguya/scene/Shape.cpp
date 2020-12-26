@@ -12,7 +12,7 @@ namespace kaguya {
             }
 
             SurfaceInteraction
-            Shape::sampleSurfaceInteraction(const Interaction &eye, const Sampler1D *sampler1D) const {
+            Shape::sampleSurfaceInteraction(const Interaction &eye, const Sampler *sampler1D) const {
                 return sampleSurfacePoint(sampler1D);
             }
 

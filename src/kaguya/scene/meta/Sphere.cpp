@@ -83,8 +83,8 @@ namespace kaguya {
                 }
             }
 
-            SurfaceInteraction Sphere::sampleSurfacePoint(const Sampler1D *sampler1D) const {
-                // sample outward normal
+            SurfaceInteraction Sphere::sampleSurfacePoint(const Sampler *sampler1D) const {
+                // sample1d outward normal
                 Vector3 normal = math::sphereUniformSampling(sampler1D);
                 if (_transformMatrix != nullptr) {
                     normal = _transformMatrix->transformNormal(normal);
@@ -104,7 +104,7 @@ namespace kaguya {
             }
 
             SurfaceInteraction
-            Sphere::sampleSurfaceInteraction(const Interaction &eye, const Sampler1D *sampler1D) const {
+            Sphere::sampleSurfaceInteraction(const Interaction &eye, const Sampler *sampler1D) const {
                 // If eye is inside sphere, then uniform sampling surface
                 const double dist = LENGTH(_transformedCenter - eye.getPoint());
                 if (_radius >= dist) {

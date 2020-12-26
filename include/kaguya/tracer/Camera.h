@@ -24,7 +24,7 @@ namespace kaguya {
         using kaguya::core::Interaction;
         using kaguya::utils::VisibilityTester;
         using kaguya::core::medium::Medium;
-        using kaguya::math::random::Sampler1D;
+        using kaguya::math::random::Sampler;
 
         class Camera {
         public:
@@ -93,7 +93,7 @@ namespace kaguya {
              * @return
              */
             Spectrum sampleCameraRay(const Interaction &eye, Vector3 *wi, double *pdf, Point2d *filmPosition,
-                                     const Sampler1D *const sampler1D,
+                                     const Sampler *const sampler1D,
                                      VisibilityTester *visibilityTester) const;
 
             /**

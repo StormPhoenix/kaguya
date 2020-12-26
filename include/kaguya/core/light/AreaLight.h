@@ -22,7 +22,7 @@ namespace kaguya {
         class AreaLight : public Light {
         public:
             /**
-             * Area light，sample radiance from shape surface
+             * Area light，sample1d radiance from shape surface
              * @param intensity
              * @param shape
              */
@@ -37,7 +37,7 @@ namespace kaguya {
             virtual Spectrum lightRadiance(const Interaction &interaction, const Vector3 &wo) const = 0;
 
             virtual Spectrum sampleFromLight(const Interaction &eye, Vector3 *wi, double *pdf,
-                                             const Sampler1D *sampler1D,
+                                             const Sampler *sampler1D,
                                              VisibilityTester *visibilityTester) override;
 
             virtual double sampleFromLightPdf(const Interaction &eye, const Vector3 &dir) override;

@@ -150,4 +150,6 @@ A simple physically based render.
 
 ## Result
 
-<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/scene_glass-bunny-with-point-light_ssp=300_max-depth=15_render-type=bdpt_1500x1500.jpg" alt="bunny-glass-point-light" width="40%">
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/scene_bunny-with-point-light2_ssp=300_max-depth=15_render-type=bdpt_1500x1500.jpg" alt="bunny-glass-point-light" width="60%">
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/scene_light_through-air_ssp=200_max-depth=12_render-type=bdpt_1200x1200.jpg" width="60%">
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/scene_smoke-with-area-light_ssp=200_max-depth=12_render-type=bdpt_1000x1000.jpg" width="60%">
