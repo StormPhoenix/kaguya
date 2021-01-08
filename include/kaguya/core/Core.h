@@ -7,7 +7,7 @@
 
 #define RGB_SPECTRUM
 
-#include <kaguya/math/Math.hpp>
+#include <kaguya/math/Math.h>
 #include <memory>
 
 namespace kaguya {

@@ -8,7 +8,7 @@
 namespace kaguya {
     namespace parallel {
 
-        RenderTask::RenderTask(const std::function<void(const int, const int, const Sampler *)> &func2D,
+        RenderTask::RenderTask(const std::function<void(const int, const int, Sampler *)> &func2D,
                                int renderWidth, int renderHeight) :
                 _renderHeight(renderHeight), _renderWidth(renderWidth),
                 func2D(func2D) {

@@ -8,7 +8,7 @@ namespace kaguya {
     namespace scene {
         namespace acc {
 
-            AxisAlignBoundingBox::AxisAlignBoundingBox(const Vector3 min, const Vector3 max) : _min(min), _max(max) {}
+            AxisAlignBoundingBox::AxisAlignBoundingBox(const Vector3d min, const Vector3d max) : _min(min), _max(max) {}
 
             bool AxisAlignBoundingBox::insectPoint(const Ray &ray, double *minStep, double *maxStep) const {
                 double t0 = 0, t1 = ray.getStep();

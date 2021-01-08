@@ -14,9 +14,9 @@ namespace kaguya {
         public:
             HenyeyGreensteinFunction(double g);
 
-            virtual double scatterPdf(const Vector3 &wo, const Vector3 &wi) const override;
+            virtual double scatterPdf(const Vector3d &wo, const Vector3d &wi) const override;
 
-            virtual double sampleScatter(const Vector3 &wo, Vector3 *wi, const Sampler *sampler1D) const override;
+            virtual double sampleScatter(const Vector3d &wo, Vector3d *wi, Sampler *sampler) const override;
 
         private:
             double henyeyGreensteinPdf(double cosTheta, double g) const;

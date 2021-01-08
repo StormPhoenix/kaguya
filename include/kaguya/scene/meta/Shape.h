@@ -6,8 +6,8 @@
 #define KAGUYA_SHAPE_H
 
 #include <kaguya/core/Interaction.h>
-#include <kaguya/math/Math.hpp>
-#include <kaguya/math/Sampler.hpp>
+#include <kaguya/math/Math.h>
+#include <kaguya/sampler/Sampler.h>
 #include <kaguya/scene/accumulation/AABB.h>
 #include <kaguya/scene/Intersectable.h>
 
@@ -33,14 +33,14 @@ namespace kaguya {
 
                 virtual double area() const = 0;
 
-                virtual SurfaceInteraction sampleSurfacePoint(const Sampler *sampler1D) const = 0;
+                virtual SurfaceInteraction sampleSurfacePoint(Sampler *sampler1D) const = 0;
 
                 virtual double surfacePointPdf(const SurfaceInteraction &si) const;
 
                 virtual SurfaceInteraction sampleSurfaceInteraction(
-                        const Interaction &eye, const Sampler *sampler1D) const;
+                        const Interaction &eye, Sampler *sampler1D) const;
 
-                virtual double surfaceInteractionPdf(const Interaction &eye, const Vector3 &dir) const;
+                virtual double surfaceInteractionPdf(const Interaction &eye, const Vector3d &dir) const;
             };
         }
     }

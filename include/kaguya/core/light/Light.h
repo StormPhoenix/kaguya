@@ -41,8 +41,8 @@ namespace kaguya {
              * @param visibilityTester 用于判断 ray 是否击中光源
              * @return
              */
-            virtual Spectrum sampleFromLight(const Interaction &eye, Vector3 *wi, double *pdf,
-                                             const Sampler *sampler1D,
+            virtual Spectrum sampleFromLight(const Interaction &eye, Vector3d *wi, double *pdf,
+                                             Sampler *sampler1D,
                                              VisibilityTester *visibilityTester) = 0;
 
             /**
@@ -51,7 +51,7 @@ namespace kaguya {
              * @param dir
              * @return
              */
-            virtual double sampleFromLightPdf(const Interaction &eye, const Vector3 &dir) = 0;
+            virtual double sampleFromLightPdf(const Interaction &eye, const Vector3d &dir) = 0;
 
             /**
              * light 主动发射光线
@@ -60,8 +60,8 @@ namespace kaguya {
              * @param pdfDir 射线方向 pdf
              * @return
              */
-            virtual Spectrum randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos,
-                                            double *pdfDir,const Sampler *sampler1D) = 0;
+            virtual Spectrum randomLightRay(Ray *ray, Vector3d *normal, double *pdfPos,
+                                            double *pdfDir, Sampler *sampler1D) = 0;
 
             /**
              * light 主动发射光线，并计算其 pdf 函数
@@ -72,7 +72,7 @@ namespace kaguya {
              * @param pdfDir
              * @return
              */
-            virtual void randomLightRayPdf(const Ray &ray, const Vector3 &normal,
+            virtual void randomLightRayPdf(const Ray &ray, const Vector3d &normal,
                                            double *pdfPos, double *pdfDir) const = 0;
 
             /**

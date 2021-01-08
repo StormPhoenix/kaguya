@@ -11,8 +11,8 @@ namespace kaguya {
                              const MediumBound &mediumBoundary) :
                 Light(LightType(type | AREA), mediumBoundary), _intensity(intensity), _geometry(shape) {}
 
-        Spectrum AreaLight::sampleFromLight(const Interaction &eye, Vector3 *wi, double *pdf,
-                                            const Sampler *sampler1D,
+        Spectrum AreaLight::sampleFromLight(const Interaction &eye, Vector3d *wi, double *pdf,
+                                            Sampler *sampler1D,
                                             VisibilityTester *visibilityTester) {
             assert(_geometry != nullptr);
             // 从 eye 出发采样一条射线，返回与 shape 的交点
@@ -27,7 +27,7 @@ namespace kaguya {
             return lightRadiance(intersection, -(*wi));
         }
 
-        double AreaLight::sampleFromLightPdf(const Interaction &eye, const Vector3 &dir) {
+        double AreaLight::sampleFromLightPdf(const Interaction &eye, const Vector3d &dir) {
             assert(_geometry != nullptr);
             return _geometry->getShape()->surfaceInteractionPdf(eye, dir);
         }

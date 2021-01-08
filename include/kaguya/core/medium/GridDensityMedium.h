@@ -22,10 +22,10 @@ namespace kaguya {
                                   float *densities,
                                   std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
-                virtual core::Spectrum transmittance(const tracer::Ray &ray, const Sampler *sampler1D) const override;
+                virtual core::Spectrum transmittance(const tracer::Ray &ray, Sampler *sampler1D) const override;
 
                 virtual core::Spectrum sampleInteraction(const tracer::Ray &ray,
-                                                         const Sampler *sampler1D,
+                                                         Sampler *sampler1D,
                                                          MediumInteraction *mi,
                                                          MemoryArena &memoryArena) const override;
 
@@ -37,14 +37,14 @@ namespace kaguya {
                  * @param coordinate
                  * @return
                  */
-                float density(const Vector3 &coord) const;
+                float density(const Vector3d &coord) const;
 
                 /**
                  * Index from _densities
                  * @param coord
                  * @return
                  */
-                float d(const Vector3 &coord) const;
+                float d(const Vector3d &coord) const;
 
             private:
                 const Spectrum _absorptionSigma;

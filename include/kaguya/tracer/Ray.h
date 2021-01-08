@@ -5,7 +5,7 @@
 #ifndef KAGUYA_RAY_H
 #define KAGUYA_RAY_H
 
-#include <kaguya/math/Math.hpp>
+#include <kaguya/math/Math.h>
 
 namespace kaguya {
 
@@ -26,12 +26,12 @@ namespace kaguya {
              * @param origin 射线起点
              * @param direction 射线方向
              */
-            Ray(const Vector3 &origin, const Vector3 &direction,
+            Ray(const Vector3d &origin, const Vector3d &direction,
                 const core::medium::Medium *medium = nullptr);
 
-            const Vector3 &getDirection() const;
+            const Vector3d &getDirection() const;
 
-            const Vector3 &getOrigin() const;
+            const Vector3d &getOrigin() const;
 
             const void setMedium(core::medium::Medium *medium);
 
@@ -49,11 +49,11 @@ namespace kaguya {
 
             void setStep(double step);
 
-            const Vector3 at(double step) const;
+            const Vector3d at(double step) const;
 
         private:
-            Vector3 _origin;
-            Vector3 _direction;
+            Vector3d _origin;
+            Vector3d _direction;
             double _minStep;
             double _step;
             const core::medium::Medium *_medium;

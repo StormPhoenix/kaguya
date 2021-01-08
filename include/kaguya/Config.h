@@ -42,6 +42,8 @@ namespace kaguya {
         static int resolutionWidth;
         // 相机高度分辨率
         static int resolutionHeight;
+        // Image tile size
+        static int tileSize;
 
         static std::shared_ptr<Camera> buildCamera() {
             // TODO load config file
@@ -54,12 +56,13 @@ namespace kaguya {
             // 若场景未构建，则线构建场景
             if (!isScenePrepared) {
 //                scenes.push_back(Scene::sceneTwoSpheresWithPointLight);
-//                scenes.push_back(Scene::sceneTwoSpheresWithAreaLight);
+                scenes.push_back(Scene::sceneTwoSpheresWithAreaLight);
 //                scenes.push_back(Scene::sceneTwoSpheresWithSpotLight);
 //                scenes.push_back(Scene::sceneBunnyWithPointLight);
 //                scenes.push_back(Scene::sceneBunnyWithAreaLight);
 //                scenes.push_back(Scene::sceneSmoke);
-                scenes.push_back(Scene::sceneLightThroughAir);
+//                scenes.push_back(Scene::sceneLightThroughAir);
+//                scenes.push_back(Scene::cornelBoxWater);
                 isScenePrepared = true;
             }
 

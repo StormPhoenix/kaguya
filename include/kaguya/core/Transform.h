@@ -17,19 +17,19 @@ namespace kaguya {
             public:
                 Transform();
 
-                Transform(Matrix4 transformMatrix);
+                Transform(Matrix4d transformMatrix);
 
-                Vector3 transformPoint(const Vector3 &p) const;
+                Vector3d transformPoint(const Vector3d &p) const;
 
-                Vector3 transformVector(const Vector3 &v) const;
+                Vector3d transformVector(const Vector3d &v) const;
 
-                Vector3 transformNormal(const Vector3 &n) const;
+                Vector3d transformNormal(const Vector3d &n) const;
 
                 std::shared_ptr<Transform> inverse() const;
 
             private:
                 bool _identity = false;
-                Matrix4 _transformMatrix;
+                Matrix4d _transformMatrix;
             };
 
         }

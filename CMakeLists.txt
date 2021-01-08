@@ -65,6 +65,7 @@ file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/medium/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/material/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/math/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/sampler/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/parallel/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/accumulation/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/meta/*.cpp

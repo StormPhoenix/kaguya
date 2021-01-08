@@ -3,11 +3,14 @@
 //
 
 #include <kaguya/scene/accumulation/BVH.h>
-#include <kaguya/math/Sampler.hpp>
+#include <kaguya/sampler/Sampler.h>
+#include <kaguya/sampler/DefaultSampler.h>
 
 namespace kaguya {
     namespace scene {
         namespace acc {
+
+            using namespace math::random;
 
             inline bool compareBox(const std::shared_ptr<Intersectable> a,
                                    const std::shared_ptr<Intersectable> b, int axis) {
@@ -57,7 +60,7 @@ namespace kaguya {
 
             void BVH::build(std::vector<std::shared_ptr<Intersectable>> &objects,
                             size_t start, size_t end) {
-                math::random::Sampler *sampler = math::random::Sampler::newInstance();
+                Sampler *sampler = DefaultSampler::newInstance();
                 // 采用最简单的平均分配法
                 int axis = math::randomInt(0, 2, sampler);
                 auto comparator = (axis == 0) ? compareX

@@ -10,14 +10,14 @@ namespace kaguya {
 
         using kaguya::core::medium::MediumBound;
 
-        Camera::Camera(const Vector3 &eye, const Vector3 &direction, const std::shared_ptr<Medium> medium, float fov,
+        Camera::Camera(const Vector3d &eye, const Vector3d &direction, const std::shared_ptr<Medium> medium, float fov,
                        float aspect) : _medium(medium) {
             _eye = eye;
             _front = NORMALIZE(direction);
             buildCameraCoordinate(fov, aspect);
         }
 
-        Camera::Camera(const Vector3 &eye, float yaw, float pitch,
+        Camera::Camera(const Vector3d &eye, float yaw, float pitch,
                        const std::shared_ptr<Medium> medium, float fov, float aspect) : _medium(medium) {
             _eye = eye;
             _front.x = cos(math::DEGREES_TO_RADIANS(pitch)) * cos(math::DEGREES_TO_RADIANS(yaw));
@@ -28,13 +28,13 @@ namespace kaguya {
         }
 
         Ray Camera::sendRay(double u, double v) const {
-            Vector3 samplePoint =
+            Vector3d samplePoint =
                     _leftBottomCorner + 2 * _halfWindowWidth * u * _right + 2 * _halfWindowHeight * v * _up;
-            Vector3 dir = NORMALIZE(samplePoint - _eye);
+            Vector3d dir = NORMALIZE(samplePoint - _eye);
             return Ray(_eye, dir, _medium.get());
         }
 
-        Vector3 Camera::getEye() const {
+        Vector3d Camera::getEye() const {
             return _eye;
         }
 
@@ -59,14 +59,14 @@ namespace kaguya {
         }
 
         Spectrum Camera::sampleCameraRay(const Interaction &eye,
-                                         Vector3 *wi, double *pdf,
+                                         Vector3d *wi, double *pdf,
                                          Point2d *filmPosition,
-                                         const Sampler *const sampler1D,
+                                         Sampler *const sampler,
                                          VisibilityTester *visibilityTester) const {
             // 在相机镜头圆盘上随机采样
-            Vector2 diskSample = math::diskUniformSampling(sampler1D, _lensRadius);
+            Vector2d diskSample = math::diskUniformSampling(sampler, _lensRadius);
             // 计算相机镜头采样点 3D 坐标
-            Vector3 lensSample = _right * diskSample.x + _up * diskSample.y + _eye;
+            Vector3d lensSample = _right * diskSample.x + _up * diskSample.y + _eye;
 
             // 计算射线方向
             (*wi) = lensSample - eye.getPoint();
@@ -97,7 +97,7 @@ namespace kaguya {
 
             // 判断射线是否击中成像平面
             double step = _focal / cosine;
-            Vector3 raster = ray.getOrigin() + ray.getDirection() * step - _leftBottomCorner;
+            Vector3d raster = ray.getOrigin() + ray.getDirection() * step - _leftBottomCorner;
             double u = DOT(raster, _right) / (DOT(_diagonalVector, _right));
             double v = DOT(raster, _up) / (DOT(_diagonalVector, _up));
             if (u < 0 || u >= 1 || v < 0 || v >= 1) {
@@ -114,7 +114,7 @@ namespace kaguya {
         Spectrum Camera::rayImportance(const Ray &ray, Point2d *const filmPosition) const {
             // 计算新射线光栅化位置
             double step = _focal / ABS_DOT(ray.getDirection(), _front);
-            Vector3 raster = ray.getOrigin() + ray.getDirection() * step - _leftBottomCorner;
+            Vector3d raster = ray.getOrigin() + ray.getDirection() * step - _leftBottomCorner;
             double u = DOT(raster, _right) / (DOT(_diagonalVector, _right));
             double v = DOT(raster, _up) / (DOT(_diagonalVector, _up));
             (*filmPosition) = Point2d(u * _resolutionWidth, v * _resolutionHeight);
@@ -149,7 +149,7 @@ namespace kaguya {
         }
 
         void Camera::buildCameraCoordinate(float fov, float aspect) {
-            const Vector3 worldUp = Vector3(0.0f, 1.0f, 0.0f);
+            const Vector3d worldUp = Vector3d(0.0f, 1.0f, 0.0f);
             // 判断 _front 方向是否与 worldUp 重叠
             if (abs(_front.x) < math::EPSILON && abs(_front.z) < math::EPSILON) {
                 _right = {1.0f, 0.0f, 0.0f};

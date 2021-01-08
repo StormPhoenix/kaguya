@@ -14,12 +14,12 @@ namespace kaguya {
             _fresnel = fresnel;
         }
 
-        Spectrum BXDFSpecularTransmission::f(const Vector3 &wo, const Vector3 &wi) const {
+        Spectrum BXDFSpecularTransmission::f(const Vector3d &wo, const Vector3d &wi) const {
             return Spectrum(0.0f);
         }
 
-        Spectrum BXDFSpecularTransmission::sampleF(const Vector3 &wo, Vector3 *wi, double *pdf,
-                                                   const Sampler *const sampler1D) {
+        Spectrum BXDFSpecularTransmission::sampleF(const Vector3d &wo, Vector3d *wi, double *pdf,
+                                                   Sampler *const sampler1D) {
             double refraction;
             if (wo.y > 0) {
                 // 外部射入
@@ -29,7 +29,7 @@ namespace kaguya {
                 refraction = _thetaT / _thetaI;
             }
 
-            Vector3 normal = Vector3(0.0, 1.0, 0.0);
+            Vector3d normal = Vector3d(0.0, 1.0, 0.0);
             if (DOT(wo, normal) < 0) {
                 normal.y = -1;
             }
@@ -48,7 +48,7 @@ namespace kaguya {
             return f;
         }
 
-        double BXDFSpecularTransmission::samplePdf(const Vector3 &wo, const Vector3 &wi) const {
+        double BXDFSpecularTransmission::samplePdf(const Vector3d &wo, const Vector3d &wi) const {
             return 0.0;
         }
     }

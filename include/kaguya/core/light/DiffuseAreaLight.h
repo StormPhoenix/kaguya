@@ -20,12 +20,12 @@ namespace kaguya {
                              const MediumBound &mediumBoundary,
                              bool singleSide = true);
 
-            Spectrum lightRadiance(const Interaction &interaction, const Vector3 &wo) const override;
+            Spectrum lightRadiance(const Interaction &interaction, const Vector3d &wo) const override;
 
-            virtual Spectrum randomLightRay(Ray *ray, Vector3 *normal, double *pdfPos, double *pdfDir,
-                                            const Sampler *sampler1D) override;
+            virtual Spectrum randomLightRay(Ray *ray, Vector3d *normal, double *pdfPos, double *pdfDir,
+                                            Sampler *sampler1D) override;
 
-            virtual void randomLightRayPdf(const Ray &ray, const Vector3 &normal,
+            virtual void randomLightRayPdf(const Ray &ray, const Vector3d &normal,
                                            double *pdfPos, double *pdfDir) const override;
 
         public:

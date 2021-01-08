@@ -23,14 +23,14 @@ namespace kaguya {
              * @param v
              * @return
              */
-            Vector3 toObjectSpace(const Vector3 &v) const;
+            Vector3d toObjectSpace(const Vector3d &v) const;
 
             /**
              * 向量 v 转化到世界坐标系
              * @param v
              * @return
              */
-            Vector3 toWorldSpace(const Vector3 &v) const;
+            Vector3d toWorldSpace(const Vector3d &v) const;
 
             /**
              * 计算 f(p, wi, wo)
@@ -39,7 +39,7 @@ namespace kaguya {
              * @param type
              * @return
              */
-            Spectrum f(const Vector3 &worldWo, const Vector3 &worldWi, BXDFType type = BSDF_ALL) const;
+            Spectrum f(const Vector3d &worldWo, const Vector3d &worldWi, BXDFType type = BSDF_ALL) const;
 
             /**
              * 随机采样 worldWi f(p, wo, wi)
@@ -50,8 +50,8 @@ namespace kaguya {
              * @param sampleType 返回采样的 BXDF 类型
              * @return
              */
-            Spectrum sampleF(const Vector3 &worldWo, Vector3 *worldWi, double *pdf,
-                             const math::random::Sampler *const sampler1D,
+            Spectrum sampleF(const Vector3d &worldWo, Vector3d *worldWi, double *pdf,
+                             math::random::Sampler *const sampler1D,
                              BXDFType type = BSDF_ALL, BXDFType *sampleType = nullptr) const;
 
             /**
@@ -61,7 +61,7 @@ namespace kaguya {
              * @param type
              * @return
              */
-            double samplePdf(const Vector3 &worldWo, const Vector3 &worldWi, BXDFType type = BSDF_ALL) const;
+            double samplePdf(const Vector3d &worldWo, const Vector3d &worldWi, BXDFType type = BSDF_ALL) const;
 
             /**
              * 计算属于 bxdfType 类型集合的材质有多少个
@@ -92,9 +92,9 @@ namespace kaguya {
             // 存储 bxdf
             BXDF *_bxdfs[MAX_BXDF_NUM];
             // 入射光方向与交点法线构成的切线空间
-            Vector3 _tanY;
-            Vector3 _tanX;
-            Vector3 _tanZ;
+            Vector3d _tanY;
+            Vector3d _tanX;
+            Vector3d _tanZ;
         };
 
     }

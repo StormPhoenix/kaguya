@@ -33,7 +33,7 @@ namespace kaguya {
             }
         }
 
-        core::Spectrum VisibilityTester::transmittance(Scene &scene, const Sampler *sampler1D) const {
+        core::Spectrum VisibilityTester::transmittance(Scene &scene, Sampler *sampler1D) const {
             Ray ray = _start.sendRayTo(_end);
             core::Spectrum tr(1.0);
             while (true) {

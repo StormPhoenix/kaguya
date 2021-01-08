@@ -15,7 +15,7 @@ namespace kaguya {
         using kaguya::core::BXDFType;
 
         Spectrum PathVertex::f(const PathVertex &next) const {
-            Vector3 worldWi = NORMALIZE(next.point - point);
+            Vector3d worldWi = NORMALIZE(next.point - point);
             switch (type) {
                 case SURFACE:
                     assert(si.getBSDF() != nullptr);
@@ -40,12 +40,12 @@ namespace kaguya {
                     (type == PathVertexType::SURFACE && si.getAreaLight() != nullptr));
         }
 
-        Spectrum PathVertex::emit(const Vector3 &eye) const {
+        Spectrum PathVertex::emit(const Vector3d &eye) const {
             if (!isLight()) {
                 return Spectrum(0.0);
             }
             // 计算射向 eye 的方向
-            Vector3 dirToEye = eye - point;
+            Vector3d dirToEye = eye - point;
             if (LENGTH(dirToEye) == 0) {
                 return Spectrum(0.0);
             }
@@ -83,8 +83,8 @@ namespace kaguya {
 
             double pdfFwd = pdfWi / distSquare;
             if (next.type == PathVertexType::SURFACE) {
-                Vector3 surfaceNormal = next.si.getNormal();
-                Vector3 dirToPre = -next.si.getDirection();
+                Vector3d surfaceNormal = next.si.getNormal();
+                Vector3d dirToPre = -next.si.getDirection();
                 pdfFwd *= ABS_DOT(surfaceNormal, dirToPre);
             }
             return pdfFwd;
@@ -116,14 +116,14 @@ namespace kaguya {
             }
 
             // 计算 wi
-            Vector3 wi = next.point - point;
+            Vector3d wi = next.point - point;
             if (LENGTH(wi) == 0) {
                 return 0;
             }
             wi = NORMALIZE(wi);
 
             // 计算 wo
-            Vector3 wo;
+            Vector3d wo;
             if (pre != nullptr) {
                 wo = pre->point - point;
                 if (LENGTH(wo) == 0) {
@@ -160,7 +160,7 @@ namespace kaguya {
             const Light *light = (type == LIGHT) ? ei.light : si.getAreaLight();
             assert(light != nullptr);
 
-            Vector3 dirToNext = next.point - point;
+            Vector3d dirToNext = next.point - point;
             double distSquare = std::pow(LENGTH(dirToNext), 2);
             dirToNext = NORMALIZE(dirToNext);
 
@@ -180,7 +180,7 @@ namespace kaguya {
         }
 
         double PathVertex::densityLightOrigin(const PathVertex &next) const {
-            Vector3 dirToNext = next.point - point;
+            Vector3d dirToNext = next.point - point;
             dirToNext = NORMALIZE(dirToNext);
 
             const Light *light = (type == LIGHT) ? ei.light : si.getAreaLight();

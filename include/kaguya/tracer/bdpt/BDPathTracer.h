@@ -13,7 +13,7 @@
 #include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/material/Material.h>
-#include <kaguya/math/Math.hpp>
+#include <kaguya/math/Math.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/tracer/Camera.h>
 #include <kaguya/tracer/Tracer.h>
@@ -42,7 +42,7 @@ namespace kaguya {
             BDPathTracer();
 
         private:
-            virtual std::function<void(const int, const int, const Sampler *)> render() override;
+            virtual std::function<void(const int, const int, Sampler *)> render() override;
 
             virtual void init();
 
@@ -55,7 +55,7 @@ namespace kaguya {
              * @return
              */
             Spectrum shader(const Ray &ray, Scene &scene, int maxDepth,
-                            const Sampler *sampler1D, MemoryArena &memoryArena);
+                            Sampler *sampler1D, MemoryArena &memoryArena);
 
             Spectrum shaderOfMyImplemention();
 
@@ -68,7 +68,7 @@ namespace kaguya {
              */
             int generateCameraPath(std::shared_ptr<Scene> scene, const Ray &ray, std::shared_ptr<Camera>,
                                    PathVertex *cameraSubPath, int maxDepth,
-                                   const Sampler *sampler1D, MemoryArena &memoryArena);
+                                   Sampler *sampler1D, MemoryArena &memoryArena);
 
             /**
              * 生成光照路径
@@ -80,7 +80,7 @@ namespace kaguya {
              */
             int generateLightPath(std::shared_ptr<Scene> scene,
                                   PathVertex *lightSubPath, int maxDepth,
-                                  const Sampler *sampler1D,
+                                  Sampler *sampler1D,
                                   MemoryArena &memoryArena);
 
             /**
@@ -96,7 +96,7 @@ namespace kaguya {
              * @return
              */
             int randomWalk(std::shared_ptr<Scene> scene, const Ray &ray, PathVertex *path, int maxDepth,
-                           double pdf, const Sampler *const sampler1D, MemoryArena &memoryArena, Spectrum &beta,
+                           double pdf, Sampler *const sampler1D, MemoryArena &memoryArena, Spectrum &beta,
                            TransportMode mode);
 
             /**
@@ -113,7 +113,7 @@ namespace kaguya {
              */
             Spectrum connectPath(Scene &scene, PathVertex *cameraSubPath, int cameraPathLength, int t,
                                  PathVertex *lightSubPath, int lightPathLength, int s, Point2d *samplePosition,
-                                 const Sampler *sampler1D);
+                                 Sampler *sampler1D);
 
             /**
              * 计算 connect 路径的 pdf
@@ -137,7 +137,7 @@ namespace kaguya {
              * @param next
              * @return
              */
-            Spectrum g(const PathVertex &pre, const PathVertex &next, const Sampler *sampler1D);
+            Spectrum g(const PathVertex &pre, const PathVertex &next, Sampler *sampler1D);
 
         private:
             // 最大采样深度

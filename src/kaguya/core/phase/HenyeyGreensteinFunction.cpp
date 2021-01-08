@@ -9,17 +9,20 @@ namespace kaguya {
 
         HenyeyGreensteinFunction::HenyeyGreensteinFunction(double g) : _g(g) {}
 
-        double HenyeyGreensteinFunction::scatterPdf(const Vector3 &wo, const Vector3 &wi) const {
+        double HenyeyGreensteinFunction::scatterPdf(const Vector3d &wo, const Vector3d &wi) const {
             return henyeyGreensteinPdf(DOT(wo, wi), _g);
         }
 
-        double HenyeyGreensteinFunction::sampleScatter(const Vector3 &wo, Vector3 *wi,
-                                                       const Sampler *sampler1D) const {
+        double HenyeyGreensteinFunction::sampleScatter(const Vector3d &wo, Vector3d *wi,
+                                                       Sampler *sampler) const {
             // Henyey-Greenstein phase function
-            assert(sampler1D != nullptr);
+            assert(sampler != nullptr);
+
+            Vector2d sample = sampler->sample2D();
+            double sampleU = sample.x;
+            double sampleV = sample.y;
 
             // \cos(\theta) \sin(\theta)
-            double sampleU = sampler1D->sample1d();
             double term1 = (1 - _g * _g) / (1 + _g * (2 * sampleU - 1));
             double cosTheta;
             if (std::abs(_g) < math::EPSILON) {
@@ -30,15 +33,14 @@ namespace kaguya {
             double sinTheta = std::sqrt(std::max(0.0, 1 - cosTheta * cosTheta));
 
             // \phi
-            double sampleV = sampler1D->sample1d();
             double phi = 2 * math::PI * sampleV;
             double cosPhi = std::cos(phi);
             double sinPhi = std::sin(phi);
 
             // build local coordinate space
-            Vector3 tanY = NORMALIZE(wo);
-            Vector3 tanX;
-            Vector3 tanZ;
+            Vector3d tanY = NORMALIZE(wo);
+            Vector3d tanX;
+            Vector3d tanZ;
             math::tangentSpace(tanY, &tanX, &tanZ);
 
             // calculate coordinate

@@ -22,4 +22,5 @@ namespace kaguya {
 
     int Config::resolutionWidth = 100;
     int Config::resolutionHeight = 100;
+    int Config::tileSize = 32;
 }

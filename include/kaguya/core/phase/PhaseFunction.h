@@ -6,7 +6,7 @@
 #define KAGUYA_PHASEFUNCTION_H
 
 #include <kaguya/core/Core.h>
-#include <kaguya/math/Sampler.hpp>
+#include <kaguya/sampler/Sampler.h>
 
 namespace kaguya {
     namespace core {
@@ -21,7 +21,7 @@ namespace kaguya {
              * @param wi
              * @return
              */
-            virtual double scatterPdf(const Vector3 &wo, const Vector3 &wi) const = 0;
+            virtual double scatterPdf(const Vector3d &wo, const Vector3d &wi) const = 0;
 
             /**
              *
@@ -29,7 +29,7 @@ namespace kaguya {
              * @param wi
              * @return
              */
-            virtual double sampleScatter(const Vector3 &wo, Vector3 *wi, const Sampler *sampler1D) const = 0;
+            virtual double sampleScatter(const Vector3d &wo, Vector3d *wi, Sampler *sampler1D) const = 0;
         };
 
     }

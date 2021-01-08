@@ -26,23 +26,23 @@ namespace kaguya {
         }
 
         void Box::build() {
-            const Vector3 a1(0, 0, 0);
-            const Vector3 a2(1, 0, 0);
-            const Vector3 a3(1, 0, 1);
-            const Vector3 a4(0, 0, 1);
-            const Vector3 a5(0, 1, 0);
-            const Vector3 a6(1, 1, 0);
-            const Vector3 a7(1, 1, 1);
-            const Vector3 a8(0, 1, 1);
+            const Vector3d a1(0, 0, 0);
+            const Vector3d a2(1, 0, 0);
+            const Vector3d a3(1, 0, 1);
+            const Vector3d a4(0, 0, 1);
+            const Vector3d a5(0, 1, 0);
+            const Vector3d a6(1, 1, 0);
+            const Vector3d a7(1, 1, 1);
+            const Vector3d a8(0, 1, 1);
 
-            const Vector3 n_left(-1, 0, 0);
-            const Vector3 n_right(1, 0, 0);
-            const Vector3 n_up(0, 1, 0);
-            const Vector3 n_down(0, -1, 0);
-            const Vector3 n_front(0, 0, -1);
-            const Vector3 n_back(0, 0, 1);
+            const Vector3d n_left(-1, 0, 0);
+            const Vector3d n_right(1, 0, 0);
+            const Vector3d n_up(0, 1, 0);
+            const Vector3d n_down(0, -1, 0);
+            const Vector3d n_front(0, 0, -1);
+            const Vector3d n_back(0, 0, 1);
 
-            const Vector2 default_uv(0);
+            const Vector2d default_uv(0);
 
             // TODO UV
             std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a5, a4, a1,

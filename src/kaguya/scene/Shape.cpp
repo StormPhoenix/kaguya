@@ -12,11 +12,11 @@ namespace kaguya {
             }
 
             SurfaceInteraction
-            Shape::sampleSurfaceInteraction(const Interaction &eye, const Sampler *sampler1D) const {
+            Shape::sampleSurfaceInteraction(const Interaction &eye, Sampler *sampler1D) const {
                 return sampleSurfacePoint(sampler1D);
             }
 
-            double Shape::surfaceInteractionPdf(const Interaction &eye, const Vector3 &dir) const {
+            double Shape::surfaceInteractionPdf(const Interaction &eye, const Vector3d &dir) const {
                 // build a ray to test interaction
                 Ray ray = eye.sendRay(dir);
                 SurfaceInteraction si;

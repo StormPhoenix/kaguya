@@ -5,7 +5,7 @@
 #ifndef KAGUYA_RENDERPOOL_H
 #define KAGUYA_RENDERPOOL_H
 
-#include <kaguya/math/Sampler.hpp>
+#include <kaguya/sampler/Sampler.h>
 
 #include <kaguya/parallel/Barrier.h>
 #include <kaguya/parallel/RenderTask.h>
@@ -26,7 +26,7 @@ namespace kaguya {
             static RenderPool *getInstance();
 
         public:
-            void addRenderTask(std::function<void(int, int, const Sampler *)> func2D,
+            void addRenderTask(std::function<void(int, int, Sampler *)> func2D,
                                int renderWidth, int renderHeight);
 
             void shutdown();

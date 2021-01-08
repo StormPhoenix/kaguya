@@ -29,7 +29,7 @@ namespace kaguya {
 
                 virtual double area() const override;
 
-                virtual SurfaceInteraction sampleSurfacePoint(const Sampler *sampler1D) const override;
+                virtual SurfaceInteraction sampleSurfacePoint(Sampler *sampler1D) const override;
 
                 virtual double surfacePointPdf(const SurfaceInteraction &si) const override;
 
@@ -44,22 +44,22 @@ namespace kaguya {
             private:
                 double _width;
                 double _height;
-                Vector3 _leftBottom;
-                Vector3 _leftTop;
-                Vector3 _rightBottom;
-                Vector3 _rightTop;
+                Vector3d _leftBottom;
+                Vector3d _leftTop;
+                Vector3d _rightBottom;
+                Vector3d _rightTop;
 
-                Vector3 _transformedLeftBottom;
-                Vector3 _transformedRightBottom;
-                Vector3 _transformedRightTop;
-                Vector3 _transformedLeftTop;
-                Vector3 _transformedNormal;
+                Vector3d _transformedLeftBottom;
+                Vector3d _transformedRightBottom;
+                Vector3d _transformedRightTop;
+                Vector3d _transformedLeftTop;
+                Vector3d _transformedNormal;
 
                 std::shared_ptr<Transform> _transformMatrix = nullptr;
                 std::shared_ptr<Transform> _invTransformMatrix = nullptr;
 
             protected:
-                Vector3 _normal;
+                Vector3d _normal;
                 AABB _aabb;
                 double _area;
             };
@@ -83,7 +83,7 @@ namespace kaguya {
 
                 virtual double area() const override;
 
-                virtual SurfaceInteraction sampleSurfacePoint(const Sampler *sampler1D) const override;
+                virtual SurfaceInteraction sampleSurfacePoint(Sampler *sampler1D) const override;
 
                 virtual double surfacePointPdf(const SurfaceInteraction &si) const override;
 
@@ -114,7 +114,7 @@ namespace kaguya {
 
                 virtual double area() const override;
 
-                virtual SurfaceInteraction sampleSurfacePoint(const Sampler *sampler1D) const override;
+                virtual SurfaceInteraction sampleSurfacePoint(Sampler *sampler1D) const override;
 
                 virtual double surfacePointPdf(const SurfaceInteraction &point) const override;
 
@@ -145,7 +145,7 @@ namespace kaguya {
 
                 virtual double area() const override;
 
-                virtual SurfaceInteraction sampleSurfacePoint(const Sampler *sampler1D) const override;
+                virtual SurfaceInteraction sampleSurfacePoint(Sampler *sampler1D) const override;
 
                 virtual double surfacePointPdf(const SurfaceInteraction &si) const override;
 

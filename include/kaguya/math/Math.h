@@ -2,12 +2,13 @@
 // Created by Storm Phoenix on 2020/9/29.
 //
 
-#ifndef KAGUYA_MATH_HPP
-#define KAGUYA_MATH_HPP
+#ifndef KAGUYA_MATH_H
+#define KAGUYA_MATH_H
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtx/compatibility.hpp>
 
 #include <cstring>
 #include <cmath>
@@ -15,20 +16,20 @@
 
 #include <functional>
 #include <random>
-#include <kaguya/math/Sampler.hpp>
 
-using Vector2 = glm::dvec2;
-using Vector3 = glm::dvec3;
-using Vector4 = glm::dvec4;
-using Matrix4 = glm::dmat4x4;
-using Matrix3 = glm::dmat3x3;
+using Vector2d = glm::dvec2;
+using Vector2i = glm::int2;
+using Point2d = Vector2d;
+using Point2i = Vector2i;
 
-typedef Vector3 Normal3;
-typedef Vector3 Point3;
+using Vector3d = glm::dvec3;
+using Normal3d = Vector3d;
+using Point3d = Vector3d;
 
-using kaguya::math::random::Sampler;
+using Vector4d = glm::dvec4;
+using Matrix4d = glm::dmat4x4;
+using Matrix3d = glm::dmat3x3;
 
-typedef Vector2 Point2d;
 
 #define ROTATE(matrix, radius, axis) glm::rotate(matrix, glm::radians(radius), axis)
 #define TRANSLATE(matrix, offset) glm::translate(matrix, offset)
@@ -45,6 +46,10 @@ typedef Vector2 Point2d;
 
 namespace kaguya {
     namespace math {
+        namespace random {
+            class Sampler;
+        }
+
         const double maxDouble = std::numeric_limits<double>::max();
         const double infinity = std::numeric_limits<double>::infinity();
         constexpr double epsilon = std::numeric_limits<float>::epsilon() * 0.5;
@@ -75,8 +80,8 @@ namespace kaguya {
             return (1 - t) * a + t * b;
         }
 
-        inline bool intersectBound(const Vector3 &origin, const Vector3 &direction,
-                                   const Vector3 &boundMin, const Vector3 &boundMax,
+        inline bool intersectBound(const Vector3d &origin, const Vector3d &direction,
+                                   const Vector3d &boundMin, const Vector3d &boundMax,
                                    double *stepMin, double *maxStep) {
             assert(stepMin != nullptr && maxStep != nullptr);
 
@@ -118,20 +123,11 @@ namespace kaguya {
             return r0 + (1 - r0) * pow((1 - cosine), 5);
         }
 
-        inline double randomDouble(double min, double max, const math::random::Sampler *const sampler1D) {
-            return min + (max - min) * sampler1D->sample1d();
-        }
+        double randomDouble(double min, double max, random::Sampler *const sampler1D);
 
-        inline int randomInt(int min, int max, const math::random::Sampler *const sampler1D) {
-            int ret = std::min(static_cast<int>(randomDouble(min, max + 1, sampler1D)), max);
-            if (ret <= max) {
-                return ret;
-            } else {
-                return randomInt(min, max, sampler1D);
-            }
-        }
+        int randomInt(int min, int max, math::random::Sampler *const sampler1D);
 
-        inline int maxAbsAxis(const Vector3 v) {
+        inline int maxAbsAxis(const Vector3d v) {
             double maxValue = std::abs(v[0]);
             int axis = 0;
             for (int i = 1; i < 3; i++) {
@@ -143,11 +139,11 @@ namespace kaguya {
             return axis;
         }
 
-        inline Vector3 swapAxis(const Vector3 v, int x, int y, int z) {
-            return Vector3(v[x], v[y], v[z]);
+        inline Vector3d swapAxis(const Vector3d v, int x, int y, int z) {
+            return Vector3d(v[x], v[y], v[z]);
         }
 
-        inline Vector3 reflect(const Vector3 &v, const Vector3 &normal) {
+        inline Vector3d reflect(const Vector3d &v, const Vector3d &normal) {
             return v - 2 * DOT(v, NORMALIZE(normal)) * normal;
         }
 
@@ -159,7 +155,7 @@ namespace kaguya {
          * @param wi
          * @return
          */
-        inline bool refract(const Vector3 &wo, const Vector3 &normal, double refraction, Vector3 *wi) {
+        inline bool refract(const Vector3d &wo, const Vector3d &normal, double refraction, Vector3d *wi) {
             double cosineThetaI = DOT(wo, normal);
             double sineThetaI = std::sqrt(std::max(0.0, 1 - cosineThetaI * cosineThetaI));
             double sineThetaT = refraction * sineThetaI;
@@ -183,53 +179,27 @@ namespace kaguya {
             return (f * f) / (g * g + f * f);
         }
 
-/**
- * （局部坐标系）
- * 从 y > 0 的半球面，按照 cos(theta) / Pi 的概率采样射线
- * @return
- */
-        inline Vector3 hemiCosineSampling(const math::random::Sampler *const sampler1D) {
-            // fi = 2 * Pi * sampleU
-            double sampleU = sampler1D->sample1d();
-            // sampleV = sin^2(theta)
-            double sampleV = sampler1D->sample1d();
-            // x = sin(theta) * cos(fi)
-            double x = sqrt(sampleV) * cos(2 * PI * sampleU);
-            // y = cos(theta)
-            double y = sqrt(1 - sampleV);
-            // z = sin(theta) * sin(fi)
-            double z = sqrt(sampleV) * sin(2 * PI * sampleU);
-            return NORMALIZE(Vector3(x, y, z));
-        }
+        /**
+         * （局部坐标系）
+         * 从 y > 0 的半球面，按照 cos(theta) / Pi 的概率采样射线
+         * @return
+         */
+        Vector3d hemiCosineSampling(random::Sampler *const sampler);
 
-/**
- * （局部坐标系）
- * 在球面做均匀采样，默认 (0, 1, 0) 为法线方向
- * @return
- */
-        inline Vector3 sphereUniformSampling(const math::random::Sampler *sampler1D) {
-            // phi = 2 * Pi * sampleU
-            double sampleU = sampler1D->sample1d();
-            // 2 * sampleV = 1 - cos(theta)
-            double sampleV = sampler1D->sample1d();
+        /**
+         * （局部坐标系）
+         * 在球面做均匀采样，默认 (0, 1, 0) 为法线方向
+         * @return
+         */
+        Vector3d sphereUniformSampling(math::random::Sampler *sampler);
 
-            // y = 1 - 2 * sampleV
-            double y = 1 - 2 * sampleV;
-            // x = sin(theta) * cos(phi)
-            double x = std::sqrt(std::max(0.0, (1 - y * y))) * std::cos(2 * PI * sampleU);
-            // z = sin(theta) * sin(phi)
-            double z = std::sqrt(std::max(0.0, (1 - y * y))) * std::sin(2 * PI * sampleU);
-
-            return NORMALIZE(Vector3(x, y, z));
-        }
-
-/**
- * （局部坐标系）
- * 计算 sample1d 在 hemi-sphere cosine 分布下的 pdf
- * @param sample
- * @return
- */
-        inline double hemiCosineSamplePdf(Vector3 sample) {
+        /**
+         * （局部坐标系）
+         * 计算 sample1d 在 hemi-sphere cosine 分布下的 pdf
+         * @param sample
+         * @return
+         */
+        inline double hemiCosineSamplePdf(Vector3d sample) {
             double cosine = NORMALIZE(sample).y;
             return cosine < 0 ? 0 : cosine * INV_PI;
         }
@@ -238,94 +208,55 @@ namespace kaguya {
             return cosTheta / PI;
         }
 
-        inline bool isValid(const Vector3 v) {
+        inline bool isValid(const Vector3d v) {
             return !std::isnan(v.x) && !std::isnan(v.y) && !std::isnan(v.z);
         }
 
-/**
- * 计算切线空间
- * @param tanY 切线空间 Y 轴
- * @param tanX 切线空间 X 轴
- * @param tanZ 切线空间 Z 轴
- */
-        inline void tangentSpace(Vector3 &tanY, Vector3 *tanX, Vector3 *tanZ) {
+        /**
+         * 计算切线空间
+         * @param tanY 切线空间 Y 轴
+         * @param tanX 切线空间 X 轴
+         * @param tanZ 切线空间 Z 轴
+         */
+        inline void tangentSpace(Vector3d &tanY, Vector3d *tanX, Vector3d *tanZ) {
             // 计算与 tanY 垂直的 tanX
             if (std::abs(tanY.x) > std::abs(tanY.y)) {
-                (*tanX) = Vector3(-tanY.z, 0, tanY.x);
+                (*tanX) = Vector3d(-tanY.z, 0, tanY.x);
             } else {
-                (*tanX) = Vector3(0, tanY.z, -tanY.y);
+                (*tanX) = Vector3d(0, tanY.z, -tanY.y);
             }
             (*tanX) = NORMALIZE(*tanX);
             (*tanZ) = NORMALIZE(CROSS(tanY, *tanX));
         }
 
-/**
- * 对圆盘做均匀采样
- * @return
- */
-        inline Vector2 diskUniformSampling(const math::random::Sampler *const sampler1D, double radius = 1.) {
-            // sampleY = r / Radius
-            // sampleX = theta / (2 * PI)
-            double sampleY = sampler1D->sample1d();
-            double sampleX = sampler1D->sample1d();
+        /**
+         * 对圆盘做均匀采样
+         * @return
+         */
+        Vector2d diskUniformSampling(math::random::Sampler *const sampler1D, double radius = 1.);
 
-            double theta = 2 * PI * sampleX;
-            double r = sampleY * radius;
+        /**
+         * Sample barycentric coordinate from triangle
+         *
+         * 1 - u = sqrt(1 - sampleU)
+         * v = sampleV * sqrt(1 - sampleU)
+         *
+         * ->
+         *
+         * 1 - u = sqrt(sampleU)
+         * v = sampleV * sqrt(sampleU)
+         *
+         * @param sampler
+         * @return
+         */
+        Vector2d triangleUniformSampling(random::Sampler *sampler);
 
-            return Vector2(r * std::cos(theta), r * std::sin(theta));
-        }
-
-/**
- * Sample barycentric coordinate from triangle
- *
- * 1 - u = sqrt(1 - sampleU)
- * v = sampleV * sqrt(1 - sampleU)
- *
- * ->
- *
- * 1 - u = sqrt(sampleU)
- * v = sampleV * sqrt(sampleU)
- *
- * @param sampler1D
- * @return
- */
-        inline Vector2 triangleUniformSampling(const Sampler *sampler1D) {
-            double sampleU = sampler1D->sample1d();
-            double sampleV = sampler1D->sample1d();
-
-            double u = 1 - std::sqrt(sampleU);
-            double v = sampleV * sqrt(sampleU);
-            return Vector2(u, v);
-        }
-
-
-/**
- * 从 cone 空间中均匀采样射线
- * @param cosThetaMax
- * @return
- */
-        inline Vector3 coneUniformSampling(double cosThetaMax, const Sampler *sampler1D) {
-            // phi = 2 * PI * sampleU
-            double sampleU = sampler1D->sample1d();
-            // sampleV = (1 - cos(theta)) / (1 - cos(thetaMax))
-            double sampleV = sampler1D->sample1d();
-
-            // 计算 cos(theta) sin(theta)
-            double cosTheta = 1.0 - sampleV + sampleV * cosThetaMax;
-            double sinTheta = std::sqrt(std::max(0.0, 1 - cosTheta * cosTheta));
-            // 计算 cos(phi) sin(phi)
-            double cosPhi = std::cos(2 * PI * sampleU);
-            double sinPhi = std::sin(2 * PI * sampleU);
-
-            // y = cos(theta)
-            double y = cosTheta;
-            // x = sin(theta) * cos(phi)
-            double x = sinTheta * cosPhi;
-            // z = sin(theta) * sin(phi)
-            double z = sinTheta * sinPhi;
-
-            return NORMALIZE(Vector3(x, y, z));
-        }
+        /**
+         * 从 cone 空间中均匀采样射线
+         * @param cosThetaMax
+         * @return
+         */
+        Vector3d coneUniformSampling(double cosThetaMax, random::Sampler *sampler);
 
         /**
          * 计算 cone 空间中均匀采样射线的 pdf
@@ -383,9 +314,62 @@ namespace kaguya {
             }
             return bits2double(bits);
         }
+
+        inline int mod(int a, int b) {
+            int rest = a - (a / b) * b;
+            return (rest < 0) ? rest + b : rest;
+        }
+
+        /**
+         * solve x, y, r, make a * x + b * y = r = gcd(a, b)
+         */
+        static int extendGCD(uint64_t a, uint64_t b, int64_t *x, int64_t *y) {
+            if (b == 0) {
+                *x = 1;
+                *y = 0;
+                return a;
+            }
+
+            int r = extendGCD(b, a % b, x, y);
+            int t = *y;
+            *y = *x - a / b * *y;
+            *x = t;
+            return r;
+        }
+
+        namespace low_discrepancy {
+            const int primeArraySize = 1000;
+
+            extern const int primes[primeArraySize];
+
+            extern const int primeSums[primeArraySize];
+
+            std::vector<uint16_t> computePermutationArray();
+
+            double radicalReverse(const int base, uint64_t n);
+
+            template<int base>
+            uint16_t inverseRadicalReverse(uint64_t reversed, int digitsCount) {
+                uint64_t ret = 0;
+                for (int i = 0; i < digitsCount; i++) {
+                    uint64_t digit = reversed % base;
+                    reversed /= base;
+                    ret = ret * base + digit;
+                }
+                return ret;
+            }
+
+            double scrambledRadicalReverse(const int base, uint64_t n, uint16_t *perm);
+
+            double radicalReverse(uint64_t n);
+
+            uint64_t reverseBit64(uint64_t n);
+
+            uint32_t reverseBit32(uint32_t n);
+        }
     }
 }
 
 #define DEGREES_TO_RADIANS(degrees) degreesToRadians(degrees)
 
-#endif //KAGUYA_MATH_HPP
+#endif //KAGUYA_MATH_H

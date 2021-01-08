@@ -5,11 +5,16 @@
 #include <kaguya/Config.h>
 #include <kaguya/parallel/RenderPool.h>
 
+#include <kaguya/sampler/DefaultSampler.h>
+#include <kaguya/sampler/HaltonSampler.h>
+
 #include <cassert>
 #include <cstdlib>
 
 namespace kaguya {
     namespace parallel {
+
+        using namespace math::random;
 
         bool RenderPool::_shutdown = false;
 
@@ -51,13 +56,14 @@ namespace kaguya {
             barrier.reset();
 
             // create sampler2d
-            Sampler *sampler1D = Sampler::newInstance();
+            Sampler *sampler = HaltonSampler::newInstance();
+//            Sampler *sampler = DefaultSampler::newInstance();
 
             std::unique_lock<std::mutex> lock(_taskMutex);
             // running rendering function
             while (!_shutdown) {
                 if (_taskQueue == nullptr) {
-                    // sleep
+                    // sleepC
                     _taskCondition.wait(lock);
                 } else {
                     // acquire task
@@ -71,7 +77,7 @@ namespace kaguya {
                         lock.unlock();
                         for (int row = rowStart; row <= rowEnd; row++) {
                             for (int col = colStart; col <= colEnd; col++) {
-                                task->func2D(row, col, sampler1D);
+                                task->func2D(row, col, sampler);
                             }
                         }
 
@@ -88,7 +94,7 @@ namespace kaguya {
                     }
                 }
             }
-            delete sampler1D;
+            delete sampler;
         }
 
         RenderPool::RenderPool(int threadCount) : _threadCount(threadCount) {
@@ -104,7 +110,7 @@ namespace kaguya {
             barrier->wait();
         }
 
-        void RenderPool::addRenderTask(std::function<void(const int, const int, const Sampler *)> func2D,
+        void RenderPool::addRenderTask(std::function<void(const int, const int, Sampler *)> func2D,
                                        int renderWidth, int renderHeight) {
             assert(_threadCount > 0);
 

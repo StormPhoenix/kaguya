@@ -2,6 +2,7 @@
 // Created by Storm Phoenix on 2020/10/16.
 //
 
+#include <kaguya/sampler/Sampler.h>
 #include <kaguya/core/bsdf/BXDFSpecular.h>
 #include <kaguya/core/bsdf/Fresnel.h>
 
@@ -12,12 +13,12 @@ namespace kaguya {
                 BXDF(BXDFType(BSDF_SPECULAR | BSDF_REFLECTION | BSDF_TRANSMISSION)),
                 _albedo(albedo), _thetaI(thetaI), _thetaT(thetaT), _mode(mode) {}
 
-        Spectrum BXDFSpecular::f(const Vector3 &wo, const Vector3 &wi) const {
+        Spectrum BXDFSpecular::f(const Vector3d &wo, const Vector3d &wi) const {
             return Spectrum(0.0);
         }
 
-        Spectrum BXDFSpecular::sampleF(const Vector3 &wo, Vector3 *wi, double *pdf,
-                                       const Sampler *const sampler1D) {
+        Spectrum BXDFSpecular::sampleF(const Vector3d &wo, Vector3d *wi, double *pdf,
+                                       Sampler *const sampler1D) {
             double cosine = wo.y;
             // 计算反射概率
             double reflectProb = fresnelDielectric(cosine, _thetaI, _thetaT);
@@ -25,10 +26,10 @@ namespace kaguya {
 //            double reflectProb = math::schlick(cosine, _thetaI / _thetaT);
 
             // 随机采样是否反射
-            double random = sampler1D->sample1d();
+            double random = sampler1D->sample1D();
             if (random < reflectProb) {
                 // 反射
-                *wi = Vector3(-wo.x, wo.y, -wo.z);
+                *wi = Vector3d(-wo.x, wo.y, -wo.z);
                 *pdf = reflectProb;
                 // f(p, w_o, w_i) / cos(theta(w_i))
                 return reflectProb * _albedo / abs(wi->y);
@@ -36,7 +37,7 @@ namespace kaguya {
                 // 折射
                 double refraction;
                 // 法向
-                Vector3 normal = Vector3(0.0, 1.0, 0.0);
+                Vector3d normal = Vector3d(0.0, 1.0, 0.0);
                 // 判断射入方向
                 if (wo.y > 0) {
                     // 外部射入
@@ -61,7 +62,7 @@ namespace kaguya {
             }
         }
 
-        double BXDFSpecular::samplePdf(const Vector3 &wo, const Vector3 &wi) const {
+        double BXDFSpecular::samplePdf(const Vector3d &wo, const Vector3d &wi) const {
             return 0.0;
         }
     }

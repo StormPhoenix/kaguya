@@ -33,7 +33,7 @@ namespace kaguya {
 
 
         Spectrum PathTracer::shaderOfProgression(const kaguya::tracer::Ray &ray, kaguya::Scene &scene,
-                                                 const Sampler *sampler1D,
+                                                 Sampler *sampler1D,
                                                  MemoryArena &memoryArena) {
             // 最终渲染结果
             Spectrum shaderColor = Spectrum(0);
@@ -70,8 +70,8 @@ namespace kaguya {
                     shaderColor += beta * evaluateDirectLight(scene, mi, sampler1D);
 
                     /* sample1d new ray */
-                    Vector3 worldWo = -scatterRay.getDirection();
-                    Vector3 worldWi;
+                    Vector3d worldWo = -scatterRay.getDirection();
+                    Vector3d worldWi;
                     mi.getPhaseFunction()->sampleScatter(worldWo, &worldWi, sampler1D);
                     scatterRay = mi.sendRay(worldWi);
                     isSpecular = false;
@@ -113,8 +113,8 @@ namespace kaguya {
                     }
 
                     // 计算下一次反射
-                    Vector3 worldWo = -scatterRay.getDirection();
-                    Vector3 worldWi = Vector3(0.0);
+                    Vector3d worldWo = -scatterRay.getDirection();
+                    Vector3d worldWi = Vector3d(0.0);
                     // 材质反射类型
                     BXDFType bxdfType;
                     // p(wi)
@@ -135,7 +135,7 @@ namespace kaguya {
 
                 // Terminate path tracing with Russian Roulette
                 if (bounce > _russianRouletteBounce) {
-                    if (sampler1D->sample1d() < _russianRoulette) {
+                    if (sampler1D->sample1D() < _russianRoulette) {
                         break;
                     }
                     beta /= (1 - _russianRoulette);
@@ -146,13 +146,13 @@ namespace kaguya {
 
         Spectrum PathTracer::evaluateDirectLight(
                 Scene &scene, const Interaction &eye,
-                const Sampler *sampler1D) {
+                Sampler *sampler1D) {
             // TODO 目前只考虑单个光源
             auto light = scene.getLight();
             // p(wi)
             double lightPdf = 0;
             // light dir
-            Vector3 wi = Vector3(0.0);
+            Vector3d wi = Vector3d(0.0);
             // visibility tester
             VisibilityTester visibilityTester;
             // 对光源采样采样
@@ -200,7 +200,7 @@ namespace kaguya {
 
             // multiple importance sampling
             if (!light->isDeltaType()) {
-                const Vector3 wo = -eye.getDirection();
+                const Vector3d wo = -eye.getDirection();
                 Spectrum f(0);
                 double scatteringPdf = 0;
                 bool sampleSpecular = false;
@@ -253,23 +253,26 @@ namespace kaguya {
             return ret;
         }
 
-        std::function<void(const int, const int, const Sampler *)> PathTracer::render() {
-            auto renderFunc = [this](const int row, const int col, const Sampler *sampler1D) -> void {
-                Spectrum ans = {0};
+        std::function<void(const int, const int, Sampler *)> PathTracer::render() {
+            auto renderFunc = [this](const int row, const int col, Sampler *sampler) -> void {
+                // set current sampling pixel
+                sampler->forPixel(Point2d(row, col));
 
+                Spectrum ans = {0};
                 const double sampleWeight = 1.0 / _samplePerPixel;
                 // 做 _samplePerPixel 次采样
-                    for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
-                        MemoryArena arena;
-                        auto u = (col + sampler1D->sample1d()) / double(_camera->getResolutionWidth());
-                        auto v = (row + sampler1D->sample1d()) / double(_camera->getResolutionHeight());
+                for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
+                    MemoryArena arena;
+                    auto u = (col + sampler->sample1D()) / double(_camera->getResolutionWidth());
+                    auto v = (row + sampler->sample1D()) / double(_camera->getResolutionHeight());
 
-                        Ray sampleRay = _camera->sendRay(u, v);
-                        Spectrum shaderColor = shaderOfProgression(sampleRay, *(_scene.get()), sampler1D, arena);
+                    Ray sampleRay = _camera->sendRay(u, v);
+                    Spectrum shaderColor = shaderOfProgression(sampleRay, *(_scene.get()), sampler, arena);
 
-                        ans += shaderColor;
-                        arena.clean();
-                    }
+                    ans += shaderColor;
+                    arena.clean();
+                    sampler->nextSampleRound();
+                }
                 ans *= sampleWeight;
                 _filmPlane->addSpectrum(ans, row, col);
             };
@@ -283,14 +286,14 @@ namespace kaguya {
 
             /*
             if (ray.getDirection().z < 0) {
-                return Vector3(0.0f, 0.0f, 0.0f);
+                return Vector3d(0.0f, 0.0f, 0.0f);
             } else {
-                return Vector3(1.0f, 1.0f, 1.0f);
+                return Vector3d(1.0f, 1.0f, 1.0f);
             }
 
-            Vector3 dir = NORMALIZE(ray.getDirection());
+            Vector3d dir = NORMALIZE(ray.getDirection());
             double t = 0.5 * (dir.y + 1.0);
-            return (1.0 - t) * Vector3(1.0, 1.0, 1.0) + t * Vector3(0.5, 0.7, 1.0);
+            return (1.0 - t) * Vector3d(1.0, 1.0, 1.0) + t * Vector3d(0.5, 0.7, 1.0);
              */
         }
 

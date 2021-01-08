@@ -8,7 +8,7 @@
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
 #include <kaguya/material/Material.h>
-#include <kaguya/math/Math.hpp>
+#include <kaguya/math/Math.h>
 
 namespace kaguya {
     namespace material {

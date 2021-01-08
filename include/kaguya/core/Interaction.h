@@ -33,8 +33,8 @@ namespace kaguya {
         using kaguya::material::Material;
         using kaguya::memory::MemoryArena;
 
-        inline Vector3 offsetOrigin(const Vector3 &origin, const Vector3 &error,
-                                    const Vector3 &normal, const Vector3 &direction);
+        inline Vector3d offsetOrigin(const Vector3d &origin, const Vector3d &error,
+                                     const Vector3d &normal, const Vector3d &direction);
 
 
         /**
@@ -44,26 +44,26 @@ namespace kaguya {
         public:
             Interaction() : _mediumBoundary(nullptr, nullptr) {}
 
-            Interaction(const Vector3 &point, const Vector3 &direction, const Vector3 &normal,
+            Interaction(const Vector3d &point, const Vector3d &direction, const Vector3d &normal,
                         const MediumBound &mediumBoundary, Material *material = nullptr);
 
-            const Vector3 getDirection() const {
+            const Vector3d getDirection() const {
                 return _direction;
             }
 
-            const Vector3 getPoint() const {
+            const Vector3d getPoint() const {
                 return _point;
             }
 
-            const Vector3 getNormal() const {
+            const Vector3d getNormal() const {
                 return _normal;
             }
 
-            const Vector3 getError() const {
+            const Vector3d getError() const {
                 return _error;
             }
 
-            void setNormal(const Vector3 &normal) {
+            void setNormal(const Vector3d &normal) {
                 _normal = normal;
             }
 
@@ -75,11 +75,11 @@ namespace kaguya {
                 _material = material;
             }
 
-            void setPoint(const Vector3 &point) {
+            void setPoint(const Vector3d &point) {
                 _point = point;
             }
 
-            void setError(const Vector3 &error) {
+            void setError(const Vector3d &error) {
                 _error = error;
             }
 
@@ -95,7 +95,7 @@ namespace kaguya {
              * Generate ray alone @param dir from origin
              * @param dir
              */
-            virtual Ray sendRay(const Vector3 &dir) const;
+            virtual Ray sendRay(const Vector3d &dir) const;
 
             virtual Ray sendRayTo(const Interaction &it) const;
 
@@ -113,17 +113,17 @@ namespace kaguya {
 
         protected:
             // 发生 Interaction 的光线的方向
-            Vector3 _direction;
+            Vector3d _direction;
             // 击中点
-            Vector3 _point;
+            Vector3d _point;
             // 击中点法线方向，发现永远指向物体表面外侧
-            Vector3 _normal = Vector3(0., 0., 0.);
+            Vector3d _normal = Vector3d(0., 0., 0.);
             // 击中材质种类
             Material *_material = nullptr;
             // medium boundary
             MediumBound _mediumBoundary;
             // Error range
-            Vector3 _error = Vector3(0., 0., 0.);
+            Vector3d _error = Vector3d(0., 0., 0.);
         };
 
         /**
@@ -133,7 +133,7 @@ namespace kaguya {
         public:
             SurfaceInteraction() : Interaction() {}
 
-            SurfaceInteraction(const Vector3 &point, const Vector3 &direction, const Vector3 &normal,
+            SurfaceInteraction(const Vector3d &point, const Vector3d &direction, const Vector3d &normal,
                                MediumBound &mediumBoundary, double u = 0, double v = 0,
                                Material *material = nullptr);
 
@@ -145,7 +145,7 @@ namespace kaguya {
              * @param outwardNormal
              * @param hitDirection
              */
-            void setOutwardNormal(const Vector3 &outwardNormal, const Vector3 &hitDirection) {
+            void setOutwardNormal(const Vector3d &outwardNormal, const Vector3d &hitDirection) {
                 _direction = hitDirection;
                 _normal = outwardNormal;
             }
@@ -200,7 +200,7 @@ namespace kaguya {
         public:
             MediumInteraction() : Interaction(), _phase(nullptr) {}
 
-            MediumInteraction(const Vector3 &point, const Vector3 &direction,
+            MediumInteraction(const Vector3d &point, const Vector3d &direction,
                               const Medium *medium, const PhaseFunction *phase);
 
             bool isValid() const;
@@ -238,8 +238,8 @@ namespace kaguya {
              * @param dir 入射方向
              * @param n 击中点法线
              */
-            StartEndInteraction(const Light *light, const Vector3 &p, const Vector3 &dir,
-                                const Vector3 &n);
+            StartEndInteraction(const Light *light, const Vector3d &p, const Vector3d &dir,
+                                const Vector3d &n);
 
         };
     }

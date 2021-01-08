@@ -27,12 +27,12 @@ namespace kaguya {
             BXDFSpecularTransmission(const Spectrum &albedo, double thetaI, double thetaT,
                                      FresnelDielectric *fresnel, TransportMode mode = TransportMode::RADIANCE);
 
-            virtual Spectrum f(const Vector3 &wo, const Vector3 &wi) const override;
+            virtual Spectrum f(const Vector3d &wo, const Vector3d &wi) const override;
 
-            virtual Spectrum sampleF(const Vector3 &wo, Vector3 *wi, double *pdf,
-                                     const Sampler *const sampler1D) override;
+            virtual Spectrum sampleF(const Vector3d &wo, Vector3d *wi, double *pdf,
+                                     Sampler *const sampler1D) override;
 
-            virtual double samplePdf(const Vector3 &wo, const Vector3 &wi) const override;
+            virtual double samplePdf(const Vector3d &wo, const Vector3d &wi) const override;
 
         private:
             const Spectrum _albedo;

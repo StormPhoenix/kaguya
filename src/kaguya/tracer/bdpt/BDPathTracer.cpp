@@ -23,25 +23,28 @@ namespace kaguya {
             init();
         }
 
-        std::function<void(const int, const int, const Sampler *)> BDPathTracer::render() {
-            auto renderFunc = [this](const int row, const int col, const Sampler *sampler1D) -> void {
-                Spectrum ans = {0};
+        std::function<void(const int, const int, Sampler *)> BDPathTracer::render() {
+            auto renderFunc = [this](const int row, const int col, Sampler *sampler) -> void {
+                // set current sampling pixel
+                sampler->forPixel(Point2d(row, col));
 
+                Spectrum ans = {0};
                 const double sampleWeight = 1.0 / _samplePerPixel;
                 // 做 _samplePerPixel 次采样
                 for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
                     MemoryArena arena;
-                    auto u = (col + sampler1D->sample1d()) / double(_camera->getResolutionWidth());
-                    auto v = (row + sampler1D->sample1d()) / double(_camera->getResolutionHeight());
+                    auto u = (col + sampler->sample1D()) / double(_camera->getResolutionWidth());
+                    auto v = (row + sampler->sample1D()) / double(_camera->getResolutionHeight());
 
-                        Ray sampleRay = _camera->sendRay(u, v);
-                        Spectrum shaderColor = shader(sampleRay, *(_scene.get()), _maxDepth, sampler1D, arena);
+                    Ray sampleRay = _camera->sendRay(u, v);
+                    Spectrum shaderColor = shader(sampleRay, *(_scene.get()), _maxDepth, sampler, arena);
 
-                        ans += shaderColor;
-                        arena.clean();
-                        ans *= sampleWeight;
-                        _filmPlane->addSpectrum(ans, row, col);
-                    }
+                    ans += shaderColor;
+                    arena.clean();
+                    ans *= sampleWeight;
+                    _filmPlane->addSpectrum(ans, row, col);
+                    sampler->nextSampleRound();
+                }
                 };
             return renderFunc;
         }
@@ -57,7 +60,7 @@ namespace kaguya {
         Spectrum BDPathTracer::connectPath(Scene &scene,
                                            PathVertex *cameraSubPath, int cameraPathLength, int t,
                                            PathVertex *lightSubPath, int lightPathLength, int s,
-                                           Point2d *samplePosition, const Sampler *sampler1D) {
+                                           Point2d *samplePosition, Sampler *sampler1D) {
             // 检查 t 和 s 的范围，必须处于 cameraPath 和 lightPathLength 的长度范围之中
             assert(t >= 1 && t <= cameraPathLength);
             assert(s >= 0 && s <= lightPathLength);
@@ -91,7 +94,7 @@ namespace kaguya {
                 // 去 lightSubPath 连接点
                 const PathVertex &ps = lightSubPath[s - 1];
                 if (ps.isConnectible()) {
-                    Vector3 worldWi;
+                    Vector3d worldWi;
                     double pdf;
                     VisibilityTester visibilityTester;
                     // 对相机采样
@@ -117,7 +120,7 @@ namespace kaguya {
                 if (pt.isConnectible()) {
                     // TODO 默认只有一个光源，我们只对这个光源采样
                     std::shared_ptr<Light> light = scene.getLight();
-                    Vector3 worldWi;
+                    Vector3d worldWi;
                     // 光源采样处的 pdf（这里指 pt 点的入射角 wi 的 pdf)
                     double sampleLightPdf;
                     VisibilityTester visibilityTester;
@@ -169,7 +172,7 @@ namespace kaguya {
 
         int BDPathTracer::generateCameraPath(std::shared_ptr<Scene> scene, const Ray &ray,
                                              std::shared_ptr<Camera> camera, PathVertex *cameraSubPath,
-                                             int maxDepth, const Sampler *sampler1D, MemoryArena &memoryArena) {
+                                             int maxDepth, Sampler *sampler1D, MemoryArena &memoryArena) {
             TransportMode mode = TransportMode::RADIANCE;
             assert(cameraSubPath != nullptr);
             // 初始 beta
@@ -186,7 +189,7 @@ namespace kaguya {
 
         int BDPathTracer::generateLightPath(std::shared_ptr<Scene> scene,
                                             PathVertex *lightSubPath, int maxDepth,
-                                            const Sampler *sampler1D,
+                                            Sampler *sampler1D,
                                             MemoryArena &memoryArena) {
             assert(lightSubPath != nullptr);
             // TODO 默认只有一个 light
@@ -197,7 +200,7 @@ namespace kaguya {
             // 光线发射方向采样概率
             double pdfDir = 0;
             // 光源发射光线切面的法线
-            Vector3 lightNormal;
+            Vector3d lightNormal;
             // 光源发射光线
             Ray scatterRay;
             // 采样光源发射
@@ -217,7 +220,7 @@ namespace kaguya {
 
         int BDPathTracer::randomWalk(std::shared_ptr<Scene> scene, const Ray &ray,
                                      PathVertex *path, int maxDepth, double pdf,
-                                     const Sampler *const sampler1D,
+                                     Sampler *const sampler1D,
                                      MemoryArena &memoryArena,
                                      Spectrum &beta, TransportMode mode) {
             // 上个路径点发射射线的 pdf
@@ -249,8 +252,8 @@ namespace kaguya {
                     vertexCount++;
 
                     // generate next ray
-                    Vector3 worldWo = -scatterRay.getDirection();
-                    Vector3 worldWi;
+                    Vector3d worldWo = -scatterRay.getDirection();
+                    Vector3d worldWi;
                     pdfPreWi = mi.getPhaseFunction()->sampleScatter(worldWo, &worldWi, sampler1D);
                     scatterRay = mi.sendRay(worldWi);
 
@@ -274,8 +277,8 @@ namespace kaguya {
                         vertexCount++;
 
                         // 采样下一个射线
-                        Vector3 worldWo = -si.getDirection();
-                        Vector3 worldWi = Vector3(0);
+                        Vector3d worldWo = -si.getDirection();
+                        Vector3d worldWi = Vector3d(0);
                         BXDFType sampleType;
                         Spectrum f = bsdf->sampleF(worldWo, &worldWi, &pdfPreWi, sampler1D,
                                                    BXDFType::BSDF_ALL, &sampleType);
@@ -418,8 +421,8 @@ namespace kaguya {
             return 1 / (sumRi + 1);
         }
 
-        Spectrum BDPathTracer::g(const PathVertex &pre, const PathVertex &next, const Sampler *sampler1D) {
-            Vector3 dirToNext = next.point - pre.point;
+        Spectrum BDPathTracer::g(const PathVertex &pre, const PathVertex &next, Sampler *sampler1D) {
+            Vector3d dirToNext = next.point - pre.point;
             double dist = LENGTH(dirToNext);
             dirToNext = NORMALIZE(dirToNext);
 
@@ -439,7 +442,7 @@ namespace kaguya {
 
 
         Spectrum BDPathTracer::shader(const Ray &ray, Scene &scene, int maxDepth,
-                                      const Sampler *sampler1D, MemoryArena &memoryArena) {
+                                      Sampler *sampler1D, MemoryArena &memoryArena) {
             // 创建临时变量用于存储 camera、light 路径
             PathVertex *cameraSubPath = memoryArena.alloc<PathVertex>(maxDepth + 1, false);
             PathVertex *lightSubPath = memoryArena.alloc<PathVertex>(maxDepth, false);

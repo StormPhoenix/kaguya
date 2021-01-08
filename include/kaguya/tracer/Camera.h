@@ -6,7 +6,7 @@
 #define KAGUYA_CAMERA_H
 
 #include <kaguya/core/Interaction.h>
-#include <kaguya/math/Math.hpp>
+#include <kaguya/math/Math.h>
 #include <kaguya/tracer/Ray.h>
 #include <kaguya/tracer/FilmPlane.h>
 #include <kaguya/utils/VisibilityTester.h>
@@ -36,7 +36,7 @@ namespace kaguya {
              * @param focal 相机焦距
              * @param aspect 相机成像平面的宽/高比例
              */
-            Camera(const Vector3 &eye = {0.0f, 0.0f, 0.0f}, const Vector3 &direction = {0.0f, 0.0f, -1.0f},
+            Camera(const Vector3d &eye = {0.0f, 0.0f, 0.0f}, const Vector3d &direction = {0.0f, 0.0f, -1.0f},
                    const std::shared_ptr<Medium> medium = nullptr, float fov = 60.0, float aspect = 1.0);
 
             /**
@@ -50,7 +50,7 @@ namespace kaguya {
              * @param yaw 欧拉角，偏航角
              * @param pitch 欧拉角，俯仰角
              */
-            Camera(const Vector3 &eye, float yaw = -90.0f, float pitch = 0.0f,
+            Camera(const Vector3d &eye, float yaw = -90.0f, float pitch = 0.0f,
                    const std::shared_ptr<Medium> medium = nullptr, float fov = 60.0, float aspect = 1.0);
 
             /**
@@ -61,7 +61,7 @@ namespace kaguya {
              */
             Ray sendRay(double u, double v) const;
 
-            Vector3 getEye() const;
+            Vector3d getEye() const;
 
             /**
              * 获得相机成像宽度
@@ -79,7 +79,7 @@ namespace kaguya {
 
             void setResolutionHeight(int resolutionHeight);
 
-            const Vector3 &getFront() const {
+            const Vector3d &getFront() const {
                 return _front;
             }
 
@@ -92,9 +92,8 @@ namespace kaguya {
              * @param visibilityTester
              * @return
              */
-            Spectrum sampleCameraRay(const Interaction &eye, Vector3 *wi, double *pdf, Point2d *filmPosition,
-                                     const Sampler *const sampler1D,
-                                     VisibilityTester *visibilityTester) const;
+            Spectrum sampleCameraRay(const Interaction &eye, Vector3d *wi, double *pdf, Point2d *filmPosition,
+                                     Sampler *const sampler, VisibilityTester *visibilityTester) const;
 
             /**
              * 构建成像平面
@@ -135,13 +134,13 @@ namespace kaguya {
             // 相机高度分辨率
             int _resolutionHeight = 700;
             // 相机位置
-            Vector3 _eye;
-            Vector3 _front;
-            Vector3 _right;
-            Vector3 _up;
-            Vector3 _leftBottomCorner;
-            Vector3 _rightTopCorner;
-            Vector3 _diagonalVector;
+            Vector3d _eye;
+            Vector3d _front;
+            Vector3d _right;
+            Vector3d _up;
+            Vector3d _leftBottomCorner;
+            Vector3d _rightTopCorner;
+            Vector3d _diagonalVector;
             // 相机成像平面大小
             double _halfWindowHeight;
             double _halfWindowWidth;

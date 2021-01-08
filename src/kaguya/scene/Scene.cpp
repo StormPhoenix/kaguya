@@ -72,13 +72,13 @@ namespace kaguya {
                             const std::shared_ptr<Medium> insideMedium,
                             const std::shared_ptr<Medium> outsideMedium) {
 
-            const Vector3 a1(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
-            const Vector3 a2(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
-            const Vector3 a3(-0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
-            const Vector3 a4(-0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
+            const Vector3d a1(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
+            const Vector3d a2(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
+            const Vector3d a3(-0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
+            const Vector3d a4(-0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
 
-            const Normal3 n(1, 0, 0);
-            const Vector2 default_uv(0);
+            const Normal3d n(1, 0, 0);
+            const Vector2d default_uv(0);
 
             std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
                                                                                  n, n, n,
@@ -102,13 +102,13 @@ namespace kaguya {
         Scene::testRightWall(const std::shared_ptr<Material> material,
                              const std::shared_ptr<Medium> insideMedium,
                              const std::shared_ptr<Medium> outsideMedium) {
-            const Vector3 a1(0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
-            const Vector3 a2(0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
-            const Vector3 a3(0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
-            const Vector3 a4(0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
+            const Vector3d a1(0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
+            const Vector3d a2(0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
+            const Vector3d a3(0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
+            const Vector3d a4(0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
 
-            const Normal3 n(-1, 0, 0);
-            const Vector2 default_uv(0);
+            const Normal3d n(-1, 0, 0);
+            const Vector2d default_uv(0);
 
             std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
                                                                                  n, n, n,
@@ -131,13 +131,13 @@ namespace kaguya {
         Scene::testBottomWall(const std::shared_ptr<Material> material,
                               const std::shared_ptr<Medium> insideMedium,
                               const std::shared_ptr<Medium> outsideMedium) {
-            const Vector3 a1(0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
-            const Vector3 a2(-0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
-            const Vector3 a3(-0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
-            const Vector3 a4(0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
+            const Vector3d a1(0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
+            const Vector3d a2(-0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
+            const Vector3d a3(-0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
+            const Vector3d a4(0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
 
-            const Normal3 n(0, 1, 0);
-            const Vector2 default_uv(0);
+            const Normal3d n(0, 1, 0);
+            const Vector2d default_uv(0);
 
             std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
                                                                                  n, n, n,
@@ -159,13 +159,13 @@ namespace kaguya {
         std::vector<std::shared_ptr<Geometry>> Scene::testTopWall(const std::shared_ptr<Material> material,
                                                      const std::shared_ptr<Medium> insideMedium,
                                                      const std::shared_ptr<Medium> outsideMedium) {
-            const Vector3 a1(0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
-            const Vector3 a2(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
-            const Vector3 a3(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
-            const Vector3 a4(0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
+            const Vector3d a1(0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
+            const Vector3d a2(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
+            const Vector3d a3(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
+            const Vector3d a4(0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
 
-            const Normal3 n(0, -1, 0);
-            const Vector2 default_uv(0);
+            const Normal3d n(0, -1, 0);
+            const Vector2d default_uv(0);
 
             std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
                                                                                  n, n, n,
@@ -188,13 +188,13 @@ namespace kaguya {
         Scene::testFrontWall(const std::shared_ptr<Material> material,
                              const std::shared_ptr<Medium> insideMedium,
                              const std::shared_ptr<Medium> outsideMedium) {
-            const Vector3 a1(0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
-            const Vector3 a2(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
-            const Vector3 a3(-0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
-            const Vector3 a4(0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
+            const Vector3d a1(0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
+            const Vector3d a2(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
+            const Vector3d a3(-0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
+            const Vector3d a4(0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
 
-            const Normal3 n(0, 0, 1);
-            const Vector2 default_uv(0);
+            const Normal3d n(0, 0, 1);
+            const Vector2d default_uv(0);
 
             std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
                                                                                  n, n, n,
@@ -221,9 +221,9 @@ namespace kaguya {
             std::vector<Vertex> bunnyVertexes = kaguya::utils::ObjLoader::loadModel("./resource/objects/bunny.obj");
 
             double scale = 0.4 * MODEL_SCALE;
-            Matrix4 mat(1.0f);
-            mat = TRANSLATE(mat, Vector3(0, -scale / 1.2, 0));
-            mat = SCALE(mat, Vector3(scale, scale, scale));
+            Matrix4d mat(1.0f);
+            mat = TRANSLATE(mat, Vector3d(0, -scale / 1.2, 0));
+            mat = SCALE(mat, Vector3d(scale, scale, scale));
             std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(mat);
             std::shared_ptr<Aggregation> bunny = std::make_shared<TriangleMesh>(bunnyVertexes, material, inside,
                                                                                 outside,
@@ -313,9 +313,9 @@ namespace kaguya {
 
             // smoke data
             double scale = 0.6 * MODEL_SCALE;
-            Matrix4 mat(1.0f);
-            mat = TRANSLATE(mat, Vector3(-scale * 0.6, -MODEL_SCALE * 0.5 + 0.0001, -scale * 0.5));
-            mat = SCALE(mat, Vector3(scale * 1.2, MODEL_SCALE * 0.90, scale * 1.2));
+            Matrix4d mat(1.0f);
+            mat = TRANSLATE(mat, Vector3d(-scale * 0.6, -MODEL_SCALE * 0.5 + 0.0001, -scale * 0.5));
+            mat = SCALE(mat, Vector3d(scale * 1.2, MODEL_SCALE * 0.90, scale * 1.2));
             std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(mat);
 
             float *smoke = testSmokeData();
@@ -375,13 +375,148 @@ namespace kaguya {
             scene->_world = bvh;
 
             // build camera
-            auto eye = Vector3(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
-            auto dir = Vector3(0.0f, 0.0f, -1.0f);
+            auto eye = Vector3d(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
+            auto dir = Vector3d(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
             camera->setResolutionWidth(Config::resolutionWidth);
             camera->setResolutionHeight(Config::resolutionHeight);
             scene->_camera = camera;
             scene->_sceneName = "smoke-with-area-light";
+
+            return scene;
+        }
+
+        std::shared_ptr<Scene> Scene::cornelBoxWater() {
+            // For testing
+            // albedos
+            // total white
+            Spectrum totalWhiteSpectrum = Spectrum(1.0);
+            std::shared_ptr<Texture> totalWhite = std::make_shared<ConstantTexture>(totalWhiteSpectrum);
+
+            // white
+            Spectrum whiteSpectrum = Spectrum(0.0);
+            whiteSpectrum.r(0.73);
+            whiteSpectrum.g(0.73);
+            whiteSpectrum.b(0.73);
+            std::shared_ptr<Texture> white = std::make_shared<ConstantTexture>(whiteSpectrum);
+
+            // red
+            Spectrum redSpectrum = Spectrum(0.0);
+            redSpectrum.r(0.65);
+            redSpectrum.g(0.05);
+            redSpectrum.b(0.05);
+            std::shared_ptr<Texture> red = std::make_shared<ConstantTexture>(redSpectrum);
+
+            // lake blue
+            Spectrum lakeBlueSpectrum = Spectrum(0.0);
+            lakeBlueSpectrum.r(30.0 / 255);
+            lakeBlueSpectrum.g(144.0 / 255);
+            lakeBlueSpectrum.b(200.0 / 255);
+            std::shared_ptr<Texture> lakeBlue = std::make_shared<ConstantTexture>(lakeBlueSpectrum);
+
+            // green
+            Spectrum greenSpectrum = Spectrum(0.0);
+            greenSpectrum.r(0.12);
+            greenSpectrum.g(0.45);
+            greenSpectrum.b(0.15);
+            std::shared_ptr<Texture> green = std::make_shared<ConstantTexture>(greenSpectrum);
+
+            // blue
+            Spectrum blueSpectrum = Spectrum(0.0);
+            blueSpectrum.r(0);
+            blueSpectrum.g(0);
+            blueSpectrum.b(1.0);
+            std::shared_ptr<Texture> blue = std::make_shared<ConstantTexture>(blueSpectrum);
+
+            // pink
+            Spectrum pinkSpectrum = Spectrum(0.0);
+            pinkSpectrum.r(255.0 / 255);
+            pinkSpectrum.g(192.0 / 255);
+            pinkSpectrum.b(203.0 / 255);
+            std::shared_ptr<Texture> pink = std::make_shared<ConstantTexture>(pinkSpectrum);
+
+            // light spectrum
+            Spectrum lightSpectrum = Spectrum(0.0);
+            double lightIntensity = 12;
+            lightSpectrum.r(double(249.0) / 255.0 * lightIntensity);
+            lightSpectrum.g(double(222.0) / 255.0 * lightIntensity);
+            lightSpectrum.b(double(180.0) / 255.0 * lightIntensity);
+
+            // lambertian materials
+            std::shared_ptr<Material> lambertLeft = std::make_shared<Lambertian>(red);
+            std::shared_ptr<Material> lambertRight = std::make_shared<Lambertian>(green);
+            std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
+            std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
+            std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
+            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
+            std::shared_ptr<Material> metal = std::make_shared<Metal>();
+
+//            std::shared_ptr<Medium> airMedium = testAirMedium();
+            std::shared_ptr<Medium> airMedium = nullptr;
+            // objects
+            std::vector<std::shared_ptr<Intersectable>> objects;
+
+            // walls
+            std::vector<std::shared_ptr<Geometry>> leftWall =
+                    testLeftWall(lambertLeft, airMedium, airMedium);
+            objects.insert(objects.end(), leftWall.begin(), leftWall.end());
+
+            std::vector<std::shared_ptr<Geometry>> rightWall =
+                    testRightWall(lambertRight, airMedium, airMedium);
+            objects.insert(objects.end(), rightWall.begin(), rightWall.end());
+
+            std::vector<std::shared_ptr<Geometry>> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
+            objects.insert(objects.end(), bottomWall.begin(), bottomWall.end());
+
+
+            std::vector<std::shared_ptr<Geometry>> topWall = testTopWall(lambertTop, airMedium, airMedium);
+            objects.insert(objects.end(), topWall.begin(), topWall.end());
+
+            std::vector<std::shared_ptr<Geometry>> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
+            objects.insert(objects.end(), frontWall.begin(), frontWall.end());
+            std::vector<Vertex> waterVertexes = kaguya::utils::ObjLoader::loadModel("./resource/objects/water.obj");
+
+            double scale = 0.5 * MODEL_SCALE;
+            Matrix4d mat(1.0f);
+            mat = TRANSLATE(mat, Vector3d(0, -scale, 0));
+            mat = SCALE(mat, Vector3d(scale, scale, scale));
+            std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(mat);
+            std::shared_ptr<Aggregation> water = std::make_shared<TriangleMesh>(waterVertexes, glass, nullptr,
+                                                                                nullptr, nullptr, transformMatrix);
+
+            // light
+            std::shared_ptr<Shape> lightWallShape = std::make_shared<meta::ZXWall>(-0.2 * MODEL_SCALE,
+                                                                                   0.2 * MODEL_SCALE,
+                                                                                   -0.2 * MODEL_SCALE,
+                                                                                   0.2 * MODEL_SCALE,
+                                                                                   0.46 * MODEL_SCALE, false);
+
+            std::shared_ptr<Geometry> lightWall = std::make_shared<Geometry>(lightWallShape, lambertTop,
+                                                                             airMedium, airMedium);
+
+            // build area light
+            std::shared_ptr<AreaLight> light = testDiffuseAreaLight(lightSpectrum, lightWall, airMedium, airMedium,
+                                                                    true);
+
+// build scene object
+            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+            scene->_light = light;
+
+            objects.push_back(lightWall);
+            objects.push_back(water);
+
+            // scene
+            std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);
+            scene->_world = bvh;
+
+            // build camera
+            auto eye = Vector3d(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
+            auto dir = Vector3d(0.0f, 0.0f, -1.0f);
+            std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
+            camera->setResolutionWidth(Config::resolutionWidth);
+            camera->setResolutionHeight(Config::resolutionHeight);
+            scene->_camera = camera;
+            scene->_sceneName = "cornell-box-with-water";
 
             return scene;
         }
@@ -486,7 +621,7 @@ namespace kaguya {
 
             // build point light
             std::shared_ptr<PointLight> light = PointLight::buildPointLight(
-                    Vector3(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), lightSpectrum,
+                    Vector3d(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), lightSpectrum,
                     MediumBound(airMedium.get(), airMedium.get()));
             scene->_light = light;
 
@@ -496,8 +631,8 @@ namespace kaguya {
             scene->_world = bvh;
 
             // build camera
-            auto eye = Vector3(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
-            auto dir = Vector3(0.0f, 0.0f, -1.0f);
+            auto eye = Vector3d(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
+            auto dir = Vector3d(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
             camera->setResolutionWidth(Config::resolutionWidth);
             camera->setResolutionHeight(Config::resolutionHeight);
@@ -633,8 +768,8 @@ namespace kaguya {
             scene->_world = bvh;
 
             // build camera
-            auto eye = Vector3(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
-            auto dir = Vector3(0.0f, 0.0f, -1.0f);
+            auto eye = Vector3d(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
+            auto dir = Vector3d(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
             camera->setResolutionWidth(Config::resolutionWidth);
             camera->setResolutionHeight(Config::resolutionHeight);
@@ -735,12 +870,12 @@ namespace kaguya {
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
             std::shared_ptr<Shape> glassSphereShape = std::make_shared<meta::Sphere>(
-                    Vector3(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
+                    Vector3d(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
             std::shared_ptr<Geometry> glassSphere = std::make_shared<Geometry>(glassSphereShape, glass,
                                                                                nullptr, airMedium);
 
             std::shared_ptr<Shape> metalSphereShape = std::make_shared<meta::Sphere>(
-                    Vector3(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE);
+                    Vector3d(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE);
             std::shared_ptr<Geometry> metalSphere = std::make_shared<Geometry>(metalSphereShape, metal,
                                                                                nullptr, airMedium);
 
@@ -756,12 +891,14 @@ namespace kaguya {
             // build area light
             std::shared_ptr<AreaLight> light = testDiffuseAreaLight(areaLightSpectrum, lightWall, airMedium, airMedium, true);
 
+            /*
             std::shared_ptr<Shape> mediumSphereShape = std::make_shared<meta::Sphere>(
-                    Vector3(0 * MODEL_SCALE, 0 * MODEL_SCALE, 0 * MODEL_SCALE), 0.1 * MODEL_SCALE);
+                    Vector3d(0 * MODEL_SCALE, 0 * MODEL_SCALE, 0 * MODEL_SCALE), 0.1 * MODEL_SCALE);
             std::shared_ptr<Medium> smokeMedium = testSmokeMedium();
 
             std::shared_ptr<Geometry> mediumSphere = std::make_shared<Geometry>(mediumSphereShape, nullptr,
                                                                                 smokeMedium, airMedium);
+                                                                                */
             // build scene object
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
             scene->_light = light;
@@ -769,15 +906,15 @@ namespace kaguya {
             objects.push_back(lightWall);
             objects.push_back(glassSphere);
             objects.push_back(metalSphere);
-            objects.push_back(mediumSphere);
+//            objects.push_back(mediumSphere);
 
             // scene
             std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);
             scene->_world = bvh;
 
             // build camera
-            auto eye = Vector3(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
-            auto dir = Vector3(0.0f, 0.0f, -1.0f);
+            auto eye = Vector3d(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
+            auto dir = Vector3d(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
             camera->setResolutionWidth(Config::resolutionWidth);
             camera->setResolutionHeight(Config::resolutionHeight);
@@ -883,13 +1020,13 @@ namespace kaguya {
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
             std::shared_ptr<Shape> glassSphereShape = std::make_shared<meta::Sphere>(
-                    Vector3(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
+                    Vector3d(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
             std::shared_ptr<Geometry> glassSphere = std::make_shared<Geometry>(glassSphereShape, glass,
                                                                                nullptr, airMedium);
 
 
             std::shared_ptr<Shape> metalSphereShape = std::make_shared<meta::Sphere>(
-                    Vector3(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE);
+                    Vector3d(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE);
             std::shared_ptr<Geometry> metalSphere = std::make_shared<Geometry>(metalSphereShape, metal,
                                                                                nullptr, airMedium);
 
@@ -898,7 +1035,7 @@ namespace kaguya {
 
             // build point light
             std::shared_ptr<SpotLight> light = SpotLight::buildSpotLight(
-                    Vector3(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), Vector3(0.0, -1, 0.0),
+                    Vector3d(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), Vector3d(0.0, -1, 0.0),
                     spotLightSpectrum, MediumBound(airMedium.get(), airMedium.get()));
             scene->_light = light;
 
@@ -910,8 +1047,8 @@ namespace kaguya {
             scene->_world = bvh;
 
             // build camera
-            auto eye = Vector3(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
-            auto dir = Vector3(0.0f, 0.0f, -1.0f);
+            auto eye = Vector3d(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
+            auto dir = Vector3d(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
             camera->setResolutionWidth(Config::resolutionWidth);
             camera->setResolutionHeight(Config::resolutionHeight);
@@ -1011,12 +1148,12 @@ namespace kaguya {
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
             std::shared_ptr<Shape> glassSphereShape = std::make_shared<meta::Sphere>(
-                    Vector3(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
+                    Vector3d(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
             std::shared_ptr<Geometry> glassSphere = std::make_shared<Geometry>(glassSphereShape, glass,
                                                                                nullptr, airMedium);
 
             std::shared_ptr<Shape> metalSphereShape = std::make_shared<meta::Sphere>(
-                    Vector3(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE);
+                    Vector3d(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE);
             std::shared_ptr<Geometry> metalSphere = std::make_shared<Geometry>(metalSphereShape, metal,
                                                                                nullptr, airMedium);
 
@@ -1025,7 +1162,7 @@ namespace kaguya {
 
             // build point light
             std::shared_ptr<PointLight> light = PointLight::buildPointLight(
-                    Vector3(0.0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), lightSpectrum,
+                    Vector3d(0.0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), lightSpectrum,
                     MediumBound(airMedium.get(), airMedium.get()));
             scene->_light = light;
 
@@ -1037,8 +1174,8 @@ namespace kaguya {
             scene->_world = bvh;
 
             // build camera
-            auto eye = Vector3(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
-            auto dir = Vector3(0.0f, 0.0f, -1.0f);
+            auto eye = Vector3d(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
+            auto dir = Vector3d(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
             camera->setResolutionWidth(Config::resolutionWidth);
             camera->setResolutionHeight(Config::resolutionHeight);
@@ -1140,7 +1277,7 @@ namespace kaguya {
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
             std::shared_ptr<Shape> glassSphereShape = std::make_shared<meta::Sphere>(
-                    Vector3(0.10 * MODEL_SCALE, 0.15 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
+                    Vector3d(0.10 * MODEL_SCALE, 0.15 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
             std::shared_ptr<Geometry> glassSphere = std::make_shared<Geometry>(glassSphereShape, glass,
                                                                                nullptr, airMedium);
 
@@ -1149,7 +1286,7 @@ namespace kaguya {
 
             // build point light
             std::shared_ptr<PointLight> light = PointLight::buildPointLight(
-                    Vector3(0.0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), pointLightSpectrum,
+                    Vector3d(0.0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), pointLightSpectrum,
                     MediumBound(airMedium.get(), airMedium.get()));
             scene->_light = light;
 
@@ -1160,8 +1297,8 @@ namespace kaguya {
             scene->_world = bvh;
 
             // build camera
-            auto eye = Vector3(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
-            auto dir = Vector3(0.0f, 0.0f, -1.0f);
+            auto eye = Vector3d(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
+            auto dir = Vector3d(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
             camera->setResolutionWidth(Config::resolutionWidth);
             camera->setResolutionHeight(Config::resolutionHeight);
@@ -1176,7 +1313,7 @@ namespace kaguya {
         }
 
         bool Scene::intersectWithMedium(Ray &ray, SurfaceInteraction &si, core::Spectrum &transmittance,
-                                        const Sampler *sampler1D) {
+                                        Sampler *sampler1D) {
             transmittance = Spectrum(1.0);
             while (true) {
                 bool foundIntersection = intersect(ray, si);

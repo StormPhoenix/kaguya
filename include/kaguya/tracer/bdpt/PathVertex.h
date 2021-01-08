@@ -30,9 +30,9 @@ namespace kaguya {
             // 路径点类型
             PathVertexType type;
             // 路径点位置
-            Vector3 point;
+            Vector3d point;
             // 路径点法向位置，只针对 Surface 类型有效
-            Vector3 normal;
+            Vector3d normal;
             // 当前点的概率密度，从上一个点发射射线选取
             double pdfForward = 0;
             // 当前点的概率密度，从下一个点发射射线选取
@@ -126,7 +126,7 @@ namespace kaguya {
              * @param eye
              * @return
              */
-            Spectrum emit(const Vector3 &eye) const;
+            Spectrum emit(const Vector3d &eye) const;
 
             static inline PathVertex createCameraVertex(const Camera *camera, const Ray &ray, Spectrum beta) {
                 StartEndInteraction ei = StartEndInteraction(camera, ray);
@@ -142,8 +142,8 @@ namespace kaguya {
                 return vertex;
             }
 
-            static inline PathVertex createLightVertex(const Light *light, const Vector3 &p, const Vector3 &dir,
-                                                       const Vector3 &n, const Spectrum &intensity, double pdf) {
+            static inline PathVertex createLightVertex(const Light *light, const Vector3d &p, const Vector3d &dir,
+                                                       const Vector3d &n, const Spectrum &intensity, double pdf) {
                 StartEndInteraction ei = StartEndInteraction(light, p, dir, n);
                 PathVertex pathVertex = PathVertex(PathVertexType::LIGHT, ei, intensity);
                 pathVertex.pdfForward = pdf;

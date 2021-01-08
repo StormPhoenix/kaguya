@@ -2,7 +2,7 @@
 // Created by Storm Phoenix on 2020/10/10.
 //
 
-#include <kaguya/math/Math.hpp>
+#include <kaguya/math/Math.h>
 #include <kaguya/scene/meta/Triangle.h>
 #include <kaguya/scene/aggregation/TriangleMesh.h>
 

@@ -10,7 +10,7 @@
 #include <cassert>
 #include <algorithm>
 
-#include <kaguya/math/Math.hpp>
+#include <kaguya/math/Math.h>
 
 namespace kaguya {
     namespace core {

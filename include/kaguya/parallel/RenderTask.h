@@ -5,7 +5,8 @@
 #ifndef KAGUYA_RENDERTASK_H
 #define KAGUYA_RENDERTASK_H
 
-#include <kaguya/math/Sampler.hpp>
+#include <kaguya/Config.h>
+#include <kaguya/sampler/Sampler.h>
 
 #include <condition_variable>
 #include <functional>
@@ -17,10 +18,10 @@ namespace kaguya {
 
         class RenderTask {
         public:
-            RenderTask(const std::function<void(const int, const int, const Sampler *)> &func2D,
+            RenderTask(const std::function<void(const int, const int, Sampler *)> &func2D,
                        int renderWidth, int renderHeight);
 
-/**
+            /**
              * rendering task assignment
              *
              * @param rowStart
@@ -42,7 +43,7 @@ namespace kaguya {
 
         public:
             // render function
-            const std::function<void(const int, const int,const Sampler *)> func2D;
+            const std::function<void(const int, const int, Sampler *)> func2D;
 
             // next render task
             RenderTask *next = nullptr;
@@ -61,7 +62,7 @@ namespace kaguya {
             int _nextTileXCount;
             int _nextTileYCount;
 
-            const int _tileSize = 20;
+            const int _tileSize = Config::tileSize;
 
             // total tile count
             int _totalTileXCount;

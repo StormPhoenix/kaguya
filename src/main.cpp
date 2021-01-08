@@ -1,5 +1,5 @@
 #include <kaguya/Config.h>
-#include <kaguya/math/Math.hpp>
+#include <kaguya/math/Math.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/meta/Vertex.h>
 #include <kaguya/tracer/pt/PathTracer.h>

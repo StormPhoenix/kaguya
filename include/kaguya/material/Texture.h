@@ -6,7 +6,7 @@
 #define KAGUYA_TEXTURE_H
 
 #include <kaguya/core/Core.h>
-#include <kaguya/math/Math.hpp>
+#include <kaguya/math/Math.h>
 
 namespace kaguya {
     namespace material {

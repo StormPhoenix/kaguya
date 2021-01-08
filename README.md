@@ -18,6 +18,11 @@ A simple physically based render.
 
 
 ## Unsolved
+- [ ] 添加 low Discrepancy 序列
+    - [ ] 添加 halton 序列
+        - [ ] 添加 halton sampling 渲染的效果反而不如 c++ 自带的随机数生成程序
+
+- [ ] Math.h 用到 Sampler 的地方全部替换成 double
 
 - [ ] Better space transformation
     - [ ] Transform class
@@ -26,6 +31,9 @@ A simple physically based render.
 - [ ] Ray direction 和 step 的关系，direction 长度可以不为 1。    
 
 - [ ] Add information for each *assert* phrase
+    
+- [ ] 数值计算中用的都是 double，但 epsilon 的计算用的是 float，如果用 double 的 epsilon，会让误差区间计算不准确，
+    无法约束求交    
     
 - [ ] Add subsurface scattering
     - [ ] add **BSSRDF**
@@ -150,6 +158,6 @@ A simple physically based render.
 
 ## Result
 
-<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/scene_bunny-with-point-light2_ssp=300_max-depth=15_render-type=bdpt_1500x1500.jpg" alt="bunny-glass-point-light" width="60%">
-<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/scene_light_through-air_ssp=200_max-depth=12_render-type=bdpt_1200x1200.jpg" width="60%">
-<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/scene_smoke-with-area-light_ssp=200_max-depth=12_render-type=bdpt_1000x1000.jpg" width="60%">
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/scene_bunny-with-point-light2_ssp=300_max-depth=15_render-type=bdpt_1500x1500.jpg" alt="bunny-glass-point-light" width="50%">
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/scene_light_through-air_ssp=200_max-depth=12_render-type=bdpt_1200x1200.jpg" alt="light-through-air" width="50%">
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/scene_smoke-with-area-light_ssp=200_max-depth=12_render-type=bdpt_1000x1000.jpg" alt="smoke" width="50%">

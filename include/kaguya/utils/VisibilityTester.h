@@ -10,6 +10,7 @@
 // TODO Ray 放到 core
 #include <kaguya/tracer/Ray.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
+#include <kaguya/sampler/Sampler.h>
 
 namespace kaguya {
     namespace scene {
@@ -36,7 +37,7 @@ namespace kaguya {
              *
              * @return
              */
-            core::Spectrum transmittance(Scene &scene, const Sampler *sampler1D) const;
+            core::Spectrum transmittance(Scene &scene, math::random::Sampler *sampler1D) const;
 
             bool isVisible(Scene &scene) const;
 

@@ -11,15 +11,15 @@ namespace kaguya {
                                std::shared_ptr<Transform> transformMatrix)
                     : _position1(a.position), _position2(b.position), _position3(c.position),
                       _normal1(a.normal), _normal2(b.normal), _normal3(c.normal),
-                      _uv1(Vector2(a.u, a.v)), _uv2(Vector2(b.u, b.v)), _uv3(Vector2(c.u, c.v)),
+                      _uv1(Vector2d(a.u, a.v)), _uv2(Vector2d(b.u, b.v)), _uv3(Vector2d(c.u, c.v)),
                       _transformMatrix(transformMatrix) {
                 assert(transformMatrix != nullptr);
                 init();
             }
 
-            Triangle::Triangle(const Vector3 &a, const Vector3 &b, const Vector3 &c, const Vector3 &normal1,
-                               const Vector3 &normal2, const Vector3 &normal3, const Vector2 &uv1, const Vector2 &uv2,
-                               const Vector2 &uv3,
+            Triangle::Triangle(const Vector3d &a, const Vector3d &b, const Vector3d &c, const Vector3d &normal1,
+                               const Vector3d &normal2, const Vector3d &normal3, const Vector2d &uv1, const Vector2d &uv2,
+                               const Vector2d &uv3,
                                std::shared_ptr<Transform> transformMatrix)
                     : _position1(a), _position2(b), _position3(c),
                       _normal1(normal1), _normal2(normal2), _normal3(normal3),
@@ -72,7 +72,7 @@ namespace kaguya {
                                 _transformedPosition3[2]
                         ) + 0.0001;
 
-                _aabb = AABB(Vector3(minX, minY, minZ), Vector3(maxX, maxY, maxZ));
+                _aabb = AABB(Vector3d(minX, minY, minZ), Vector3d(maxX, maxY, maxZ));
             }
 
             bool Triangle::intersect(Ray &ray, SurfaceInteraction &si,
@@ -80,16 +80,16 @@ namespace kaguya {
 
                 /* transform the ray direction, let it to point to z-axis */
                 // move ray's origin to (0, 0, 0)
-                Vector3 p0 = _transformedPosition1 - ray.getOrigin();
-                Vector3 p1 = _transformedPosition2 - ray.getOrigin();
-                Vector3 p2 = _transformedPosition3 - ray.getOrigin();
+                Vector3d p0 = _transformedPosition1 - ray.getOrigin();
+                Vector3d p1 = _transformedPosition2 - ray.getOrigin();
+                Vector3d p2 = _transformedPosition3 - ray.getOrigin();
 
                 // swap axis
                 int zAxis = math::maxAbsAxis(ray.getDirection());
                 int xAxis = zAxis + 1 == 3 ? 0 : zAxis + 1;
                 int yAxis = xAxis + 1 == 3 ? 0 : xAxis + 1;
 
-                Vector3 dir = math::swapAxis(ray.getDirection(), xAxis, yAxis, zAxis);
+                Vector3d dir = math::swapAxis(ray.getDirection(), xAxis, yAxis, zAxis);
                 p0 = math::swapAxis(p0, xAxis, yAxis, zAxis);
                 p1 = math::swapAxis(p1, xAxis, yAxis, zAxis);
                 p2 = math::swapAxis(p2, xAxis, yAxis, zAxis);
@@ -146,12 +146,12 @@ namespace kaguya {
                 double zError = math::gamma(7) * (std::abs(b0 * p2.z) + std::abs(b1 * p0.z) + std::abs(b2 * p1.z));
                 double xError = math::gamma(7) * (std::abs(b0 * p2.x) + std::abs(b1 * p0.x) + std::abs(b2 * p1.x));
                 double yError = math::gamma(7) * (std::abs(b0 * p2.y) + std::abs(b1 * p0.y) + std::abs(b2 * p1.y));
-                Vector3 error = Vector3(xError, yError, zError);
+                Vector3d error = Vector3d(xError, yError, zError);
 
                 ray.setStep(step);
                 si.setPoint(ray.at(step));
 
-                Vector3 normal = b0 * _transformedNormal3 +
+                Vector3d normal = b0 * _transformedNormal3 +
                                  b1 * _transformedNormal1 +
                                  b2 * _transformedNormal2;
 
@@ -182,22 +182,22 @@ namespace kaguya {
                                           (_transformedNormal3 - _transformedNormal1)));
             }
 
-            SurfaceInteraction Triangle::sampleSurfacePoint(const Sampler *sampler1D) const {
+            SurfaceInteraction Triangle::sampleSurfacePoint(Sampler *sampler1D) const {
                 // Uniform sampling triangle
-                Vector2 barycentric = math::triangleUniformSampling(sampler1D);
+                Vector2d barycentric = math::triangleUniformSampling(sampler1D);
 
                 SurfaceInteraction si;
-                Vector3 p = _transformedPosition1 * barycentric[0] +
+                Vector3d p = _transformedPosition1 * barycentric[0] +
                             _transformedPosition2 * barycentric[1] +
                             _transformedPosition3 * (1 - barycentric[0] - barycentric[1]);
                 si.setPoint(p);
 
                 // geometry normal
-                Vector3 ng = NORMALIZE(CROSS(_transformedPosition2 - _transformedPosition1,
+                Vector3d ng = NORMALIZE(CROSS(_transformedPosition2 - _transformedPosition1,
                                              _transformedPosition3 - _transformedPosition1));
 
                 // shading normal
-                Vector3 ns = _transformedNormal1 * barycentric[0] +
+                Vector3d ns = _transformedNormal1 * barycentric[0] +
                              _transformedNormal2 * barycentric[1] +
                              _transformedNormal3 * (1 - barycentric[0] - barycentric[1]);
 

@@ -34,13 +34,13 @@ namespace kaguya {
              * @param wo
              * @return
              */
-            virtual Spectrum lightRadiance(const Interaction &interaction, const Vector3 &wo) const = 0;
+            virtual Spectrum lightRadiance(const Interaction &interaction, const Vector3d &wo) const = 0;
 
-            virtual Spectrum sampleFromLight(const Interaction &eye, Vector3 *wi, double *pdf,
-                                             const Sampler *sampler1D,
+            virtual Spectrum sampleFromLight(const Interaction &eye, Vector3d *wi, double *pdf,
+                                             Sampler *sampler1D,
                                              VisibilityTester *visibilityTester) override;
 
-            virtual double sampleFromLightPdf(const Interaction &eye, const Vector3 &dir) override;
+            virtual double sampleFromLightPdf(const Interaction &eye, const Vector3d &dir) override;
 
         protected:
             const Spectrum _intensity;

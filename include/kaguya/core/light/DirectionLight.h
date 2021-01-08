@@ -12,7 +12,7 @@ namespace kaguya {
 
         class DirectionLight : public Light {
         public:
-            DirectionLight(const Vector3 origin, const Vector3 dir);
+            DirectionLight(const Vector3d origin, const Vector3d dir);
         };
 
     }

@@ -20,14 +20,14 @@ namespace kaguya {
             }
         }
 
-        Vector3 BSDF::toObjectSpace(const Vector3 &v) const {
-            return Vector3(DOT(_tanX, v),
-                           DOT(_tanY, v),
-                           DOT(_tanZ, v));
+        Vector3d BSDF::toObjectSpace(const Vector3d &v) const {
+            return Vector3d(DOT(_tanX, v),
+                            DOT(_tanY, v),
+                            DOT(_tanZ, v));
         }
 
-        Vector3 BSDF::toWorldSpace(const Vector3 &v) const {
-            return Vector3(_tanX.x * v.x + _tanY.x * v.y + _tanZ.x * v.z,
+        Vector3d BSDF::toWorldSpace(const Vector3d &v) const {
+            return Vector3d(_tanX.x * v.x + _tanY.x * v.y + _tanZ.x * v.z,
                            _tanX.y * v.x + _tanY.y * v.y + _tanZ.y * v.z,
                            _tanX.z * v.x + _tanY.z * v.y + _tanZ.z * v.z);
         }
@@ -38,9 +38,9 @@ namespace kaguya {
             _bxdfCount++;
         }
 
-        Spectrum BSDF::f(const Vector3 &worldWo, const Vector3 &worldWi, BXDFType type) const {
-            Vector3 wo = toObjectSpace(worldWo);
-            Vector3 wi = toObjectSpace(worldWi);
+        Spectrum BSDF::f(const Vector3d &worldWo, const Vector3d &worldWi, BXDFType type) const {
+            Vector3d wo = toObjectSpace(worldWo);
+            Vector3d wi = toObjectSpace(worldWi);
 
             bool reflect = wo.y * wi.y > 0;
             Spectrum f = 0;
@@ -55,8 +55,8 @@ namespace kaguya {
             return f;
         }
 
-        Spectrum BSDF::sampleF(const Vector3 &worldWo, Vector3 *worldWi, double *pdf,
-                               const math::random::Sampler *const sampler1D,
+        Spectrum BSDF::sampleF(const Vector3d &worldWo, Vector3d *worldWi, double *pdf,
+                               math::random::Sampler *const sampler1D,
                                BXDFType type, BXDFType *sampleType) const {
             // 找到符合类型的 BXDF，并随机选择一个做 sampleF
             int matchedCount = 0;
@@ -93,8 +93,8 @@ namespace kaguya {
                 }
 
                 // 匹配成功，开始采样 bxdf 值
-                Vector3 wo = toObjectSpace(worldWo);
-                Vector3 wi = Vector3(0.0f);
+                Vector3d wo = toObjectSpace(worldWo);
+                Vector3d wi = Vector3d(0.0f);
                 double samplePdf;
                 Spectrum f = bxdf->sampleF(wo, &wi, &samplePdf, sampler1D);
                 // 一般来说 surfacePointPdf = 0 的情况不会发生
@@ -137,12 +137,12 @@ namespace kaguya {
             }
         }
 
-        double BSDF::samplePdf(const Vector3 &worldWo, const Vector3 &worldWi, BXDFType type) const {
+        double BSDF::samplePdf(const Vector3d &worldWo, const Vector3d &worldWi, BXDFType type) const {
             if (_bxdfCount == 0) {
                 return 0.f;
             }
-            Vector3 wo = toObjectSpace(worldWo);
-            Vector3 wi = toObjectSpace(worldWi);
+            Vector3d wo = toObjectSpace(worldWo);
+            Vector3d wi = toObjectSpace(worldWi);
             if (std::abs(wo.y - 0) < math::EPSILON) {
                 return 0.0;
             }

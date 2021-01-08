@@ -7,7 +7,7 @@
 
 #include <kaguya/core/Transform.h>
 #include <kaguya/scene/accumulation/AABB.h>
-#include <kaguya/math/Math.hpp>
+#include <kaguya/math/Math.h>
 #include <kaguya/scene/meta/Shape.h>
 #include <memory>
 
@@ -28,7 +28,7 @@ namespace kaguya {
                  * @param outward 是否向外
                  * @param transformMatrix 变换矩阵
                  */
-                Sphere(const Vector3 &center, double radius, bool outward = true,
+                Sphere(const Vector3d &center, double radius, bool outward = true,
                        std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
                 bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
@@ -37,12 +37,12 @@ namespace kaguya {
                     return 4 * math::PI * _radius * _radius;
                 }
 
-                virtual SurfaceInteraction sampleSurfacePoint(const Sampler *sampler1D) const override;
+                virtual SurfaceInteraction sampleSurfacePoint(Sampler *sampler1D) const override;
 
                 virtual SurfaceInteraction
-                sampleSurfaceInteraction(const Interaction &eye, const Sampler *sampler1D) const override;
+                sampleSurfaceInteraction(const Interaction &eye, Sampler *sampler1D) const override;
 
-                virtual double surfaceInteractionPdf(const Interaction &eye, const Vector3 &dir) const override;
+                virtual double surfaceInteractionPdf(const Interaction &eye, const Vector3d &dir) const override;
 
 
                 virtual const AABB &bound() const override;
@@ -55,12 +55,12 @@ namespace kaguya {
                  * @param hitPoint
                  * @return
                  */
-                virtual Vector3 computeNormal(const Vector3 &hitPoint) const;
+                virtual Vector3d computeNormal(const Vector3d &hitPoint) const;
 
             private:
                 AABB _aabb;
-                Vector3 _center;
-                Vector3 _transformedCenter;
+                Vector3d _center;
+                Vector3d _transformedCenter;
                 double _radius;
                 bool _outward;
                 std::shared_ptr<Transform> _transformMatrix = nullptr;

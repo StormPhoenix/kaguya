@@ -8,7 +8,7 @@
 #include <kaguya/core/Interaction.h>
 #include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/core/bsdf/BXDF.h>
-#include <kaguya/math/Math.hpp>
+#include <kaguya/math/Math.h>
 #include <kaguya/scene/meta/Shape.h>
 #include <kaguya/utils/MemoryArena.h>
 

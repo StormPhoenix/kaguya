@@ -32,7 +32,7 @@ namespace kaguya {
 
         private:
             // Rendering implementation
-            virtual std::function<void(const int, const int, const Sampler *)> render() = 0;
+            virtual std::function<void(const int, const int, Sampler *)> render() = 0;
 
         protected:
             // 场景

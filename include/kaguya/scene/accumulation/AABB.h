@@ -5,7 +5,7 @@
 #ifndef KAGUYA_AABB_H
 #define KAGUYA_AABB_H
 
-#include <kaguya/math/Math.hpp>
+#include <kaguya/math/Math.h>
 #include <kaguya/tracer/Ray.h>
 
 namespace kaguya {
@@ -21,23 +21,23 @@ namespace kaguya {
             public:
                 AxisAlignBoundingBox() {}
 
-                AxisAlignBoundingBox(const Vector3 min, const Vector3 max);
+                AxisAlignBoundingBox(const Vector3d min, const Vector3d max);
 
                 bool insect(const Ray &ray, double minStep, double maxStep) const;
 
                 bool insectPoint(const Ray &ray, double *minStep, double *maxStep) const;
 
-                const Vector3 &min() const {
+                const Vector3d &min() const {
                     return _min;
                 }
 
-                const Vector3 &max() const {
+                const Vector3d &max() const {
                     return _max;
                 }
 
             private:
-                Vector3 _min;
-                Vector3 _max;
+                Vector3d _min;
+                Vector3d _max;
             };
 
             typedef AxisAlignBoundingBox AABB;

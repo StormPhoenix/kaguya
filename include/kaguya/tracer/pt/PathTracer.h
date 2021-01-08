@@ -23,7 +23,7 @@ namespace kaguya {
         public:
             PathTracer();
 
-            virtual std::function<void(const int, const int, const Sampler *)> render() override;
+            virtual std::function<void(const int, const int, Sampler *)> render() override;
 
         private:
             virtual void init();
@@ -36,7 +36,7 @@ namespace kaguya {
              * @param lightPdf 采样概率
              * @return
              */
-            Spectrum evaluateDirectLight(Scene &scene, const Interaction &eye, const Sampler *sampler1D);
+            Spectrum evaluateDirectLight(Scene &scene, const Interaction &eye, Sampler *sampler1D);
 
             /**
              * Path Tracing 渲染代码，渐进式实现
@@ -46,7 +46,7 @@ namespace kaguya {
              * @return
              */
             Spectrum shaderOfProgression(const Ray &ray, Scene &scene,
-                                         const Sampler *sampler1D,
+                                         Sampler *sampler1D,
                                          MemoryArena &memoryArena);
 
             /**
@@ -62,7 +62,7 @@ namespace kaguya {
              * @param row
              * @param col
              */
-            void writeBuffer(const Vector3 &color, int row, int col);
+            void writeBuffer(const Vector3d &color, int row, int col);
 
         private:
             // 最大采样深度

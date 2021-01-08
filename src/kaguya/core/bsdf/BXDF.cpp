@@ -9,8 +9,8 @@ namespace kaguya {
 
         BXDF::BXDF(BXDFType type) : type(type) {}
 
-        Spectrum BXDF::sampleF(const Vector3 &wo, Vector3 *wi, double *pdf,
-                               const Sampler *const sampler1D) {
+        Spectrum BXDF::sampleF(const Vector3d &wo, Vector3d *wi, double *pdf,
+                               Sampler *const sampler1D) {
             // 半球面采样
             *wi = math::hemiCosineSampling(sampler1D);
             if (wo.y < 0) {
@@ -21,7 +21,7 @@ namespace kaguya {
             return f(wo, *wi);
         }
 
-        double BXDF::samplePdf(const Vector3 &wo, const Vector3 &wi) const {
+        double BXDF::samplePdf(const Vector3d &wo, const Vector3d &wi) const {
             if (wo.y * wi.y > 0) {
                 return std::abs(wi.y) * math::INV_PI;
             } else {

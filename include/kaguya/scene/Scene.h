@@ -118,7 +118,10 @@ namespace kaguya {
 
             static std::shared_ptr<Scene> sceneSmoke();
 
+            static std::shared_ptr<Scene> cornelBoxWater();
+
             static std::shared_ptr<Scene> sceneLightThroughAir();
+
 #endif
 
             /**
@@ -164,7 +167,7 @@ namespace kaguya {
              * @return
              */
             bool intersectWithMedium(Ray &ray, SurfaceInteraction &si, core::Spectrum &transmittance,
-                                     const Sampler *sampler1D);
+                                     Sampler *sampler1D);
 
             std::shared_ptr<Intersectable> getWorld() {
                 return _world;
