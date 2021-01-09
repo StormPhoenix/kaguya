@@ -5,16 +5,13 @@
 #include <kaguya/Config.h>
 #include <kaguya/parallel/RenderPool.h>
 
-#include <kaguya/sampler/DefaultSampler.h>
-#include <kaguya/sampler/HaltonSampler.h>
+#include <kaguya/sampler/SamplerFactory.hpp>
 
 #include <cassert>
 #include <cstdlib>
 
 namespace kaguya {
     namespace parallel {
-
-        using namespace math::random;
 
         bool RenderPool::_shutdown = false;
 
@@ -55,9 +52,8 @@ namespace kaguya {
             // when notified, release the barrier
             barrier.reset();
 
-            // create sampler2d
-            Sampler *sampler = HaltonSampler::newInstance();
-//            Sampler *sampler = DefaultSampler::newInstance();
+            // create sampler
+            Sampler *sampler = sampler::SamplerFactory::newSamplerInstance();
 
             std::unique_lock<std::mutex> lock(_taskMutex);
             // running rendering function
@@ -81,7 +77,6 @@ namespace kaguya {
                             }
                         }
 
-                        // lock
                         lock.lock();
                         task->activeRender--;
                         if (task->isFinished()) {

@@ -75,5 +75,5 @@ file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/pt/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/*.cpp)
 
-add_executable(kaguya ${sources})
+add_executable(kaguya ${sources} include/kaguya/sampler/SamplerFactory.hpp)
 target_link_libraries(kaguya pthread)

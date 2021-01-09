@@ -22,5 +22,7 @@ namespace kaguya {
 
     int Config::resolutionWidth = 100;
     int Config::resolutionHeight = 100;
-    int Config::tileSize = 32;
+    int Config::tileSize = 64;
+
+    std::string Config::samplerType = "default";
 }

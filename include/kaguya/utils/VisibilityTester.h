@@ -37,7 +37,7 @@ namespace kaguya {
              *
              * @return
              */
-            core::Spectrum transmittance(Scene &scene, math::random::Sampler *sampler1D) const;
+            core::Spectrum transmittance(Scene &scene, sampler::Sampler *sampler1D) const;
 
             bool isVisible(Scene &scene) const;
 

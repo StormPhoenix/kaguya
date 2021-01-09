@@ -5,22 +5,20 @@
 #include <kaguya/sampler/Sampler.h>
 
 namespace kaguya {
-    namespace math {
-        namespace random {
+    namespace sampler {
 
-            Sampler::Sampler(int samplePerPixel) :
-                    samplePerPixel(samplePerPixel),
-                    randomSeed(0) {}
+        Sampler::Sampler(int samplePerPixel) :
+                samplePerPixel(samplePerPixel),
+                randomSeed(0) {}
 
-            void Sampler::forPixel(const Point2d pixel) {
-                currentPixel = pixel;
-                randomSeed = 0;
-            }
+        void Sampler::forPixel(const Point2d pixel) {
+            currentPixel = pixel;
+            randomSeed = 0;
+        }
 
-            bool Sampler::nextSampleRound() {
-                randomSeed++;
-                return randomSeed < samplePerPixel;
-            }
+        bool Sampler::nextSampleRound() {
+            randomSeed++;
+            return randomSeed < samplePerPixel;
         }
     }
 }

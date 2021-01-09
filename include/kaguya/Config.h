@@ -44,12 +44,13 @@ namespace kaguya {
         static int resolutionHeight;
         // Image tile size
         static int tileSize;
+        // Sampler type
+        static std::string samplerType;
 
         static std::shared_ptr<Camera> buildCamera() {
             // TODO load config file
             return std::make_shared<Camera>();
         }
-
 
         // TODO 临时代码，用于测试构建场景
         static std::shared_ptr<Scene> nextScene() {
@@ -58,7 +59,7 @@ namespace kaguya {
 //                scenes.push_back(Scene::sceneTwoSpheresWithPointLight);
                 scenes.push_back(Scene::sceneTwoSpheresWithAreaLight);
 //                scenes.push_back(Scene::sceneTwoSpheresWithSpotLight);
-//                scenes.push_back(Scene::sceneBunnyWithPointLight);
+//                scenes.push_back(Scene::sceneBunnyWithPoint Light);
 //                scenes.push_back(Scene::sceneBunnyWithAreaLight);
 //                scenes.push_back(Scene::sceneSmoke);
 //                scenes.push_back(Scene::sceneLightThroughAir);

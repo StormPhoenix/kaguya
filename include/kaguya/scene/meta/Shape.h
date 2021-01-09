@@ -19,7 +19,7 @@ namespace kaguya {
 
     namespace scene {
         namespace meta {
-            using kaguya::math::random::Sampler;
+            using kaguya::sampler::Sampler;
             using kaguya::scene::acc::AABB;
             using kaguya::tracer::Ray;
             using kaguya::core::SurfaceInteraction;

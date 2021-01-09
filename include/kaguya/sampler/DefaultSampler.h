@@ -8,29 +8,27 @@
 #include <kaguya/sampler/Sampler.h>
 
 namespace kaguya {
-    namespace math {
-        namespace random {
+    namespace sampler {
 
-            class DefaultSampler : public Sampler {
-            public:
-                DefaultSampler(int samplePerPixel);
+        class DefaultSampler : public Sampler {
+        public:
+            DefaultSampler(int samplePerPixel);
 
-                virtual double sample1D() override;
+            virtual double sample1D() override;
 
-                virtual Vector2d sample2D() override;
+            virtual Vector2d sample2D() override;
 
-                virtual bool nextSampleRound() override;
+            virtual bool nextSampleRound() override;
 
-                virtual ~DefaultSampler() override {}
+            virtual ~DefaultSampler() override {}
 
-                static Sampler *newInstance();
+            static Sampler *newInstance();
 
-            private:
-                std::uniform_real_distribution<double> distribution;
-                std::mt19937 generator;
-                std::function<double()> randGenerator;
-            };
-        }
+        private:
+            std::uniform_real_distribution<double> distribution;
+            std::mt19937 generator;
+            std::function<double()> randGenerator;
+        };
     }
 }
 

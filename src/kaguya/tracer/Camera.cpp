@@ -64,7 +64,7 @@ namespace kaguya {
                                          Sampler *const sampler,
                                          VisibilityTester *visibilityTester) const {
             // 在相机镜头圆盘上随机采样
-            Vector2d diskSample = math::diskUniformSampling(sampler, _lensRadius);
+            Vector2d diskSample = math::sampling::diskUniformSampling(sampler, _lensRadius);
             // 计算相机镜头采样点 3D 坐标
             Vector3d lensSample = _right * diskSample.x + _up * diskSample.y + _eye;
 

@@ -16,17 +16,19 @@ A simple physically based render.
     
 - [ ] 编写实时展现渲染进度的功能。
 
+- [ ] 添加 Stratified Sampling
+
+- [ ] BSSRDF
 
 ## Unsolved
 - [ ] 添加 low Discrepancy 序列
     - [ ] 添加 halton 序列
-        - [ ] 添加 halton sampling 渲染的效果反而不如 c++ 自带的随机数生成程序
+        - [x] 添加 halton sampling 渲染的效果反而不如 c++ 自带的随机数生成程序
+        - [x] 对照 PBRT 的 HaltonSampler 、检查 halton + Faure 都没有错误 
+        - [x] 使用 PT 的情况下，halton 和 random 的效果没有什么差别，仅仅只是 halton 的噪点看起来更均匀
+    - [x] 添加 Faure permutation
 
 - [ ] Math.h 用到 Sampler 的地方全部替换成 double
-
-- [ ] Better space transformation
-    - [ ] Transform class
-    - [ ] Replace all occurrence.
 
 - [ ] Ray direction 和 step 的关系，direction 长度可以不为 1。    
 
@@ -58,6 +60,11 @@ A simple physically based render.
     无法在光线传输过程中确定碰撞位置两端的折射率。程序采用的是将外界材质的折射率固定设置为空气折射率（1.0）
     
 ## Solved
+
+- [x] Better space transformation
+    - [x] Transform class
+    - [x] Replace all occurrence.
+    
 - [x] Volume (smoke etc) rendering
     - [x] add medium boundary to path tracing
     - [x] add medium boundary to bi-directional path tracing

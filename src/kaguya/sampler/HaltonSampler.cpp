@@ -6,22 +6,24 @@
 #include <kaguya/sampler/HaltonSampler.h>
 
 namespace kaguya {
-    namespace math {
-        namespace random {
+    namespace sampler {
 
-            static const int MAX_TILE_RESOLUTION = 128;
-            static const int START_DIMENSION = 2;
+        using namespace math;
 
-            std::vector<uint16_t> HaltonSampler::permutation;
+        static const int MAX_TILE_RESOLUTION = 128;
 
-            /**
-             * a = 1 (mod n)
-             * solve a', a * a' = 1 (mode n)
-             */
-            static uint64_t multiplicativeInverse(int64_t a, int64_t b) {
-                int64_t x, y;
-                extendGCD(a, b, &x, &y);
-                return mod(x, b);
+        static const int START_DIMENSION = 0;
+
+        std::vector<uint16_t> HaltonSampler::permutation;
+
+        /**
+         * a = 1 (mod n)
+         * solve a', a * a' = 1 (mode n)
+         */
+        static uint64_t multiplicativeInverse(int64_t a, int64_t b) {
+            int64_t x, y;
+            math::extendGCD(a, b, &x, &y);
+                return math::mod(x, b);
             }
 
             bool HaltonSampler::isPrimesValid = false;
@@ -36,23 +38,24 @@ namespace kaguya {
                         scale *= base;
                         digits++;
                     }
-                    firstTwoDimScale[i] = scale;
+                    firstTwoDimScales[i] = scale;
                     firstTwoDimScaleDigits[i] = digits;
                 }
-                sampleStride = firstTwoDimScale[0] * firstTwoDimScale[1];
-                numTheoreticReciprocal[0] = multiplicativeInverse(firstTwoDimScale[1], firstTwoDimScale[0]);
-                numTheoreticReciprocal[1] = multiplicativeInverse(firstTwoDimScale[0], firstTwoDimScale[1]);
+                sampleStride = firstTwoDimScales[0] * firstTwoDimScales[1];
+                numTheoreticReciprocal[0] = multiplicativeInverse(firstTwoDimScales[1], firstTwoDimScales[0]);
+                numTheoreticReciprocal[1] = multiplicativeInverse(firstTwoDimScales[0], firstTwoDimScales[1]);
             }
 
             void HaltonSampler::forPixel(const Point2d pixel) {
                 Sampler::forPixel(pixel);
                 // new seed
-                seedForPixel = seedForCurrentPixel(randomSeed);
+                seedForPixel = seedForCurrentPixel(0);
                 dimension = START_DIMENSION;
             }
 
             bool HaltonSampler::nextSampleRound() {
                 seedForPixel = seedForCurrentPixel(randomSeed + 1);
+
                 dimension = START_DIMENSION;
                 return Sampler::nextSampleRound();
             }
@@ -65,7 +68,7 @@ namespace kaguya {
                     {
                         std::lock_guard<std::mutex> lock(singleInstance);
                         if (!isPrimesValid) {
-                            permutation = math::low_discrepancy::computePermutationArray();
+                            permutation = math::sampling::low_discrepancy::computePermutationArray(true);
                             isPrimesValid = true;
                         }
                     }
@@ -74,19 +77,22 @@ namespace kaguya {
             }
 
             double HaltonSampler::sample1D() {
-                if (dimension >= low_discrepancy::primeArraySize) {
+                if (dimension >= math::sampling::low_discrepancy::primeArraySize) {
                     // TODO add warning
-                    dimension = low_discrepancy::primeArraySize - 1;
+                    dimension = math::sampling::low_discrepancy::primeArraySize - 1;
                 }
 
-                int base = low_discrepancy::primes[dimension];
-                if (dimension <= 1) {
-                    dimension++;
-                    return low_discrepancy::radicalReverse(base, seedForPixel);
+                const int dim = dimension;
+                dimension++;
+                if (dim == 0) {
+                    return math::sampling::low_discrepancy::radicalReverse(dim,
+                                                                           seedForPixel >> firstTwoDimScaleDigits[0]);
+                } else if (dim == 1) {
+                    return math::sampling::low_discrepancy::radicalReverse(dim,
+                                                                           seedForPixel / firstTwoDimScales[1]);
                 } else {
-                    uint16_t *perm = &permutation[low_discrepancy::primeSums[dimension]];
-                    dimension++;
-                    return low_discrepancy::scrambledRadicalReverse(base, seedForPixel, perm);
+                    uint16_t *perm = &permutation[math::sampling::low_discrepancy::primeSums[dim]];
+                    return math::sampling::low_discrepancy::scrambledRadicalReverse(dim, seedForPixel, perm);
                 }
             }
 
@@ -97,22 +103,28 @@ namespace kaguya {
             }
 
             int HaltonSampler::seedForCurrentPixel(int seed) {
-                Point2i p_j = Point2i(mod(currentPixel.x, Config::tileSize),
-                                      mod(currentPixel.y, Config::tileSize));
-                int dimOffset = 0;
-                for (int i = 0; i < 2; i++) {
-                    // l_j
-                    uint64_t l_j =
-                            (i == 0) ? low_discrepancy::inverseRadicalReverse<2>(p_j[i], firstTwoDimScaleDigits[i]) :
-                            low_discrepancy::inverseRadicalReverse<3>(p_j[i], firstTwoDimScaleDigits[i]);
-                    // m_j
-                    int m_j = sampleStride / firstTwoDimScale[i];
-                    // mul multiplicative inverse term
-                    dimOffset += l_j * m_j * numTheoreticReciprocal[i];
+                if (currentPixel.x != pixelForOffset.x ||
+                    currentPixel.y != pixelForOffset.y) {
+                    Point2i p_j = Point2i(mod(currentPixel[0], MAX_TILE_RESOLUTION),
+                                          mod(currentPixel[1], MAX_TILE_RESOLUTION));
+                    seedForPixel = 0;
+                    for (int i = 0; i < 2; i++) {
+                        // l_j
+                        uint64_t l_j =
+                                (i == 0) ? math::sampling::low_discrepancy::inverseRadicalReverse<2>(p_j[i],
+                                                                                                     firstTwoDimScaleDigits[i])
+                                         :
+                                math::sampling::low_discrepancy::inverseRadicalReverse<3>(p_j[i],
+                                                                                          firstTwoDimScaleDigits[i]);
+                        // m_j
+                        int m_j = sampleStride / firstTwoDimScales[i];
+                        // mul multiplicative inverse term
+                        seedForPixel += l_j * m_j * numTheoreticReciprocal[i];
+                    }
+                    seedForPixel %= sampleStride;
+                    pixelForOffset = currentPixel;
                 }
-                dimOffset %= sampleStride;
-                return dimOffset + seed * sampleStride;
+                return seedForPixel + seed * sampleStride;
             }
-        }
     }
 }

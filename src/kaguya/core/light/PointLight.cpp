@@ -35,7 +35,7 @@ namespace kaguya {
         Spectrum PointLight::randomLightRay(Ray *ray, Vector3d *normal, double *pdfPos, double *pdfDir,
                                             Sampler *sampler1D) {
             // 采样射线
-            Vector3d rayDir = math::sphereUniformSampling(sampler1D);
+            Vector3d rayDir = math::sampling::sphereUniformSampling(sampler1D);
             (*ray) = Ray(_center, NORMALIZE(rayDir), _mediumBoundary.inside());
 
             *normal = rayDir;

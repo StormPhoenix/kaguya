@@ -56,7 +56,7 @@ namespace kaguya {
         }
 
         Spectrum BSDF::sampleF(const Vector3d &worldWo, Vector3d *worldWi, double *pdf,
-                               math::random::Sampler *const sampler1D,
+                               sampler::Sampler *const sampler1D,
                                BXDFType type, BXDFType *sampleType) const {
             // 找到符合类型的 BXDF，并随机选择一个做 sampleF
             int matchedCount = 0;

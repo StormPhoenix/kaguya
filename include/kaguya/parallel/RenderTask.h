@@ -14,7 +14,7 @@
 namespace kaguya {
     namespace parallel {
 
-        using kaguya::math::random::Sampler;
+        using sampler::Sampler;
 
         class RenderTask {
         public:

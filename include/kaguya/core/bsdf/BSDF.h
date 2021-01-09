@@ -51,7 +51,7 @@ namespace kaguya {
              * @return
              */
             Spectrum sampleF(const Vector3d &worldWo, Vector3d *worldWi, double *pdf,
-                             math::random::Sampler *const sampler1D,
+                             Sampler *const sampler1D,
                              BXDFType type = BSDF_ALL, BXDFType *sampleType = nullptr) const;
 
             /**

@@ -85,7 +85,7 @@ namespace kaguya {
 
             SurfaceInteraction Sphere::sampleSurfacePoint(Sampler *sampler1D) const {
                 // sample1d outward normal
-                Vector3d normal = math::sphereUniformSampling(sampler1D);
+                Vector3d normal = math::sampling::sphereUniformSampling(sampler1D);
                 if (_transformMatrix != nullptr) {
                     normal = _transformMatrix->transformNormal(normal);
                 }
@@ -118,7 +118,7 @@ namespace kaguya {
                     double cosThetaMax = std::sqrt(std::max(0., 1 - sinThetaMax2));
 
                     // cone sampling
-                    const Vector3d dir = math::coneUniformSampling(cosThetaMax, sampler1D);
+                    const Vector3d dir = math::sampling::coneUniformSampling(cosThetaMax, sampler1D);
 
                     // build coordinate system
                     Vector3d tanY = NORMALIZE(_transformedCenter - eye.getPoint());
@@ -161,7 +161,7 @@ namespace kaguya {
                     double sinThetaMax2 = (_radius * _radius) / (dist * dist);
                     double cosThetaMax = std::sqrt(std::max(0., 1 - sinThetaMax2));
 
-                    pdf = math::coneUniformSamplePdf(cosThetaMax);
+                    pdf = math::sampling::coneUniformSamplePdf(cosThetaMax);
                 }
                 return pdf;
             }

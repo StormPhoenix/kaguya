@@ -10,7 +10,7 @@ namespace kaguya {
     namespace scene {
         namespace acc {
 
-            using namespace math::random;
+            using namespace sampler;
 
             inline bool compareBox(const std::shared_ptr<Intersectable> a,
                                    const std::shared_ptr<Intersectable> b, int axis) {

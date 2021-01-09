@@ -12,7 +12,7 @@ namespace kaguya {
         Spectrum BXDF::sampleF(const Vector3d &wo, Vector3d *wi, double *pdf,
                                Sampler *const sampler1D) {
             // 半球面采样
-            *wi = math::hemiCosineSampling(sampler1D);
+            *wi = math::sampling::hemiCosineSampling(sampler1D);
             if (wo.y < 0) {
                 wi->y *= -1;
             }

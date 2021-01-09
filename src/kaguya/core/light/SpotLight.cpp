@@ -41,7 +41,7 @@ namespace kaguya {
         Spectrum SpotLight::randomLightRay(Ray *ray, Vector3d *normal, double *pdfPos, double *pdfDir,
                                            Sampler *sampler1D) {
             // 在局部坐标空间中均匀采样射线
-            Vector3d dirLocal = math::coneUniformSampling(_cosTotalRange, sampler1D);
+            Vector3d dirLocal = math::sampling::coneUniformSampling(_cosTotalRange, sampler1D);
 
             // 计算切线空间
             Vector3d tanY = _dir;
@@ -57,7 +57,7 @@ namespace kaguya {
 
             (*normal) = dirWorld;
             (*pdfPos) = 1.0;
-            (*pdfDir) = math::coneUniformSamplePdf(_cosTotalRange);
+            (*pdfDir) = math::sampling::coneUniformSamplePdf(_cosTotalRange);
 
             return _intensity * fallOffWeight(dirWorld);
         }
@@ -66,7 +66,7 @@ namespace kaguya {
                                           double *pdfPos, double *pdfDir) const {
             (*pdfPos) = 0;
             (*pdfDir) = std::cos(DOT(ray.getDirection(), _dir)) >= _cosTotalRange ?
-                        math::coneUniformSamplePdf(_cosTotalRange) : 0;
+                        math::sampling::coneUniformSamplePdf(_cosTotalRange) : 0;
         }
 
         Spectrum SpotLight::fallOffWeight(const Vector3d &wo) {

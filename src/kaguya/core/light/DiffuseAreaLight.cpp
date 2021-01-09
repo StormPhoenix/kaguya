@@ -39,12 +39,12 @@ namespace kaguya {
             // 判断区域光是否是双面发光
             if (_singleSide) {
                 // 单面发光，按照 cosine 方式采样
-                dirLocal = math::hemiCosineSampling(sampler1D);
-                (*pdfDir) = math::hemiCosineSamplePdf(dirLocal);
+                dirLocal = math::sampling::hemiCosineSampling(sampler1D);
+                (*pdfDir) = math::sampling::hemiCosineSamplePdf(dirLocal);
             } else {
                 // 双面发光，按照 cosine 方式在两边采样
-                dirLocal = math::hemiCosineSampling(sampler1D);
-                (*pdfDir) = math::hemiCosineSamplePdf(dirLocal) * 0.5;
+                dirLocal = math::sampling::hemiCosineSampling(sampler1D);
+                (*pdfDir) = math::sampling::hemiCosineSamplePdf(dirLocal) * 0.5;
 
                 // 按照 0.5 的概率确认在上/下球面做 cosine / PI 采样
                 double prob = sampler1D->sample1D();
@@ -77,7 +77,7 @@ namespace kaguya {
             si.setPoint(ray.getOrigin());
             (*pdfPos) = _geometry->getShape()->surfacePointPdf(si);
             double cosTheta = ABS_DOT(normal, ray.getDirection());
-            (*pdfDir) = _singleSide ? math::hemiCosineSamplePdf(cosTheta) : 0.5 * math::hemiCosineSamplePdf(cosTheta);
+            (*pdfDir) = _singleSide ? math::sampling::hemiCosineSamplePdf(cosTheta) : 0.5 * math::sampling::hemiCosineSamplePdf(cosTheta);
         }
 
         Spectrum DiffuseAreaLight::lightRadiance(const Interaction &interaction, const Vector3d &wo) const {

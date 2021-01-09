@@ -45,10 +45,11 @@ using Matrix3d = glm::dmat3x3;
 #define CROSS(x, y) glm::cross(x, y)
 
 namespace kaguya {
+    namespace sampler {
+        class Sampler;
+    }
+
     namespace math {
-        namespace random {
-            class Sampler;
-        }
 
         const double maxDouble = std::numeric_limits<double>::max();
         const double infinity = std::numeric_limits<double>::infinity();
@@ -61,6 +62,7 @@ namespace kaguya {
         const double REFRACTION_INDEX_WATER = 1.0f;
 
         using namespace kaguya;
+        using sampler::Sampler;
 
         inline double degreesToRadians(double degrees) {
             return degrees * PI / 180;
@@ -123,9 +125,9 @@ namespace kaguya {
             return r0 + (1 - r0) * pow((1 - cosine), 5);
         }
 
-        double randomDouble(double min, double max, random::Sampler *const sampler1D);
+        double randomDouble(double min, double max, Sampler *const sampler1D);
 
-        int randomInt(int min, int max, math::random::Sampler *const sampler1D);
+        int randomInt(int min, int max, Sampler *const sampler1D);
 
         inline int maxAbsAxis(const Vector3d v) {
             double maxValue = std::abs(v[0]);
@@ -179,35 +181,6 @@ namespace kaguya {
             return (f * f) / (g * g + f * f);
         }
 
-        /**
-         * （局部坐标系）
-         * 从 y > 0 的半球面，按照 cos(theta) / Pi 的概率采样射线
-         * @return
-         */
-        Vector3d hemiCosineSampling(random::Sampler *const sampler);
-
-        /**
-         * （局部坐标系）
-         * 在球面做均匀采样，默认 (0, 1, 0) 为法线方向
-         * @return
-         */
-        Vector3d sphereUniformSampling(math::random::Sampler *sampler);
-
-        /**
-         * （局部坐标系）
-         * 计算 sample1d 在 hemi-sphere cosine 分布下的 pdf
-         * @param sample
-         * @return
-         */
-        inline double hemiCosineSamplePdf(Vector3d sample) {
-            double cosine = NORMALIZE(sample).y;
-            return cosine < 0 ? 0 : cosine * INV_PI;
-        }
-
-        inline double hemiCosineSamplePdf(double cosTheta) {
-            return cosTheta / PI;
-        }
-
         inline bool isValid(const Vector3d v) {
             return !std::isnan(v.x) && !std::isnan(v.y) && !std::isnan(v.z);
         }
@@ -227,44 +200,6 @@ namespace kaguya {
             }
             (*tanX) = NORMALIZE(*tanX);
             (*tanZ) = NORMALIZE(CROSS(tanY, *tanX));
-        }
-
-        /**
-         * 对圆盘做均匀采样
-         * @return
-         */
-        Vector2d diskUniformSampling(math::random::Sampler *const sampler1D, double radius = 1.);
-
-        /**
-         * Sample barycentric coordinate from triangle
-         *
-         * 1 - u = sqrt(1 - sampleU)
-         * v = sampleV * sqrt(1 - sampleU)
-         *
-         * ->
-         *
-         * 1 - u = sqrt(sampleU)
-         * v = sampleV * sqrt(sampleU)
-         *
-         * @param sampler
-         * @return
-         */
-        Vector2d triangleUniformSampling(random::Sampler *sampler);
-
-        /**
-         * 从 cone 空间中均匀采样射线
-         * @param cosThetaMax
-         * @return
-         */
-        Vector3d coneUniformSampling(double cosThetaMax, random::Sampler *sampler);
-
-        /**
-         * 计算 cone 空间中均匀采样射线的 pdf
-         * @param cosThetaMax
-         * @return
-         */
-        inline double coneUniformSamplePdf(double cosThetaMax) {
-            return 1 / (2 * PI * (1 - cosThetaMax));
         }
 
         inline uint64_t double2bits(double v) {
@@ -337,35 +272,105 @@ namespace kaguya {
             return r;
         }
 
-        namespace low_discrepancy {
-            const int primeArraySize = 1000;
+        namespace sampling {
 
-            extern const int primes[primeArraySize];
+            /**
+             * （局部坐标系）
+             * 从 y > 0 的半球面，按照 cos(theta) / Pi 的概率采样射线
+             * @return
+             */
+            Vector3d hemiCosineSampling(Sampler *const sampler);
 
-            extern const int primeSums[primeArraySize];
+            /**
+             * （局部坐标系）
+             * 在球面做均匀采样，默认 (0, 1, 0) 为法线方向
+             * @return
+             */
+            Vector3d sphereUniformSampling(Sampler *sampler);
 
-            std::vector<uint16_t> computePermutationArray();
-
-            double radicalReverse(const int base, uint64_t n);
-
-            template<int base>
-            uint16_t inverseRadicalReverse(uint64_t reversed, int digitsCount) {
-                uint64_t ret = 0;
-                for (int i = 0; i < digitsCount; i++) {
-                    uint64_t digit = reversed % base;
-                    reversed /= base;
-                    ret = ret * base + digit;
-                }
-                return ret;
+            /**
+             * （局部坐标系）
+             * 计算 sample1d 在 hemi-sphere cosine 分布下的 pdf
+             * @param sample
+             * @return
+             */
+            inline double hemiCosineSamplePdf(Vector3d sample) {
+                double cosine = NORMALIZE(sample).y;
+                return cosine < 0 ? 0 : cosine * INV_PI;
             }
 
-            double scrambledRadicalReverse(const int base, uint64_t n, uint16_t *perm);
+            inline double hemiCosineSamplePdf(double cosTheta) {
+                return cosTheta / PI;
+            }
 
-            double radicalReverse(uint64_t n);
+            /**
+             * 对圆盘做均匀采样
+             * @return
+             */
+            Vector2d diskUniformSampling(Sampler *const sampler1D, double radius = 1.);
 
-            uint64_t reverseBit64(uint64_t n);
+            /**
+             * Sample barycentric coordinate from triangle
+             *
+             * 1 - u = sqrt(1 - sampleU)
+             * v = sampleV * sqrt(1 - sampleU)
+             *
+             * ->
+             *
+             * 1 - u = sqrt(sampleU)
+             * v = sampleV * sqrt(sampleU)
+             *
+             * @param sampler
+             * @return
+             */
+            Vector2d triangleUniformSampling(Sampler *sampler);
 
-            uint32_t reverseBit32(uint32_t n);
+            /**
+             * 从 cone 空间中均匀采样射线
+             * @param cosThetaMax
+             * @return
+             */
+            Vector3d coneUniformSampling(double cosThetaMax, Sampler *sampler);
+
+            /**
+             * 计算 cone 空间中均匀采样射线的 pdf
+             * @param cosThetaMax
+             * @return
+             */
+            inline double coneUniformSamplePdf(double cosThetaMax) {
+                return 1 / (2 * PI * (1 - cosThetaMax));
+            }
+
+            namespace low_discrepancy {
+                const uint16_t primeArraySize = 256;
+
+                extern const uint16_t primes[primeArraySize];
+
+                extern const int primeSums[primeArraySize];
+
+                std::vector<uint16_t> computePermutationArray(bool initFaure = true);
+
+                double radicalReverse(const int dimension, uint64_t n);
+
+                template<int base>
+                uint16_t inverseRadicalReverse(uint64_t reversed, int digitsCount) {
+                    uint64_t ret = 0;
+                    for (int i = 0; i < digitsCount; i++) {
+                        uint64_t digit = reversed % base;
+                        reversed /= base;
+                        ret = ret * base + digit;
+                    }
+                    return ret;
+                }
+
+                double scrambledRadicalReverse(const int dimension, uint64_t n, uint16_t *perm);
+
+                double radicalReverse(uint64_t n);
+
+                uint64_t reverseBit64(uint64_t n);
+
+                uint32_t reverseBit32(uint32_t n);
+            }
         }
     }
 }

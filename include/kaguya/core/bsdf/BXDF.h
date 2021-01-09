@@ -11,7 +11,7 @@
 namespace kaguya {
     namespace core {
 
-        using kaguya::math::random::Sampler;
+        using sampler::Sampler;
 
         typedef enum TransportMode {
             IMPORTANCE,

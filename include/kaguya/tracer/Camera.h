@@ -24,7 +24,7 @@ namespace kaguya {
         using kaguya::core::Interaction;
         using kaguya::utils::VisibilityTester;
         using kaguya::core::medium::Medium;
-        using kaguya::math::random::Sampler;
+        using kaguya::sampler::Sampler;
 
         class Camera {
         public:
