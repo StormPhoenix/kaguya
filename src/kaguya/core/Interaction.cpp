@@ -38,25 +38,34 @@ namespace kaguya {
 
 
         Ray Interaction::sendRay(const Vector3d &dir) const {
-            // check whether the ray direction is point to outside or inside
-            const medium::Medium *medium = (DOT(dir, _normal) > 0 ?
-                                            _mediumBoundary.outside() : _mediumBoundary.inside());
             Vector3d origin = offsetOrigin(_point, _error, _normal, dir);
-            return Ray(origin, NORMALIZE(dir), medium);
+            return Ray(origin, NORMALIZE(dir), getMedium(dir));
+        }
+
+        Ray Interaction::sendRayTo(const Point3d &target) const {
+            Vector3d origin = offsetOrigin(_point, _error, _normal, target - _point);
+            const Vector3d dir = (target - origin);
+
+            Ray ray = Ray(origin, dir, getMedium(dir));
+            ray.setStep(1. - math::shadowEpsilon);
+            return ray;
         }
 
         Ray Interaction::sendRayTo(const Interaction &it) const {
             // check whether the ray direction is point to outside or inside
-
             Vector3d origin = offsetOrigin(_point, _error, _normal, it.getPoint() - _point);
             Vector3d target = offsetOrigin(it.getPoint(), it.getError(), it.getNormal(), origin - it.getPoint());
             const Vector3d dir = (target - origin);
-            const medium::Medium *medium = (DOT(dir, _normal) > 0 ?
-                                            _mediumBoundary.outside() : _mediumBoundary.inside());
 
-            Ray ray = Ray(origin, dir, medium);
+            Ray ray = Ray(origin, dir, getMedium(dir));
             ray.setStep(1. - math::shadowEpsilon);
             return ray;
+        }
+
+        const Medium *Interaction::getMedium(const Vector3d &dir) const {
+            // check whether the ray direction is point to outside or inside
+            return (DOT(dir, _normal) > 0 ?
+                    _mediumBoundary.outside() : _mediumBoundary.inside());
         }
 
         MediumInteraction::MediumInteraction(const Vector3d &point, const Vector3d &direction,

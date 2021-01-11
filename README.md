@@ -16,9 +16,11 @@ A simple physically based render.
     
 - [ ] 编写实时展现渲染进度的功能。
 
-- [ ] 添加 Stratified Sampling
+- [ ] 添加 Stratified Sampler、Sobel Sampler
 
-- [ ] BSSRDF
+- [ ] add BSSRDF
+
+- [ ] Geometry Aggregation 结构调整
 
 ## Unsolved
 - [ ] 添加 low Discrepancy 序列

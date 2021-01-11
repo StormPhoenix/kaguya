@@ -68,7 +68,8 @@ namespace kaguya {
             return degrees * PI / 180;
         }
 
-        inline double clamp(double x, double min, double max) {
+        template<typename T, typename U, typename V>
+        T clamp(T x, U min, V max) {
             if (x < min) return min;
             if (x > max) return max;
             return x;

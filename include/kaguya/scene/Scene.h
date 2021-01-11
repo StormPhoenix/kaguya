@@ -155,7 +155,7 @@ namespace kaguya {
              * @param si
              * @return
              */
-            bool intersect(Ray &ray, SurfaceInteraction &si);
+            bool intersect(Ray &ray, SurfaceInteraction &si) const;
 
             /**
              * Intersect scene with participating medium
@@ -167,7 +167,7 @@ namespace kaguya {
              * @return
              */
             bool intersectWithMedium(Ray &ray, SurfaceInteraction &si, core::Spectrum &transmittance,
-                                     Sampler *sampler1D);
+                                     Sampler *sampler1D) const;
 
             std::shared_ptr<Intersectable> getWorld() {
                 return _world;

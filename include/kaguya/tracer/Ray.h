@@ -17,6 +17,8 @@ namespace kaguya {
 
     namespace tracer {
 
+        using core::medium::Medium;
+
         class Ray {
         public:
             Ray();
@@ -27,15 +29,15 @@ namespace kaguya {
              * @param direction 射线方向
              */
             Ray(const Vector3d &origin, const Vector3d &direction,
-                const core::medium::Medium *medium = nullptr);
+                const Medium *medium = nullptr);
 
             const Vector3d &getDirection() const;
 
             const Vector3d &getOrigin() const;
 
-            const void setMedium(core::medium::Medium *medium);
+            const void setMedium(Medium *medium);
 
-            const core::medium::Medium *getMedium() const {
+            const Medium *getMedium() const {
                 return _medium;
             }
 
@@ -56,7 +58,7 @@ namespace kaguya {
             Vector3d _direction;
             double _minStep;
             double _step;
-            const core::medium::Medium *_medium;
+            const Medium *_medium;
         };
 
     }

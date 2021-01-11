@@ -14,7 +14,7 @@ namespace kaguya {
 
         class BSDF {
         public:
-            BSDF(const Interaction &insect);
+            BSDF(const Interaction &interaction);
 
             void addBXDF(BXDF *bxdf);
 

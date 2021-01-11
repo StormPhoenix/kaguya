@@ -346,8 +346,8 @@ namespace kaguya {
                         for (unsigned i = 0; i < base; i++) {
                             perms[base][i] = i;
                         }
-                        // TODO deprecated
                         std::random_shuffle(perms[base].begin(), perms[base].end(), rand48);
+//                        std::shuffle(perms[base].begin(), perms[base].end(), rand48);
                     }
                 }
 

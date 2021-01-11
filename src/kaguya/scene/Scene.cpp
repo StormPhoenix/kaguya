@@ -1308,12 +1308,12 @@ namespace kaguya {
             return scene;
         }
 
-        bool Scene::intersect(Ray &ray, SurfaceInteraction &si) {
+        bool Scene::intersect(Ray &ray, SurfaceInteraction &si) const {
             return _world->intersect(ray, si, ray.getMinStep(), ray.getStep());
         }
 
         bool Scene::intersectWithMedium(Ray &ray, SurfaceInteraction &si, core::Spectrum &transmittance,
-                                        Sampler *sampler1D) {
+                                        Sampler *sampler1D) const {
             transmittance = Spectrum(1.0);
             while (true) {
                 bool foundIntersection = intersect(ray, si);

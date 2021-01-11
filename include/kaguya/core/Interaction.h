@@ -6,13 +6,17 @@
 #define KAGUYA_INTERACTION_H
 
 #include <kaguya/core/Core.h>
-#include <kaguya/core/phase/PhaseFunction.h>
-#include <kaguya/core/medium/MediumBound.h>
-#include <kaguya/utils/MemoryArena.h>
 #include <kaguya/core/bsdf/BXDF.h>
+#include <kaguya/core/medium/MediumBound.h>
+#include <kaguya/core/phase/PhaseFunction.h>
+#include <kaguya/utils/MemoryArena.h>
 #include <kaguya/tracer/Ray.h>
 
 namespace kaguya {
+
+    namespace scene {
+        class Intersectable;
+    }
 
     namespace material {
         class Material;
@@ -27,6 +31,8 @@ namespace kaguya {
 
         class Light;
 
+        using scene::Intersectable;
+        using medium::Medium;
         using medium::MediumBound;
         using kaguya::tracer::Camera;
         using kaguya::tracer::Ray;
@@ -47,6 +53,53 @@ namespace kaguya {
             Interaction(const Vector3d &point, const Vector3d &direction, const Vector3d &normal,
                         const MediumBound &mediumBoundary, Material *material = nullptr);
 
+            /**
+             * 检测是否是体积碰撞
+             * @return
+             */
+            virtual bool isMediumInteraction() const {
+                return false;
+            }
+
+            /**
+             * Generate ray alone @param dir from origin
+             * @param dir
+             */
+            virtual Ray sendRay(const Vector3d &dir) const;
+
+            virtual Ray sendRayTo(const Point3d &target) const;
+
+            virtual Ray sendRayTo(const Interaction &it) const;
+
+            void setMediumBoundary(const MediumBound &mediumBoundary) {
+                _mediumBoundary = mediumBoundary;
+            }
+
+        protected:
+            /**
+             * 清空 Interaction 中部分属性
+             */
+            virtual void reset() {
+                _material = nullptr;
+            }
+
+            const Medium *getMedium(const Vector3d &dir) const;
+
+        protected:
+            // 发生 Interaction 的光线的方向
+            Vector3d _direction;
+            // 击中点
+            Vector3d _point;
+            // 击中点法线方向，发现永远指向物体表面外侧
+            Vector3d _normal = Vector3d(0., 0., 0.);
+            // 击中材质种类
+            Material *_material = nullptr;
+            // medium boundary
+            MediumBound _mediumBoundary;
+            // Error range
+            Vector3d _error = Vector3d(0., 0., 0.);
+
+        public:
             const Vector3d getDirection() const {
                 return _direction;
             }
@@ -82,48 +135,6 @@ namespace kaguya {
             void setError(const Vector3d &error) {
                 _error = error;
             }
-
-            /**
-             * 检测是否是体积碰撞
-             * @return
-             */
-            virtual bool isMediumInteraction() const {
-                return false;
-            }
-
-            /**
-             * Generate ray alone @param dir from origin
-             * @param dir
-             */
-            virtual Ray sendRay(const Vector3d &dir) const;
-
-            virtual Ray sendRayTo(const Interaction &it) const;
-
-            void setMediumBoundary(const MediumBound &mediumBoundary) {
-                _mediumBoundary = mediumBoundary;
-            }
-
-        protected:
-            /**
-             * 清空 Interaction 中部分属性
-             */
-            virtual void reset() {
-                _material = nullptr;
-            }
-
-        protected:
-            // 发生 Interaction 的光线的方向
-            Vector3d _direction;
-            // 击中点
-            Vector3d _point;
-            // 击中点法线方向，发现永远指向物体表面外侧
-            Vector3d _normal = Vector3d(0., 0., 0.);
-            // 击中材质种类
-            Material *_material = nullptr;
-            // medium boundary
-            MediumBound _mediumBoundary;
-            // Error range
-            Vector3d _error = Vector3d(0., 0., 0.);
         };
 
         /**
@@ -150,6 +161,36 @@ namespace kaguya {
                 _normal = outwardNormal;
             }
 
+            virtual void reset() override {
+                Interaction::reset();
+                _bsdf = nullptr;
+                _areaLight = nullptr;
+            }
+
+        protected:
+            // 击中点纹理坐标
+            double _u;
+            double _v;
+            // 击中点处的 BSDF
+            BSDF *_bsdf = nullptr;
+            // 如果被击中物体是 AreaLight，则这一项应该被赋值
+            AreaLight *_areaLight = nullptr;
+            // TODO modify to geometry
+            const Intersectable *_geometry;
+
+        public:
+            void setGeometry(const Intersectable *geometry) {
+                _geometry = geometry;
+            }
+
+            const Intersectable *getGeometry() const {
+                return _geometry;
+            }
+
+            void setDirection(const Vector3d &direction) {
+                _direction = direction;
+            }
+
             const double getU() {
                 return _u;
             }
@@ -174,24 +215,13 @@ namespace kaguya {
                 _areaLight = areaLight;
             }
 
-            const BSDF *getBSDF() const {
+            BSDF *getBSDF() const {
                 return _bsdf;
             }
 
-            virtual void reset() override {
-                Interaction::reset();
-                _bsdf = nullptr;
-                _areaLight = nullptr;
+            void setBSDF(BSDF *bsdf) {
+                _bsdf = bsdf;
             }
-
-        protected:
-            // 击中点纹理坐标
-            double _u;
-            double _v;
-            // 击中点处的 BSDF
-            BSDF *_bsdf = nullptr;
-            // 如果被击中物体是 AreaLight，则这一项应该被赋值
-            AreaLight *_areaLight = nullptr;
         };
 
         using medium::Medium;

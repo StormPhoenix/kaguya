@@ -18,7 +18,7 @@ namespace kaguya {
         using kaguya::scene::acc::BVH;
         using kaguya::core::transform::Transform;
 
-        class TriangleMesh : public BVH {
+        class TriangleMesh final : public BVH {
         public:
             TriangleMesh(std::vector<Vertex> &vertices,
                          const std::shared_ptr<Material> material,
@@ -26,6 +26,8 @@ namespace kaguya {
                          const std::shared_ptr<Medium> outside = nullptr,
                          const std::shared_ptr<AreaLight> areaLight = nullptr,
                          std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
+
+            virtual bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
 
             virtual ~TriangleMesh() {}
 

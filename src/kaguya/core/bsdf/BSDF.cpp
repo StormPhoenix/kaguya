@@ -7,12 +7,12 @@
 namespace kaguya {
     namespace core {
 
-        BSDF::BSDF(const Interaction &insect) {
+        BSDF::BSDF(const Interaction &interaction) {
             // 构造切线空间
             /* 此处的实现和 pbrt 中的实现不同，pbrt 用的是 dudp 和纹理相关，但目前没有实现纹理部分
              * 暂时用入射光线和法线来构造切线空间*/
-            _tanY = NORMALIZE(insect.getNormal());
-            _tanZ = NORMALIZE(CROSS(insect.getDirection(), _tanY));
+            _tanY = NORMALIZE(interaction.getNormal());
+            _tanZ = NORMALIZE(CROSS(interaction.getDirection(), _tanY));
             if (!math::isValid(_tanZ)) {
                 math::tangentSpace(_tanY, &_tanX, &_tanZ);
             } else {
