@@ -20,18 +20,18 @@ namespace kaguya {
                 Wall() {}
 
                 // XY 上的二维片面
-                Wall(double width, double height,
+                Wall(Float width, Float height,
                      std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
-                virtual bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
+                virtual bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const override;
 
                 virtual const AABB &bound() const override;
 
-                virtual double area() const override;
+                virtual Float area() const override;
 
                 virtual SurfaceInteraction sampleSurfacePoint(Sampler *sampler1D) const override;
 
-                virtual double surfacePointPdf(const SurfaceInteraction &si) const override;
+                virtual Float surfacePointPdf(const SurfaceInteraction &si) const override;
 
                 virtual ~Wall() {}
 
@@ -42,26 +42,26 @@ namespace kaguya {
                 virtual void init();
 
             private:
-                double _width;
-                double _height;
-                Vector3d _leftBottom;
-                Vector3d _leftTop;
-                Vector3d _rightBottom;
-                Vector3d _rightTop;
+                Float _width;
+                Float _height;
+                Vector3F _leftBottom;
+                Vector3F _leftTop;
+                Vector3F _rightBottom;
+                Vector3F _rightTop;
 
-                Vector3d _transformedLeftBottom;
-                Vector3d _transformedRightBottom;
-                Vector3d _transformedRightTop;
-                Vector3d _transformedLeftTop;
-                Vector3d _transformedNormal;
+                Vector3F _transformedLeftBottom;
+                Vector3F _transformedRightBottom;
+                Vector3F _transformedRightTop;
+                Vector3F _transformedLeftTop;
+                Vector3F _transformedNormal;
 
                 std::shared_ptr<Transform> _transformMatrix = nullptr;
                 std::shared_ptr<Transform> _invTransformMatrix = nullptr;
 
             protected:
-                Vector3d _normal;
+                Vector3F _normal;
                 AABB _aabb;
-                double _area;
+                Float _area;
             };
 
             class ZXWall : public Wall {
@@ -75,24 +75,24 @@ namespace kaguya {
                  * @param y
                  * @param upward
                  */
-                ZXWall(double z0, double z1, double x0, double x1, double y, bool upward);
+                ZXWall(Float z0, Float z1, Float x0, Float x1, Float y, bool upward);
 
                 virtual void init() override;
 
-                virtual bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
+                virtual bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const override;
 
-                virtual double area() const override;
+                virtual Float area() const override;
 
                 virtual SurfaceInteraction sampleSurfacePoint(Sampler *sampler1D) const override;
 
-                virtual double surfacePointPdf(const SurfaceInteraction &si) const override;
+                virtual Float surfacePointPdf(const SurfaceInteraction &si) const override;
 
             protected:
-                double _y;
-                double _z0;
-                double _z1;
-                double _x0;
-                double _x1;
+                Float _y;
+                Float _z0;
+                Float _z1;
+                Float _x0;
+                Float _x1;
             };
 
             class YZWall : public Wall {
@@ -106,24 +106,24 @@ namespace kaguya {
                  * @param x
                  * @param rightward
                  */
-                YZWall(double y0, double y1, double z0, double z1, double x, bool rightward);
+                YZWall(Float y0, Float y1, Float z0, Float z1, Float x, bool rightward);
 
                 virtual void init() override;
 
-                virtual bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
+                virtual bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const override;
 
-                virtual double area() const override;
+                virtual Float area() const override;
 
                 virtual SurfaceInteraction sampleSurfacePoint(Sampler *sampler1D) const override;
 
-                virtual double surfacePointPdf(const SurfaceInteraction &point) const override;
+                virtual Float surfacePointPdf(const SurfaceInteraction &point) const override;
 
             protected:
-                double _x;
-                double _y0;
-                double _y1;
-                double _z0;
-                double _z1;
+                Float _x;
+                Float _y0;
+                Float _y1;
+                Float _z0;
+                Float _z1;
             };
 
             class XYWall : public Wall {
@@ -137,24 +137,24 @@ namespace kaguya {
                  * @param z
                  * @param frontward
                  */
-                XYWall(double x0, double x1, double y0, double y1, double z, bool frontward);
+                XYWall(Float x0, Float x1, Float y0, Float y1, Float z, bool frontward);
 
                 virtual void init() override;
 
-                virtual bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
+                virtual bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const override;
 
-                virtual double area() const override;
+                virtual Float area() const override;
 
                 virtual SurfaceInteraction sampleSurfacePoint(Sampler *sampler1D) const override;
 
-                virtual double surfacePointPdf(const SurfaceInteraction &si) const override;
+                virtual Float surfacePointPdf(const SurfaceInteraction &si) const override;
 
             protected:
-                double _z;
-                double _x0;
-                double _x1;
-                double _y0;
-                double _y1;
+                Float _z;
+                Float _x0;
+                Float _x1;
+                Float _y0;
+                Float _y1;
             };
         }
     }

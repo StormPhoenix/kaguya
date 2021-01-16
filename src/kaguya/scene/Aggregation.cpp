@@ -10,7 +10,7 @@ namespace kaguya {
 
         using kaguya::scene::acc::AABB;
 
-        bool Aggregation::intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const {
+        bool Aggregation::intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const {
             const std::vector<std::shared_ptr<Intersectable>> objects = aggregation();
             if (objects.size() == 0) {
                 return false;
@@ -26,17 +26,17 @@ namespace kaguya {
         }
 
         AABB Aggregation::mergeAABB(const AABB &a, const AABB &b) const {
-            Vector3d small(std::min(a.min().x, b.min().x),
+            Vector3F small(std::min(a.min().x, b.min().x),
                            std::min(a.min().y, b.min().y),
                            std::min(a.min().z, b.min().z));
-            Vector3d big(std::max(a.max().x, b.max().x),
+            Vector3F big(std::max(a.max().x, b.max().x),
                          std::max(a.max().y, b.max().y),
                          std::max(a.max().z, b.max().z));
             return AABB(small, big);
         }
 
         AABB Aggregation::mergeBoundingBox(const std::vector<std::shared_ptr<Intersectable>> &objects) const {
-            AABB bound(Vector3d(0), Vector3d(0));
+            AABB bound(Vector3F(0), Vector3F(0));
             if (objects.size() == 0) {
                 return bound;
             }

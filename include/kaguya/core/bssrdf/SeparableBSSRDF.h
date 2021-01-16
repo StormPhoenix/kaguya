@@ -19,17 +19,19 @@ namespace kaguya {
             friend class SeparableBSSRDFAdapter;
 
         public:
-            SeparableBSSRDF();
+            /*
+            SeparableBSSRDF(const SurfaceInteraction &po, Material *material, Float theta);
+             */
 
             /**
              * S(p_o, p_i, w_o, w_i) = (1 - Fr(w_o)) * S_p(p_o, p_i) * S_w(w_i)
              */
-            Spectrum s(const SurfaceInteraction &si, const Vector3d &wi) override;
+            Spectrum s(const SurfaceInteraction &si, const Vector3F &wi) override;
 
             /**
              * Sample S(p_o, p_i, w_o, w_i) = (1 - Fr(w_o)) * S_p(p_o, p_i) * S_w(w_i)
              */
-            virtual Spectrum sampleS(const Scene &scene, SurfaceInteraction *si, double *pdf, MemoryArena &memoryArena,
+            virtual Spectrum sampleS(const Scene &scene, SurfaceInteraction *si, Float *pdf, MemoryArena &memoryArena,
                                      Sampler *sampler) override;
 
         protected:
@@ -37,7 +39,7 @@ namespace kaguya {
              * Sample S_p(p_o, p_i)
              * @return
              */
-            virtual Spectrum sampleSubsurfacePoint(const Scene &scene, SurfaceInteraction *si, double *pdf,
+            virtual Spectrum sampleSubsurfacePoint(const Scene &scene, SurfaceInteraction *si, Float *pdf,
                                                    MemoryArena &memoryArena, Sampler *sampler);
 
             /**
@@ -52,42 +54,43 @@ namespace kaguya {
              * @param si
              * @return
              */
-            virtual double subsurfacePointPdf(SurfaceInteraction &si) const;
+            virtual Float subsurfacePointPdf(SurfaceInteraction &si) const;
 
             /**
              * S_p(p_o, p_i) = S_r(|p_o - p_i|)
              * Sample radius for the channel @param spectrumChannel
              * @return
              */
-            virtual double sampleSubsurfaceRadius(int spectrumChannel, double sample) const = 0;
+            virtual Float sampleSubsurfaceRadius(int spectrumChannel, Float sample) const = 0;
 
             /**
              * Get spectrum value for the @param radius
              * S_p(p_o, p_i) = S_r(|p_o - p_i|)
              * @return
              */
-            virtual Spectrum subsurfaceRadius(double radius) const = 0;
+            virtual Spectrum subsurfaceRadius(Float radius) const = 0;
 
             /**
              * Get pdf of the @param radius for channel @param spectrumChannel
              * Pdf of S_p(p_o, p_i) = S_r(|p_o - p_i|)
              * @return
              */
-            virtual double subsurfaceRadiusPdf(int spectrumChannel, double radius) const = 0;
+            virtual Float subsurfaceRadiusPdf(int spectrumChannel, Float radius) const = 0;
 
             /**
              * S_w(w_i)
              * @param wi
              * @return
              */
-            virtual Spectrum subsurfaceWi(const Vector3d &wi) const;
+            virtual Spectrum subsurfaceWi(const Vector3F &wi) const;
 
         private:
-            Vector3d _tanY;
-            Vector3d _tanX;
-            Vector3d _tanZ;
+            Vector3F _tanY;
+            Vector3F _tanX;
+            Vector3F _tanZ;
 
             Material *_material;
+            Float _theta;
         };
 
     }

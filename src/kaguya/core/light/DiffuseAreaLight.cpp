@@ -24,18 +24,18 @@ namespace kaguya {
                                            bool singleSide) :
                 AreaLight(intensity, shape, AREA, mediumBoundary), _singleSide(singleSide) {}
 
-        Spectrum DiffuseAreaLight::randomLightRay(Ray *ray, Vector3d *normal, double *pdfPos, double *pdfDir,
+        Spectrum DiffuseAreaLight::randomLightRay(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
                                                   Sampler *sampler1D) {
             assert(_geometry != nullptr);
 
             // 采样位置
             SurfaceInteraction si = _geometry->getShape()->sampleSurfacePoint(sampler1D);
-            *normal = si.getNormal();
+            *normal = si.normal;
 
             // 采样位置 pdf
             *pdfPos = _geometry->getShape()->surfacePointPdf(si);
 
-            Vector3d dirLocal;
+            Vector3F dirLocal;
             // 判断区域光是否是双面发光
             if (_singleSide) {
                 // 单面发光，按照 cosine 方式采样
@@ -47,41 +47,43 @@ namespace kaguya {
                 (*pdfDir) = math::sampling::hemiCosineSamplePdf(dirLocal) * 0.5;
 
                 // 按照 0.5 的概率确认在上/下球面做 cosine / PI 采样
-                double prob = sampler1D->sample1D();
+                Float prob = sampler1D->sample1D();
                 if (prob < 0.5) {
                     dirLocal.y *= -1;
                 }
             }
 
             // 计算切线坐标系
-            Vector3d tanY = *normal;
-            Vector3d tanX;
-            Vector3d tanZ;
+            Vector3F tanY = *normal;
+            Vector3F tanX;
+            Vector3F tanZ;
             math::tangentSpace(tanY, &tanX, &tanZ);
 
             // 射线方向从局部坐标系转化到世界坐标系
-            Vector3d dirWorld = dirLocal.x * tanX + dirLocal.y * tanY + dirLocal.z * tanZ;
+            Vector3F dirWorld = dirLocal.x * tanX + dirLocal.y * tanY + dirLocal.z * tanZ;
 
             // 设置 ray
-            (*ray) = Ray(si.getPoint(), NORMALIZE(dirWorld),
+            (*ray) = Ray(si.point, NORMALIZE(dirWorld),
                          DOT(dirWorld, *normal) > 0 ? _mediumBoundary.outside() : _mediumBoundary.inside());
 
             return lightRadiance(si, dirWorld);
         }
 
-        void DiffuseAreaLight::randomLightRayPdf(const Ray &ray, const Vector3d &normal,
-                                                 double *pdfPos, double *pdfDir) const {
+        void DiffuseAreaLight::randomLightRayPdf(const Ray &ray, const Vector3F &normal,
+                                                 Float *pdfPos, Float *pdfDir) const {
             assert(_geometry != nullptr);
             // 创建 SurfaceInteraction
             SurfaceInteraction si;
-            si.setPoint(ray.getOrigin());
+            si.point = ray.getOrigin();
             (*pdfPos) = _geometry->getShape()->surfacePointPdf(si);
-            double cosTheta = ABS_DOT(normal, ray.getDirection());
-            (*pdfDir) = _singleSide ? math::sampling::hemiCosineSamplePdf(cosTheta) : 0.5 * math::sampling::hemiCosineSamplePdf(cosTheta);
+            Float cosTheta = ABS_DOT(normal, ray.getDirection());
+            (*pdfDir) = _singleSide ? math::sampling::hemiCosineSamplePdf(cosTheta) : 0.5 *
+                                                                                      math::sampling::hemiCosineSamplePdf(
+                                                                                              cosTheta);
         }
 
-        Spectrum DiffuseAreaLight::lightRadiance(const Interaction &interaction, const Vector3d &wo) const {
-            double cosine = DOT(interaction.getNormal(), wo);
+        Spectrum DiffuseAreaLight::lightRadiance(const Interaction &interaction, const Vector3F &wo) const {
+            Float cosine = DOT(interaction.normal, wo);
             return (!_singleSide || cosine > 0) ? _intensity : Spectrum(0.0);
 
             /*

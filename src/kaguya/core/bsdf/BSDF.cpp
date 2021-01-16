@@ -11,8 +11,8 @@ namespace kaguya {
             // 构造切线空间
             /* 此处的实现和 pbrt 中的实现不同，pbrt 用的是 dudp 和纹理相关，但目前没有实现纹理部分
              * 暂时用入射光线和法线来构造切线空间*/
-            _tanY = NORMALIZE(interaction.getNormal());
-            _tanZ = NORMALIZE(CROSS(interaction.getDirection(), _tanY));
+            _tanY = NORMALIZE(interaction.normal);
+            _tanZ = NORMALIZE(CROSS(interaction.direction, _tanY));
             if (!math::isValid(_tanZ)) {
                 math::tangentSpace(_tanY, &_tanX, &_tanZ);
             } else {
@@ -20,14 +20,14 @@ namespace kaguya {
             }
         }
 
-        Vector3d BSDF::toObjectSpace(const Vector3d &v) const {
-            return Vector3d(DOT(_tanX, v),
+        Vector3F BSDF::toObjectSpace(const Vector3F &v) const {
+            return Vector3F(DOT(_tanX, v),
                             DOT(_tanY, v),
                             DOT(_tanZ, v));
         }
 
-        Vector3d BSDF::toWorldSpace(const Vector3d &v) const {
-            return Vector3d(_tanX.x * v.x + _tanY.x * v.y + _tanZ.x * v.z,
+        Vector3F BSDF::toWorldSpace(const Vector3F &v) const {
+            return Vector3F(_tanX.x * v.x + _tanY.x * v.y + _tanZ.x * v.z,
                            _tanX.y * v.x + _tanY.y * v.y + _tanZ.y * v.z,
                            _tanX.z * v.x + _tanY.z * v.y + _tanZ.z * v.z);
         }
@@ -38,9 +38,9 @@ namespace kaguya {
             _bxdfCount++;
         }
 
-        Spectrum BSDF::f(const Vector3d &worldWo, const Vector3d &worldWi, BXDFType type) const {
-            Vector3d wo = toObjectSpace(worldWo);
-            Vector3d wi = toObjectSpace(worldWi);
+        Spectrum BSDF::f(const Vector3F &worldWo, const Vector3F &worldWi, BXDFType type) const {
+            Vector3F wo = toObjectSpace(worldWo);
+            Vector3F wi = toObjectSpace(worldWi);
 
             bool reflect = wo.y * wi.y > 0;
             Spectrum f = 0;
@@ -55,7 +55,7 @@ namespace kaguya {
             return f;
         }
 
-        Spectrum BSDF::sampleF(const Vector3d &worldWo, Vector3d *worldWi, double *pdf,
+        Spectrum BSDF::sampleF(const Vector3F &worldWo, Vector3F *worldWi, Float *pdf,
                                sampler::Sampler *const sampler1D,
                                BXDFType type, BXDFType *sampleType) const {
             // 找到符合类型的 BXDF，并随机选择一个做 sampleF
@@ -93,9 +93,9 @@ namespace kaguya {
                 }
 
                 // 匹配成功，开始采样 bxdf 值
-                Vector3d wo = toObjectSpace(worldWo);
-                Vector3d wi = Vector3d(0.0f);
-                double samplePdf;
+                Vector3F wo = toObjectSpace(worldWo);
+                Vector3F wi = Vector3F(0.0f);
+                Float samplePdf;
                 Spectrum f = bxdf->sampleF(wo, &wi, &samplePdf, sampler1D);
                 // 一般来说 surfacePointPdf = 0 的情况不会发生
                 if (samplePdf == 0) {
@@ -137,16 +137,16 @@ namespace kaguya {
             }
         }
 
-        double BSDF::samplePdf(const Vector3d &worldWo, const Vector3d &worldWi, BXDFType type) const {
+        Float BSDF::samplePdf(const Vector3F &worldWo, const Vector3F &worldWi, BXDFType type) const {
             if (_bxdfCount == 0) {
                 return 0.f;
             }
-            Vector3d wo = toObjectSpace(worldWo);
-            Vector3d wi = toObjectSpace(worldWi);
+            Vector3F wo = toObjectSpace(worldWo);
+            Vector3F wi = toObjectSpace(worldWi);
             if (std::abs(wo.y - 0) < math::EPSILON) {
                 return 0.0;
             }
-            double pdf = 0.0f;
+            Float pdf = 0.0f;
             int matchCount = 0;
             for (int i = 0; i < _bxdfCount; ++i)
                 if (_bxdfs[i]->allIncludeOf(type)) {

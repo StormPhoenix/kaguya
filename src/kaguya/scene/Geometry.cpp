@@ -19,7 +19,7 @@ namespace kaguya {
             assert(_shape != nullptr);
         }
 
-        bool Geometry::intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const {
+        bool Geometry::intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const {
             // proxy
             bool ret = _shape->intersect(ray, si, minStep, maxStep);
             if (ret) {

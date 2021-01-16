@@ -18,7 +18,7 @@ namespace kaguya {
 
             ConstantTexture(const Spectrum &albedo);
 
-            Spectrum sample(double u, double v) override;
+            Spectrum sample(Float u, Float v) override;
 
         private:
             Spectrum _albedo;

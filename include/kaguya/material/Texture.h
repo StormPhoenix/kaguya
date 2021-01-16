@@ -21,7 +21,7 @@ namespace kaguya {
              * @param v 纹理坐标 - y
              * @return
              */
-            virtual Spectrum sample(double u, double v) = 0;
+            virtual Spectrum sample(Float u, Float v) = 0;
         };
 
     }

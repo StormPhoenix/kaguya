@@ -70,8 +70,8 @@ namespace kaguya {
                     shaderColor += beta * evaluateDirectLight(scene, mi, sampler1D);
 
                     /* sample1d new ray */
-                    Vector3d worldWo = -scatterRay.getDirection();
-                    Vector3d worldWi;
+                    Vector3F worldWo = -scatterRay.getDirection();
+                    Vector3F worldWi;
                     mi.getPhaseFunction()->sampleScatter(worldWo, &worldWi, sampler1D);
                     scatterRay = mi.sendRay(worldWi);
                     isSpecular = false;
@@ -83,7 +83,7 @@ namespace kaguya {
                             // 如果有交点，则直接从交点上取值
                             if (si.getAreaLight() != nullptr) {
                                 shaderColor += (si.getAreaLight()->lightRadiance(
-                                        si, -si.getDirection()) * beta);
+                                        si, -si.direction) * beta);
                             }
                         } else {
                             shaderColor += (beta * background(scatterRay));
@@ -113,17 +113,17 @@ namespace kaguya {
                     }
 
                     // 计算下一次反射
-                    Vector3d worldWo = -scatterRay.getDirection();
-                    Vector3d worldWi = Vector3d(0.0);
+                    Vector3F worldWo = -scatterRay.getDirection();
+                    Vector3F worldWi = Vector3F(0.0);
                     // 材质反射类型
                     BXDFType bxdfType;
                     // p(wi)
-                    double samplePdf = 0;
+                    Float samplePdf = 0;
                     // f(p, wo, wi)
                     Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, sampler1D, BSDF_ALL, &bxdfType);
 
                     // cosine
-                    double cosine = std::abs(DOT(si.getNormal(), NORMALIZE(worldWi)));
+                    Float cosine = std::abs(DOT(si.normal, NORMALIZE(worldWi)));
                     // 计算 beta
                     beta *= (f * cosine / samplePdf);
                     // 设置下一次打击光线
@@ -150,9 +150,9 @@ namespace kaguya {
             // TODO 目前只考虑单个光源
             auto light = scene.getLight();
             // p(wi)
-            double lightPdf = 0;
+            Float lightPdf = 0;
             // light dir
-            Vector3d wi = Vector3d(0.0);
+            Vector3F wi = Vector3F(0.0);
             // visibility tester
             VisibilityTester visibilityTester;
             // 对光源采样采样
@@ -165,22 +165,22 @@ namespace kaguya {
             // 排除对光源采样贡献为 0 的情况
             if (lightPdf > math::EPSILON && !lumi.isBlack()) {
                 Spectrum f;
-                double scatteringPdf = 0.0f;
+                Float scatteringPdf = 0.0f;
                 if (eye.isMediumInteraction()) {
                     // handle medium interaction
                     const MediumInteraction &mi = (const MediumInteraction &) eye;
                     assert(mi.getPhaseFunction() != nullptr);
 
-                    scatteringPdf = mi.getPhaseFunction()->scatterPdf(-mi.getDirection(), wi);
+                    scatteringPdf = mi.getPhaseFunction()->scatterPdf(-mi.direction, wi);
                     f = Spectrum(scatteringPdf);
                 } else {
                     // handle surface interaction
                     const SurfaceInteraction &si = (const SurfaceInteraction &) eye;
                     assert(si.getBSDF() != nullptr);
 
-                    double cosine = ABS_DOT(eye.getNormal(), wi);
-                    scatteringPdf = si.getBSDF()->samplePdf(-eye.getDirection(), wi);
-                    f = si.getBSDF()->f(-eye.getDirection(), wi) * cosine;
+                    Float cosine = ABS_DOT(eye.normal, wi);
+                    scatteringPdf = si.getBSDF()->samplePdf(-eye.direction, wi);
+                    f = si.getBSDF()->f(-eye.direction, wi) * cosine;
                 }
 
                 if (!f.isBlack()) {
@@ -191,7 +191,7 @@ namespace kaguya {
                             ret += f / lightPdf * lumi;
                         } else {
                             // multiple rayImportance sampling
-                            double weight = math::misWeight(1, lightPdf, 1, scatteringPdf);
+                            Float weight = math::misWeight(1, lightPdf, 1, scatteringPdf);
                             ret += f * weight / lightPdf * lumi;
                         }
                     }
@@ -200,9 +200,9 @@ namespace kaguya {
 
             // multiple importance sampling
             if (!light->isDeltaType()) {
-                const Vector3d wo = -eye.getDirection();
+                const Vector3F wo = -eye.direction;
                 Spectrum f(0);
-                double scatteringPdf = 0;
+                Float scatteringPdf = 0;
                 bool sampleSpecular = false;
                 if (eye.isMediumInteraction()) {
                     // handle medium interaction
@@ -218,12 +218,12 @@ namespace kaguya {
 
                     BXDFType sampleType;
                     f = si.getBSDF()->sampleF(wo, &wi, &scatteringPdf, sampler1D, BSDF_ALL, &sampleType);
-                    f *= ABS_DOT(-si.getDirection(), wi);
+                    f *= ABS_DOT(-si.direction, wi);
                     sampleSpecular = (sampleType & BXDFType::BSDF_SPECULAR) != 0;
                 }
 
                 if (!f.isBlack() && scatteringPdf > 0) {
-                    double weight = 1.0;
+                    Float weight = 1.0;
                     if (!sampleSpecular) {
                         // sample1d light pdf
                         lightPdf = light->sampleFromLightPdf(eye, wi);
@@ -236,7 +236,7 @@ namespace kaguya {
                     // find intersection
                     SurfaceInteraction misSI;
                     Spectrum misTr = 1.0;
-                    Ray misRay(eye.getPoint(), NORMALIZE(wi));
+                    Ray misRay(eye.point, NORMALIZE(wi));
                     bool foundIntersection = scene.intersectWithMedium(misRay, misSI, misTr, sampler1D);
                     Spectrum misLumi(0.0);
                     if (foundIntersection) {
@@ -256,15 +256,15 @@ namespace kaguya {
         std::function<void(const int, const int, Sampler *)> PathTracer::render() {
             auto renderFunc = [this](const int row, const int col, Sampler *sampler) -> void {
                 // set current sampling pixel
-                sampler->forPixel(Point2d(row, col));
+                sampler->forPixel(Point2F(row, col));
 
                 Spectrum ans = {0};
-                const double sampleWeight = 1.0 / _samplePerPixel;
+                const Float sampleWeight = 1.0 / _samplePerPixel;
                 // 做 _samplePerPixel 次采样
                 for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
                     MemoryArena arena;
-                    auto u = (col + sampler->sample1D()) / double(_camera->getResolutionWidth());
-                    auto v = (row + sampler->sample1D()) / double(_camera->getResolutionHeight());
+                    auto u = (col + sampler->sample1D()) / Float(_camera->getResolutionWidth());
+                    auto v = (row + sampler->sample1D()) / Float(_camera->getResolutionHeight());
 
                     Ray sampleRay = _camera->sendRay(u, v);
                     Spectrum shaderColor = shaderOfProgression(sampleRay, *(_scene.get()), sampler, arena);
@@ -283,18 +283,6 @@ namespace kaguya {
         Spectrum PathTracer::background(const Ray &ray) {
             // TODO 临时设计背景色
             return Spectrum(0.0f);
-
-            /*
-            if (ray.getDirection().z < 0) {
-                return Vector3d(0.0f, 0.0f, 0.0f);
-            } else {
-                return Vector3d(1.0f, 1.0f, 1.0f);
-            }
-
-            Vector3d dir = NORMALIZE(ray.getDirection());
-            double t = 0.5 * (dir.y + 1.0);
-            return (1.0 - t) * Vector3d(1.0, 1.0, 1.0) + t * Vector3d(0.5, 0.7, 1.0);
-             */
         }
 
     }

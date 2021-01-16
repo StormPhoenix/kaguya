@@ -14,7 +14,7 @@ namespace kaguya {
         class SpotLight : public Light {
         public:
             static std::shared_ptr<SpotLight>
-            buildSpotLight(const Vector3d &center, const Vector3d &dir, const Spectrum &intensity,
+            buildSpotLight(const Vector3F &center, const Vector3F &dir, const Spectrum &intensity,
                            const MediumBound &mediumBoundary) {
                 std::shared_ptr<SpotLight> light = std::make_shared<SpotLight>(center, dir, intensity, mediumBoundary,
                                                                                15, 20);
@@ -22,11 +22,11 @@ namespace kaguya {
             }
 
             virtual Spectrum sampleFromLight(const Interaction &eye,
-                                             Vector3d *wi, double *pdf,
+                                             Vector3F *wi, Float *pdf,
                                              Sampler *sampler1D,
                                              VisibilityTester *visibilityTester) override;
 
-            virtual double sampleFromLightPdf(const Interaction &eye, const Vector3d &dir) override;
+            virtual Float sampleFromLightPdf(const Interaction &eye, const Vector3F &dir) override;
 
             /**
              * 聚光灯
@@ -36,23 +36,23 @@ namespace kaguya {
              * @param fallOffRange 聚光灯高光区半角
              * @param totalRange 聚光灯所有区域半角
              */
-            SpotLight(const Vector3d eye, const Vector3d dir, Spectrum intensity, const MediumBound &mediumBoundary,
-                      double fallOffRange = 30, double totalRange = 45);
+            SpotLight(const Vector3F eye, const Vector3F dir, Spectrum intensity, const MediumBound &mediumBoundary,
+                      Float fallOffRange = 30, Float totalRange = 45);
 
-            virtual Spectrum randomLightRay(Ray *ray, Vector3d *normal, double *pdfPos, double *pdfDir,
+            virtual Spectrum randomLightRay(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
                                             Sampler *sampler1D) override;
 
-            virtual void randomLightRayPdf(const Ray &ray, const Vector3d &normal,
-                                           double *pdfPos, double *pdfDir) const override;
+            virtual void randomLightRayPdf(const Ray &ray, const Vector3F &normal,
+                                           Float *pdfPos, Float *pdfDir) const override;
 
         private:
-            Spectrum fallOffWeight(const Vector3d &wo);
+            Spectrum fallOffWeight(const Vector3F &wo);
 
         private:
-            const Vector3d _center;
-            const Vector3d _dir;
-            double _cosFallOffRange;
-            double _cosTotalRange;
+            const Vector3F _center;
+            const Vector3F _dir;
+            Float _cosFallOffRange;
+            Float _cosTotalRange;
             const Spectrum _intensity;
         };
 

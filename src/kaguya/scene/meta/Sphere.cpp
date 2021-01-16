@@ -7,7 +7,7 @@
 namespace kaguya {
     namespace scene {
         namespace meta {
-            Sphere::Sphere(const Vector3d &center, double radius, bool outward,
+            Sphere::Sphere(const Vector3F &center, Float radius, bool outward,
                            std::shared_ptr<Transform> transformMatrix) {
                 assert(radius > 0);
 
@@ -18,11 +18,11 @@ namespace kaguya {
                 _transformMatrix = transformMatrix;
 
                 // build bounding box
-                _aabb = AABB(_transformedCenter - Vector3d(_radius, _radius, _radius),
-                             _transformedCenter + Vector3d(_radius, _radius, _radius));
+                _aabb = AABB(_transformedCenter - Vector3F(_radius, _radius, _radius),
+                             _transformedCenter + Vector3F(_radius, _radius, _radius));
             }
 
-            Vector3d Sphere::computeNormal(const Vector3d &hitPoint) const {
+            Vector3F Sphere::computeNormal(const Vector3F &hitPoint) const {
                 if (_outward) {
                     return NORMALIZE(hitPoint - _transformedCenter);
                 } else {
@@ -30,49 +30,51 @@ namespace kaguya {
                 }
             }
 
-            bool Sphere::intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const {
-                Vector3d centerToOrigin = ray.getOrigin() - _transformedCenter;
-                double c = DOT(centerToOrigin, centerToOrigin) - _radius * _radius;
-                double a = pow(LENGTH(ray.getDirection()), 2);
-                double halfB = DOT(centerToOrigin, ray.getDirection());
+            bool Sphere::intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const {
+                Vector3F centerToOrigin = ray.getOrigin() - _transformedCenter;
+                Float c = DOT(centerToOrigin, centerToOrigin) - _radius * _radius;
+                Float a = pow(LENGTH(ray.getDirection()), 2);
+                Float halfB = DOT(centerToOrigin, ray.getDirection());
 
-                double discriminant = halfB * halfB - a * c;
+                Float discriminant = halfB * halfB - a * c;
 
                 // 判别一元二次方程的根数量
                 if (discriminant > 0) {
-                    double root = (-halfB - sqrt(discriminant)) / a;
+                    Float root = (-halfB - sqrt(discriminant)) / a;
                     if (root > minStep && root < maxStep) {
-                        Vector3d origin = ray.at(root);
+                        Vector3F origin = ray.at(root);
                         origin *= _radius / LENGTH(origin - _center);
-                        si.setPoint(origin);
-                        si.setU(0);
-                        si.setV(0);
+                        si.point = origin;
+                        si.u = 0;
+                        si.v = 0;
                         si.setAreaLight(nullptr);
 
-                        Vector3d error = math::gamma(5) * ABS(origin);
-                        si.setError(error);
+                        Vector3F error = math::gamma(5) * ABS(origin);
+                        si.error = error;
 
                         ray.setStep(root);
 
-                        Vector3d outwardNormal = computeNormal(si.getPoint());
-                        si.setOutwardNormal(outwardNormal, ray.getDirection());
+                        Vector3F outwardNormal = computeNormal(si.point);
+                        si.normal = si.rendering.normal = outwardNormal;
+                        si.direction = ray.getDirection();
                         return true;
                     }
 
                     root = (-halfB + sqrt(discriminant)) / a;
                     if (root > minStep && root < maxStep) {
-                        Vector3d origin = ray.at(root);
+                        Vector3F origin = ray.at(root);
                         origin *= _radius / LENGTH(origin - _center);
-                        si.setPoint(origin);
-                        si.setU(0);
-                        si.setV(0);
+                        si.point = origin;
+                        si.u = 0;
+                        si.v = 0;
                         si.setAreaLight(nullptr);
-                        Vector3d error = math::gamma(5) * ABS(origin);
-                        si.setError(error);
+                        Vector3F error = math::gamma(5) * ABS(origin);
+                        si.error = error;
                         ray.setStep(root);
 
-                        Vector3d outwardNormal = computeNormal(si.getPoint());
-                        si.setOutwardNormal(outwardNormal, ray.getDirection());
+                        Vector3F outwardNormal = computeNormal(si.point);
+                        si.normal = si.rendering.normal = outwardNormal;
+                        si.direction = ray.getDirection();
                         return true;
                     } else {
                         return false;
@@ -85,7 +87,7 @@ namespace kaguya {
 
             SurfaceInteraction Sphere::sampleSurfacePoint(Sampler *sampler1D) const {
                 // sample1d outward normal
-                Vector3d normal = math::sampling::sphereUniformSampling(sampler1D);
+                Vector3F normal = math::sampling::sphereUniformSampling(sampler1D);
                 if (_transformMatrix != nullptr) {
                     normal = _transformMatrix->transformNormal(normal);
                 }
@@ -93,20 +95,20 @@ namespace kaguya {
                 SurfaceInteraction si;
 
                 // point
-                Vector3d point = _transformedCenter + _radius * normal;
-                si.setPoint(point);
+                Vector3F point = _transformedCenter + _radius * normal;
+                si.point = point;
 
                 if (!_outward) {
                     normal = -normal;
                 }
-                si.setNormal(normal);
+                si.normal = si.rendering.normal = normal;
                 return si;
             }
 
             SurfaceInteraction
             Sphere::sampleSurfaceInteraction(const Interaction &eye, Sampler *sampler1D) const {
                 // If eye is inside sphere, then uniform sampling surface
-                const double dist = LENGTH(_transformedCenter - eye.getPoint());
+                const Float dist = LENGTH(_transformedCenter - eye.point);
                 if (_radius >= dist) {
                     // inside
                     return sampleSurfacePoint(sampler1D);
@@ -114,22 +116,22 @@ namespace kaguya {
                     // outside sphere, then use uniform cone sampling strategy
 
                     // cosThetaMax
-                    double sinThetaMax2 = (_radius * _radius) / (dist * dist);
-                    double cosThetaMax = std::sqrt(std::max(0., 1 - sinThetaMax2));
+                    Float sinThetaMax2 = (_radius * _radius) / (dist * dist);
+                    Float cosThetaMax = std::sqrt(std::max(0.f, 1 - sinThetaMax2));
 
                     // cone sampling
-                    const Vector3d dir = math::sampling::coneUniformSampling(cosThetaMax, sampler1D);
+                    const Vector3F dir = math::sampling::coneUniformSampling(cosThetaMax, sampler1D);
 
                     // build coordinate system
-                    Vector3d tanY = NORMALIZE(_transformedCenter - eye.getPoint());
-                    Vector3d tanX, tanZ;
+                    Vector3F tanY = NORMALIZE(_transformedCenter - eye.point);
+                    Vector3F tanX, tanZ;
                     math::tangentSpace(tanY, &tanX, &tanZ);
 
                     // 计算世界坐标系中射线方向
-                    Vector3d dirWorld = dir.x * tanX + dir.y * tanY + dir.z * tanZ;
+                    Vector3F dirWorld = dir.x * tanX + dir.y * tanY + dir.z * tanZ;
 
                     SurfaceInteraction si;
-                    Ray sampleRay = Ray(eye.getPoint(), NORMALIZE(dirWorld));
+                    Ray sampleRay = Ray(eye.point, NORMALIZE(dirWorld));
                     bool isInsect = intersect(sampleRay, si, sampleRay.getMinStep(), sampleRay.getStep());
                     assert(isInsect);
 
@@ -137,7 +139,7 @@ namespace kaguya {
                 }
             }
 
-            double Sphere::surfaceInteractionPdf(const Interaction &eye, const Vector3d &dir) const {
+            Float Sphere::surfaceInteractionPdf(const Interaction &eye, const Vector3F &dir) const {
                 Ray ray = eye.sendRay(dir);
 
                 // get interaction
@@ -147,19 +149,19 @@ namespace kaguya {
                     return 0;
                 }
 
-                double pdf = 0;
-                double dist = LENGTH(eye.getPoint() - _transformedCenter);
+                Float pdf = 0;
+                Float dist = LENGTH(eye.point - _transformedCenter);
                 if (_radius > dist) {
                     // inside sphere
-                    double cosine = ABS_DOT(dir, si.getNormal());
+                    Float cosine = ABS_DOT(dir, si.normal);
                     pdf = (dist * dist / area()) / cosine;
                     if (std::isinf(pdf)) {
                         pdf = 0.;
                     }
                 } else {
                     // outside
-                    double sinThetaMax2 = (_radius * _radius) / (dist * dist);
-                    double cosThetaMax = std::sqrt(std::max(0., 1 - sinThetaMax2));
+                    Float sinThetaMax2 = (_radius * _radius) / (dist * dist);
+                    Float cosThetaMax = std::sqrt(std::max(0.f, 1 - sinThetaMax2));
 
                     pdf = math::sampling::coneUniformSamplePdf(cosThetaMax);
                 }

@@ -45,7 +45,7 @@ namespace kaguya {
             }
 
             bool BVH::intersect(Ray &ray, SurfaceInteraction &si,
-                                double minStep, double maxStep) const {
+                                Float minStep, Float maxStep) const {
                 // 在 insect 之前，BVH 必须已经构建完毕
                 assert(_isValid);
 

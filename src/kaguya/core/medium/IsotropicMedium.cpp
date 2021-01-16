@@ -10,7 +10,7 @@ namespace kaguya {
 
             core::Spectrum IsotropicMedium::transmittance(const tracer::Ray &ray, Sampler *sampler1D) const {
                 // e^{-\sigma_t * dist}
-                return exp(-_totalSigma * std::min(ray.getStep() * LENGTH(ray.getDirection()), math::maxDouble));
+                return exp(-_totalSigma * std::min(ray.getStep() * LENGTH(ray.getDirection()), math::MAX_FLOAT));
             }
 
             core::Spectrum
@@ -20,8 +20,8 @@ namespace kaguya {
                 int channel = math::randomInt(0, SPECTRUM_CHANNEL - 1, sampler1D);
 
                 // sample1d Tr uniformly, and calculate the correspond dist
-                double dist = -std::log(1 - sampler1D->sample1D()) / _totalSigma[channel];
-                double step = dist / LENGTH(ray.getDirection());
+                Float dist = -std::log(1 - sampler1D->sample1D()) / _totalSigma[channel];
+                Float step = dist / LENGTH(ray.getDirection());
 
                 // check whether sample1d the surface or medium
                 bool sampleMedium = step < ray.getStep();
@@ -33,11 +33,11 @@ namespace kaguya {
                 }
 
                 // calculate transmittance
-                Spectrum T = exp(-_totalSigma * std::min(step, math::maxDouble) * LENGTH(ray.getDirection()));
+                Spectrum T = exp(-_totalSigma * std::min(step, math::MAX_FLOAT) * LENGTH(ray.getDirection()));
 
                 // calculate pdf
                 Spectrum p = sampleMedium ? _totalSigma * T : T;
-                double pdf = 0;
+                Float pdf = 0;
                 for (int i = 0; i < SPECTRUM_CHANNEL; i++) {
                     pdf += p[i];
                 }

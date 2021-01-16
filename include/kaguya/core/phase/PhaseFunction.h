@@ -21,7 +21,7 @@ namespace kaguya {
              * @param wi
              * @return
              */
-            virtual double scatterPdf(const Vector3d &wo, const Vector3d &wi) const = 0;
+            virtual Float scatterPdf(const Vector3F &wo, const Vector3F &wi) const = 0;
 
             /**
              *
@@ -29,7 +29,7 @@ namespace kaguya {
              * @param wi
              * @return
              */
-            virtual double sampleScatter(const Vector3d &wo, Vector3d *wi, Sampler *sampler1D) const = 0;
+            virtual Float sampleScatter(const Vector3F &wo, Vector3F *wi, Sampler *sampler1D) const = 0;
         };
 
     }

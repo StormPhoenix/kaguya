@@ -96,7 +96,7 @@ namespace kaguya {
              * @return
              */
             int randomWalk(std::shared_ptr<Scene> scene, const Ray &ray, PathVertex *path, int maxDepth,
-                           double pdf, Sampler *const sampler1D, MemoryArena &memoryArena, Spectrum &beta,
+                           Float pdf, Sampler *const sampler1D, MemoryArena &memoryArena, Spectrum &beta,
                            TransportMode mode);
 
             /**
@@ -112,7 +112,7 @@ namespace kaguya {
              * @return
              */
             Spectrum connectPath(Scene &scene, PathVertex *cameraSubPath, int cameraPathLength, int t,
-                                 PathVertex *lightSubPath, int lightPathLength, int s, Point2d *samplePosition,
+                                 PathVertex *lightSubPath, int lightPathLength, int s, Point2F *samplePosition,
                                  Sampler *sampler1D);
 
             /**
@@ -127,7 +127,7 @@ namespace kaguya {
              * @param extraVertex t = 1 或 s = 1 时传入的点
              * @return
              */
-            double misWeight(PathVertex *cameraSubPath, int t,
+            Float misWeight(PathVertex *cameraSubPath, int t,
                              PathVertex *lightSubPath, int s,
                              PathVertex &extraVertex);
 
@@ -147,9 +147,9 @@ namespace kaguya {
             // 开始 Russian Roulette 时机
             int _russianRouletteBounce;
             // Russian Roulette 概率
-            double _russianRoulette;
+            Float _russianRoulette;
             // 对光源采样概率
-            double _sampleLightProb = 0.2;
+            Float _sampleLightProb = 0.2;
         };
 
     }

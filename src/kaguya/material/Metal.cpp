@@ -14,7 +14,7 @@ namespace kaguya {
 
         Metal::Metal() : Metal(Spectrum(1.0f), 0) {}
 
-        Metal::Metal(const Spectrum &albedo, double fuzzy) : _albedo(albedo), _fuzzy(fuzzy) {
+        Metal::Metal(const Spectrum &albedo, Float fuzzy) : _albedo(albedo), _fuzzy(fuzzy) {
         }
 
         bool Metal::isSpecular() const {

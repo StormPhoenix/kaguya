@@ -20,7 +20,7 @@ namespace kaguya {
             buildMeshes();
         }
 
-        bool TriangleMesh::intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const {
+        bool TriangleMesh::intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const {
             bool ret = BVH::intersect(ray, si, minStep, maxStep);
             if (ret) {
                 si.setGeometry(this);

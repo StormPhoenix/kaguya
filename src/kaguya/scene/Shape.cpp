@@ -7,7 +7,7 @@
 namespace kaguya {
     namespace scene {
         namespace meta {
-            double Shape::surfacePointPdf(const SurfaceInteraction &si) const {
+            Float Shape::surfacePointPdf(const SurfaceInteraction &si) const {
                 return 1.0 / area();
             }
 
@@ -16,15 +16,15 @@ namespace kaguya {
                 return sampleSurfacePoint(sampler1D);
             }
 
-            double Shape::surfaceInteractionPdf(const Interaction &eye, const Vector3d &dir) const {
+            Float Shape::surfaceInteractionPdf(const Interaction &eye, const Vector3F &dir) const {
                 // build a ray to test interaction
                 Ray ray = eye.sendRay(dir);
                 SurfaceInteraction si;
                 bool foundIntersection = intersect(ray, si, ray.getMinStep(), ray.getStep());
                 if (foundIntersection) {
                     // convert density to pdf
-                    double distance = LENGTH(si.getPoint() - ray.getOrigin());
-                    double cosine = ABS_DOT(dir, si.getNormal());
+                    Float distance = LENGTH(si.point - ray.getOrigin());
+                    Float cosine = ABS_DOT(dir, si.normal);
                     if (std::abs(cosine - 0) < math::EPSILON) {
                         return 0;
                     }

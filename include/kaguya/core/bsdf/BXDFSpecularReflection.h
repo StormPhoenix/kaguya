@@ -18,12 +18,12 @@ namespace kaguya {
         public:
             BXDFSpecularReflection(const Spectrum &albedo, Fresnel *fresnel);
 
-            virtual Spectrum f(const Vector3d &wo, const Vector3d &wi) const override;
+            virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
 
-            virtual Spectrum sampleF(const Vector3d &wo, Vector3d *wi, double *pdf,
+            virtual Spectrum sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
                                      Sampler *const sampler1D) override;
 
-            virtual double samplePdf(const Vector3d &wo, const Vector3d &wi) const override;
+            virtual Float samplePdf(const Vector3F &wo, const Vector3F &wi) const override;
 
         private:
             const Spectrum _albedo;

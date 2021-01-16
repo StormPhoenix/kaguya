@@ -29,7 +29,7 @@ namespace kaguya {
                      const std::shared_ptr<Medium> outside = nullptr,
                      const std::shared_ptr<AreaLight> areaLight = nullptr);
 
-            virtual bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
+            virtual bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const override;
 
             virtual const AABB &boundingBox() const override;
 

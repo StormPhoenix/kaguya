@@ -18,7 +18,7 @@ namespace kaguya {
             public:
                 IsotropicMedium(const Spectrum &absorptionSigma,
                                 const Spectrum &scatteringSigma,
-                                double g) :
+                                Float g) :
                         _absorptionSigma(absorptionSigma),
                         _scatteringSigma(scatteringSigma),
                         _totalSigma(absorptionSigma + scatteringSigma), _g(g) {}
@@ -36,7 +36,7 @@ namespace kaguya {
                 const Spectrum _absorptionSigma;
                 const Spectrum _scatteringSigma;
                 const Spectrum _totalSigma;
-                double _g;
+                Float _g;
             };
         }
     }

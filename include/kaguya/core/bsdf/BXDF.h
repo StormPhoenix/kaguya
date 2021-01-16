@@ -41,7 +41,7 @@ namespace kaguya {
              * @param wi 入射方向
              * @return 辐射系数
              */
-            virtual Spectrum f(const Vector3d &wo, const Vector3d &wi) const = 0;
+            virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const = 0;
 
             /**
              * 针对 w_o 出射方向，采样 wi 入射方向，并返回概率 pdf 以及对应的辐射系数。
@@ -51,7 +51,7 @@ namespace kaguya {
              * @param pdf 采样概率
              * @return 辐射系数
              */
-            virtual Spectrum sampleF(const Vector3d &wo, Vector3d *wi, double *pdf,
+            virtual Spectrum sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
                                      Sampler *const sampler1D);
 
             /**
@@ -60,7 +60,7 @@ namespace kaguya {
              * @param wi 入射方向
              * @return
              */
-            virtual double samplePdf(const Vector3d &wo, const Vector3d &wi) const;
+            virtual Float samplePdf(const Vector3F &wo, const Vector3F &wi) const;
 
             virtual ~BXDF() {}
 

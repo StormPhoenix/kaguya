@@ -11,7 +11,7 @@ namespace kaguya {
                 samplePerPixel(samplePerPixel),
                 randomSeed(0) {}
 
-        void Sampler::forPixel(const Point2d pixel) {
+        void Sampler::forPixel(const Point2F pixel) {
             currentPixel = pixel;
             randomSeed = 0;
         }

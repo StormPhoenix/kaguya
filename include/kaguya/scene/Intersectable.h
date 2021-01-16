@@ -26,7 +26,7 @@ namespace kaguya {
              * @param maxStep 射线步长最大值
              * @return
              */
-            virtual bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const = 0;
+            virtual bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const = 0;
 
             /**
              * Bounding box

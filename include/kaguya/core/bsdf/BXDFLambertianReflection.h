@@ -14,7 +14,7 @@ namespace kaguya {
         public:
             BXDFLambertianReflection(const Spectrum &albedo);
 
-            virtual Spectrum f(const Vector3d &wo, const Vector3d &wi) const override;
+            virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
 
         private:
             const Spectrum _albedo;

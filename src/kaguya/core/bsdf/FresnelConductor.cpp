@@ -7,7 +7,7 @@
 namespace kaguya {
     namespace core {
 
-        Spectrum FresnelConductor::fresnel(double cosineTheta) {
+        Spectrum FresnelConductor::fresnel(Float cosineTheta) {
             return fresnelConductor(cosineTheta, _thetaI, _thetaT, _k);
         }
 

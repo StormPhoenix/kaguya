@@ -18,18 +18,37 @@
 #include <random>
 
 using Vector2d = glm::dvec2;
+using Vector2f = glm::vec2;
 using Vector2i = glm::int2;
-using Point2d = Vector2d;
-using Point2i = Vector2i;
 
+using Vector3i = glm::int3;
 using Vector3d = glm::dvec3;
-using Normal3d = Vector3d;
-using Point3d = Vector3d;
+using Vector3f = glm::vec3;
 
 using Vector4d = glm::dvec4;
 using Matrix4d = glm::dmat4x4;
 using Matrix3d = glm::dmat3x3;
 
+using Vector4f = glm::vec4;
+using Matrix4f = glm::mat4x4;
+using Matrix3f = glm::mat3x3;
+
+//#define DOUBLE
+
+#ifndef DOUBLE
+using Float = float;
+using Vector3F = Vector3f;
+using Vector2F = Vector2f;
+#else
+using Float = double;
+using Vector3F = Vector3d;
+using Vector2F = Vector2d;
+#endif
+
+using Point2F = Vector2F;
+using Point3F = Vector3F;
+using Normal3F = Vector3F;
+using Point2I = Vector2i;
 
 #define ROTATE(matrix, radius, axis) glm::rotate(matrix, glm::radians(radius), axis)
 #define TRANSLATE(matrix, offset) glm::translate(matrix, offset)
@@ -51,20 +70,20 @@ namespace kaguya {
 
     namespace math {
 
-        const double maxDouble = std::numeric_limits<double>::max();
-        const double infinity = std::numeric_limits<double>::infinity();
-        constexpr double epsilon = std::numeric_limits<float>::epsilon() * 0.5;
-        constexpr float shadowEpsilon = 0.0001;
+        constexpr Float MAX_FLOAT = std::numeric_limits<Float>::max();
+        constexpr Float infinity = std::numeric_limits<Float>::infinity();
+        constexpr Float epsilon = std::numeric_limits<Float>::epsilon() * 0.5;
+        constexpr Float shadowEpsilon = 0.0001;
         const double PI = 3.1415926535897932385;
-        const double INV_PI = 1.0 / PI;
-        const double INV_4PI = 1.0 / (4 * PI);
-        const double EPSILON = 10e-6f;
-        const double REFRACTION_INDEX_WATER = 1.0f;
+        const Float INV_PI = 1.0 / PI;
+        const Float INV_4PI = 1.0 / (4 * PI);
+        const Float EPSILON = 10e-6f;
+        const Float REFRACTION_INDEX_WATER = 1.0f;
 
         using namespace kaguya;
         using sampler::Sampler;
 
-        inline double degreesToRadians(double degrees) {
+        inline Float degreesToRadians(double degrees) {
             return degrees * PI / 180;
         }
 
@@ -75,24 +94,56 @@ namespace kaguya {
             return x;
         }
 
-        inline bool checkRange(double num, double min, double max) {
+        /**
+         * 计算非导体（玻璃、水晶等）的反射概率
+         * @param cosineI 值的正负用于表示内部、外部射入
+         * @param thetaI
+         * @param thetaT
+         * @return
+         */
+        inline Float fresnelDielectric(Float cosineI, Float thetaI, Float thetaT) {
+            cosineI = clamp(cosineI, -1, 1);
+            if (cosineI < 0) {
+                // 内部射入
+                cosineI = std::abs(cosineI);
+                std::swap(thetaI, thetaT);
+            }
+
+            Float sineI = std::sqrt(std::max(0.0, 1 - std::pow(cosineI, 2)));
+            Float sineT = sineI * (thetaI / thetaT);
+
+            if (sineT >= 1) {
+                // 全反射
+                return 1.0f;
+            }
+
+            Float cosineT = std::sqrt(std::max(0.0, (1 - std::pow(sineT, 2))));
+            // 计算 R_parallel
+            Float parallelR = ((thetaT * cosineI) - (thetaI * cosineT)) /
+                              ((thetaT * cosineI) + (thetaI * cosineT));
+            Float perpendicularR = ((thetaI * cosineI) - (thetaT * cosineT)) /
+                                   ((thetaI * cosineI) + (thetaT * cosineT));
+            return 0.5 * (parallelR * parallelR + perpendicularR * perpendicularR);
+        }
+
+        inline bool checkRange(Float num, Float min, Float max) {
             return num >= min && num <= max;
         }
 
-        inline double linearInterpolation(double t, double a, double b) {
+        inline Float linearInterpolation(Float t, Float a, Float b) {
             return (1 - t) * a + t * b;
         }
 
-        inline bool intersectBound(const Vector3d &origin, const Vector3d &direction,
-                                   const Vector3d &boundMin, const Vector3d &boundMax,
-                                   double *stepMin, double *maxStep) {
+        inline bool intersectBound(const Vector3F &origin, const Vector3F &direction,
+                                   const Vector3F &boundMin, const Vector3F &boundMax,
+                                   Float *stepMin, Float *maxStep) {
             assert(stepMin != nullptr && maxStep != nullptr);
 
-            double t0 = *stepMin, t1 = *maxStep;
+            Float t0 = *stepMin, t1 = *maxStep;
             for (int axis = 0; axis < 3; ++axis) {
-                double invStep = 1 / direction[axis];
-                double near = (boundMin[axis] - origin[axis]) * invStep;
-                double far = (boundMax[axis] - origin[axis]) * invStep;
+                Float invStep = 1 / direction[axis];
+                Float near = (boundMin[axis] - origin[axis]) * invStep;
+                Float far = (boundMax[axis] - origin[axis]) * invStep;
 
                 if (near > far) {
                     std::swap(near, far);
@@ -110,13 +161,13 @@ namespace kaguya {
             return true;
         }
 
-        inline double schlick(double cosine, double ref_idx) {
+        inline Float schlick(Float cosine, Float ref_idx) {
             if (cosine < 0) {
                 ref_idx = 1 / ref_idx;
                 cosine = -cosine;
             }
 
-            double sine = std::sqrt(std::max(0.0, 1 - std::pow(cosine, 2)));
+            Float sine = std::sqrt(std::max(0.0, 1 - std::pow(cosine, 2)));
             if (sine * ref_idx >= 1) {
                 return 1.0;
             }
@@ -126,12 +177,12 @@ namespace kaguya {
             return r0 + (1 - r0) * pow((1 - cosine), 5);
         }
 
-        double randomDouble(double min, double max, Sampler *const sampler1D);
+        Float randomDouble(Float min, Float max, Sampler *const sampler1D);
 
         int randomInt(int min, int max, Sampler *const sampler1D);
 
-        inline int maxAbsAxis(const Vector3d v) {
-            double maxValue = std::abs(v[0]);
+        inline int maxAbsAxis(const Vector3F v) {
+            Float maxValue = std::abs(v[0]);
             int axis = 0;
             for (int i = 1; i < 3; i++) {
                 if (std::abs(v[i]) > maxValue) {
@@ -142,11 +193,11 @@ namespace kaguya {
             return axis;
         }
 
-        inline Vector3d swapAxis(const Vector3d v, int x, int y, int z) {
-            return Vector3d(v[x], v[y], v[z]);
+        inline Vector3F swapAxis(const Vector3F v, int x, int y, int z) {
+            return Vector3F(v[x], v[y], v[z]);
         }
 
-        inline Vector3d reflect(const Vector3d &v, const Vector3d &normal) {
+        inline Vector3F reflect(const Vector3F &v, const Vector3F &normal) {
             return v - 2 * DOT(v, NORMALIZE(normal)) * normal;
         }
 
@@ -158,31 +209,31 @@ namespace kaguya {
          * @param wi
          * @return
          */
-        inline bool refract(const Vector3d &wo, const Vector3d &normal, double refraction, Vector3d *wi) {
-            double cosineThetaI = DOT(wo, normal);
-            double sineThetaI = std::sqrt(std::max(0.0, 1 - cosineThetaI * cosineThetaI));
-            double sineThetaT = refraction * sineThetaI;
+        inline bool refract(const Vector3F &wo, const Vector3F &normal, Float refraction, Vector3F *wi) {
+            Float cosineThetaI = DOT(wo, normal);
+            Float sineThetaI = std::sqrt(std::max(0.0f, 1 - cosineThetaI * cosineThetaI));
+            Float sineThetaT = refraction * sineThetaI;
             if (sineThetaT > 1) {
                 // 全反射，无法折射
                 return false;
             }
 
-            double cosineThetaT = std::sqrt(std::max(0.0, 1 - sineThetaT * sineThetaT));
+            Float cosineThetaT = std::sqrt(std::max(0.0f, 1 - sineThetaT * sineThetaT));
             *wi = refraction * (-wo) + (refraction * cosineThetaI - cosineThetaT) * normal;
             return true;
         }
 
-        inline double gamma(int n) {
+        inline Float gamma(int n) {
             return (n * epsilon) / (1 - n * epsilon);
         }
 
-        inline double misWeight(int nSampleF, double pdfF, int nSampleG, double pdfG) {
-            double f = nSampleF * pdfF;
-            double g = nSampleG * pdfG;
+        inline Float misWeight(int nSampleF, Float pdfF, int nSampleG, Float pdfG) {
+            Float f = nSampleF * pdfF;
+            Float g = nSampleG * pdfG;
             return (f * f) / (g * g + f * f);
         }
 
-        inline bool isValid(const Vector3d v) {
+        inline bool isValid(const Vector3F v) {
             return !std::isnan(v.x) && !std::isnan(v.y) && !std::isnan(v.z);
         }
 
@@ -192,63 +243,112 @@ namespace kaguya {
          * @param tanX 切线空间 X 轴
          * @param tanZ 切线空间 Z 轴
          */
-        inline void tangentSpace(Vector3d &tanY, Vector3d *tanX, Vector3d *tanZ) {
+        inline void tangentSpace(Vector3F &tanY, Vector3F *tanX, Vector3F *tanZ) {
             // 计算与 tanY 垂直的 tanX
             if (std::abs(tanY.x) > std::abs(tanY.y)) {
-                (*tanX) = Vector3d(-tanY.z, 0, tanY.x);
+                (*tanX) = Vector3F(-tanY.z, 0, tanY.x);
             } else {
-                (*tanX) = Vector3d(0, tanY.z, -tanY.y);
+                (*tanX) = Vector3F(0, tanY.z, -tanY.y);
             }
             (*tanX) = NORMALIZE(*tanX);
             (*tanZ) = NORMALIZE(CROSS(tanY, *tanX));
         }
 
-        inline uint64_t double2bits(double v) {
+        inline uint32_t float2bits(float v) {
+            uint32_t bits;
+            memcpy(&bits, &v, sizeof(float));
+            return bits;
+        }
+
+        inline float bits2float(uint32_t bits) {
+            float f;
+            memcpy(&f, &bits, sizeof(uint32_t));
+            return f;
+        }
+
+        inline uint64_t float2bits(double v) {
             uint64_t bits;
             memcpy(&bits, &v, sizeof(double));
             return bits;
         }
 
-        inline double bits2double(uint64_t bits) {
-            double d;
-            memcpy(&d, &bits, sizeof(uint64_t));
-            return d;
+        inline double bits2float(uint64_t bits) {
+            double f;
+            memcpy(&f, &bits, sizeof(uint64_t));
+            return f;
         }
 
-        inline double doubleUp(double a) {
-            if (std::isinf(a) && a > 0) {
+        inline float floatUp(float a) {
+            if (std::isinf(a) && a > 0.) {
                 return a;
             }
 
             if (a == -0.) {
-                a = 0.;
+                a = 0.f;
             }
 
-            uint64_t bits = double2bits(a);
-            if (bits >= 0) {
+            uint32_t bits = float2bits(a);
+            if (a >= 0) {
                 bits++;
             } else {
                 bits--;
             }
-            return bits2double(bits);
+            return bits2float(bits);
         }
 
-        inline double doubleDown(double a) {
+
+        inline float floatDown(float a) {
             if (std::isinf(a) && a < 0) {
                 return a;
             }
 
-            if (a == 0.) {
-                a = -0.;
+            if (a == 0.f) {
+                a = -0.f;
             }
 
-            uint64_t bits = double2bits(a);
-            if (bits > 0) {
+            uint32_t bits = float2bits(a);
+            if (a > 0) {
                 bits--;
             } else {
                 bits++;
             }
-            return bits2double(bits);
+            return bits2float(bits);
+        }
+
+        inline double floatUp(double a, int delta = 1) {
+            if (std::isinf(a) && a > 0.) {
+                return a;
+            }
+
+            if (a == -0.f) {
+                a = 0.f;
+            }
+
+            uint64_t bits = float2bits(a);
+            if (a >= 0.) {
+                bits += delta;
+            } else {
+                bits -= delta;
+            }
+            return bits2float(bits);
+        }
+
+        inline double floatDown(double a, int delta = 1) {
+            if (std::isinf(a) && a < 0.f) {
+                return a;
+            }
+
+            if (a == 0.f) {
+                a = -0.f;
+            }
+
+            uint64_t bits = float2bits(a);
+            if (a > 0.) {
+                bits -= delta;
+            } else {
+                bits += delta;
+            }
+            return bits2float(bits);
         }
 
         inline int mod(int a, int b) {
@@ -280,14 +380,14 @@ namespace kaguya {
              * 从 y > 0 的半球面，按照 cos(theta) / Pi 的概率采样射线
              * @return
              */
-            Vector3d hemiCosineSampling(Sampler *const sampler);
+            Vector3F hemiCosineSampling(Sampler *const sampler);
 
             /**
              * （局部坐标系）
              * 在球面做均匀采样，默认 (0, 1, 0) 为法线方向
              * @return
              */
-            Vector3d sphereUniformSampling(Sampler *sampler);
+            Vector3F sphereUniformSampling(Sampler *sampler);
 
             /**
              * （局部坐标系）
@@ -295,12 +395,12 @@ namespace kaguya {
              * @param sample
              * @return
              */
-            inline double hemiCosineSamplePdf(Vector3d sample) {
-                double cosine = NORMALIZE(sample).y;
+            inline Float hemiCosineSamplePdf(Vector3F sample) {
+                Float cosine = NORMALIZE(sample).y;
                 return cosine < 0 ? 0 : cosine * INV_PI;
             }
 
-            inline double hemiCosineSamplePdf(double cosTheta) {
+            inline Float hemiCosineSamplePdf(Float cosTheta) {
                 return cosTheta / PI;
             }
 
@@ -308,7 +408,7 @@ namespace kaguya {
              * 对圆盘做均匀采样
              * @return
              */
-            Vector2d diskUniformSampling(Sampler *const sampler1D, double radius = 1.);
+            Vector2F diskUniformSampling(Sampler *const sampler1D, Float radius = 1.);
 
             /**
              * Sample barycentric coordinate from triangle
@@ -324,21 +424,21 @@ namespace kaguya {
              * @param sampler
              * @return
              */
-            Vector2d triangleUniformSampling(Sampler *sampler);
+            Vector2F triangleUniformSampling(Sampler *sampler);
 
             /**
              * 从 cone 空间中均匀采样射线
              * @param cosThetaMax
              * @return
              */
-            Vector3d coneUniformSampling(double cosThetaMax, Sampler *sampler);
+            Vector3F coneUniformSampling(Float cosThetaMax, Sampler *sampler);
 
             /**
              * 计算 cone 空间中均匀采样射线的 pdf
              * @param cosThetaMax
              * @return
              */
-            inline double coneUniformSamplePdf(double cosThetaMax) {
+            inline Float coneUniformSamplePdf(Float cosThetaMax) {
                 return 1 / (2 * PI * (1 - cosThetaMax));
             }
 
@@ -351,7 +451,7 @@ namespace kaguya {
 
                 std::vector<uint16_t> computePermutationArray(bool initFaure = true);
 
-                double radicalReverse(const int dimension, uint64_t n);
+                Float radicalReverse(const int dimension, uint64_t n);
 
                 template<int base>
                 uint16_t inverseRadicalReverse(uint64_t reversed, int digitsCount) {
@@ -364,9 +464,9 @@ namespace kaguya {
                     return ret;
                 }
 
-                double scrambledRadicalReverse(const int dimension, uint64_t n, uint16_t *perm);
+                Float scrambledRadicalReverse(const int dimension, uint64_t n, uint16_t *perm);
 
-                double radicalReverse(uint64_t n);
+                Float radicalReverse(uint64_t n);
 
                 uint64_t reverseBit64(uint64_t n);
 

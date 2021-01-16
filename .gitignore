@@ -4,6 +4,9 @@
 /output
 /resource
 
+./*.png
+temp.txt
+
 # IDE
 /.idea
 

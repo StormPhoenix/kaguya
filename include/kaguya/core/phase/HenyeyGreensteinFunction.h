@@ -12,17 +12,17 @@ namespace kaguya {
 
         class HenyeyGreensteinFunction : public PhaseFunction {
         public:
-            HenyeyGreensteinFunction(double g);
+            HenyeyGreensteinFunction(Float g);
 
-            virtual double scatterPdf(const Vector3d &wo, const Vector3d &wi) const override;
+            virtual Float scatterPdf(const Vector3F &wo, const Vector3F &wi) const override;
 
-            virtual double sampleScatter(const Vector3d &wo, Vector3d *wi, Sampler *sampler) const override;
-
-        private:
-            double henyeyGreensteinPdf(double cosTheta, double g) const;
+            virtual Float sampleScatter(const Vector3F &wo, Vector3F *wi, Sampler *sampler) const override;
 
         private:
-            double _g;
+            Float henyeyGreensteinPdf(Float cosTheta, Float g) const;
+
+        private:
+            Float _g;
         };
 
     }

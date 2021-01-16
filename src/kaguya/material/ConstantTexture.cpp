@@ -13,7 +13,7 @@ namespace kaguya {
 
         ConstantTexture::ConstantTexture(const Spectrum &albedo) : _albedo(albedo) {}
 
-        Spectrum ConstantTexture::sample(double u, double v) {
+        Spectrum ConstantTexture::sample(Float u, Float v) {
             return _albedo;
         }
 

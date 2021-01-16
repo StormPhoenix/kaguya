@@ -27,20 +27,20 @@ namespace kaguya {
 
             class Shape {
             public:
-                virtual bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const = 0;
+                virtual bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const = 0;
 
                 virtual const AABB &bound() const = 0;
 
-                virtual double area() const = 0;
+                virtual Float area() const = 0;
 
                 virtual SurfaceInteraction sampleSurfacePoint(Sampler *sampler1D) const = 0;
 
-                virtual double surfacePointPdf(const SurfaceInteraction &si) const;
+                virtual Float surfacePointPdf(const SurfaceInteraction &si) const;
 
                 virtual SurfaceInteraction sampleSurfaceInteraction(
                         const Interaction &eye, Sampler *sampler1D) const;
 
-                virtual double surfaceInteractionPdf(const Interaction &eye, const Vector3d &dir) const;
+                virtual Float surfaceInteractionPdf(const Interaction &eye, const Vector3F &dir) const;
             };
         }
     }

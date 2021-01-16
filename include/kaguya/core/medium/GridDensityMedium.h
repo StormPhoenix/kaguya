@@ -18,8 +18,8 @@ namespace kaguya {
             public:
                 GridDensityMedium(const Spectrum &absorptionSigma,
                                   const Spectrum &scatteringSigma,
-                                  double g, int axisXGrid, int axisYGrid, int axisZGrid,
-                                  float *densities,
+                                  Float g, int axisXGrid, int axisYGrid, int axisZGrid,
+                                  Float *densities,
                                   std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
                 virtual core::Spectrum transmittance(const tracer::Ray &ray, Sampler *sampler1D) const override;
@@ -37,20 +37,20 @@ namespace kaguya {
                  * @param coordinate
                  * @return
                  */
-                float density(const Vector3d &coord) const;
+                float density(const Vector3F &coord) const;
 
                 /**
                  * Index from _densities
                  * @param coord
                  * @return
                  */
-                float d(const Vector3d &coord) const;
+                float d(const Vector3F &coord) const;
 
             private:
                 const Spectrum _absorptionSigma;
                 const Spectrum _scatteringSigma;
-                double _totalSigma;
-                double _g;
+                Float _totalSigma;
+                Float _g;
                 float *_densities = nullptr;
                 std::shared_ptr<Transform> _transformMatrix = nullptr;
                 std::shared_ptr<Transform> _invTransformMatrix = nullptr;

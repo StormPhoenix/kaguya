@@ -8,14 +8,14 @@ namespace kaguya {
     namespace scene {
         namespace acc {
 
-            AxisAlignBoundingBox::AxisAlignBoundingBox(const Vector3d min, const Vector3d max) : _min(min), _max(max) {}
+            AxisAlignBoundingBox::AxisAlignBoundingBox(const Vector3F min, const Vector3F max) : _min(min), _max(max) {}
 
-            bool AxisAlignBoundingBox::insectPoint(const Ray &ray, double *minStep, double *maxStep) const {
-                double t0 = 0, t1 = ray.getStep();
+            bool AxisAlignBoundingBox::insectPoint(const Ray &ray, Float *minStep, Float *maxStep) const {
+                Float t0 = 0, t1 = ray.getStep();
                 for (int axis = 0; axis < 3; ++axis) {
-                    double invStep = 1 / ray.getDirection()[axis];
-                    double near = (_min[axis] - ray.getOrigin()[axis]) * invStep;
-                    double far = (_max[axis] - ray.getOrigin()[axis]) * invStep;
+                    Float invStep = 1 / ray.getDirection()[axis];
+                    Float near = (_min[axis] - ray.getOrigin()[axis]) * invStep;
+                    Float far = (_max[axis] - ray.getOrigin()[axis]) * invStep;
 
                     if (near > far) {
                         std::swap(near, far);
@@ -37,11 +37,11 @@ namespace kaguya {
                 return true;
             }
 
-            bool AxisAlignBoundingBox::insect(const Ray &ray, double minStep, double maxStep) const {
+            bool AxisAlignBoundingBox::insect(const Ray &ray, Float minStep, Float maxStep) const {
                 for (int axis = 0; axis < 3; axis++) {
-                    double invStep = 1.0 / ray.getDirection()[axis];
-                    double t0 = (_min[axis] - ray.getOrigin()[axis]) * invStep;
-                    double t1 = (_max[axis] - ray.getOrigin()[axis]) * invStep;
+                    Float invStep = 1.0 / ray.getDirection()[axis];
+                    Float t0 = (_min[axis] - ray.getOrigin()[axis]) * invStep;
+                    Float t1 = (_max[axis] - ray.getOrigin()[axis]) * invStep;
 
                     if (invStep < 0.0f) {
                         std::swap(t0, t1);

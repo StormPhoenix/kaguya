@@ -14,20 +14,20 @@ namespace kaguya {
 
         }
 
-        Spectrum BXDFSpecularReflection::f(const Vector3d &wo, const Vector3d &wi) const {
+        Spectrum BXDFSpecularReflection::f(const Vector3F &wo, const Vector3F &wi) const {
             return Spectrum(0.0f);
         }
 
-        Spectrum BXDFSpecularReflection::sampleF(const Vector3d &wo, Vector3d *wi, double *pdf,
+        Spectrum BXDFSpecularReflection::sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
                                                  Sampler *const sampler1D) {
             assert(_fresnel != nullptr);
-            *wi = Vector3d(-wo.x, wo.y, -wo.z);
+            *wi = Vector3F(-wo.x, wo.y, -wo.z);
             *pdf = 1;
             // 除以 cosine(w_i) 是为了不让能量损耗，这个可以利用 hemisphere-directional 积分得到
             return _fresnel->fresnel(wo.y) * _albedo / std::abs((*wi).y);
         }
 
-        double BXDFSpecularReflection::samplePdf(const Vector3d &wo, const Vector3d &wi) const {
+        Float BXDFSpecularReflection::samplePdf(const Vector3F &wo, const Vector3F &wi) const {
             return 0;
         }
     }

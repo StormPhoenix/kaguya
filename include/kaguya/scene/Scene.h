@@ -70,17 +70,10 @@ namespace kaguya {
 
             static float *testSmokeData();
 
-            static std::shared_ptr<Medium> testAirMedium() {
-                Spectrum sigmaA(0.001);
-//                sigmaA.r(0.0011f);
-//                sigmaA.g(0.0024f);
-//                sigmaA.b(0.014f);
-                std::shared_ptr<Medium> airMedium = std::make_shared<IsotropicMedium>(sigmaA, 0.1, 0);
-                return airMedium;
-            }
+            static std::shared_ptr<Medium> testAirMedium();
 
             static std::shared_ptr<Medium> testSmokeMedium() {
-                return std::make_shared<IsotropicMedium>(0.00001, 0.1, 0);
+                return std::make_shared<IsotropicMedium>(0.1, 1.2, 0);
             }
 
             static std::vector<std::shared_ptr<Geometry>>

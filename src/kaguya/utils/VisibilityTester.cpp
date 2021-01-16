@@ -20,7 +20,6 @@ namespace kaguya {
             while (true) {
                 SurfaceInteraction si;
                 bool foundIntersection = scene.intersect(ray, si);
-
                 if (foundIntersection && si.getMaterial() != nullptr) {
                     return false;
                 }

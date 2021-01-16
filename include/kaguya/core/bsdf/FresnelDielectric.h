@@ -12,14 +12,14 @@ namespace kaguya {
 
         class FresnelDielectric : public Fresnel {
         public:
-            FresnelDielectric(double thetaI, double thetaT) :
+            FresnelDielectric(Float thetaI, Float thetaT) :
                     _thetaI(thetaI), _thetaT(thetaT) {}
 
-            virtual Spectrum fresnel(double cosineTheta) override;
+            virtual Spectrum fresnel(Float cosineTheta) override;
 
         private:
-            double _thetaI;
-            double _thetaT;
+            Float _thetaI;
+            Float _thetaT;
         };
 
     }

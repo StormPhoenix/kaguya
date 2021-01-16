@@ -12,11 +12,11 @@ namespace kaguya {
 
         struct Vertex {
             // 定点坐标
-            Vector3d position;
+            Vector3F position;
             // 法线
-            Vector3d normal;
+            Vector3F normal;
             // 纹理坐标
-            double u, v;
+            Float u, v;
         };
 
     }

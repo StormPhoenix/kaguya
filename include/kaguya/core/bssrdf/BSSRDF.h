@@ -28,12 +28,12 @@ namespace kaguya {
             /**
              * S(p_o, p_i, w_o, w_i)
              */
-            virtual Spectrum s(const SurfaceInteraction &si, const Vector3d &wi) = 0;
+            virtual Spectrum s(const SurfaceInteraction &si, const Vector3F &wi) = 0;
 
             /**
              * Sample S(p_o, p_i, w_o, w_i)
              */
-            virtual Spectrum sampleS(const Scene &scene, SurfaceInteraction *si, double *pdf,
+            virtual Spectrum sampleS(const Scene &scene, SurfaceInteraction *si, Float *pdf,
                                      MemoryArena &memoryArena, Sampler *sampler) = 0;
 
         protected:

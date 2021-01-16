@@ -46,7 +46,7 @@ namespace kaguya {
                 numTheoreticReciprocal[1] = multiplicativeInverse(firstTwoDimScales[0], firstTwoDimScales[1]);
             }
 
-            void HaltonSampler::forPixel(const Point2d pixel) {
+            void HaltonSampler::forPixel(const Point2F pixel) {
                 Sampler::forPixel(pixel);
                 // new seed
                 seedForPixel = seedForCurrentPixel(0);
@@ -76,7 +76,7 @@ namespace kaguya {
                 return new HaltonSampler(Config::samplePerPixel);
             }
 
-            double HaltonSampler::sample1D() {
+        Float HaltonSampler::sample1D() {
                 if (dimension >= math::sampling::low_discrepancy::primeArraySize) {
                     // TODO add warning
                     dimension = math::sampling::low_discrepancy::primeArraySize - 1;
@@ -96,20 +96,20 @@ namespace kaguya {
                 }
             }
 
-            Vector2d HaltonSampler::sample2D() {
-                double u = sample1D();
-                double v = sample1D();
-                return Vector2d(u, v);
-            }
+        Vector2F HaltonSampler::sample2D() {
+            Float u = sample1D();
+            Float v = sample1D();
+            return Vector2F(u, v);
+        }
 
-            int HaltonSampler::seedForCurrentPixel(int seed) {
-                if (currentPixel.x != pixelForOffset.x ||
-                    currentPixel.y != pixelForOffset.y) {
-                    Point2i p_j = Point2i(mod(currentPixel[0], MAX_TILE_RESOLUTION),
-                                          mod(currentPixel[1], MAX_TILE_RESOLUTION));
-                    seedForPixel = 0;
-                    for (int i = 0; i < 2; i++) {
-                        // l_j
+        int HaltonSampler::seedForCurrentPixel(int seed) {
+            if (currentPixel.x != pixelForOffset.x ||
+                currentPixel.y != pixelForOffset.y) {
+                Point2I p_j = Point2I(mod(currentPixel[0], MAX_TILE_RESOLUTION),
+                                      mod(currentPixel[1], MAX_TILE_RESOLUTION));
+                seedForPixel = 0;
+                for (int i = 0; i < 2; i++) {
+                    // l_j
                         uint64_t l_j =
                                 (i == 0) ? math::sampling::low_discrepancy::inverseRadicalReverse<2>(p_j[i],
                                                                                                      firstTwoDimScaleDigits[i])

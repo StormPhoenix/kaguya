@@ -15,7 +15,7 @@ namespace kaguya {
         public:
             Dielectric(std::shared_ptr<Texture> albedo);
 
-            Dielectric(std::shared_ptr<Texture> albedo, double refractiveIndex);
+            Dielectric(std::shared_ptr<Texture> albedo, Float refractiveIndex);
 
             virtual bool isSpecular() const override;
 
@@ -24,7 +24,7 @@ namespace kaguya {
 
 
         private:
-            double _refractiveIndex;
+            Float _refractiveIndex;
 
             std::shared_ptr<Texture> _albedo = nullptr;
         };

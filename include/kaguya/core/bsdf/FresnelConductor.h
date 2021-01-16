@@ -17,7 +17,7 @@ namespace kaguya {
                              const Spectrum &k) :
                     _thetaI(thetaI), _thetaT(thetaT), _k(k) {}
 
-            virtual Spectrum fresnel(double cosineTheta) override;
+            virtual Spectrum fresnel(Float cosineTheta) override;
 
         private:
             Spectrum _thetaI;

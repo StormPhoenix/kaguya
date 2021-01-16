@@ -12,7 +12,7 @@ namespace kaguya {
 
         Dielectric::Dielectric(std::shared_ptr<Texture> albedo) : Dielectric(albedo, 1.5) {}
 
-        Dielectric::Dielectric(std::shared_ptr<Texture> albedo, double refractiveIndex)
+        Dielectric::Dielectric(std::shared_ptr<Texture> albedo, Float refractiveIndex)
                 : _refractiveIndex(refractiveIndex), _albedo(albedo) {
         }
 
@@ -21,7 +21,7 @@ namespace kaguya {
         }
 
         BSDF *Dielectric::bsdf(SurfaceInteraction &insect, MemoryArena &memoryArena, TransportMode mode) {
-            Spectrum albedo = _albedo->sample(insect.getU(), insect.getV());
+            Spectrum albedo = _albedo->sample(insect.u, insect.v);
             BXDFSpecular *specularBXDF = ALLOC(memoryArena, BXDFSpecular)(albedo, 1.0f, _refractiveIndex, mode);
             BSDF *bsdf = ALLOC(memoryArena, BSDF)(insect);
             bsdf->addBXDF(specularBXDF);

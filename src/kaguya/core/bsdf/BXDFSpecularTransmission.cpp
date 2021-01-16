@@ -8,19 +8,19 @@
 namespace kaguya {
     namespace core {
 
-        BXDFSpecularTransmission::BXDFSpecularTransmission(const Spectrum &albedo, double thetaI, double thetaT,
+        BXDFSpecularTransmission::BXDFSpecularTransmission(const Spectrum &albedo, Float thetaI, Float thetaT,
                                                            FresnelDielectric *fresnel, TransportMode mode) :
                 BXDF(BXDFType(BSDF_SPECULAR | BSDF_TRANSMISSION)), _thetaI(thetaI), _thetaT(thetaT), _mode(mode) {
             _fresnel = fresnel;
         }
 
-        Spectrum BXDFSpecularTransmission::f(const Vector3d &wo, const Vector3d &wi) const {
+        Spectrum BXDFSpecularTransmission::f(const Vector3F &wo, const Vector3F &wi) const {
             return Spectrum(0.0f);
         }
 
-        Spectrum BXDFSpecularTransmission::sampleF(const Vector3d &wo, Vector3d *wi, double *pdf,
+        Spectrum BXDFSpecularTransmission::sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
                                                    Sampler *const sampler1D) {
-            double refraction;
+            Float refraction;
             if (wo.y > 0) {
                 // 外部射入
                 refraction = _thetaI / _thetaT;
@@ -29,7 +29,7 @@ namespace kaguya {
                 refraction = _thetaT / _thetaI;
             }
 
-            Vector3d normal = Vector3d(0.0, 1.0, 0.0);
+            Vector3F normal = Vector3F(0.0, 1.0, 0.0);
             if (DOT(wo, normal) < 0) {
                 normal.y = -1;
             }
@@ -39,8 +39,7 @@ namespace kaguya {
                 return 0;
             }
             *pdf = 1;
-            double cosineThetaI = abs(wo.y);
-            double cosineThetaT = abs(wi->y);
+            Float cosineThetaT = abs(wi->y);
             Spectrum f = _albedo * (Spectrum(1.0) - _fresnel->fresnel(cosineThetaT)) / cosineThetaT;
             if (_mode == TransportMode::RADIANCE) {
                 f *= std::pow(refraction, 2);
@@ -48,7 +47,7 @@ namespace kaguya {
             return f;
         }
 
-        double BXDFSpecularTransmission::samplePdf(const Vector3d &wo, const Vector3d &wi) const {
+        Float BXDFSpecularTransmission::samplePdf(const Vector3F &wo, const Vector3F &wi) const {
             return 0.0;
         }
     }

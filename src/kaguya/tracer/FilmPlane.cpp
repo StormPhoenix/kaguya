@@ -16,8 +16,8 @@ namespace kaguya {
         FilmPlane::FilmPlane(int resolutionWidth, int resolutionHeight, int channel) :
                 _resolutionWidth(resolutionWidth), _resolutionHeight(resolutionHeight),
                 _channel(channel) {
-            _bitmap = (double *) malloc(resolutionHeight * resolutionWidth * channel * sizeof(double));
-            memset(_bitmap, 0, resolutionHeight * resolutionWidth * channel * sizeof(double));
+            _bitmap = (Float *) malloc(resolutionHeight * resolutionWidth * channel * sizeof(Float));
+            memset(_bitmap, 0, resolutionHeight * resolutionWidth * channel * sizeof(Float));
         }
 
         void FilmPlane::addSpectrum(const Spectrum &spectrum, int row, int col) {
@@ -39,7 +39,7 @@ namespace kaguya {
         }
 
 
-        double FilmPlane::getSpectrum(int row, int col, int channel) const {
+        Float FilmPlane::getSpectrum(int row, int col, int channel) const {
             int offset = (row * _resolutionWidth + col) * _channel;
             return (_bitmap + offset)[channel];
         }

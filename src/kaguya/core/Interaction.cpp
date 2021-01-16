@@ -9,20 +9,20 @@
 namespace kaguya {
     namespace core {
 
-        Vector3d offsetOrigin(const Vector3d &origin, const Vector3d &error,
-                              const Vector3d &normal, const Vector3d &direction) {
-            double dist = DOT(ABS(normal), error);
-            Vector3d offset = dist * normal;
+        Vector3F offsetOrigin(const Vector3F &origin, const Vector3F &error,
+                              const Vector3F &normal, const Vector3F &direction) {
+            Float dist = DOT(ABS(normal), error);
+            Vector3F offset = dist * normal;
             if (DOT(normal, direction) < 0) {
                 offset = -offset;
             }
 
-            Vector3d o = origin + offset;
+            Point3F o = origin + offset;
             for (int i = 0; i < 3; i++) {
                 if (offset[i] > 0) {
-                    o[i] = math::doubleUp(o[i]);
+                    o[i] = math::floatUp(o[i]);
                 } else if (offset[i] < 0) {
-                    o[i] = math::doubleDown(o[i]);
+                    o[i] = math::floatDown(o[i]);
                 }
             }
             return o;
@@ -30,21 +30,21 @@ namespace kaguya {
 
         using kaguya::material::Material;
 
-        Interaction::Interaction(const Vector3d &point,
-                                 const Vector3d &direction, const Vector3d &normal,
+        Interaction::Interaction(const Vector3F &point,
+                                 const Vector3F &direction, const Vector3F &normal,
                                  const MediumBound &mediumBoundary, Material *material) :
-                _point(point), _direction(direction), _normal(normal),
+                point(point), direction(direction), normal(normal),
                 _mediumBoundary(mediumBoundary), _material(material) {}
 
 
-        Ray Interaction::sendRay(const Vector3d &dir) const {
-            Vector3d origin = offsetOrigin(_point, _error, _normal, dir);
+        Ray Interaction::sendRay(const Vector3F &dir) const {
+            Vector3F origin = offsetOrigin(point, error, normal, dir);
             return Ray(origin, NORMALIZE(dir), getMedium(dir));
         }
 
-        Ray Interaction::sendRayTo(const Point3d &target) const {
-            Vector3d origin = offsetOrigin(_point, _error, _normal, target - _point);
-            const Vector3d dir = (target - origin);
+        Ray Interaction::sendRayTo(const Point3F &target) const {
+            Vector3F origin = offsetOrigin(point, error, normal, target - point);
+            const Vector3F dir = (target - origin);
 
             Ray ray = Ray(origin, dir, getMedium(dir));
             ray.setStep(1. - math::shadowEpsilon);
@@ -53,32 +53,32 @@ namespace kaguya {
 
         Ray Interaction::sendRayTo(const Interaction &it) const {
             // check whether the ray direction is point to outside or inside
-            Vector3d origin = offsetOrigin(_point, _error, _normal, it.getPoint() - _point);
-            Vector3d target = offsetOrigin(it.getPoint(), it.getError(), it.getNormal(), origin - it.getPoint());
-            const Vector3d dir = (target - origin);
+            Vector3F origin = offsetOrigin(point, error, normal, it.point - point);
+            Vector3F target = offsetOrigin(it.point, it.error, it.normal, origin - it.point);
+            const Vector3F dir = (target - origin);
 
             Ray ray = Ray(origin, dir, getMedium(dir));
             ray.setStep(1. - math::shadowEpsilon);
             return ray;
         }
 
-        const Medium *Interaction::getMedium(const Vector3d &dir) const {
+        const Medium *Interaction::getMedium(const Vector3F &dir) const {
             // check whether the ray direction is point to outside or inside
-            return (DOT(dir, _normal) > 0 ?
+            return (DOT(dir, normal) > 0 ?
                     _mediumBoundary.outside() : _mediumBoundary.inside());
         }
 
-        MediumInteraction::MediumInteraction(const Vector3d &point, const Vector3d &direction,
+        MediumInteraction::MediumInteraction(const Vector3F &point, const Vector3F &direction,
                                              const Medium *medium, const PhaseFunction *phase) :
-                Interaction(point, direction, Vector3d(0), medium),
+                Interaction(point, direction, Vector3F(0), medium),
                 _medium(medium), _phase(phase) {}
 
-        SurfaceInteraction::SurfaceInteraction(const Vector3d &point, const Vector3d &direction,
-                                               const Vector3d &normal,
+        SurfaceInteraction::SurfaceInteraction(const Vector3F &point, const Vector3F &direction,
+                                               const Vector3F &normal,
                                                MediumBound &mediumBoundary,
-                                               double u, double v, Material *material) :
+                                               Float u, Float v, Material *material) :
                 Interaction(point, direction, normal, mediumBoundary, material),
-                _u(u), _v(v) {}
+                u(u), v(v) {}
 
 
         BSDF *SurfaceInteraction::buildBSDF(MemoryArena &memoryArena, TransportMode mode) {
@@ -90,9 +90,9 @@ namespace kaguya {
         StartEndInteraction::StartEndInteraction(const Camera *camera,
                                                  const Ray &ray) : camera(camera) {
             assert(camera != nullptr);
-            _point = ray.getOrigin();
-            _direction = ray.getDirection();
-            _normal = camera->getFront();
+            point = ray.getOrigin();
+            direction = ray.getDirection();
+            normal = rendering.normal = camera->getFront();
         }
 
         StartEndInteraction::StartEndInteraction(const Light *light,
@@ -101,11 +101,11 @@ namespace kaguya {
         }
 
         StartEndInteraction::StartEndInteraction(const Light *light,
-                                                 const Vector3d &p, const Vector3d &dir, const Vector3d &n) :
+                                                 const Vector3F &p, const Vector3F &dir, const Vector3F &n) :
                 light(light) {
-            _point = p;
-            _direction = dir;
-            _normal = n;
+            point = p;
+            direction = dir;
+            normal = rendering.normal = n;
         }
 
         bool MediumInteraction::isValid() const {

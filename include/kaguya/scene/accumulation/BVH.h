@@ -27,7 +27,7 @@ namespace kaguya {
 
                 const AABB &boundingBox() const override;
 
-                bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
+                bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const override;
 
                 virtual const std::vector<std::shared_ptr<Intersectable>> aggregation() const override;
 

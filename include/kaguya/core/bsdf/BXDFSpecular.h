@@ -15,19 +15,19 @@ namespace kaguya {
          */
         class BXDFSpecular : public BXDF {
         public:
-            BXDFSpecular(const Spectrum &albedo, double thetaI, double thetaT,
+            BXDFSpecular(const Spectrum &albedo, Float thetaI, Float thetaT,
                          TransportMode mode = TransportMode::RADIANCE);
 
-            virtual Spectrum f(const Vector3d &wo, const Vector3d &wi) const override;
+            virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
 
-            virtual Spectrum sampleF(const Vector3d &wo, Vector3d *wi, double *pdf,
+            virtual Spectrum sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
                                      Sampler *const sampler1D) override;
 
-            virtual double samplePdf(const Vector3d &wo, const Vector3d &wi) const override;
+            virtual Float samplePdf(const Vector3F &wo, const Vector3F &wi) const override;
 
         private:
-            double _thetaI;
-            double _thetaT;
+            Float _thetaI;
+            Float _thetaT;
             Spectrum _albedo;
             const TransportMode _mode;
         };

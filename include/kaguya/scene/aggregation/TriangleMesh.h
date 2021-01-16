@@ -27,7 +27,7 @@ namespace kaguya {
                          const std::shared_ptr<AreaLight> areaLight = nullptr,
                          std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
-            virtual bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
+            virtual bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const override;
 
             virtual ~TriangleMesh() {}
 

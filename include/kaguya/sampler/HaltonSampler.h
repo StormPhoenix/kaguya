@@ -14,13 +14,13 @@ namespace kaguya {
         public:
             HaltonSampler(int samplePerPixel);
 
-            virtual void forPixel(const Point2d pixel) override;
+            virtual void forPixel(const Point2F pixel) override;
 
             virtual bool nextSampleRound() override;
 
-            virtual double sample1D() override;
+            virtual Float sample1D() override;
 
-            virtual Vector2d sample2D() override;
+            virtual Vector2F sample2D() override;
 
         private:
             /**
@@ -33,7 +33,7 @@ namespace kaguya {
             int seedForCurrentPixel(int seed);
 
         private:
-            Point2i pixelForOffset = Point2i(std::numeric_limits<int>::max(),
+            Point2I pixelForOffset = Point2I(std::numeric_limits<int>::max(),
                                              std::numeric_limits<int>::max());
             // Sampling seed
             int seedForPixel;
@@ -44,10 +44,10 @@ namespace kaguya {
             static bool isPrimesValid;
 
             // Halton sampling grid
-            Point2i firstTwoDimScales;
-            Point2i firstTwoDimScaleDigits;
+            Point2I firstTwoDimScales;
+            Point2I firstTwoDimScaleDigits;
             // number-theoretic reciprocal
-            Point2i numTheoreticReciprocal;
+            Point2I numTheoreticReciprocal;
             // stride
             int sampleStride;
             // Permutation array

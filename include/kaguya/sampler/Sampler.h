@@ -20,7 +20,7 @@ namespace kaguya {
              * Set current sampling pixel
              * @param pixel
              */
-            virtual void forPixel(const Point2d pixel);
+            virtual void forPixel(const Point2F pixel);
 
             /**
              * Begin next sample round
@@ -28,15 +28,15 @@ namespace kaguya {
              */
             virtual bool nextSampleRound();
 
-            virtual double sample1D() = 0;
+            virtual Float sample1D() = 0;
 
-            virtual Vector2d sample2D() = 0;
+            virtual Vector2F sample2D() = 0;
 
             virtual ~Sampler() {};
 
         protected:
             // current pixel on which sampling
-            Point2i currentPixel;
+            Point2I currentPixel;
 
             // sample times
             const int samplePerPixel;

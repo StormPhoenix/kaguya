@@ -21,23 +21,23 @@ namespace kaguya {
             public:
                 AxisAlignBoundingBox() {}
 
-                AxisAlignBoundingBox(const Vector3d min, const Vector3d max);
+                AxisAlignBoundingBox(const Vector3F min, const Vector3F max);
 
-                bool insect(const Ray &ray, double minStep, double maxStep) const;
+                bool insect(const Ray &ray, Float minStep, Float maxStep) const;
 
-                bool insectPoint(const Ray &ray, double *minStep, double *maxStep) const;
+                bool insectPoint(const Ray &ray, Float *minStep, Float *maxStep) const;
 
-                const Vector3d &min() const {
+                const Vector3F &min() const {
                     return _min;
                 }
 
-                const Vector3d &max() const {
+                const Vector3F &max() const {
                     return _max;
                 }
 
             private:
-                Vector3d _min;
-                Vector3d _max;
+                Vector3F _min;
+                Vector3F _max;
             };
 
             typedef AxisAlignBoundingBox AABB;

@@ -31,13 +31,13 @@ namespace kaguya {
         // rendering kernel count
         static int kernelCount;
         // 终止概率
-        static double russianRoulette;
+        static Float russianRoulette;
         // 最大散射深度
         static int maxScatterDepth;
         // 每像素采样次数
         static int samplePerPixel;
         // 对光源采样概率
-        static double sampleLightProb;
+        static Float sampleLightProb;
         // 相机宽度分辨率
         static int resolutionWidth;
         // 相机高度分辨率

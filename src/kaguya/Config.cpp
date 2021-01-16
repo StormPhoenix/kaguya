@@ -14,15 +14,15 @@ namespace kaguya {
     std::string Config::filenameSufix = "";
 
     int Config::russianRouletteDepth = 3;
-    double Config::russianRoulette = 0.135;
-    double Config::sampleLightProb = 0.3f;
+    Float Config::russianRoulette = 0.135;
+    Float Config::sampleLightProb = 0.3f;
     int Config::kernelCount = 1;
     int Config::maxScatterDepth = 15;
     int Config::samplePerPixel = 10;
 
     int Config::resolutionWidth = 100;
     int Config::resolutionHeight = 100;
-    int Config::tileSize = 64;
+    int Config::tileSize = 10;
 
     std::string Config::samplerType = "default";
 }

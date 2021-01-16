@@ -5,39 +5,40 @@
 #include <kaguya/sampler/Sampler.h>
 #include <kaguya/core/bsdf/BXDFSpecular.h>
 #include <kaguya/core/bsdf/Fresnel.h>
+#include <kaguya/math/Math.h>
 
 namespace kaguya {
     namespace core {
 
-        BXDFSpecular::BXDFSpecular(const Spectrum &albedo, double thetaI, double thetaT, TransportMode mode) :
+        BXDFSpecular::BXDFSpecular(const Spectrum &albedo, Float thetaI, Float thetaT, TransportMode mode) :
                 BXDF(BXDFType(BSDF_SPECULAR | BSDF_REFLECTION | BSDF_TRANSMISSION)),
                 _albedo(albedo), _thetaI(thetaI), _thetaT(thetaT), _mode(mode) {}
 
-        Spectrum BXDFSpecular::f(const Vector3d &wo, const Vector3d &wi) const {
+        Spectrum BXDFSpecular::f(const Vector3F &wo, const Vector3F &wi) const {
             return Spectrum(0.0);
         }
 
-        Spectrum BXDFSpecular::sampleF(const Vector3d &wo, Vector3d *wi, double *pdf,
+        Spectrum BXDFSpecular::sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
                                        Sampler *const sampler1D) {
-            double cosine = wo.y;
+            Float cosine = wo.y;
             // 计算反射概率
-            double reflectProb = fresnelDielectric(cosine, _thetaI, _thetaT);
+            Float reflectProb = math::fresnelDielectric(cosine, _thetaI, _thetaT);
             // Fresnel 的近似计算
-//            double reflectProb = math::schlick(cosine, _thetaI / _thetaT);
+//            Float reflectProb = math::schlick(cosine, _thetaI / _thetaT);
 
             // 随机采样是否反射
-            double random = sampler1D->sample1D();
+            Float random = sampler1D->sample1D();
             if (random < reflectProb) {
                 // 反射
-                *wi = Vector3d(-wo.x, wo.y, -wo.z);
+                *wi = Vector3F(-wo.x, wo.y, -wo.z);
                 *pdf = reflectProb;
                 // f(p, w_o, w_i) / cos(theta(w_i))
                 return reflectProb * _albedo / abs(wi->y);
             } else {
                 // 折射
-                double refraction;
+                Float refraction;
                 // 法向
-                Vector3d normal = Vector3d(0.0, 1.0, 0.0);
+                Vector3F normal = Vector3F(0.0, 1.0, 0.0);
                 // 判断射入方向
                 if (wo.y > 0) {
                     // 外部射入
@@ -62,7 +63,7 @@ namespace kaguya {
             }
         }
 
-        double BXDFSpecular::samplePdf(const Vector3d &wo, const Vector3d &wi) const {
+        Float BXDFSpecular::samplePdf(const Vector3F &wo, const Vector3F &wi) const {
             return 0.0;
         }
     }

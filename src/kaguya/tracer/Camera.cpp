@@ -10,14 +10,14 @@ namespace kaguya {
 
         using kaguya::core::medium::MediumBound;
 
-        Camera::Camera(const Vector3d &eye, const Vector3d &direction, const std::shared_ptr<Medium> medium, float fov,
+        Camera::Camera(const Vector3F &eye, const Vector3F &direction, const std::shared_ptr<Medium> medium, float fov,
                        float aspect) : _medium(medium) {
             _eye = eye;
             _front = NORMALIZE(direction);
             buildCameraCoordinate(fov, aspect);
         }
 
-        Camera::Camera(const Vector3d &eye, float yaw, float pitch,
+        Camera::Camera(const Vector3F &eye, float yaw, float pitch,
                        const std::shared_ptr<Medium> medium, float fov, float aspect) : _medium(medium) {
             _eye = eye;
             _front.x = cos(math::DEGREES_TO_RADIANS(pitch)) * cos(math::DEGREES_TO_RADIANS(yaw));
@@ -27,14 +27,14 @@ namespace kaguya {
             buildCameraCoordinate(fov, aspect);
         }
 
-        Ray Camera::sendRay(double u, double v) const {
-            Vector3d samplePoint =
+        Ray Camera::sendRay(Float u, Float v) const {
+            Vector3F samplePoint =
                     _leftBottomCorner + 2 * _halfWindowWidth * u * _right + 2 * _halfWindowHeight * v * _up;
-            Vector3d dir = NORMALIZE(samplePoint - _eye);
+            Vector3F dir = NORMALIZE(samplePoint - _eye);
             return Ray(_eye, dir, _medium.get());
         }
 
-        Vector3d Camera::getEye() const {
+        Vector3F Camera::getEye() const {
             return _eye;
         }
 
@@ -59,18 +59,18 @@ namespace kaguya {
         }
 
         Spectrum Camera::sampleCameraRay(const Interaction &eye,
-                                         Vector3d *wi, double *pdf,
-                                         Point2d *filmPosition,
+                                         Vector3F *wi, Float *pdf,
+                                         Point2F *filmPosition,
                                          Sampler *const sampler,
                                          VisibilityTester *visibilityTester) const {
             // 在相机镜头圆盘上随机采样
-            Vector2d diskSample = math::sampling::diskUniformSampling(sampler, _lensRadius);
+            Vector2F diskSample = math::sampling::diskUniformSampling(sampler, _lensRadius);
             // 计算相机镜头采样点 3D 坐标
-            Vector3d lensSample = _right * diskSample.x + _up * diskSample.y + _eye;
+            Vector3F lensSample = _right * diskSample.x + _up * diskSample.y + _eye;
 
             // 计算射线方向
-            (*wi) = lensSample - eye.getPoint();
-            double dist = LENGTH(*wi);
+            (*wi) = lensSample - eye.point;
+            Float dist = LENGTH(*wi);
             (*wi) = NORMALIZE(*wi);
 
             // 创建 Interaction
@@ -79,16 +79,16 @@ namespace kaguya {
             (*visibilityTester) = VisibilityTester(eye, lensInter);
 
             // lensInter 向 eye 发射射线的 pdf
-            double lensArea = math::PI * _lensRadius * _lensRadius;
+            Float lensArea = math::PI * _lensRadius * _lensRadius;
             // 从 eye 位置对相机成像平面采样 pdf
-            (*pdf) = (dist * dist) / (lensArea * ABS_DOT(lensInter.getNormal(), *wi));
+            (*pdf) = (dist * dist) / (lensArea * ABS_DOT(lensInter.normal, *wi));
 
             return rayImportance(Ray(lensSample, -(*wi)), filmPosition);
         }
 
-        void Camera::rayImportance(const Ray &ray, double &pdfPos, double &pdfDir) const {
+        void Camera::rayImportance(const Ray &ray, Float &pdfPos, Float &pdfDir) const {
             // 判断射线是否从正面发射出去
-            double cosine = DOT(ray.getDirection(), _front);
+            Float cosine = DOT(ray.getDirection(), _front);
             if (cosine <= 0) {
                 pdfPos = 0.0;
                 pdfDir = 0.0;
@@ -96,10 +96,10 @@ namespace kaguya {
             }
 
             // 判断射线是否击中成像平面
-            double step = _focal / cosine;
-            Vector3d raster = ray.getOrigin() + ray.getDirection() * step - _leftBottomCorner;
-            double u = DOT(raster, _right) / (DOT(_diagonalVector, _right));
-            double v = DOT(raster, _up) / (DOT(_diagonalVector, _up));
+            Float step = _focal / cosine;
+            Vector3F raster = ray.getOrigin() + ray.getDirection() * step - _leftBottomCorner;
+            Float u = DOT(raster, _right) / (DOT(_diagonalVector, _right));
+            Float v = DOT(raster, _up) / (DOT(_diagonalVector, _up));
             if (u < 0 || u >= 1 || v < 0 || v >= 1) {
                 pdfPos = 0.0;
                 pdfDir = 0.0;
@@ -111,13 +111,13 @@ namespace kaguya {
             pdfDir = (_focal * _focal) / (_area * cosine * cosine * cosine);
         }
 
-        Spectrum Camera::rayImportance(const Ray &ray, Point2d *const filmPosition) const {
+        Spectrum Camera::rayImportance(const Ray &ray, Point2F *const filmPosition) const {
             // 计算新射线光栅化位置
-            double step = _focal / ABS_DOT(ray.getDirection(), _front);
-            Vector3d raster = ray.getOrigin() + ray.getDirection() * step - _leftBottomCorner;
-            double u = DOT(raster, _right) / (DOT(_diagonalVector, _right));
-            double v = DOT(raster, _up) / (DOT(_diagonalVector, _up));
-            (*filmPosition) = Point2d(u * _resolutionWidth, v * _resolutionHeight);
+            Float step = _focal / ABS_DOT(ray.getDirection(), _front);
+            Vector3F raster = ray.getOrigin() + ray.getDirection() * step - _leftBottomCorner;
+            Float u = DOT(raster, _right) / (DOT(_diagonalVector, _right));
+            Float v = DOT(raster, _up) / (DOT(_diagonalVector, _up));
+            (*filmPosition) = Point2F(u * _resolutionWidth, v * _resolutionHeight);
 
             // 如果超出边界，则 rayImportance 为 0
             if (std::floor(filmPosition->x) < 0 || std::floor(filmPosition->x) >= _resolutionWidth ||
@@ -137,19 +137,19 @@ namespace kaguya {
              * 5) W_e = _focal^2 / (cosine^4 * A * PI * lensRadius^2)
              **/
 
-            double cosine = ABS_DOT(ray.getDirection(), _front);
+            Float cosine = ABS_DOT(ray.getDirection(), _front);
             /*
-            double dist = _focal / cosine;
-            double pW = dist * dist / (_area * cosine);
-            double weight = pW / (PI * _lensRadius * _lensRadius * cosine);
+            Float dist = _focal / cosine;
+            Float pW = dist * dist / (_area * cosine);
+            Float weight = pW / (PI * _lensRadius * _lensRadius * cosine);
              */
-            double weight = (_focal * _focal) /
+            Float weight = (_focal * _focal) /
                             (_area * math::PI * _lensRadius * _lensRadius * std::pow(cosine, 4));
             return Spectrum(weight);
         }
 
         void Camera::buildCameraCoordinate(float fov, float aspect) {
-            const Vector3d worldUp = Vector3d(0.0f, 1.0f, 0.0f);
+            const Vector3F worldUp = Vector3F(0.0f, 1.0f, 0.0f);
             // 判断 _front 方向是否与 worldUp 重叠
             if (abs(_front.x) < math::EPSILON && abs(_front.z) < math::EPSILON) {
                 _right = {1.0f, 0.0f, 0.0f};

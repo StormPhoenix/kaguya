@@ -24,20 +24,20 @@ namespace kaguya {
              * @param fresnel
              * @param mode
              */
-            BXDFSpecularTransmission(const Spectrum &albedo, double thetaI, double thetaT,
+            BXDFSpecularTransmission(const Spectrum &albedo, Float thetaI, Float thetaT,
                                      FresnelDielectric *fresnel, TransportMode mode = TransportMode::RADIANCE);
 
-            virtual Spectrum f(const Vector3d &wo, const Vector3d &wi) const override;
+            virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
 
-            virtual Spectrum sampleF(const Vector3d &wo, Vector3d *wi, double *pdf,
+            virtual Spectrum sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
                                      Sampler *const sampler1D) override;
 
-            virtual double samplePdf(const Vector3d &wo, const Vector3d &wi) const override;
+            virtual Float samplePdf(const Vector3F &wo, const Vector3F &wi) const override;
 
         private:
             const Spectrum _albedo;
-            const double _thetaI;
-            const double _thetaT;
+            const Float _thetaI;
+            const Float _thetaT;
             // 光线传输模式
             const TransportMode _mode;
             FresnelDielectric *_fresnel = nullptr;

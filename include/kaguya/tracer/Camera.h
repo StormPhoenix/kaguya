@@ -36,7 +36,7 @@ namespace kaguya {
              * @param focal 相机焦距
              * @param aspect 相机成像平面的宽/高比例
              */
-            Camera(const Vector3d &eye = {0.0f, 0.0f, 0.0f}, const Vector3d &direction = {0.0f, 0.0f, -1.0f},
+            Camera(const Vector3F &eye = {0.0f, 0.0f, 0.0f}, const Vector3F &direction = {0.0f, 0.0f, -1.0f},
                    const std::shared_ptr<Medium> medium = nullptr, float fov = 60.0, float aspect = 1.0);
 
             /**
@@ -50,7 +50,7 @@ namespace kaguya {
              * @param yaw 欧拉角，偏航角
              * @param pitch 欧拉角，俯仰角
              */
-            Camera(const Vector3d &eye, float yaw = -90.0f, float pitch = 0.0f,
+            Camera(const Vector3F &eye, float yaw = -90.0f, float pitch = 0.0f,
                    const std::shared_ptr<Medium> medium = nullptr, float fov = 60.0, float aspect = 1.0);
 
             /**
@@ -59,9 +59,9 @@ namespace kaguya {
              * @param v
              * @return
              */
-            Ray sendRay(double u, double v) const;
+            Ray sendRay(Float u, Float v) const;
 
-            Vector3d getEye() const;
+            Vector3F getEye() const;
 
             /**
              * 获得相机成像宽度
@@ -79,7 +79,7 @@ namespace kaguya {
 
             void setResolutionHeight(int resolutionHeight);
 
-            const Vector3d &getFront() const {
+            const Vector3F &getFront() const {
                 return _front;
             }
 
@@ -92,7 +92,7 @@ namespace kaguya {
              * @param visibilityTester
              * @return
              */
-            Spectrum sampleCameraRay(const Interaction &eye, Vector3d *wi, double *pdf, Point2d *filmPosition,
+            Spectrum sampleCameraRay(const Interaction &eye, Vector3F *wi, Float *pdf, Point2F *filmPosition,
                                      Sampler *const sampler, VisibilityTester *visibilityTester) const;
 
             /**
@@ -109,7 +109,7 @@ namespace kaguya {
              * @param pdfDir
              * @return
              */
-            void rayImportance(const Ray &ray, double &pdfPos, double &pdfDir) const;
+            void rayImportance(const Ray &ray, Float &pdfPos, Float &pdfDir) const;
 
         private:
             /**
@@ -119,7 +119,7 @@ namespace kaguya {
              * @param filmPosition
              * @return
              */
-            Spectrum rayImportance(const Ray &ray, Point2d *const filmPosition) const;
+            Spectrum rayImportance(const Ray &ray, Point2F *const filmPosition) const;
 
             /**
              * 构建相机坐标系
@@ -134,22 +134,22 @@ namespace kaguya {
             // 相机高度分辨率
             int _resolutionHeight = 700;
             // 相机位置
-            Vector3d _eye;
-            Vector3d _front;
-            Vector3d _right;
-            Vector3d _up;
-            Vector3d _leftBottomCorner;
-            Vector3d _rightTopCorner;
-            Vector3d _diagonalVector;
+            Vector3F _eye;
+            Vector3F _front;
+            Vector3F _right;
+            Vector3F _up;
+            Vector3F _leftBottomCorner;
+            Vector3F _rightTopCorner;
+            Vector3F _diagonalVector;
             // 相机成像平面大小
-            double _halfWindowHeight;
-            double _halfWindowWidth;
+            Float _halfWindowHeight;
+            Float _halfWindowWidth;
             // 相机成像平面面积
-            double _area;
+            Float _area;
             // 相机光圈大小
-            double _lensRadius = 0.025;
+            Float _lensRadius = 0.025;
             // 默认焦距为 10
-            const double _focal = 10;
+            const Float _focal = 10;
             // medium
             std::shared_ptr<Medium> _medium;
         };

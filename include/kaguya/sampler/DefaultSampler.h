@@ -14,9 +14,9 @@ namespace kaguya {
         public:
             DefaultSampler(int samplePerPixel);
 
-            virtual double sample1D() override;
+            virtual Float sample1D() override;
 
-            virtual Vector2d sample2D() override;
+            virtual Vector2F sample2D() override;
 
             virtual bool nextSampleRound() override;
 
@@ -25,9 +25,9 @@ namespace kaguya {
             static Sampler *newInstance();
 
         private:
-            std::uniform_real_distribution<double> distribution;
+            std::uniform_real_distribution<Float> distribution;
             std::mt19937 generator;
-            std::function<double()> randGenerator;
+            std::function<Float()> randGenerator;
         };
     }
 }

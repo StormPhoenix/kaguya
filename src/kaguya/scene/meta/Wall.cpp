@@ -7,7 +7,7 @@
 namespace kaguya {
     namespace scene {
         namespace meta {
-            Wall::Wall(double width, double height,
+            Wall::Wall(Float width, Float height,
                        std::shared_ptr<Transform> transformMatrix)
                     : _width(width), _height(height),
                       _transformMatrix(transformMatrix),
@@ -29,49 +29,49 @@ namespace kaguya {
                 _transformedLeftTop = _transformMatrix->transformPoint(_leftTop);
                 _transformedNormal = _transformMatrix->transformNormal(_normal);
 
-                double minX = std::min(
+                Float minX = std::min(
                         std::min(std::min(_transformedLeftBottom[0], _transformedRightBottom[0]),
                                  _transformedRightTop[0]),
                         _transformedLeftTop[0]) - 0.0001;
-                double minY = std::min(
+                Float minY = std::min(
                         std::min(std::min(_transformedLeftBottom[1], _transformedRightBottom[1]),
                                  _transformedRightTop[1]),
                         _transformedLeftTop[1]) - 0.0001;
-                double minZ = std::min(
+                Float minZ = std::min(
                         std::min(std::min(_transformedLeftBottom[2], _transformedRightBottom[2]),
                                  _transformedRightTop[2]),
                         _transformedLeftTop[2]) - 0.0001;
 
-                double maxX = std::max(
+                Float maxX = std::max(
                         std::max(std::max(_transformedLeftBottom[0], _transformedRightBottom[0]),
                                  _transformedRightTop[0]),
                         _transformedLeftTop[0]) + 0.0001;
-                double maxY = std::max(
+                Float maxY = std::max(
                         std::max(std::max(_transformedLeftBottom[1], _transformedRightBottom[1]),
                                  _transformedRightTop[1]),
                         _transformedLeftTop[1]) + 0.0001;
-                double maxZ = std::max(
+                Float maxZ = std::max(
                         std::max(std::max(_transformedLeftBottom[2], _transformedRightBottom[2]),
                                  _transformedRightTop[2]),
                         _transformedLeftTop[2]) + 0.0001;
 
-                _aabb = AABB(Vector3d(minX, minY, minZ), Vector3d(maxX, maxY, maxZ));
+                _aabb = AABB(Vector3F(minX, minY, minZ), Vector3F(maxX, maxY, maxZ));
 
                 // 计算面积
-                double transformedWidth = LENGTH(_transformedRightBottom - _transformedLeftBottom);
-                double transformedHeight = LENGTH(_transformedLeftTop - _transformedLeftBottom);
+                Float transformedWidth = LENGTH(_transformedRightBottom - _transformedLeftBottom);
+                Float transformedHeight = LENGTH(_transformedLeftTop - _transformedLeftBottom);
                 _area = (transformedWidth * transformedHeight);
             }
 
             bool Wall::intersect(Ray &ray, SurfaceInteraction &si,
-                                 double minStep, double maxStep) const {
+                                 Float minStep, Float maxStep) const {
                 // 仿照三角形平面求直线交点解法
-                Vector3d transformedA = _transformMatrix->transformPoint(_leftTop);
-                Vector3d transformedB = _transformMatrix->transformPoint(_leftBottom);
-                Vector3d transformedC = _transformMatrix->transformPoint(_rightBottom);
+                Vector3F transformedA = _transformMatrix->transformPoint(_leftTop);
+                Vector3F transformedB = _transformMatrix->transformPoint(_leftBottom);
+                Vector3F transformedC = _transformMatrix->transformPoint(_rightBottom);
 
-                const Vector3d &dir = ray.getDirection();
-                const Vector3d &eye = Vector3d(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
+                const Vector3F &dir = ray.getDirection();
+                const Vector3F &eye = Vector3F(ray.getOrigin().x, ray.getOrigin().y, ray.getOrigin().z);
                 glm::mat3 equationParam(glm::vec3(transformedA - transformedB), glm::vec3(transformedA - transformedC),
                                         dir);
 
@@ -79,27 +79,28 @@ namespace kaguya {
                     return false;
                 }
 
-                Vector3d equationResult = transformedA - eye;
-                Vector3d ans = INVERSE(equationParam) * equationResult;
-                double step = ans[2];
-                double alpha = 1 - ans[0] - ans[1];
+                Vector3F equationResult = transformedA - eye;
+                Vector3F ans = INVERSE(equationParam) * equationResult;
+                Float step = ans[2];
+                Float alpha = 1 - ans[0] - ans[1];
 
                 // 检查射线范围
                 if (step < maxStep && step > minStep) {
-                    Vector3d hitPoint = ray.at(step);
-                    Vector3d modelPoint = _invTransformMatrix->transformPoint(hitPoint);
+                    Vector3F hitPoint = ray.at(step);
+                    Vector3F modelPoint = _invTransformMatrix->transformPoint(hitPoint);
 
-                    double offsetX = modelPoint.x - (-_width / 2);
-                    double offsetY = modelPoint.y - (-_height / 2);
+                    Float offsetX = modelPoint.x - (-_width / 2);
+                    Float offsetY = modelPoint.y - (-_height / 2);
 
                     // 判断是否在四边形内部
                     if (math::checkRange(offsetX, 0, _width)
                         && math::checkRange(offsetY, 0, _height)) {
-                        si.setPoint(hitPoint);
-                        Vector3d normal = _transformMatrix->transformNormal(_normal);
-                        si.setOutwardNormal(normal, dir);
-                        si.setU(offsetX / _width);
-                        si.setV(offsetY / _height);
+                        si.point = hitPoint;
+                        Vector3F normal = _transformMatrix->transformNormal(_normal);
+                        si.normal = si.rendering.normal = normal;
+                        si.direction = dir;
+                        si.u = (offsetX / _width);
+                        si.v = (offsetY / _height);
                         ray.setStep(step);
                         return true;
                     } else {
@@ -114,26 +115,26 @@ namespace kaguya {
                 return _aabb;
             }
 
-            double Wall::area() const {
+            Float Wall::area() const {
                 return _area;
             }
 
             SurfaceInteraction Wall::sampleSurfacePoint(Sampler *sampler1D) const {
                 // 随机采样坐标
-                double u = sampler1D->sample1D();
-                double v = sampler1D->sample1D();
+                Float u = sampler1D->sample1D();
+                Float v = sampler1D->sample1D();
 
-                Vector3d horizontal = (_transformedRightBottom - _transformedLeftBottom) * u;
-                Vector3d vertical = (_transformedLeftTop - _transformedLeftBottom) * v;
+                Vector3F horizontal = (_transformedRightBottom - _transformedLeftBottom) * u;
+                Vector3F vertical = (_transformedLeftTop - _transformedLeftBottom) * v;
 
                 SurfaceInteraction si;
-                si.setPoint(_transformedLeftBottom + horizontal + vertical);
-                si.setNormal(_transformedNormal);
+                si.point = (_transformedLeftBottom + horizontal + vertical);
+                si.normal = si.rendering.normal = (_transformedNormal);
                 return si;
             }
 
-            double Wall::surfacePointPdf(const SurfaceInteraction &si) const {
-                Vector3d transformedPoint = _invTransformMatrix->transformPoint(si.getPoint());
+            Float Wall::surfacePointPdf(const SurfaceInteraction &si) const {
+                Vector3F transformedPoint = _invTransformMatrix->transformPoint(si.point);
 
                 if (transformedPoint.z - 0 <= math::EPSILON &&
                     transformedPoint.x >= -_width / 2 && transformedPoint.x <= _width / 2 &&
@@ -144,7 +145,7 @@ namespace kaguya {
                 }
             }
 
-            ZXWall::ZXWall(double z0, double z1, double x0, double x1, double y, bool upward) {
+            ZXWall::ZXWall(Float z0, Float z1, Float x0, Float x1, Float y, bool upward) {
                 _y = y;
                 _z0 = z0;
                 _z1 = z1;
@@ -160,18 +161,19 @@ namespace kaguya {
             }
 
             bool ZXWall::intersect(Ray &ray, SurfaceInteraction &si,
-                                   double minStep, double maxStep) const {
-                double step = (_y - ray.getOrigin().y) / ray.getDirection().y;
+                                   Float minStep, Float maxStep) const {
+                Float step = (_y - ray.getOrigin().y) / ray.getDirection().y;
                 if (step > minStep && step < maxStep) {
-                    double z = ray.getOrigin().z + step * ray.getDirection().z;
-                    double x = ray.getOrigin().x + step * ray.getDirection().x;
+                    Float z = ray.getOrigin().z + step * ray.getDirection().z;
+                    Float x = ray.getOrigin().x + step * ray.getDirection().x;
 
                     if (math::checkRange(z, _z0, _z1) && math::checkRange(x, _x0, _x1)) {
-                        si.setPoint(ray.at(step));
+                        si.point = (ray.at(step));
                         ray.setStep(step);
-                        si.setOutwardNormal(_normal, ray.getDirection());
-                        si.setU((x - _x0) / (_x1 - _x0));
-                        si.setV((z - _z0) / (_z1 - _z0));
+                        si.normal = si.rendering.normal = _normal;
+                        si.direction = ray.getDirection();
+                        si.u = ((x - _x0) / (_x1 - _x0));
+                        si.v = ((z - _z0) / (_z1 - _z0));
                         return true;
                     } else {
                         return false;
@@ -181,27 +183,27 @@ namespace kaguya {
                 }
             }
 
-            double ZXWall::area() const {
-                double width = abs(_x1 - _x0);
-                double height = abs(_z1 - _z0);
+            Float ZXWall::area() const {
+                Float width = abs(_x1 - _x0);
+                Float height = abs(_z1 - _z0);
                 return width * height;
             }
 
             SurfaceInteraction ZXWall::sampleSurfacePoint(Sampler *sampler1D) const {
-                double u = sampler1D->sample1D();
-                double v = sampler1D->sample1D();
+                Float u = sampler1D->sample1D();
+                Float v = sampler1D->sample1D();
 
-                double width = abs(_x1 - _x0);
-                double height = abs(_z1 - _z0);
+                Float width = abs(_x1 - _x0);
+                Float height = abs(_z1 - _z0);
 
-                SurfaceInteraction interaction;
-                interaction.setPoint({_x0 + width * u, _y, _z0 + height * v});
-                interaction.setNormal(_normal);
-                return interaction;
+                SurfaceInteraction si;
+                si.point = Vector3F({_x0 + width * u, _y, _z0 + height * v});
+                si.normal = si.rendering.normal = (_normal);
+                return si;
             }
 
-            double ZXWall::surfacePointPdf(const SurfaceInteraction &si) const {
-                Vector3d samplePoint = si.getPoint();
+            Float ZXWall::surfacePointPdf(const SurfaceInteraction &si) const {
+                Vector3F samplePoint = si.point;
                 if (samplePoint.y - _y < math::EPSILON &&
                     samplePoint.x >= _x0 && samplePoint.x <= _x1 &&
                     samplePoint.z >= _z0 && samplePoint.z <= _z1) {
@@ -215,7 +217,7 @@ namespace kaguya {
                 _aabb = AABB({_x0, _y - 0.0001, _z0}, {_x1, _y + 0.0001, _z1});
             }
 
-            YZWall::YZWall(double y0, double y1, double z0, double z1, double x, bool rightward) {
+            YZWall::YZWall(Float y0, Float y1, Float z0, Float z1, Float x, bool rightward) {
                 _x = x;
                 _y0 = y0;
                 _y1 = y1;
@@ -231,18 +233,19 @@ namespace kaguya {
             }
 
             bool YZWall::intersect(Ray &ray, SurfaceInteraction &si,
-                                   double minStep, double maxStep) const {
-                double step = (_x - ray.getOrigin().x) / ray.getDirection().x;
+                                   Float minStep, Float maxStep) const {
+                Float step = (_x - ray.getOrigin().x) / ray.getDirection().x;
                 if (step > minStep && step < maxStep) {
-                    double z = ray.getOrigin().z + step * ray.getDirection().z;
-                    double y = ray.getOrigin().y + step * ray.getDirection().y;
+                    Float z = ray.getOrigin().z + step * ray.getDirection().z;
+                    Float y = ray.getOrigin().y + step * ray.getDirection().y;
 
                     if (math::checkRange(z, _z0, _z1) && math::checkRange(y, _y0, _y1)) {
-                        si.setPoint(ray.at(step));
+                        si.point = (ray.at(step));
                         ray.setStep(step);
-                        si.setOutwardNormal(_normal, ray.getDirection());
-                        si.setU((z - _z0) / (_z1 - _z0));
-                        si.setV((y - _y0) / (_y1 - _y0));
+                        si.normal = si.rendering.normal = _normal;
+                        si.direction = ray.getDirection();
+                        si.u = ((z - _z0) / (_z1 - _z0));
+                        si.v = ((y - _y0) / (_y1 - _y0));
                         return true;
                     } else {
                         return false;
@@ -256,27 +259,27 @@ namespace kaguya {
                 _aabb = AABB({_x - 0.0001, _y0, _z0}, {_x + 0.0001, _y1, _z1});
             }
 
-            double YZWall::area() const {
-                double width = abs(_z1 - _z0);
-                double height = abs(_y1 - _y0);
+            Float YZWall::area() const {
+                Float width = abs(_z1 - _z0);
+                Float height = abs(_y1 - _y0);
                 return width * height;
             }
 
             SurfaceInteraction YZWall::sampleSurfacePoint(Sampler *sampler1D) const {
-                double u = sampler1D->sample1D();
-                double v = sampler1D->sample1D();
+                Float u = sampler1D->sample1D();
+                Float v = sampler1D->sample1D();
 
-                double width = abs(_z1 - _z0);
-                double height = abs(_y1 - _y0);
+                Float width = abs(_z1 - _z0);
+                Float height = abs(_y1 - _y0);
 
-                SurfaceInteraction interaction;
-                interaction.setPoint({_x, _y0 + v * height, _z0 + width * u});
-                interaction.setNormal(_normal);
-                return interaction;
+                SurfaceInteraction si;
+                si.point = Vector3F({_x, _y0 + v * height, _z0 + width * u});
+                si.normal = si.rendering.normal = (_normal);
+                return si;
             }
 
-            double YZWall::surfacePointPdf(const SurfaceInteraction &point) const {
-                Vector3d samplePoint = point.getPoint();
+            Float YZWall::surfacePointPdf(const SurfaceInteraction &point) const {
+                Vector3F samplePoint = point.point;
                 if (samplePoint.y - _x < math::EPSILON &&
                     samplePoint.x >= _y0 && samplePoint.x <= _y1 &&
                     samplePoint.z >= _z0 && samplePoint.z <= _z1) {
@@ -286,7 +289,7 @@ namespace kaguya {
                 }
             }
 
-            XYWall::XYWall(double x0, double x1, double y0, double y1, double z, bool frontward) {
+            XYWall::XYWall(Float x0, Float x1, Float y0, Float y1, Float z, bool frontward) {
                 _z = z;
                 _x0 = x0;
                 _x1 = x1;
@@ -302,18 +305,19 @@ namespace kaguya {
             }
 
             bool XYWall::intersect(Ray &ray, SurfaceInteraction &si,
-                                   double minStep, double maxStep) const {
-                double step = (_z - ray.getOrigin().z) / ray.getDirection().z;
+                                   Float minStep, Float maxStep) const {
+                Float step = (_z - ray.getOrigin().z) / ray.getDirection().z;
                 if (step > minStep && step < maxStep) {
-                    double x = ray.getOrigin().x + step * ray.getDirection().x;
-                    double y = ray.getOrigin().y + step * ray.getDirection().y;
+                    Float x = ray.getOrigin().x + step * ray.getDirection().x;
+                    Float y = ray.getOrigin().y + step * ray.getDirection().y;
 
                     if (math::checkRange(x, _x0, _x1) && math::checkRange(y, _y0, _y1)) {
-                        si.setPoint(ray.at(step));
+                        si.point = (ray.at(step));
                         ray.setStep(step);
-                        si.setOutwardNormal(_normal, ray.getDirection());
-                        si.setU((x - _x0) / (_x1 - _x0));
-                        si.setV((y - _y0) / (_y1 - _y0));
+                        si.normal = si.rendering.normal = _normal;
+                        si.direction = ray.getDirection();
+                        si.u = ((x - _x0) / (_x1 - _x0));
+                        si.v = ((y - _y0) / (_y1 - _y0));
                         return true;
                     } else {
                         return false;
@@ -327,27 +331,27 @@ namespace kaguya {
                 _aabb = AABB({_x0, _y0, _z - 0.0001}, {_x1, _y1, _z + 0.0001});
             }
 
-            double XYWall::area() const {
-                double width = abs(_x1 - _x0);
-                double height = abs(_y1 - _y0);
+            Float XYWall::area() const {
+                Float width = abs(_x1 - _x0);
+                Float height = abs(_y1 - _y0);
                 return width * height;
             }
 
             SurfaceInteraction XYWall::sampleSurfacePoint(Sampler *sampler1D) const {
-                double u = sampler1D->sample1D();
-                double v = sampler1D->sample1D();
+                Float u = sampler1D->sample1D();
+                Float v = sampler1D->sample1D();
 
-                double width = abs(_x1 - _x0);
-                double height = abs(_y1 - _y0);
+                Float width = abs(_x1 - _x0);
+                Float height = abs(_y1 - _y0);
 
-                SurfaceInteraction interaction;
-                interaction.setPoint({_x0 + width * u, _y0 + v * height, _z});
-                interaction.setNormal(_normal);
-                return interaction;
+                SurfaceInteraction si;
+                si.point = Vector3F({_x0 + width * u, _y0 + v * height, _z });
+                si.normal = si.rendering.normal = (_normal);
+                return si;
             }
 
-            double XYWall::surfacePointPdf(const SurfaceInteraction &si) const {
-                Vector3d samplePoint = si.getPoint();
+            Float XYWall::surfacePointPdf(const SurfaceInteraction &si) const {
+                Vector3F samplePoint = si.point;
                 if (samplePoint.x - _z < math::EPSILON &&
                     samplePoint.y >= _y0 && samplePoint.x <= _y1 &&
                     samplePoint.x >= _x0 && samplePoint.z <= _x1) {

@@ -13,7 +13,7 @@ namespace kaguya {
                     _transformMatrix(transformMatrix),
                     _identity(false) {}
 
-            Vector3d Transform::transformPoint(const Vector3d &p) const {
+            Vector3F Transform::transformPoint(const Vector3F &p) const {
                 if (_identity) {
                     return p;
                 }
@@ -21,7 +21,7 @@ namespace kaguya {
                 return _transformMatrix * Vector4d(p, 1.);
             }
 
-            Vector3d Transform::transformVector(const Vector3d &v) const {
+            Vector3F Transform::transformVector(const Vector3F &v) const {
                 if (_identity) {
                     return v;
                 }
@@ -29,11 +29,11 @@ namespace kaguya {
                 return _transformMatrix * Vector4d(v, 0.);
             }
 
-            Vector3d Transform::transformNormal(const Vector3d &n) const {
+            Vector3F Transform::transformNormal(const Vector3F &n) const {
                 if (_identity) {
                     return n;
                 }
-                Vector3d ret = INVERSE_TRANSPOSE(_transformMatrix) * Vector4d(n, 0.0f);
+                Vector3F ret = INVERSE_TRANSPOSE(_transformMatrix) * Vector4d(n, 0.0f);
                 return NORMALIZE(ret);
             }
 

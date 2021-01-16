@@ -19,32 +19,32 @@ namespace kaguya {
              * @param intensity
              * @return
              */
-            static std::shared_ptr<PointLight> buildPointLight(const Vector3d &center, const Spectrum &intensity, const MediumBound mediumBoundary);
+            static std::shared_ptr<PointLight> buildPointLight(const Vector3F &center, const Spectrum &intensity, const MediumBound mediumBoundary);
 
             /**
              * 点光源
              * @param center 光源位置
              * @param intensity 光源处，单位立体角的光通量
              */
-            PointLight(const Vector3d &center, const Spectrum &intensity, const MediumBound &mediumBoundary);
+            PointLight(const Vector3F &center, const Spectrum &intensity, const MediumBound &mediumBoundary);
 
             virtual Spectrum sampleFromLight(const Interaction &eye,
-                                             Vector3d *wi, double *pdf,
+                                             Vector3F *wi, Float *pdf,
                                              Sampler *sampler1D,
                                              VisibilityTester *visibilityTester) override;
 
-            virtual double sampleFromLightPdf(const Interaction &eye, const Vector3d &dir) override;
+            virtual Float sampleFromLightPdf(const Interaction &eye, const Vector3F &dir) override;
 
-            virtual Spectrum randomLightRay(Ray *ray, Vector3d *normal, double *pdfPos, double *pdfDir,
+            virtual Spectrum randomLightRay(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
                                             Sampler *sampler1D) override;
 
-            virtual void randomLightRayPdf(const Ray &ray, const Vector3d &normal,
-                                           double *pdfPos, double *pdfDir) const override;
+            virtual void randomLightRayPdf(const Ray &ray, const Vector3F &normal,
+                                           Float *pdfPos, Float *pdfDir) const override;
 
         private:
             // 单位立体角的光强
             const Spectrum _intensity;
-            const Vector3d _center;
+            const Vector3F _center;
         };
 
     }

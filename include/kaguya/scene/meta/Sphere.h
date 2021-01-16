@@ -28,12 +28,12 @@ namespace kaguya {
                  * @param outward 是否向外
                  * @param transformMatrix 变换矩阵
                  */
-                Sphere(const Vector3d &center, double radius, bool outward = true,
+                Sphere(const Vector3F &center, Float radius, bool outward = true,
                        std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
-                bool intersect(Ray &ray, SurfaceInteraction &si, double minStep, double maxStep) const override;
+                bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const override;
 
-                virtual double area() const override {
+                virtual Float area() const override {
                     return 4 * math::PI * _radius * _radius;
                 }
 
@@ -42,7 +42,7 @@ namespace kaguya {
                 virtual SurfaceInteraction
                 sampleSurfaceInteraction(const Interaction &eye, Sampler *sampler1D) const override;
 
-                virtual double surfaceInteractionPdf(const Interaction &eye, const Vector3d &dir) const override;
+                virtual Float surfaceInteractionPdf(const Interaction &eye, const Vector3F &dir) const override;
 
 
                 virtual const AABB &bound() const override;
@@ -55,13 +55,13 @@ namespace kaguya {
                  * @param hitPoint
                  * @return
                  */
-                virtual Vector3d computeNormal(const Vector3d &hitPoint) const;
+                virtual Vector3F computeNormal(const Vector3F &hitPoint) const;
 
             private:
                 AABB _aabb;
-                Vector3d _center;
-                Vector3d _transformedCenter;
-                double _radius;
+                Vector3F _center;
+                Vector3F _transformedCenter;
+                Float _radius;
                 bool _outward;
                 std::shared_ptr<Transform> _transformMatrix = nullptr;
                 std::shared_ptr<Transform> _inverseTransformMatrix = nullptr;

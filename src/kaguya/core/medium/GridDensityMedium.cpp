@@ -14,7 +14,7 @@ namespace kaguya {
             using kaguya::core::HenyeyGreensteinFunction;
 
             GridDensityMedium::GridDensityMedium(const Spectrum &absorptionSigma, const Spectrum &scatteringSigma,
-                                                 double g, int axisXGrid, int axisYGrid, int axisZGrid,
+                                                 Float g, int axisXGrid, int axisYGrid, int axisZGrid,
                                                  float *densities, std::shared_ptr<Transform> transformMatrix) :
                     _absorptionSigma(absorptionSigma), _scatteringSigma(scatteringSigma),
                     _g(g), _gridX(axisXGrid), _gridY(axisYGrid), _gridZ(axisZGrid),
@@ -40,21 +40,21 @@ namespace kaguya {
 
             core::Spectrum GridDensityMedium::transmittance(const tracer::Ray &ray, Sampler *sampler1D) const {
                 // transform ray from world space to medium space
-                const Vector3d origin = _invTransformMatrix->transformPoint(ray.getOrigin());
-                const Vector3d dir = _invTransformMatrix->transformVector(ray.getDirection());
+                const Vector3F origin = _invTransformMatrix->transformPoint(ray.getOrigin());
+                const Vector3F dir = _invTransformMatrix->transformVector(ray.getDirection());
                 Ray transformedRay = Ray(origin, dir, ray.getMedium());
 
                 // calculate intersection
-                AABB aabb(Vector3d(0, 0, 0), Vector3d(1, 1, 1));
-                double minStep = 0, maxStep = transformedRay.getStep();
+                AABB aabb(Vector3F(0, 0, 0), Vector3F(1, 1, 1));
+                Float minStep = 0, maxStep = transformedRay.getStep();
                 bool foundIntersection = aabb.insectPoint(transformedRay, &minStep, &maxStep);
                 if (!foundIntersection) {
                     return Spectrum(1.0);
                 }
 
                 // loop for sampling step and calculate transmittance
-                double step = minStep;
-                double transmittance = 1.0;
+                Float step = minStep;
+                Float transmittance = 1.0;
                 while (true) {
                     // Sample a travel distance
                     step -= std::log(1 - sampler1D->sample1D()) / (_totalSigma * _maxDensity);
@@ -63,8 +63,8 @@ namespace kaguya {
                     if (step >= maxStep) {
                         break;
                     } else {
-                        float d = density(transformedRay.at(step));
-                        transmittance *= 1. - std::max(0., (double) d * _maxInvDensity);
+                        Float d = density(transformedRay.at(step));
+                        transmittance *= 1. - std::max(0.f, (Float) d * _maxInvDensity);
                     }
                 }
                 return Spectrum(transmittance);
@@ -74,21 +74,21 @@ namespace kaguya {
             core::Spectrum GridDensityMedium::sampleInteraction(const tracer::Ray &ray, Sampler *sampler1D,
                                                                 MediumInteraction *mi, MemoryArena &memoryArena) const {
                 // transform ray from world space to medium space
-                const Vector3d origin = _invTransformMatrix->transformPoint(ray.getOrigin());
-                const Vector3d dir = _invTransformMatrix->transformVector(ray.getDirection());
+                const Vector3F origin = _invTransformMatrix->transformPoint(ray.getOrigin());
+                const Vector3F dir = _invTransformMatrix->transformVector(ray.getDirection());
                 Ray transformedRay = Ray(origin, dir, ray.getMedium());
                 transformedRay.setStep(ray.getStep());
 
                 // calculate intersection
-                AABB aabb(Vector3d(0, 0, 0), Vector3d(1, 1, 1));
+                AABB aabb(Vector3F(0, 0, 0), Vector3F(1, 1, 1));
 
-                double minStep = 0, maxStep = transformedRay.getStep();
+                Float minStep = 0, maxStep = transformedRay.getStep();
                 bool foundIntersection = aabb.insectPoint(transformedRay, &minStep, &maxStep);
                 if (!foundIntersection) {
                     return Spectrum(1.);
                 } else {
                     // loop for sampling interaction and transmittance
-                    double step = minStep;
+                    Float step = minStep;
                     while (true) {
                         // Sample a travel distance
                         step -= std::log(1 - sampler1D->sample1D()) / (_totalSigma * _maxDensity);
@@ -99,7 +99,7 @@ namespace kaguya {
                         } else {
                             float d = density(transformedRay.at(step));
                             // Sample by probability
-                            if (std::max(0., (double) d * _maxInvDensity)
+                            if (std::max(0.f, (Float) d * _maxInvDensity)
                                 > sampler1D->sample1D()) {
                                 (*mi) = MediumInteraction(ray.at(step), -ray.getDirection(), this,
                                                           ALLOC(memoryArena, HenyeyGreensteinFunction)(_g));
@@ -110,7 +110,7 @@ namespace kaguya {
                 }
             }
 
-            float GridDensityMedium::d(const Vector3d &coord) const {
+            float GridDensityMedium::d(const Vector3F &coord) const {
                 assert(_densities != nullptr);
 
                 int x = std::floor(coord.x);
@@ -128,23 +128,23 @@ namespace kaguya {
                 return _densities[(z * _gridY + y) * _gridX + x];
             }
 
-            float GridDensityMedium::density(const Vector3d &coord) const {
-                Vector3d coordf = Vector3d(coord.x * _gridX - 0.5, coord.y * _gridY - 0.5, coord.z * _gridZ - 0.5);
-                Vector3d coordi = Vector3d(std::floor(coordf.x), std::floor(coordf.y), std::floor(coordf.z));
-                Vector3d interValue = coordf - coordi;
+            float GridDensityMedium::density(const Vector3F &coord) const {
+                Vector3F coordf = Vector3F(coord.x * _gridX - 0.5, coord.y * _gridY - 0.5, coord.z * _gridZ - 0.5);
+                Vector3F coordi = Vector3F(std::floor(coordf.x), std::floor(coordf.y), std::floor(coordf.z));
+                Vector3F interValue = coordf - coordi;
 
                 /* Interpolation for x-axis */
                 // (x, y, z) - (x + 1, y, z)
-                float x1 = math::linearInterpolation(interValue.x, d(coordi), d(coordi + Vector3d(1, 0, 0)));
+                float x1 = math::linearInterpolation(interValue.x, d(coordi), d(coordi + Vector3F(1, 0, 0)));
                 // (x, y + 1, z) - (x + 1, y + 1, z)
-                float x2 = math::linearInterpolation(interValue.x, d(coordi + Vector3d(0, 1, 0)),
-                                               d(coordi + Vector3d(1, 1, 0)));
+                float x2 = math::linearInterpolation(interValue.x, d(coordi + Vector3F(0, 1, 0)),
+                                                     d(coordi + Vector3F(1, 1, 0)));
                 // (x, y, z + 1) - (x + 1, y, z + 1)
-                float x3 = math::linearInterpolation(interValue.x, d(coordi + Vector3d(0, 0, 1)),
-                                               d(coordi + Vector3d(1, 0, 1)));
+                float x3 = math::linearInterpolation(interValue.x, d(coordi + Vector3F(0, 0, 1)),
+                                                     d(coordi + Vector3F(1, 0, 1)));
                 // (x, y + 1, z + 1) - (x + 1, y + 1, z + 1)
-                float x4 = math::linearInterpolation(interValue.x, d(coordi + Vector3d(0, 1, 1)),
-                                               d(coordi + Vector3d(1, 1, 1)));
+                float x4 = math::linearInterpolation(interValue.x, d(coordi + Vector3F(0, 1, 1)),
+                                                     d(coordi + Vector3F(1, 1, 1)));
 
                 /* Interpolation for y-axis */
                 // x1 - x2

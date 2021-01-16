@@ -62,7 +62,7 @@ namespace kaguya {
              * @param row
              * @param col
              */
-            void writeBuffer(const Vector3d &color, int row, int col);
+            void writeBuffer(const Vector3F &color, int row, int col);
 
         private:
             // 最大采样深度
@@ -72,9 +72,9 @@ namespace kaguya {
             // 开始 Russian Roulette 时机
             int _russianRouletteBounce;
             // Russian Roulette 概率
-            double _russianRoulette;
+            Float _russianRoulette;
             // 对光源采样概率
-            double _sampleLightProb = 0.2;
+            Float _sampleLightProb = 0.2;
         };
 
     }

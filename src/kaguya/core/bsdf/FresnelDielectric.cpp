@@ -7,8 +7,8 @@
 namespace kaguya {
     namespace core {
 
-        Spectrum FresnelDielectric::fresnel(double cosineTheta) {
-            return fresnelDielectric(cosineTheta, _thetaI, _thetaT);
+        Spectrum FresnelDielectric::fresnel(Float cosineTheta) {
+            return math::fresnelDielectric(cosineTheta, _thetaI, _thetaT);
         }
 
     }

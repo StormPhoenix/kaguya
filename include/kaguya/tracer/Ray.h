@@ -28,12 +28,12 @@ namespace kaguya {
              * @param origin 射线起点
              * @param direction 射线方向
              */
-            Ray(const Vector3d &origin, const Vector3d &direction,
+            Ray(const Vector3F &origin, const Vector3F &direction,
                 const Medium *medium = nullptr);
 
-            const Vector3d &getDirection() const;
+            const Vector3F &getDirection() const;
 
-            const Vector3d &getOrigin() const;
+            const Vector3F &getOrigin() const;
 
             const void setMedium(Medium *medium);
 
@@ -41,23 +41,23 @@ namespace kaguya {
                 return _medium;
             }
 
-            double getMinStep() const {
+            Float getMinStep() const {
                 return _minStep;
             }
 
-            double getStep() const {
+            Float getStep() const {
                 return _step;
             }
 
-            void setStep(double step);
+            void setStep(Float step);
 
-            const Vector3d at(double step) const;
+            const Vector3F at(Float step) const;
 
         private:
-            Vector3d _origin;
-            Vector3d _direction;
-            double _minStep;
-            double _step;
+            Vector3F _origin;
+            Vector3F _direction;
+            Float _minStep;
+            Float _step;
             const Medium *_medium;
         };
 

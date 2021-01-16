@@ -30,13 +30,13 @@ namespace kaguya {
             // 路径点类型
             PathVertexType type;
             // 路径点位置
-            Vector3d point;
+            Vector3F point;
             // 路径点法向位置，只针对 Surface 类型有效
-            Vector3d normal;
+            Vector3F normal;
             // 当前点的概率密度，从上一个点发射射线选取
-            double pdfForward = 0;
+            Float pdfForward = 0;
             // 当前点的概率密度，从下一个点发射射线选取
-            double pdfBackward = 0;
+            Float pdfBackward = 0;
             // 当前点的前后传输射线是否是 delta 分布
             bool isDelta = false;
             // 交互点
@@ -47,13 +47,13 @@ namespace kaguya {
             PathVertex() {}
 
             PathVertex(const SurfaceInteraction &si, const Spectrum &beta) :
-                    si(si), beta(beta), point(si.getPoint()), normal(si.getNormal()), type(PathVertexType::SURFACE) {}
+                    si(si), beta(beta), point(si.point), normal(si.normal), type(PathVertexType::SURFACE) {}
 
             PathVertex(const MediumInteraction &mi, const Spectrum &beta) :
-                    mi(mi), beta(beta), point(mi.getPoint()), type(PathVertexType::MEDIUM) {}
+                    mi(mi), beta(beta), point(mi.point), type(PathVertexType::MEDIUM) {}
 
             PathVertex(PathVertexType type, const StartEndInteraction &ei, const Spectrum &beta) :
-                    type(type), ei(ei), point(ei.getPoint()), normal(ei.getNormal()), beta(beta) {
+                    type(type), ei(ei), point(ei.point), normal(ei.normal), beta(beta) {
             }
 
             /**
@@ -77,7 +77,7 @@ namespace kaguya {
              * @param next 下一个点
              * @return
              */
-            double convertDensity(double pdfWi, const PathVertex &next) const;
+            Float convertDensity(Float pdfWi, const PathVertex &next) const;
 
             /**
              * 计算 pre -> p -> next 的 density pdf，这个 ，density pdf 是 next 的。
@@ -88,7 +88,7 @@ namespace kaguya {
              * @param next
              * @return
              */
-            double density(const PathVertex *pre, const PathVertex &next) const;
+            Float density(const PathVertex *pre, const PathVertex &next) const;
 
             /**
              * 计算 p -> next 的 density pdf（密度 pdf），这个 density pdf 是 next 的 density pdf，
@@ -97,14 +97,14 @@ namespace kaguya {
              * @param next
              * @return
              */
-            double densityByLight(const PathVertex &next) const;
+            Float densityByLight(const PathVertex &next) const;
 
             /**
              * 当前 PathVertex 作为发光体的时候，计算这个发光体上的发光点的 density pdf
              * @param next
              * @return
              */
-            double densityLightOrigin(const PathVertex &next) const;
+            Float densityLightOrigin(const PathVertex &next) const;
 
             const Interaction getInteraction() const;
 
@@ -126,7 +126,7 @@ namespace kaguya {
              * @param eye
              * @return
              */
-            Spectrum emit(const Vector3d &eye) const;
+            Spectrum emit(const Vector3F &eye) const;
 
             static inline PathVertex createCameraVertex(const Camera *camera, const Ray &ray, Spectrum beta) {
                 StartEndInteraction ei = StartEndInteraction(camera, ray);
@@ -135,15 +135,15 @@ namespace kaguya {
                 return cameraVertex;
             }
 
-            static inline PathVertex createMediumVertex(const MediumInteraction &mi, double forwardDensity,
+            static inline PathVertex createMediumVertex(const MediumInteraction &mi, Float forwardDensity,
                                                         const PathVertex &preVertex, const Spectrum &beta) {
                 PathVertex vertex = PathVertex(mi, beta);
                 vertex.pdfForward = preVertex.convertDensity(forwardDensity, vertex);
                 return vertex;
             }
 
-            static inline PathVertex createLightVertex(const Light *light, const Vector3d &p, const Vector3d &dir,
-                                                       const Vector3d &n, const Spectrum &intensity, double pdf) {
+            static inline PathVertex createLightVertex(const Light *light, const Vector3F &p, const Vector3F &dir,
+                                                       const Vector3F &n, const Spectrum &intensity, Float pdf) {
                 StartEndInteraction ei = StartEndInteraction(light, p, dir, n);
                 PathVertex pathVertex = PathVertex(PathVertexType::LIGHT, ei, intensity);
                 pathVertex.pdfForward = pdf;
@@ -156,7 +156,7 @@ namespace kaguya {
             }
 
             static inline PathVertex createSurfaceVertex(const SurfaceInteraction &si,
-                                                         double pdfPreWi,
+                                                         Float pdfPreWi,
                                                          const PathVertex &pre,
                                                          const Spectrum &beta) {
                 // 创建路径点

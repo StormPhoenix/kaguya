@@ -15,14 +15,14 @@ namespace kaguya {
         using kaguya::core::BXDFType;
 
         Spectrum PathVertex::f(const PathVertex &next) const {
-            Vector3d worldWi = NORMALIZE(next.point - point);
+            Vector3F worldWi = NORMALIZE(next.point - point);
             switch (type) {
                 case SURFACE:
                     assert(si.getBSDF() != nullptr);
-                    return si.getBSDF()->f(-si.getDirection(), worldWi);
+                    return si.getBSDF()->f(-si.direction, worldWi);
                 case MEDIUM:
                     assert(mi.getPhaseFunction() != nullptr);
-                    return mi.getPhaseFunction()->scatterPdf(-mi.getDirection(), worldWi);
+                    return mi.getPhaseFunction()->scatterPdf(-mi.direction, worldWi);
                 case CAMERA:
                 case LIGHT:
                 default:
@@ -40,12 +40,12 @@ namespace kaguya {
                     (type == PathVertexType::SURFACE && si.getAreaLight() != nullptr));
         }
 
-        Spectrum PathVertex::emit(const Vector3d &eye) const {
+        Spectrum PathVertex::emit(const Vector3F &eye) const {
             if (!isLight()) {
                 return Spectrum(0.0);
             }
             // 计算射向 eye 的方向
-            Vector3d dirToEye = eye - point;
+            Vector3F dirToEye = eye - point;
             if (LENGTH(dirToEye) == 0) {
                 return Spectrum(0.0);
             }
@@ -75,16 +75,16 @@ namespace kaguya {
             }
         }
 
-        double PathVertex::convertDensity(double pdfWi, const PathVertex &next) const {
-            double distSquare = std::pow(LENGTH(point - next.point), 2);
+        Float PathVertex::convertDensity(Float pdfWi, const PathVertex &next) const {
+            Float distSquare = std::pow(LENGTH(point - next.point), 2);
             if (distSquare == 0) {
                 return 0;
             }
 
-            double pdfFwd = pdfWi / distSquare;
+            Float pdfFwd = pdfWi / distSquare;
             if (next.type == PathVertexType::SURFACE) {
-                Vector3d surfaceNormal = next.si.getNormal();
-                Vector3d dirToPre = -next.si.getDirection();
+                Vector3F surfaceNormal = next.si.normal;
+                Vector3F dirToPre = -next.si.direction;
                 pdfFwd *= ABS_DOT(surfaceNormal, dirToPre);
             }
             return pdfFwd;
@@ -110,20 +110,20 @@ namespace kaguya {
             }
         }
 
-        double PathVertex::density(const PathVertex *pre, const PathVertex &next) const {
+        Float PathVertex::density(const PathVertex *pre, const PathVertex &next) const {
             if (type == LIGHT) {
                 return densityByLight(next);
             }
 
             // 计算 wi
-            Vector3d wi = next.point - point;
+            Vector3F wi = next.point - point;
             if (LENGTH(wi) == 0) {
                 return 0;
             }
             wi = NORMALIZE(wi);
 
             // 计算 wo
-            Vector3d wo;
+            Vector3F wo;
             if (pre != nullptr) {
                 wo = pre->point - point;
                 if (LENGTH(wo) == 0) {
@@ -136,10 +136,10 @@ namespace kaguya {
             }
 
             // 计算从当前点射向 next 点的 pdf
-            double pdf = 0;
+            Float pdf = 0;
             if (type == CAMERA) {
-                double pdfPos = 0;
-                Ray cameraRay = Ray(ei.getPoint(), ei.getDirection());
+                Float pdfPos = 0;
+                Ray cameraRay = Ray(ei.point, ei.direction);
                 ei.camera->rayImportance(cameraRay, pdfPos, pdf);
             } else if (type == SURFACE) {
                 pdf = si.getBSDF()->samplePdf(wo, wi);
@@ -155,18 +155,18 @@ namespace kaguya {
             return convertDensity(pdf, next);
         }
 
-        double PathVertex::densityByLight(const PathVertex &next) const {
+        Float PathVertex::densityByLight(const PathVertex &next) const {
             // 获取当前 PathVertex 保存的 light 和 areaLight
             const Light *light = (type == LIGHT) ? ei.light : si.getAreaLight();
             assert(light != nullptr);
 
-            Vector3d dirToNext = next.point - point;
-            double distSquare = std::pow(LENGTH(dirToNext), 2);
+            Vector3F dirToNext = next.point - point;
+            Float distSquare = std::pow(LENGTH(dirToNext), 2);
             dirToNext = NORMALIZE(dirToNext);
 
             Ray ray = Ray(point, NORMALIZE(next.point - point));
-            double pdfPos = 0;
-            double pdfDir = 0;
+            Float pdfPos = 0;
+            Float pdfDir = 0;
             // 计算光源采样的 pdf
             light->randomLightRayPdf(ray, normal, &pdfPos, &pdfDir);
 
@@ -179,8 +179,8 @@ namespace kaguya {
             return pdfDir;
         }
 
-        double PathVertex::densityLightOrigin(const PathVertex &next) const {
-            Vector3d dirToNext = next.point - point;
+        Float PathVertex::densityLightOrigin(const PathVertex &next) const {
+            Vector3F dirToNext = next.point - point;
             dirToNext = NORMALIZE(dirToNext);
 
             const Light *light = (type == LIGHT) ? ei.light : si.getAreaLight();
@@ -189,8 +189,8 @@ namespace kaguya {
             // TODO 只考虑一个光源的情况，如果有多光源，则计算 pdf 时候要考虑到对不同光源采样的概率
 
             Ray ray = Ray(point, dirToNext);
-            double pdfPos = 0;
-            double pdfDir = 0;
+            Float pdfPos = 0;
+            Float pdfDir = 0;
             light->randomLightRayPdf(ray, normal, &pdfPos, &pdfDir);
             return pdfPos;
         }

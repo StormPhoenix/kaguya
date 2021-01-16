@@ -20,13 +20,13 @@ namespace kaguya {
                              const MediumBound &mediumBoundary,
                              bool singleSide = true);
 
-            Spectrum lightRadiance(const Interaction &interaction, const Vector3d &wo) const override;
+            Spectrum lightRadiance(const Interaction &interaction, const Vector3F &wo) const override;
 
-            virtual Spectrum randomLightRay(Ray *ray, Vector3d *normal, double *pdfPos, double *pdfDir,
+            virtual Spectrum randomLightRay(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
                                             Sampler *sampler1D) override;
 
-            virtual void randomLightRayPdf(const Ray &ray, const Vector3d &normal,
-                                           double *pdfPos, double *pdfDir) const override;
+            virtual void randomLightRayPdf(const Ray &ray, const Vector3F &normal,
+                                           Float *pdfPos, Float *pdfDir) const override;
 
         public:
             // 构造漫反射区域灯光

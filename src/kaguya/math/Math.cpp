@@ -7,8 +7,7 @@
 
 namespace kaguya {
     namespace math {
-
-        double randomDouble(double min, double max, Sampler *const sampler1D) {
+        Float randomDouble(Float min, Float max, Sampler *const sampler1D) {
             return min + (max - min) * sampler1D->sample1D();
         }
 
@@ -30,82 +29,82 @@ namespace kaguya {
                 }
             } DRand48;
 
-            Vector3d hemiCosineSampling(Sampler *const sampler) {
-                Vector2d sample = sampler->sample2D();
+            Vector3F hemiCosineSampling(Sampler *const sampler) {
+                Vector2F sample = sampler->sample2D();
                 // fi = 2 * Pi * sampleU
-                double sampleU = sample.x;
+                Float sampleU = sample.x;
                 // sampleV = sin^2(theta)
-                double sampleV = sample.y;
+                Float sampleV = sample.y;
                 // x = sin(theta) * cos(fi)
-                double x = sqrt(sampleV) * cos(2 * PI * sampleU);
+                Float x = sqrt(sampleV) * cos(2 * PI * sampleU);
                 // y = cos(theta)
-                double y = sqrt(1 - sampleV);
+                Float y = sqrt(1 - sampleV);
                 // z = sin(theta) * sin(fi)
-                double z = sqrt(sampleV) * sin(2 * PI * sampleU);
-                return NORMALIZE(Vector3d(x, y, z));
+                Float z = sqrt(sampleV) * sin(2 * PI * sampleU);
+                return NORMALIZE(Vector3F(x, y, z));
             }
 
-            Vector3d sphereUniformSampling(Sampler *sampler) {
-                Vector2d sample = sampler->sample2D();
+            Vector3F sphereUniformSampling(Sampler *sampler) {
+                Vector2F sample = sampler->sample2D();
                 // fi = 2 * Pi * sampleU
-                double sampleU = sample.x;
+                Float sampleU = sample.x;
                 // 2 * sampleV = 1 - cos(theta)
-                double sampleV = sample.y;
+                Float sampleV = sample.y;
 
                 // y = 1 - 2 * sampleV
-                double y = 1 - 2 * sampleV;
+                Float y = 1 - 2 * sampleV;
                 // x = sin(theta) * cos(phi)
-                double x = std::sqrt(std::max(0.0, (1 - y * y))) * std::cos(2 * PI * sampleU);
+                Float x = std::sqrt(std::max(0.0f, (1 - y * y))) * std::cos(2 * PI * sampleU);
                 // z = sin(theta) * sin(phi)
-                double z = std::sqrt(std::max(0.0, (1 - y * y))) * std::sin(2 * PI * sampleU);
+                Float z = std::sqrt(std::max(0.0f, (1 - y * y))) * std::sin(2 * PI * sampleU);
 
-                return NORMALIZE(Vector3d(x, y, z));
+                return NORMALIZE(Vector3F(x, y, z));
             }
 
-            Vector2d diskUniformSampling(Sampler *const sampler1D, double radius) {
+            Vector2F diskUniformSampling(Sampler *const sampler1D, Float radius) {
                 // sampleY = r / Radius
                 // sampleX = theta / (2 * PI)
-                double sampleY = sampler1D->sample1D();
-                double sampleX = sampler1D->sample1D();
+                Float sampleY = sampler1D->sample1D();
+                Float sampleX = sampler1D->sample1D();
 
-                double theta = 2 * PI * sampleX;
-                double r = sampleY * radius;
+                Float theta = 2 * PI * sampleX;
+                Float r = sampleY * radius;
 
-                return Vector2d(r * std::cos(theta), r * std::sin(theta));
+                return Vector2F(r * std::cos(theta), r * std::sin(theta));
             }
 
-            Vector2d triangleUniformSampling(Sampler *sampler) {
-                Vector2d sample = sampler->sample2D();
-                double sampleU = sample.x;
-                double sampleV = sample.y;
+            Vector2F triangleUniformSampling(Sampler *sampler) {
+                Vector2F sample = sampler->sample2D();
+                Float sampleU = sample.x;
+                Float sampleV = sample.y;
 
-                double u = 1 - std::sqrt(sampleU);
-                double v = sampleV * sqrt(sampleU);
-                return Vector2d(u, v);
+                Float u = 1 - std::sqrt(sampleU);
+                Float v = sampleV * sqrt(sampleU);
+                return Vector2F(u, v);
             }
 
-            Vector3d coneUniformSampling(double cosThetaMax, Sampler *sampler) {
-                Vector2d sample = sampler->sample2D();
+            Vector3F coneUniformSampling(Float cosThetaMax, Sampler *sampler) {
+                Vector2F sample = sampler->sample2D();
                 // phi = 2 * PI * sampleU
-                double sampleU = sample.x;
+                Float sampleU = sample.x;
                 // sampleV = (1 - cos(theta)) / (1 - cos(thetaMax))
-                double sampleV = sample.y;
+                Float sampleV = sample.y;
 
                 // 计算 cos(theta) sin(theta)
-                double cosTheta = 1.0 - sampleV + sampleV * cosThetaMax;
-                double sinTheta = std::sqrt(std::max(0.0, 1 - cosTheta * cosTheta));
+                Float cosTheta = 1.0 - sampleV + sampleV * cosThetaMax;
+                Float sinTheta = std::sqrt(std::max(0.0f, 1 - cosTheta * cosTheta));
                 // 计算 cos(phi) sin(phi)
-                double cosPhi = std::cos(2 * PI * sampleU);
-                double sinPhi = std::sin(2 * PI * sampleU);
+                Float cosPhi = std::cos(2 * PI * sampleU);
+                Float sinPhi = std::sin(2 * PI * sampleU);
 
                 // y = cos(theta)
-                double y = cosTheta;
+                Float y = cosTheta;
                 // x = sin(theta) * cos(phi)
-                double x = sinTheta * cosPhi;
+                Float x = sinTheta * cosPhi;
                 // z = sin(theta) * sin(phi)
-                double z = sinTheta * sinPhi;
+                Float z = sinTheta * sinPhi;
 
-                return NORMALIZE(Vector3d(x, y, z));
+                return NORMALIZE(Vector3F(x, y, z));
             }
 
             namespace low_discrepancy {
@@ -410,10 +409,10 @@ namespace kaguya {
                 };
 
                 template<int base>
-                double scrambledRadicalReverseSpecialized(uint64_t n, uint16_t *perm) {
-                    const double invBase = 1.0 / base;
+                Float scrambledRadicalReverseSpecialized(uint64_t n, uint16_t *perm) {
+                    const Float invBase = 1.0 / base;
                     uint64_t reverse = 0;
-                    double inv = 1;
+                    Float inv = 1;
                     while (n != 0) {
                         uint64_t next = n / base;
                         uint64_t rest = n - next * base;
@@ -424,7 +423,7 @@ namespace kaguya {
                     return reverse * inv;
                 }
 
-                double scrambledRadicalReverse(const int dimension, uint64_t n, uint16_t *perm) {
+                Float scrambledRadicalReverse(const int dimension, uint64_t n, uint16_t *perm) {
                     if (dimension == 0) {
                         return radicalReverse(n);
                     } else {
@@ -951,14 +950,14 @@ namespace kaguya {
                 }
 
                 // TODO delete template specialized
-                double radicalReverse(const int dimension, uint64_t n) {
+                Float radicalReverse(const int dimension, uint64_t n) {
                     if (dimension == 0) {
                         return radicalReverse(n);
                     } else {
                         const int base = primes[dimension];
-                        const double invBase = 1.0 / base;
+                        const Float invBase = 1.0 / base;
                         uint64_t reverse = 0;
-                        double inv = 1;
+                        Float inv = 1;
                         while (n != 0) {
                             uint64_t next = n / base;
                             uint64_t rest = n - next * base;
@@ -985,7 +984,7 @@ namespace kaguya {
                     return (left << 32) | right;
                 }
 
-                double radicalReverse(uint64_t n) {
+                Float radicalReverse(uint64_t n) {
                     uint64_t rev64 = reverseBit64(n);
                     return rev64 * 0x1p-64;
                 }

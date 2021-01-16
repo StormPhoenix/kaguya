@@ -39,8 +39,8 @@ namespace kaguya {
         using kaguya::material::Material;
         using kaguya::memory::MemoryArena;
 
-        inline Vector3d offsetOrigin(const Vector3d &origin, const Vector3d &error,
-                                     const Vector3d &normal, const Vector3d &direction);
+        inline Vector3F offsetOrigin(const Vector3F &origin, const Vector3F &error,
+                                     const Vector3F &normal, const Vector3F &direction);
 
 
         /**
@@ -50,7 +50,7 @@ namespace kaguya {
         public:
             Interaction() : _mediumBoundary(nullptr, nullptr) {}
 
-            Interaction(const Vector3d &point, const Vector3d &direction, const Vector3d &normal,
+            Interaction(const Vector3F &point, const Vector3F &direction, const Vector3F &normal,
                         const MediumBound &mediumBoundary, Material *material = nullptr);
 
             /**
@@ -65,9 +65,9 @@ namespace kaguya {
              * Generate ray alone @param dir from origin
              * @param dir
              */
-            virtual Ray sendRay(const Vector3d &dir) const;
+            virtual Ray sendRay(const Vector3F &dir) const;
 
-            virtual Ray sendRayTo(const Point3d &target) const;
+            virtual Ray sendRayTo(const Point3F &target) const;
 
             virtual Ray sendRayTo(const Interaction &it) const;
 
@@ -83,57 +83,34 @@ namespace kaguya {
                 _material = nullptr;
             }
 
-            const Medium *getMedium(const Vector3d &dir) const;
+            const Medium *getMedium(const Vector3F &dir) const;
 
-        protected:
+        public:
+            // Shading data
+            struct {
+                Normal3F normal;
+            } rendering;
             // 发生 Interaction 的光线的方向
-            Vector3d _direction;
+            Vector3F direction;
             // 击中点
-            Vector3d _point;
+            Vector3F point;
             // 击中点法线方向，发现永远指向物体表面外侧
-            Vector3d _normal = Vector3d(0., 0., 0.);
+            Vector3F normal = Vector3F(0., 0., 0.);
+            // Error range
+            Vector3F error = Vector3F(0., 0., 0.);
+        protected:
             // 击中材质种类
             Material *_material = nullptr;
             // medium boundary
             MediumBound _mediumBoundary;
-            // Error range
-            Vector3d _error = Vector3d(0., 0., 0.);
 
         public:
-            const Vector3d getDirection() const {
-                return _direction;
-            }
-
-            const Vector3d getPoint() const {
-                return _point;
-            }
-
-            const Vector3d getNormal() const {
-                return _normal;
-            }
-
-            const Vector3d getError() const {
-                return _error;
-            }
-
-            void setNormal(const Vector3d &normal) {
-                _normal = normal;
-            }
-
             const Material *getMaterial() const {
                 return _material;
             }
 
             void setMaterial(Material *material) {
                 _material = material;
-            }
-
-            void setPoint(const Vector3d &point) {
-                _point = point;
-            }
-
-            void setError(const Vector3d &error) {
-                _error = error;
             }
         };
 
@@ -144,22 +121,11 @@ namespace kaguya {
         public:
             SurfaceInteraction() : Interaction() {}
 
-            SurfaceInteraction(const Vector3d &point, const Vector3d &direction, const Vector3d &normal,
-                               MediumBound &mediumBoundary, double u = 0, double v = 0,
+            SurfaceInteraction(const Vector3F &point, const Vector3F &direction, const Vector3F &normal,
+                               MediumBound &mediumBoundary, Float u = 0, Float v = 0,
                                Material *material = nullptr);
 
             BSDF *buildBSDF(MemoryArena &memoryArena, TransportMode mode = TransportMode::RADIANCE);
-
-            /**
-             * TODO delete
-             * 设置击中位置处的法线
-             * @param outwardNormal
-             * @param hitDirection
-             */
-            void setOutwardNormal(const Vector3d &outwardNormal, const Vector3d &hitDirection) {
-                _direction = hitDirection;
-                _normal = outwardNormal;
-            }
 
             virtual void reset() override {
                 Interaction::reset();
@@ -167,10 +133,10 @@ namespace kaguya {
                 _areaLight = nullptr;
             }
 
-        protected:
             // 击中点纹理坐标
-            double _u;
-            double _v;
+            Float u, v;
+
+        protected:
             // 击中点处的 BSDF
             BSDF *_bsdf = nullptr;
             // 如果被击中物体是 AreaLight，则这一项应该被赋值
@@ -185,26 +151,6 @@ namespace kaguya {
 
             const Intersectable *getGeometry() const {
                 return _geometry;
-            }
-
-            void setDirection(const Vector3d &direction) {
-                _direction = direction;
-            }
-
-            const double getU() {
-                return _u;
-            }
-
-            void setU(double u) {
-                _u = u;
-            }
-
-            const double getV() {
-                return _v;
-            }
-
-            void setV(double v) {
-                _v = v;
             }
 
             const AreaLight *getAreaLight() const {
@@ -230,7 +176,7 @@ namespace kaguya {
         public:
             MediumInteraction() : Interaction(), _phase(nullptr) {}
 
-            MediumInteraction(const Vector3d &point, const Vector3d &direction,
+            MediumInteraction(const Vector3F &point, const Vector3F &direction,
                               const Medium *medium, const PhaseFunction *phase);
 
             bool isValid() const;
@@ -268,8 +214,8 @@ namespace kaguya {
              * @param dir 入射方向
              * @param n 击中点法线
              */
-            StartEndInteraction(const Light *light, const Vector3d &p, const Vector3d &dir,
-                                const Vector3d &n);
+            StartEndInteraction(const Light *light, const Vector3F &p, const Vector3F &dir,
+                                const Vector3F &n);
 
         };
     }

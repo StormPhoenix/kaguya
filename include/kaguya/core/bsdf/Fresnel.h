@@ -18,51 +18,19 @@ namespace kaguya {
              * @param cosineTheta 入射角余弦值
              * @return
              */
-            virtual Spectrum fresnel(double cosineTheta) = 0;
+            virtual Spectrum fresnel(Float cosineTheta) = 0;
 
             virtual ~Fresnel() {};
         };
 
-        /**
-         * 计算非导体（玻璃、水晶等）的反射概率
-         * @param cosineI 值的正负用于表示内部、外部射入
-         * @param thetaI
-         * @param thetaT
-         * @return
-         */
-        inline double fresnelDielectric(double cosineI, double thetaI, double thetaT) {
-            cosineI = math::clamp(cosineI, -1, 1);
-            if (cosineI < 0) {
-                // 内部射入
-                cosineI = std::abs(cosineI);
-                std::swap(thetaI, thetaT);
-            }
-
-            double sineI = std::sqrt(std::max(0.0, 1 - std::pow(cosineI, 2)));
-            double sineT = sineI * (thetaI / thetaT);
-
-            if (sineT >= 1) {
-                // 全反射
-                return 1.0f;
-            }
-
-            double cosineT = std::sqrt(std::max(0.0, (1 - std::pow(sineT, 2))));
-            // 计算 R_parallel
-            double parallelR = ((thetaT * cosineI) - (thetaI * cosineT)) /
-                               ((thetaT * cosineI) + (thetaI * cosineT));
-            double perpendicularR = ((thetaI * cosineI) - (thetaT * cosineT)) /
-                                    ((thetaI * cosineI) + (thetaT * cosineT));
-            return 0.5 * (parallelR * parallelR + perpendicularR * perpendicularR);
-        }
-
-        inline Spectrum fresnelConductor(double cosineI, const Spectrum &thetaI,
+        inline Spectrum fresnelConductor(Float cosineI, const Spectrum &thetaI,
                                          const Spectrum &thetaT, const Spectrum &k) {
             cosineI = math::clamp(cosineI, -1, 1);
             Spectrum theta = thetaT / thetaI;
             Spectrum thetaK = k / thetaI;
 
-            double cosine2 = cosineI * cosineI;
-            double sine2 = 1 - sine2;
+            Float cosine2 = cosineI * cosineI;
+            Float sine2 = 1 - sine2;
 
             Spectrum theta2 = theta * theta;
             Spectrum thetaK2 = thetaK * thetaK;

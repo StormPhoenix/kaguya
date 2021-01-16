@@ -21,7 +21,7 @@ namespace kaguya {
 
             void addSpectrum(const Spectrum &spectrum, int row, int col);
 
-            double getSpectrum(int row, int col, int channel) const;
+            Float getSpectrum(int row, int col, int channel) const;
 
             void writeImage(char const *filename) const;
 
@@ -31,7 +31,7 @@ namespace kaguya {
             int _resolutionWidth = 0;
             int _resolutionHeight = 0;
             int _channel = 0;
-            double *_bitmap = nullptr;
+            Float *_bitmap = nullptr;
             std::mutex writeLock;
         };
 

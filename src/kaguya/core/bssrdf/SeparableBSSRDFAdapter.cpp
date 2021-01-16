@@ -13,7 +13,7 @@ namespace kaguya {
             assert(_bssrdf != nullptr);
         }
 
-        Spectrum SeparableBSSRDFAdapter::f(const Vector3d &wo, const Vector3d &wi) const {
+        Spectrum SeparableBSSRDFAdapter::f(const Vector3F &wo, const Vector3F &wi) const {
             // TODO check radiance transport mode
             return _bssrdf->subsurfaceWi(wi);
         }

@@ -19,7 +19,7 @@ namespace kaguya {
         public:
             Metal();
 
-            Metal(const Spectrum &albedo, double fuzzy = 0);
+            Metal(const Spectrum &albedo, Float fuzzy = 0);
 
             virtual bool isSpecular() const override;
 
@@ -30,7 +30,7 @@ namespace kaguya {
             // 反射率
             Spectrum _albedo;
             // 毛玻璃效果系数
-            double _fuzzy;
+            Float _fuzzy;
         };
 
     }
