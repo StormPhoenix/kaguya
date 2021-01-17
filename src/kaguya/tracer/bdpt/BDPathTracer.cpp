@@ -37,7 +37,7 @@ namespace kaguya {
                     auto v = (row + sampler->sample1D()) / Float(_camera->getResolutionHeight());
 
                     Ray sampleRay = _camera->sendRay(u, v);
-                    Spectrum shaderColor = shader(sampleRay, *(_scene.get()), _maxDepth, sampler, arena);
+                    Spectrum shaderColor = shader(sampleRay, _scene, _maxDepth, sampler, arena);
 
                     ans += shaderColor;
                     arena.clean();
@@ -57,7 +57,7 @@ namespace kaguya {
             _russianRoulette = Config::russianRoulette;
         }
 
-        Spectrum BDPathTracer::connectPath(Scene &scene,
+        Spectrum BDPathTracer::connectPath(std::shared_ptr<Scene> scene,
                                            PathVertex *cameraSubPath, int cameraPathLength, int t,
                                            PathVertex *lightSubPath, int lightPathLength, int s,
                                            Point2F *samplePosition, Sampler *sampler1D) {
@@ -118,8 +118,12 @@ namespace kaguya {
                 // 由于 lightSubPath 没有任何点参与路径构建，所以我们重新采样一个光源点，加到 cameraSubPath 上
                 PathVertex &pt = cameraSubPath[t - 1];
                 if (pt.isConnectible()) {
-                    // TODO 默认只有一个光源，我们只对这个光源采样
-                    std::shared_ptr<Light> light = scene.getLight();
+                    Float lightPdf = 0;
+                    auto light = uniformSampleLight(scene, &lightPdf, sampler1D);
+                    if (light == nullptr) {
+                        return 0;
+                    }
+
                     Vector3F worldWi;
                     // 光源采样处的 pdf（这里指 pt 点的入射角 wi 的 pdf)
                     Float sampleLightPdf;
@@ -135,7 +139,7 @@ namespace kaguya {
                     } else {
                         // 构建一个新 StartEndInteraction，用于保存路径点上的光源
                         StartEndInteraction ei = StartEndInteraction(light.get(), visibilityTester.getEnd());
-                        Spectrum L = (sampleIntensity / sampleLightPdf);
+                        Spectrum L = (sampleIntensity / (sampleLightPdf * lightPdf));
                         // 由于对光源采样位置是一个新点，所以要重新创建 PathVertex
                         extraVertex = PathVertex::createLightVertex(ei, L);
                         // 计算 pdfForward
@@ -192,8 +196,12 @@ namespace kaguya {
                                             Sampler *sampler1D,
                                             MemoryArena &memoryArena) {
             assert(lightSubPath != nullptr);
-            // TODO 默认只有一个 light
-            std::shared_ptr<Light> light = scene->getLight();
+
+            Float lightPdf = 0;
+            auto light = uniformSampleLight(scene, &lightPdf, sampler1D);
+            if (light == nullptr) {
+                return 0;
+            }
 
             // 光源位置采样概率
             Float pdfPos = 0;
@@ -210,9 +218,9 @@ namespace kaguya {
             // TODO 没有考虑多光源情况
             lightSubPath[0] = PathVertex::createLightVertex(light.get(), scatterRay.getOrigin(),
                                                             scatterRay.getDirection(), lightNormal, intensity,
-                                                            pdfPos);
+                                                            pdfPos * lightPdf);
 
-            Spectrum beta = intensity * std::abs(DOT(scatterRay.getDirection(), lightNormal)) / (pdfPos * pdfDir);
+            Spectrum beta = intensity * std::abs(DOT(scatterRay.getDirection(), lightNormal)) / (pdfPos * pdfDir * lightPdf);
 
             return randomWalk(scene, scatterRay, lightSubPath, maxDepth, pdfDir,
                               sampler1D, memoryArena, beta, TransportMode::IMPORTANCE);
@@ -437,11 +445,11 @@ namespace kaguya {
             }
 
             VisibilityTester visibilityTester = VisibilityTester(pre.getInteraction(), next.getInteraction());
-            return cosPre * cosNext / std::pow(dist, 2) * visibilityTester.transmittance(*_scene, sampler1D);
+            return cosPre * cosNext / std::pow(dist, 2) * visibilityTester.transmittance(_scene, sampler1D);
         }
 
 
-        Spectrum BDPathTracer::shader(const Ray &ray, Scene &scene, int maxDepth,
+        Spectrum BDPathTracer::shader(const Ray &ray, std::shared_ptr<Scene> scene, int maxDepth,
                                       Sampler *sampler1D, MemoryArena &memoryArena) {
             // 创建临时变量用于存储 camera、light 路径
             PathVertex *cameraSubPath = memoryArena.alloc<PathVertex>(maxDepth + 1, false);

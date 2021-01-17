@@ -22,7 +22,7 @@ namespace kaguya {
                                   Float *densities,
                                   std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
-                virtual core::Spectrum transmittance(const tracer::Ray &ray, Sampler *sampler1D) const override;
+                virtual core::Spectrum transmittance(const Ray &ray, Sampler *sampler1D) const override;
 
                 virtual core::Spectrum sampleInteraction(const tracer::Ray &ray,
                                                          Sampler *sampler1D,

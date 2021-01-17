@@ -15,11 +15,11 @@ namespace kaguya {
                 _start(start), _end(end) {
         }
 
-        bool VisibilityTester::isVisible(Scene &scene) const {
+        bool VisibilityTester::isVisible(std::shared_ptr<Scene> scene) const {
             Ray ray = _start.sendRayTo(_end);
             while (true) {
                 SurfaceInteraction si;
-                bool foundIntersection = scene.intersect(ray, si);
+                bool foundIntersection = scene->intersect(ray, si);
                 if (foundIntersection && si.getMaterial() != nullptr) {
                     return false;
                 }
@@ -32,12 +32,12 @@ namespace kaguya {
             }
         }
 
-        core::Spectrum VisibilityTester::transmittance(Scene &scene, Sampler *sampler1D) const {
+        core::Spectrum VisibilityTester::transmittance(std::shared_ptr<Scene> scene, Sampler *sampler1D) const {
             Ray ray = _start.sendRayTo(_end);
             core::Spectrum tr(1.0);
             while (true) {
                 SurfaceInteraction si;
-                bool foundIntersection = scene.intersect(ray, si);
+                bool foundIntersection = scene->intersect(ray, si);
                 // check whether interaction is between _start and _end
                 if (foundIntersection && si.getMaterial() != nullptr) {
                     // occluded

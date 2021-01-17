@@ -86,6 +86,10 @@ namespace kaguya {
                           const std::shared_ptr<Medium> insideMedium,
                           const std::shared_ptr<Medium> outsideMedium);
 
+            static std::vector<std::shared_ptr<Geometry>>
+            testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
+                             std::vector<std::shared_ptr<Light>> &lights, const std::shared_ptr<Material> material);
+
             static std::vector<std::shared_ptr<Geometry>> testBottomWall(const std::shared_ptr<Material> material,
                                                                          const std::shared_ptr<Medium> insideMedium,
                                                                          const std::shared_ptr<Medium> outsideMedium);
@@ -170,8 +174,8 @@ namespace kaguya {
                 return _camera;
             }
 
-            const std::shared_ptr<Light> getLight() const {
-                return _light;
+            const std::vector<std::shared_ptr<Light>> getLights() const {
+                return _lights;
             }
 
             const std::string getName() const {
@@ -191,9 +195,9 @@ namespace kaguya {
             // camera
             std::shared_ptr<Camera> _camera = nullptr;
             // TODO 单个光源 用于测试
-            std::shared_ptr<Light> _light = nullptr;
+//            std::shared_ptr<Light> _light = nullptr;
             // TODO 增加多个光源选项
-//            std::vector<std::shared_ptr<DiffuseLight>> _lights;
+            std::vector<std::shared_ptr<Light>> _lights;
         };
 
     }

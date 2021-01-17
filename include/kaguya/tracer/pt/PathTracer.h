@@ -36,7 +36,10 @@ namespace kaguya {
              * @param lightPdf 采样概率
              * @return
              */
-            Spectrum evaluateDirectLight(Scene &scene, const Interaction &eye, Sampler *sampler1D);
+            Spectrum sampleDirectLight(std::shared_ptr<Scene> scene, const Interaction &eye, Sampler *sampler);
+
+            Spectrum evaluateDirectLight(std::shared_ptr<Scene> scene, const Interaction &eye,
+                                         const std::shared_ptr<Light> light, Sampler *sampler);
 
             /**
              * Path Tracing 渲染代码，渐进式实现
@@ -45,7 +48,7 @@ namespace kaguya {
              * @param memoryArena
              * @return
              */
-            Spectrum shaderOfProgression(const Ray &ray, Scene &scene,
+            Spectrum shaderOfProgression(const Ray &ray, std::shared_ptr<Scene> scene,
                                          Sampler *sampler1D,
                                          MemoryArena &memoryArena);
 

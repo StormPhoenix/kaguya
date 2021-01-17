@@ -32,7 +32,7 @@ namespace kaguya {
         }
 
 
-        Spectrum PathTracer::shaderOfProgression(const kaguya::tracer::Ray &ray, kaguya::Scene &scene,
+        Spectrum PathTracer::shaderOfProgression(const Ray &ray, std::shared_ptr<Scene> scene,
                                                  Sampler *sampler1D,
                                                  MemoryArena &memoryArena) {
             // 最终渲染结果
@@ -44,15 +44,11 @@ namespace kaguya {
             // 散射光线
             Ray scatterRay = ray;
 
-            // TODO 依然只考虑一个光源的情况
-            const std::shared_ptr<Light> light = scene.getLight();
-            assert(light != nullptr);
-
             // 最多进行 _maxDepth 次数弹射
             for (int bounce = 0; bounce < _maxDepth; bounce++) {
                 // intersect
                 SurfaceInteraction si;
-                bool isIntersected = scene.intersect(scatterRay, si);
+                bool isIntersected = scene->intersect(scatterRay, si);
 
                 // deal with participating medium
                 core::MediumInteraction mi;
@@ -67,7 +63,7 @@ namespace kaguya {
                 if (mi.isValid()) {
                     /* handle medium interaction */
                     // sample1d direct light
-                    shaderColor += beta * evaluateDirectLight(scene, mi, sampler1D);
+                    shaderColor += beta * sampleDirectLight(scene, mi, sampler1D);
 
                     /* sample1d new ray */
                     Vector3F worldWo = -scatterRay.getDirection();
@@ -109,7 +105,7 @@ namespace kaguya {
 
                     // 判断是否向光源采样
                     if (bsdf->allIncludeOf(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
-                        shaderColor += (beta * evaluateDirectLight(scene, si, sampler1D));
+                        shaderColor += (beta * sampleDirectLight(scene, si, sampler1D));
                     }
 
                     // 计算下一次反射
@@ -144,23 +140,20 @@ namespace kaguya {
             return shaderColor;
         }
 
-        Spectrum PathTracer::evaluateDirectLight(
-                Scene &scene, const Interaction &eye,
-                Sampler *sampler1D) {
-            // TODO 目前只考虑单个光源
-            auto light = scene.getLight();
+        Spectrum PathTracer::evaluateDirectLight(std::shared_ptr<Scene> scene, const Interaction &eye,
+                                                 const std::shared_ptr<Light> light, Sampler *sampler) {
             // p(wi)
             Float lightPdf = 0;
             // light dir
             Vector3F wi = Vector3F(0.0);
             // visibility tester
             VisibilityTester visibilityTester;
-            // 对光源采样采样
-            Spectrum lumi = light->sampleFromLight(eye, &wi,
-                                                   &lightPdf, sampler1D,
-                                                   &visibilityTester);
 
             Spectrum ret(0);
+            // 对光源采样采样
+            Spectrum lumi = light->sampleFromLight(eye, &wi,
+                                                   &lightPdf, sampler,
+                                                   &visibilityTester);
 
             // 排除对光源采样贡献为 0 的情况
             if (lightPdf > math::EPSILON && !lumi.isBlack()) {
@@ -184,7 +177,7 @@ namespace kaguya {
                 }
 
                 if (!f.isBlack()) {
-                    lumi *= visibilityTester.transmittance(scene, sampler1D);
+                    lumi *= visibilityTester.transmittance(scene, sampler);
                     if (!lumi.isBlack()) {
                         if (light->isDeltaType()) {
                             // shader spectrum
@@ -217,7 +210,7 @@ namespace kaguya {
                     assert(si.getBSDF() != nullptr);
 
                     BXDFType sampleType;
-                    f = si.getBSDF()->sampleF(wo, &wi, &scatteringPdf, sampler1D, BSDF_ALL, &sampleType);
+                    f = si.getBSDF()->sampleF(wo, &wi, &scatteringPdf, sampler, BSDF_ALL, &sampleType);
                     f *= ABS_DOT(-si.direction, wi);
                     sampleSpecular = (sampleType & BXDFType::BSDF_SPECULAR) != 0;
                 }
@@ -237,7 +230,7 @@ namespace kaguya {
                     SurfaceInteraction misSI;
                     Spectrum misTr = 1.0;
                     Ray misRay(eye.point, NORMALIZE(wi));
-                    bool foundIntersection = scene.intersectWithMedium(misRay, misSI, misTr, sampler1D);
+                    bool foundIntersection = scene->intersectWithMedium(misRay, misSI, misTr, sampler);
                     Spectrum misLumi(0.0);
                     if (foundIntersection) {
                         if (misSI.getAreaLight() != nullptr && misSI.getAreaLight() == light.get()) {
@@ -249,8 +242,19 @@ namespace kaguya {
                     }
                 }
             }
-            // 没有采样到光源
             return ret;
+        }
+
+        Spectrum PathTracer::sampleDirectLight(std::shared_ptr<Scene> scene, const Interaction &eye,
+                                               Sampler *sampler) {
+            Float lightPdf = 0;
+            auto light = uniformSampleLight(scene, &lightPdf, sampler);
+            if (light == nullptr) {
+                return 0;
+            } else {
+                // Sample light spectrum
+                return evaluateDirectLight(scene, eye, light, sampler) / lightPdf;
+            }
         }
 
         std::function<void(const int, const int, Sampler *)> PathTracer::render() {
@@ -267,7 +271,7 @@ namespace kaguya {
                     auto v = (row + sampler->sample1D()) / Float(_camera->getResolutionHeight());
 
                     Ray sampleRay = _camera->sendRay(u, v);
-                    Spectrum shaderColor = shaderOfProgression(sampleRay, *(_scene.get()), sampler, arena);
+                    Spectrum shaderColor = shaderOfProgression(sampleRay, _scene, sampler, arena);
 
                     ans += shaderColor;
                     arena.clean();

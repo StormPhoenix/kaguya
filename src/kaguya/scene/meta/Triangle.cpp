@@ -189,8 +189,8 @@ namespace kaguya {
             }
 
             Float Triangle::area() const {
-                return 0.5 * LENGTH(CROSS((_transformedPosition2 - _transformedNormal1),
-                                          (_transformedNormal3 - _transformedNormal1)));
+                return 0.5 * LENGTH(CROSS((_transformedPosition2 - _transformedPosition1),
+                                          (_transformedPosition3 - _transformedPosition1)));
             }
 
             SurfaceInteraction Triangle::sampleSurfacePoint(Sampler *sampler1D) const {

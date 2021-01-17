@@ -49,5 +49,19 @@ namespace kaguya {
             pool->shutdown();
 //            delete pool;
         }
+
+        std::shared_ptr<Light> Tracer::uniformSampleLight(std::shared_ptr<Scene> scene, Float *lightPdf, Sampler *sampler) {
+            // Sample from multiple light
+            auto lights = scene->getLights();
+            int nLights = lights.size();
+            if (nLights == 0) {
+                return nullptr;
+            }
+            *lightPdf = Float(1.0) / nLights;
+
+            // Randomly select a light
+            int lightIndex = std::min(int(sampler->sample1D() * nLights), nLights - 1);
+            return lights[lightIndex];
+        }
     }
 }

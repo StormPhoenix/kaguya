@@ -23,7 +23,7 @@ namespace kaguya {
                         _scatteringSigma(scatteringSigma),
                         _totalSigma(absorptionSigma + scatteringSigma), _g(g) {}
 
-                virtual core::Spectrum transmittance(const tracer::Ray &ray, Sampler *sampler1D) const override;
+                virtual core::Spectrum transmittance(const Ray &ray, Sampler *sampler1D) const override;
 
                 virtual core::Spectrum sampleInteraction(
                         const tracer::Ray &ray,

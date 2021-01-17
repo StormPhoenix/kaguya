@@ -9,7 +9,6 @@
 #include <kaguya/core/light/SpotLight.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/meta/Triangle.h>
-#include <kaguya/scene/meta/Wall.h>
 #include <kaguya/scene/Geometry.h>
 #include <kaguya/Config.h>
 #include <kaguya/scene/aggregation/Box.h>
@@ -166,10 +165,42 @@ namespace kaguya {
         }
 
 
+        std::vector<std::shared_ptr<Geometry>>
+        Scene::testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
+                                std::vector<std::shared_ptr<Light>> &lights, const std::shared_ptr<Material> material) {
+            const Vector3F a1(0.2 * MODEL_SCALE, 0.46 * MODEL_SCALE, -0.2 * MODEL_SCALE);
+            const Vector3F a2(-0.2 * MODEL_SCALE, 0.46 * MODEL_SCALE, -0.2 * MODEL_SCALE);
+            const Vector3F a3(-0.2 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0.2 * MODEL_SCALE);
+            const Vector3F a4(0.2 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0.2 * MODEL_SCALE);
+
+            const Normal3F n(0, -1, 0);
+            const Vector2f default_uv(0);
+
+            std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
+                                                                                 n, n, n,
+                                                                                 default_uv, default_uv, default_uv);
+            std::shared_ptr<Geometry> gt1 = std::make_shared<Geometry>(tri1, material, medium, medium,
+                                                                       nullptr);
+
+            std::shared_ptr<meta::Shape> tri2 = std::make_shared<meta::Triangle>(a1, a2, a3,
+                                                                                 n, n, n,
+                                                                                 default_uv, default_uv, default_uv);
+            std::shared_ptr<Geometry> gt2 = std::make_shared<Geometry>(tri2, material, medium, medium,
+                                                                       nullptr);
+            std::vector<std::shared_ptr<Geometry>> v;
+            v.push_back(gt1);
+            v.push_back(gt2);
+            // build area light
+            std::shared_ptr<AreaLight> light1 = testDiffuseAreaLight(spectrum, gt1, medium, medium, true);
+            std::shared_ptr<AreaLight> light2 = testDiffuseAreaLight(spectrum, gt2, medium, medium, true);
+            lights.push_back(light1);
+            lights.push_back(light2);
+            return v;
+        }
 
         std::vector<std::shared_ptr<Geometry>> Scene::testTopWall(const std::shared_ptr<Material> material,
-                                                     const std::shared_ptr<Medium> insideMedium,
-                                                     const std::shared_ptr<Medium> outsideMedium) {
+                                                                  const std::shared_ptr<Medium> insideMedium,
+                                                                  const std::shared_ptr<Medium> outsideMedium) {
             const Vector3F a1(0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
             const Vector3F a2(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
             const Vector3F a3(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
@@ -248,9 +279,7 @@ namespace kaguya {
                                                                const std::shared_ptr<Medium> outside,
                                                                bool singleSide) {
             std::shared_ptr<AreaLight> light = DiffuseAreaLight::buildDiffuseAreaLight(
-                    spectrum, geometry,
-                    MediumBound(inside.get(), outside.get()),
-                    singleSide);
+                    spectrum, geometry, MediumBound(inside.get(), outside.get()), singleSide);
             return light;
         }
 
@@ -361,25 +390,12 @@ namespace kaguya {
             std::vector<std::shared_ptr<Geometry>> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
-
-            // light
-            std::shared_ptr<Shape> lightWallShape = std::make_shared<meta::ZXWall>(-0.2 * MODEL_SCALE,
-                                                                                   0.2 * MODEL_SCALE,
-                                                                                   -0.2 * MODEL_SCALE,
-                                                                                   0.2 * MODEL_SCALE,
-                                                                                   0.46 * MODEL_SCALE, false);
-            std::shared_ptr<Geometry> lightWall = std::make_shared<Geometry>(lightWallShape, lambertTop,
-                                                                             airMedium, airMedium);
-
-            // build area light
-            std::shared_ptr<AreaLight> light = testDiffuseAreaLight(areaLightSpectrum, lightWall, airMedium, airMedium,
-                                                                    true);
-            objects.push_back(lightWall);
-
             // build scene object
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-            scene->_light = light;
 
+            // build area light
+            auto lightWall = testTopAreaLight(areaLightSpectrum, airMedium, scene->_lights, lambertTop);
+            objects.insert(objects.end(), lightWall.begin(), lightWall.end());
 
             // scene
             std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);
@@ -495,25 +511,13 @@ namespace kaguya {
             std::shared_ptr<Aggregation> water = std::make_shared<TriangleMesh>(waterVertexes, glass, nullptr,
                                                                                 nullptr, nullptr, transformMatrix);
 
-            // light
-            std::shared_ptr<Shape> lightWallShape = std::make_shared<meta::ZXWall>(-0.2 * MODEL_SCALE,
-                                                                                   0.2 * MODEL_SCALE,
-                                                                                   -0.2 * MODEL_SCALE,
-                                                                                   0.2 * MODEL_SCALE,
-                                                                                   0.46 * MODEL_SCALE, false);
-
-            std::shared_ptr<Geometry> lightWall = std::make_shared<Geometry>(lightWallShape, lambertTop,
-                                                                             airMedium, airMedium);
+            // build scene object
+            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 
             // build area light
-            std::shared_ptr<AreaLight> light = testDiffuseAreaLight(lightSpectrum, lightWall, airMedium, airMedium,
-                                                                    true);
+            auto lightWall = testTopAreaLight(lightSpectrum, airMedium, scene->_lights, lambertTop);
+            objects.insert(objects.end(), lightWall.begin(), lightWall.end());
 
-// build scene object
-            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-            scene->_light = light;
-
-            objects.push_back(lightWall);
             objects.push_back(water);
 
             // scene
@@ -634,7 +638,7 @@ namespace kaguya {
             std::shared_ptr<PointLight> light = PointLight::buildPointLight(
                     Vector3F(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), lightSpectrum,
                     MediumBound(airMedium.get(), airMedium.get()));
-            scene->_light = light;
+            scene->_lights.push_back(light);
 
 
             // scene
@@ -757,25 +761,13 @@ namespace kaguya {
             std::shared_ptr<Intersectable> bunny = testBunny(glass, bunnyMedium, airMedium, nullptr);
 //            std::shared_ptr<Intersectable> bunny = testBunny(nullptr, bunnyMedium, airMedium, nullptr);
 
-
-            // light
-            std::shared_ptr<Shape> lightWallShape = std::make_shared<meta::ZXWall>(-0.2 * MODEL_SCALE,
-                                                                             0.2 * MODEL_SCALE,
-                                                                             -0.2 * MODEL_SCALE,
-                                                                             0.2 * MODEL_SCALE,
-                                                                             0.46 * MODEL_SCALE, false);
-
-            std::shared_ptr<Geometry> lightWall = std::make_shared<Geometry>(lightWallShape, lambertTop,
-                                                                             airMedium, airMedium);
-
-            // build area light
-            std::shared_ptr<AreaLight> light = testDiffuseAreaLight(lightSpectrum, lightWall, airMedium, airMedium, true);
-
             // build scene object
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-            scene->_light = light;
 
-            objects.push_back(lightWall);
+            // build area light
+            auto lightWall = testTopAreaLight(lightSpectrum, airMedium, scene->_lights, lambertTop);
+            objects.insert(objects.end(), lightWall.begin(), lightWall.end());
+
             objects.push_back(bunny);
 
             // scene
@@ -894,23 +886,13 @@ namespace kaguya {
             std::shared_ptr<Geometry> metalSphere = std::make_shared<Geometry>(metalSphereShape, metal,
                                                                                nullptr, airMedium);
 
-            // light
-            std::shared_ptr<Shape> lightWallShape = std::make_shared<meta::ZXWall>(-0.2 * MODEL_SCALE,
-                                                                             0.2 * MODEL_SCALE,
-                                                                             -0.2 * MODEL_SCALE,
-                                                                             0.2 * MODEL_SCALE,
-                                                                             0.46 * MODEL_SCALE, false);
-            std::shared_ptr<Geometry> lightWall = std::make_shared<Geometry>(lightWallShape, lambertTop,
-                                                                             airMedium, airMedium);
-
-            // build area light
-            std::shared_ptr<AreaLight> light = testDiffuseAreaLight(areaLightSpectrum, lightWall, airMedium, airMedium, true);
-
             // build scene object
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-            scene->_light = light;
 
-            objects.push_back(lightWall);
+            // build area light
+            auto lightWall = testTopAreaLight(areaLightSpectrum, airMedium, scene->_lights, lambertTop);
+            objects.insert(objects.end(), lightWall.begin(), lightWall.end());
+
             objects.push_back(glassSphere);
             objects.push_back(metalSphere);
 //            objects.push_back(mediumSphere);
@@ -1044,7 +1026,7 @@ namespace kaguya {
             std::shared_ptr<SpotLight> light = SpotLight::buildSpotLight(
                     Vector3F(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), Vector3F(0.0, -1, 0.0),
                     spotLightSpectrum, MediumBound(airMedium.get(), airMedium.get()));
-            scene->_light = light;
+            scene->_lights.push_back(light);
 
             objects.push_back(glassSphere);
             objects.push_back(metalSphere);
@@ -1171,7 +1153,7 @@ namespace kaguya {
             std::shared_ptr<PointLight> light = PointLight::buildPointLight(
                     Vector3F(0.0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), lightSpectrum,
                     MediumBound(airMedium.get(), airMedium.get()));
-            scene->_light = light;
+            scene->_lights.push_back(light);
 
             objects.push_back(glassSphere);
             objects.push_back(metalSphere);
@@ -1295,7 +1277,7 @@ namespace kaguya {
             std::shared_ptr<PointLight> light = PointLight::buildPointLight(
                     Vector3F(0.0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), pointLightSpectrum,
                     MediumBound(airMedium.get(), airMedium.get()));
-            scene->_light = light;
+            scene->_lights.push_back(light);
 
             objects.push_back(glassSphere);
 

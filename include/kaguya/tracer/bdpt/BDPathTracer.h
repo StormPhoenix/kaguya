@@ -54,7 +54,7 @@ namespace kaguya {
              * @param memoryArena
              * @return
              */
-            Spectrum shader(const Ray &ray, Scene &scene, int maxDepth,
+            Spectrum shader(const Ray &ray, std::shared_ptr<Scene> scene, int maxDepth,
                             Sampler *sampler1D, MemoryArena &memoryArena);
 
             Spectrum shaderOfMyImplemention();
@@ -111,7 +111,7 @@ namespace kaguya {
              * @param samplePosition 最终在成像平面上采样的点。当 cameraSubPath 只去一个相机点时，samplePosition 会改变
              * @return
              */
-            Spectrum connectPath(Scene &scene, PathVertex *cameraSubPath, int cameraPathLength, int t,
+            Spectrum connectPath(std::shared_ptr<Scene> scene, PathVertex *cameraSubPath, int cameraPathLength, int t,
                                  PathVertex *lightSubPath, int lightPathLength, int s, Point2F *samplePosition,
                                  Sampler *sampler1D);
 

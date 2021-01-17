@@ -38,7 +38,7 @@ namespace kaguya {
                 delete _densities;
             }
 
-            core::Spectrum GridDensityMedium::transmittance(const tracer::Ray &ray, Sampler *sampler1D) const {
+            core::Spectrum GridDensityMedium::transmittance(const Ray &ray, Sampler *sampler1D) const {
                 // transform ray from world space to medium space
                 const Vector3F origin = _invTransformMatrix->transformPoint(ray.getOrigin());
                 const Vector3F dir = _invTransformMatrix->transformVector(ray.getDirection());

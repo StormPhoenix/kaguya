@@ -48,9 +48,6 @@ A simple physically based render.
 
 - [ ] Delete variable *isFrontFace*
 
-- [ ] Add multiple light source
-    - [ ] Delete Wall.h
-
 - [ ] 去掉 Interaction 里面的 frontFace
 
 - [ ] Move *struct Vertex* to new package
@@ -62,7 +59,9 @@ A simple physically based render.
     无法在光线传输过程中确定碰撞位置两端的折射率。程序采用的是将外界材质的折射率固定设置为空气折射率（1.0）
     
 ## Solved
-
+- [x] Add multiple light source
+    - [x] Delete Wall.h
+    
 - [x] Better space transformation
     - [x] Transform class
     - [x] Replace all occurrence.
