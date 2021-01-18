@@ -11,13 +11,14 @@ namespace kaguya {
             // 构造切线空间
             /* 此处的实现和 pbrt 中的实现不同，pbrt 用的是 dudp 和纹理相关，但目前没有实现纹理部分
              * 暂时用入射光线和法线来构造切线空间*/
-            _tanY = NORMALIZE(interaction.normal);
+            _tanY = NORMALIZE(interaction.rendering.normal);
             _tanZ = NORMALIZE(CROSS(interaction.direction, _tanY));
             if (!math::isValid(_tanZ)) {
                 math::tangentSpace(_tanY, &_tanX, &_tanZ);
             } else {
                 _tanX = NORMALIZE(CROSS(_tanY, _tanZ));
             }
+            _geoNormal = interaction.normal;
         }
 
         Vector3F BSDF::toObjectSpace(const Vector3F &v) const {
@@ -42,7 +43,7 @@ namespace kaguya {
             Vector3F wo = toObjectSpace(worldWo);
             Vector3F wi = toObjectSpace(worldWi);
 
-            bool reflect = wo.y * wi.y > 0;
+            bool reflect = DOT(worldWo, _geoNormal) * DOT(worldWi, _geoNormal) > 0;
             Spectrum f = 0;
             for (int i = 0; i < _bxdfCount; i++) {
                 if (_bxdfs[i]->allIncludeOf(type)) {
@@ -102,7 +103,7 @@ namespace kaguya {
                     return Spectrum(0.0);
                 }
 
-                // 计算最终 samplePdf
+                // 计算最终 sample pdf
                 if (!bxdf->hasAllOf(BSDF_SPECULAR) && matchedCount > 1) {
                     // 如果是 specular 类型，则可以不用进行额外计算
                     for (int i = 0; i < _bxdfCount; i++) {
@@ -117,12 +118,14 @@ namespace kaguya {
                     samplePdf /= matchedCount;
                 }
 
+                (*worldWi) = toWorldSpace(wi);
+
                 // 计算 f 的总和
                 /* 计算 f 的总和一直觉得有问题有问题，如果处理不当 f 的加和是会大于 1 的，
                  * 参考 pbrt 中 MixMaterial 中的方法，当多个 BXDF 加在一起是会进行加权的，其加权和为 1 */
                 if (!bxdf->hasAllOf(BSDF_SPECULAR)) {
                     for (int i = 0; i < _bxdfCount; i++) {
-                        bool reflect = wi.y * wo.y > 0 ? true : false;
+                        bool reflect = DOT(worldWo, _geoNormal) * DOT(*worldWi, _geoNormal) > 0;
                         if (_bxdfs[i] != nullptr && _bxdfs[i] != bxdf) {
                             if ((reflect && _bxdfs[i]->hasAllOf(BSDF_REFLECTION)) ||
                                 (!reflect && _bxdfs[i]->hasAllOf(BSDF_TRANSMISSION))) {
@@ -131,7 +134,6 @@ namespace kaguya {
                         }
                     }
                 }
-                (*worldWi) = toWorldSpace(wi);
                 (*pdf) = samplePdf;
                 return f;
             }

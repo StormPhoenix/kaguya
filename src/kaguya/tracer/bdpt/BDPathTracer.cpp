@@ -301,7 +301,7 @@ namespace kaguya {
 
                         // TODO cosine 的计算感觉有问题，对于从光源发射的光线，应该用 worldWo
                         // 更新 beta
-                        Float cosine = std::abs(DOT(si.normal, worldWi));
+                        Float cosine = ABS_DOT(si.rendering.normal, worldWi);
 
                         beta *= (f * cosine / pdfPreWi);
 

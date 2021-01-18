@@ -119,7 +119,7 @@ namespace kaguya {
                     Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, sampler1D, BSDF_ALL, &bxdfType);
 
                     // cosine
-                    Float cosine = std::abs(DOT(si.normal, NORMALIZE(worldWi)));
+                    Float cosine = ABS_DOT(si.rendering.normal, NORMALIZE(worldWi));
                     // 计算 beta
                     beta *= (f * cosine / samplePdf);
                     // 设置下一次打击光线
