@@ -25,11 +25,11 @@ namespace kaguya {
                 AreaLight(intensity, shape, AREA, mediumBoundary), _singleSide(singleSide) {}
 
         Spectrum DiffuseAreaLight::randomLightRay(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
-                                                  Sampler *sampler1D) {
+                                                  Sampler *sampler) {
             assert(_geometry != nullptr);
 
             // 采样位置
-            SurfaceInteraction si = _geometry->getShape()->sampleSurfacePoint(sampler1D);
+            SurfaceInteraction si = _geometry->getShape()->sampleSurfacePoint(sampler);
             *normal = si.normal;
 
             // 采样位置 pdf
@@ -39,15 +39,15 @@ namespace kaguya {
             // 判断区域光是否是双面发光
             if (_singleSide) {
                 // 单面发光，按照 cosine 方式采样
-                dirLocal = math::sampling::hemiCosineSampling(sampler1D);
+                dirLocal = math::sampling::hemiCosineSampling(sampler);
                 (*pdfDir) = math::sampling::hemiCosineSamplePdf(dirLocal);
             } else {
                 // 双面发光，按照 cosine 方式在两边采样
-                dirLocal = math::sampling::hemiCosineSampling(sampler1D);
+                dirLocal = math::sampling::hemiCosineSampling(sampler);
                 (*pdfDir) = math::sampling::hemiCosineSamplePdf(dirLocal) * 0.5;
 
                 // 按照 0.5 的概率确认在上/下球面做 cosine / PI 采样
-                Float prob = sampler1D->sample1D();
+                Float prob = sampler->sample1D();
                 if (prob < 0.5) {
                     dirLocal.y *= -1;
                 }

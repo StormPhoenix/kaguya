@@ -68,7 +68,7 @@ namespace kaguya {
 
 #ifdef TEST_SCENE
 
-            static float *testSmokeData();
+            static Float *testSmokeData();
 
             static std::shared_ptr<Medium> testAirMedium();
 
@@ -164,7 +164,7 @@ namespace kaguya {
              * @return
              */
             bool intersectWithMedium(Ray &ray, SurfaceInteraction &si, core::Spectrum &transmittance,
-                                     Sampler *sampler1D) const;
+                                     Sampler *sampler) const;
 
             std::shared_ptr<Intersectable> getWorld() {
                 return _world;

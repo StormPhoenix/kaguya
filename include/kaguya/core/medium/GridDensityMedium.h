@@ -22,10 +22,10 @@ namespace kaguya {
                                   Float *densities,
                                   std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
-                virtual core::Spectrum transmittance(const Ray &ray, Sampler *sampler1D) const override;
+                virtual core::Spectrum transmittance(const Ray &ray, Sampler *sampler) const override;
 
                 virtual core::Spectrum sampleInteraction(const tracer::Ray &ray,
-                                                         Sampler *sampler1D,
+                                                         Sampler *sampler,
                                                          MediumInteraction *mi,
                                                          MemoryArena &memoryArena) const override;
 
@@ -51,7 +51,7 @@ namespace kaguya {
                 const Spectrum _scatteringSigma;
                 Float _totalSigma;
                 Float _g;
-                float *_densities = nullptr;
+                Float *_densities = nullptr;
                 std::shared_ptr<Transform> _transformMatrix = nullptr;
                 std::shared_ptr<Transform> _invTransformMatrix = nullptr;
                 float _maxInvDensity;

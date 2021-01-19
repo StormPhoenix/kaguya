@@ -8,19 +8,19 @@ namespace kaguya {
     namespace core {
         namespace medium {
 
-            core::Spectrum IsotropicMedium::transmittance(const tracer::Ray &ray, Sampler *sampler1D) const {
+            core::Spectrum IsotropicMedium::transmittance(const tracer::Ray &ray, Sampler *sampler) const {
                 // e^{-\sigma_t * dist}
                 return exp(-_totalSigma * std::min(ray.getStep() * LENGTH(ray.getDirection()), math::MAX_FLOAT));
             }
 
             core::Spectrum
-            IsotropicMedium::sampleInteraction(const tracer::Ray &ray, Sampler *sampler1D,
+            IsotropicMedium::sampleInteraction(const tracer::Ray &ray, Sampler *sampler,
                                                MediumInteraction *mi, MemoryArena &memoryArena) const {
                 // different channel has different sigma, randomly chose a channel
-                int channel = math::randomInt(0, SPECTRUM_CHANNEL - 1, sampler1D);
+                int channel = math::randomInt(0, SPECTRUM_CHANNEL - 1, sampler);
 
                 // sample1d Tr uniformly, and calculate the correspond dist
-                Float dist = -std::log(1 - sampler1D->sample1D()) / _totalSigma[channel];
+                Float dist = -std::log(1 - sampler->sample1D()) / _totalSigma[channel];
                 Float step = dist / LENGTH(ray.getDirection());
 
                 // check whether sample1d the surface or medium

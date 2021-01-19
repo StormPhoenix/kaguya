@@ -12,8 +12,8 @@ namespace kaguya {
             }
 
             SurfaceInteraction
-            Shape::sampleSurfaceInteraction(const Interaction &eye, Sampler *sampler1D) const {
-                return sampleSurfacePoint(sampler1D);
+            Shape::sampleSurfaceInteraction(const Interaction &eye, Sampler *sampler) const {
+                return sampleSurfacePoint(sampler);
             }
 
             Float Shape::surfaceInteractionPdf(const Interaction &eye, const Vector3F &dir) const {

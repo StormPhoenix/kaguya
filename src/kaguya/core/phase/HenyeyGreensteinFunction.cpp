@@ -30,7 +30,7 @@ namespace kaguya {
             } else {
                 cosTheta = (1 + _g * _g - term1 * term1) / (2 * _g);
             }
-            Float sinTheta = std::sqrt(std::max(0.f, 1 - cosTheta * cosTheta));
+            Float sinTheta = std::sqrt(std::max(Float(0.), 1 - cosTheta * cosTheta));
 
             // \phi
             Float phi = 2 * math::PI * sampleV;

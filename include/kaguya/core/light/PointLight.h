@@ -30,13 +30,13 @@ namespace kaguya {
 
             virtual Spectrum sampleFromLight(const Interaction &eye,
                                              Vector3F *wi, Float *pdf,
-                                             Sampler *sampler1D,
+                                             Sampler *sampler,
                                              VisibilityTester *visibilityTester) override;
 
             virtual Float sampleFromLightPdf(const Interaction &eye, const Vector3F &dir) override;
 
             virtual Spectrum randomLightRay(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
-                                            Sampler *sampler1D) override;
+                                            Sampler *sampler) override;
 
             virtual void randomLightRayPdf(const Ray &ray, const Vector3F &normal,
                                            Float *pdfPos, Float *pdfDir) const override;

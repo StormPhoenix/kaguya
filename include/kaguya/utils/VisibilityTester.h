@@ -37,7 +37,7 @@ namespace kaguya {
              *
              * @return
              */
-            core::Spectrum transmittance(std::shared_ptr<Scene> scene, sampler::Sampler *sampler1D) const;
+            core::Spectrum transmittance(std::shared_ptr<Scene> scene, sampler::Sampler *sampler) const;
 
             bool isVisible(std::shared_ptr<Scene> scene) const;
 

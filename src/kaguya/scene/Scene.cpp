@@ -42,14 +42,14 @@ namespace kaguya {
 
 #ifdef TEST_SCENE
 
-        float *Scene::testSmokeData() {
+        Float *Scene::testSmokeData() {
             std::cout << "load smoke data ... " << std::endl;
             float density;
             float maxDensity = 0;
             long gridCount = 0;
 
-            float *smokeData = new float[gridx * gridy * gridz];
-            float *p = smokeData;
+            Float *smokeData = new Float[gridx * gridy * gridz];
+            Float *p = smokeData;
 
             std::fstream fr(path.c_str(), std::ios::in);
             while (fr >> density) {
@@ -263,7 +263,7 @@ namespace kaguya {
             std::vector<Vertex> bunnyVertexes = kaguya::utils::ObjLoader::loadModel("./resource/objects/bunny.obj");
 
             Float scale = 0.4 * MODEL_SCALE;
-            Matrix4f mat(1.0f);
+            Matrix4F mat(1.0f);
             mat = TRANSLATE(mat, Vector3F(0, -scale / 1.2, 0));
             mat = SCALE(mat, Vector3F(scale, scale, scale));
             std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(mat);
@@ -353,12 +353,12 @@ namespace kaguya {
 
             // smoke data
             Float scale = 0.6 * MODEL_SCALE;
-            Matrix4f mat(1.0f);
+            Matrix4F mat(1.0f);
             mat = TRANSLATE(mat, Vector3F(-scale * 0.6, -MODEL_SCALE * 0.5 + 0.0001, -scale * 0.5));
             mat = SCALE(mat, Vector3F(scale * 1.2, MODEL_SCALE * 0.90, scale * 1.2));
             std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(mat);
 
-            float *smoke = testSmokeData();
+            Float *smoke = testSmokeData();
             std::shared_ptr<Medium> smokeMedium = std::make_shared<GridDensityMedium>(0.002, 2.3, 0, gridx, gridy,
                                                                                       gridz,
                                                                                       smoke, transformMatrix);
@@ -504,7 +504,7 @@ namespace kaguya {
             std::vector<Vertex> waterVertexes = kaguya::utils::ObjLoader::loadModel("./resource/objects/water.obj");
 
             Float scale = 0.5 * MODEL_SCALE;
-            Matrix4f mat(1.0f);
+            Matrix4F mat(1.0f);
             mat = TRANSLATE(mat, Vector3F(0, -scale, 0));
             mat = SCALE(mat, Vector3F(scale, scale, scale));
             std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(mat);
@@ -1302,12 +1302,12 @@ namespace kaguya {
         }
 
         bool Scene::intersectWithMedium(Ray &ray, SurfaceInteraction &si, core::Spectrum &transmittance,
-                                        Sampler *sampler1D) const {
+                                        Sampler *sampler) const {
             transmittance = Spectrum(1.0);
             while (true) {
                 bool foundIntersection = intersect(ray, si);
                 if (ray.getMedium() != nullptr) {
-                    transmittance *= ray.getMedium()->transmittance(ray, sampler1D);
+                    transmittance *= ray.getMedium()->transmittance(ray, sampler);
                 }
 
                 if (!foundIntersection) {

@@ -19,7 +19,7 @@ namespace kaguya {
         }
 
         Spectrum BXDFSpecular::sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
-                                       Sampler *const sampler1D) {
+                                       Sampler *const sampler) {
             Float cosine = wo.y;
             // 计算反射概率
             Float reflectProb = math::fresnelDielectric(cosine, _thetaI, _thetaT);
@@ -27,7 +27,7 @@ namespace kaguya {
 //            Float reflectProb = math::schlick(cosine, _thetaI / _thetaT);
 
             // 随机采样是否反射
-            Float random = sampler1D->sample1D();
+            Float random = sampler->sample1D();
             if (random < reflectProb) {
                 // 反射
                 *wi = Vector3F(-wo.x, wo.y, -wo.z);

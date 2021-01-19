@@ -43,7 +43,7 @@ namespace kaguya {
                     Float root = (-halfB - sqrt(discriminant)) / a;
                     if (root > minStep && root < maxStep) {
                         Vector3F origin = ray.at(root);
-                        origin *= _radius / LENGTH(origin - _center);
+                        origin = (origin - _center) * (_radius / LENGTH(origin - _center)) + _center;
                         si.point = origin;
                         si.u = 0;
                         si.v = 0;
@@ -63,7 +63,7 @@ namespace kaguya {
                     root = (-halfB + sqrt(discriminant)) / a;
                     if (root > minStep && root < maxStep) {
                         Vector3F origin = ray.at(root);
-                        origin *= _radius / LENGTH(origin - _center);
+                        origin = (origin - _center) * (_radius / LENGTH(origin - _center)) + _center;
                         si.point = origin;
                         si.u = 0;
                         si.v = 0;
@@ -85,9 +85,9 @@ namespace kaguya {
                 }
             }
 
-            SurfaceInteraction Sphere::sampleSurfacePoint(Sampler *sampler1D) const {
+            SurfaceInteraction Sphere::sampleSurfacePoint(Sampler *sampler) const {
                 // sample1d outward normal
-                Vector3F normal = math::sampling::sphereUniformSampling(sampler1D);
+                Vector3F normal = math::sampling::sphereUniformSampling(sampler);
                 if (_transformMatrix != nullptr) {
                     normal = _transformMatrix->transformNormal(normal);
                 }
@@ -106,21 +106,21 @@ namespace kaguya {
             }
 
             SurfaceInteraction
-            Sphere::sampleSurfaceInteraction(const Interaction &eye, Sampler *sampler1D) const {
+            Sphere::sampleSurfaceInteraction(const Interaction &eye, Sampler *sampler) const {
                 // If eye is inside sphere, then uniform sampling surface
                 const Float dist = LENGTH(_transformedCenter - eye.point);
                 if (_radius >= dist) {
                     // inside
-                    return sampleSurfacePoint(sampler1D);
+                    return sampleSurfacePoint(sampler);
                 } else {
                     // outside sphere, then use uniform cone sampling strategy
 
                     // cosThetaMax
                     Float sinThetaMax2 = (_radius * _radius) / (dist * dist);
-                    Float cosThetaMax = std::sqrt(std::max(0.f, 1 - sinThetaMax2));
+                    Float cosThetaMax = std::sqrt(std::max(Float(0.), 1 - sinThetaMax2));
 
                     // cone sampling
-                    const Vector3F dir = math::sampling::coneUniformSampling(cosThetaMax, sampler1D);
+                    const Vector3F dir = math::sampling::coneUniformSampling(cosThetaMax, sampler);
 
                     // build coordinate system
                     Vector3F tanY = NORMALIZE(_transformedCenter - eye.point);
@@ -161,7 +161,7 @@ namespace kaguya {
                 } else {
                     // outside
                     Float sinThetaMax2 = (_radius * _radius) / (dist * dist);
-                    Float cosThetaMax = std::sqrt(std::max(0.f, 1 - sinThetaMax2));
+                    Float cosThetaMax = std::sqrt(std::max(Float(0.), 1 - sinThetaMax2));
 
                     pdf = math::sampling::coneUniformSamplePdf(cosThetaMax);
                 }

@@ -21,12 +21,12 @@ namespace kaguya {
             class Medium {
             public:
                 // 计算 ray 的透射率
-                virtual core::Spectrum transmittance(const Ray &ray, Sampler *sampler1D) const = 0;
+                virtual core::Spectrum transmittance(const Ray &ray, Sampler *sampler) const = 0;
 
                 // 在 medium 中采样 interaction
                 virtual core::Spectrum sampleInteraction(
                         const tracer::Ray &ray,
-                        Sampler *sampler1D,
+                        Sampler *sampler,
                         MediumInteraction *mi,
                         MemoryArena &memoryArena
                 ) const = 0;

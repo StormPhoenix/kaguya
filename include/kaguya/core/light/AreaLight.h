@@ -37,7 +37,7 @@ namespace kaguya {
             virtual Spectrum lightRadiance(const Interaction &interaction, const Vector3F &wo) const = 0;
 
             virtual Spectrum sampleFromLight(const Interaction &eye, Vector3F *wi, Float *pdf,
-                                             Sampler *sampler1D,
+                                             Sampler *sampler,
                                              VisibilityTester *visibilityTester) override;
 
             virtual Float sampleFromLightPdf(const Interaction &eye, const Vector3F &dir) override;

@@ -32,7 +32,7 @@ namespace kaguya {
             }
         }
 
-        core::Spectrum VisibilityTester::transmittance(std::shared_ptr<Scene> scene, Sampler *sampler1D) const {
+        core::Spectrum VisibilityTester::transmittance(std::shared_ptr<Scene> scene, Sampler *sampler) const {
             Ray ray = _start.sendRayTo(_end);
             core::Spectrum tr(1.0);
             while (true) {
@@ -45,7 +45,7 @@ namespace kaguya {
                 }
 
                 if (ray.getMedium() != nullptr) {
-                    tr *= ray.getMedium()->transmittance(ray, sampler1D);
+                    tr *= ray.getMedium()->transmittance(ray, sampler);
                 }
 
                 if (!foundIntersection) {

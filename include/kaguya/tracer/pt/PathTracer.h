@@ -49,7 +49,7 @@ namespace kaguya {
              * @return
              */
             Spectrum shaderOfProgression(const Ray &ray, std::shared_ptr<Scene> scene,
-                                         Sampler *sampler1D,
+                                         Sampler *sampler,
                                          MemoryArena &memoryArena);
 
             /**

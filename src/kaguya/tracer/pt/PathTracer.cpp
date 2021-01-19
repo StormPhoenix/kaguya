@@ -33,7 +33,7 @@ namespace kaguya {
 
 
         Spectrum PathTracer::shaderOfProgression(const Ray &ray, std::shared_ptr<Scene> scene,
-                                                 Sampler *sampler1D,
+                                                 Sampler *sampler,
                                                  MemoryArena &memoryArena) {
             // 最终渲染结果
             Spectrum shaderColor = Spectrum(0);
@@ -53,7 +53,7 @@ namespace kaguya {
                 // deal with participating medium
                 core::MediumInteraction mi;
                 if (scatterRay.getMedium() != nullptr) {
-                    beta *= scatterRay.getMedium()->sampleInteraction(scatterRay, sampler1D, &mi, memoryArena);
+                    beta *= scatterRay.getMedium()->sampleInteraction(scatterRay, sampler, &mi, memoryArena);
                     if (beta.isBlack()) {
                         break;
                     }
@@ -63,12 +63,12 @@ namespace kaguya {
                 if (mi.isValid()) {
                     /* handle medium interaction */
                     // sample1d direct light
-                    shaderColor += beta * sampleDirectLight(scene, mi, sampler1D);
+                    shaderColor += beta * sampleDirectLight(scene, mi, sampler);
 
                     /* sample1d new ray */
                     Vector3F worldWo = -scatterRay.getDirection();
                     Vector3F worldWi;
-                    mi.getPhaseFunction()->sampleScatter(worldWo, &worldWi, sampler1D);
+                    mi.getPhaseFunction()->sampleScatter(worldWo, &worldWi, sampler);
                     scatterRay = mi.sendRay(worldWi);
                     isSpecular = false;
                 } else {
@@ -105,7 +105,7 @@ namespace kaguya {
 
                     // 判断是否向光源采样
                     if (bsdf->allIncludeOf(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
-                        shaderColor += (beta * sampleDirectLight(scene, si, sampler1D));
+                        shaderColor += (beta * sampleDirectLight(scene, si, sampler));
                     }
 
                     // 计算下一次反射
@@ -116,7 +116,7 @@ namespace kaguya {
                     // p(wi)
                     Float samplePdf = 0;
                     // f(p, wo, wi)
-                    Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, sampler1D, BSDF_ALL, &bxdfType);
+                    Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, sampler, BSDF_ALL, &bxdfType);
 
                     // cosine
                     Float cosine = ABS_DOT(si.rendering.normal, NORMALIZE(worldWi));
@@ -131,7 +131,7 @@ namespace kaguya {
 
                 // Terminate path tracing with Russian Roulette
                 if (bounce > _russianRouletteBounce) {
-                    if (sampler1D->sample1D() < _russianRoulette) {
+                    if (sampler->sample1D() < _russianRoulette) {
                         break;
                     }
                     beta /= (1 - _russianRoulette);

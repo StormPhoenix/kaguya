@@ -29,7 +29,7 @@ namespace kaguya {
              * @param wi
              * @return
              */
-            virtual Float sampleScatter(const Vector3F &wo, Vector3F *wi, Sampler *sampler1D) const = 0;
+            virtual Float sampleScatter(const Vector3F &wo, Vector3F *wi, Sampler *sampler) const = 0;
         };
 
     }

@@ -33,16 +33,20 @@ using Vector4f = glm::vec4;
 using Matrix4f = glm::mat4x4;
 using Matrix3f = glm::mat3x3;
 
-//#define DOUBLE
+#define DOUBLE
 
 #ifndef DOUBLE
 using Float = float;
 using Vector3F = Vector3f;
 using Vector2F = Vector2f;
+using Matrix4F = Matrix4f;
+using Matrix3F = Matrix3f;
 #else
 using Float = double;
 using Vector3F = Vector3d;
 using Vector2F = Vector2d;
+using Matrix4F = Matrix4d;
+using Matrix3F = Matrix3d;
 #endif
 
 using Point2F = Vector2F;
@@ -109,7 +113,7 @@ namespace kaguya {
                 std::swap(thetaI, thetaT);
             }
 
-            Float sineI = std::sqrt(std::max(0.0, 1 - std::pow(cosineI, 2)));
+            Float sineI = std::sqrt(std::max(Float(0.), 1 - std::pow(cosineI, 2)));
             Float sineT = sineI * (thetaI / thetaT);
 
             if (sineT >= 1) {
@@ -117,7 +121,7 @@ namespace kaguya {
                 return 1.0f;
             }
 
-            Float cosineT = std::sqrt(std::max(0.0, (1 - std::pow(sineT, 2))));
+            Float cosineT = std::sqrt(std::max(Float(0.), (1 - std::pow(sineT, 2))));
             // 计算 R_parallel
             Float parallelR = ((thetaT * cosineI) - (thetaI * cosineT)) /
                               ((thetaT * cosineI) + (thetaI * cosineT));
@@ -167,7 +171,7 @@ namespace kaguya {
                 cosine = -cosine;
             }
 
-            Float sine = std::sqrt(std::max(0.0, 1 - std::pow(cosine, 2)));
+            Float sine = std::sqrt(std::max(Float(0.), 1 - std::pow(cosine, 2)));
             if (sine * ref_idx >= 1) {
                 return 1.0;
             }
@@ -177,9 +181,9 @@ namespace kaguya {
             return r0 + (1 - r0) * pow((1 - cosine), 5);
         }
 
-        Float randomDouble(Float min, Float max, Sampler *const sampler1D);
+        Float randomDouble(Float min, Float max, Sampler *const sampler);
 
-        int randomInt(int min, int max, Sampler *const sampler1D);
+        int randomInt(int min, int max, Sampler *const sampler);
 
         inline int maxAbsAxis(const Vector3F v) {
             Float maxValue = std::abs(v[0]);
@@ -211,14 +215,14 @@ namespace kaguya {
          */
         inline bool refract(const Vector3F &wo, const Vector3F &normal, Float refraction, Vector3F *wi) {
             Float cosineThetaI = DOT(wo, normal);
-            Float sineThetaI = std::sqrt(std::max(0.0f, 1 - cosineThetaI * cosineThetaI));
+            Float sineThetaI = std::sqrt(std::max(Float(0.), 1 - cosineThetaI * cosineThetaI));
             Float sineThetaT = refraction * sineThetaI;
             if (sineThetaT > 1) {
                 // 全反射，无法折射
                 return false;
             }
 
-            Float cosineThetaT = std::sqrt(std::max(0.0f, 1 - sineThetaT * sineThetaT));
+            Float cosineThetaT = std::sqrt(std::max(Float(0.), 1 - sineThetaT * sineThetaT));
             *wi = refraction * (-wo) + (refraction * cosineThetaI - cosineThetaT) * normal;
             return true;
         }
@@ -408,7 +412,7 @@ namespace kaguya {
              * 对圆盘做均匀采样
              * @return
              */
-            Vector2F diskUniformSampling(Sampler *const sampler1D, Float radius = 1.);
+            Vector2F diskUniformSampling(Sampler *const sampler, Float radius = 1.);
 
             /**
              * Sample barycentric coordinate from triangle

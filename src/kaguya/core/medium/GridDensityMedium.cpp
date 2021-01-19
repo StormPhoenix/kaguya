@@ -15,7 +15,7 @@ namespace kaguya {
 
             GridDensityMedium::GridDensityMedium(const Spectrum &absorptionSigma, const Spectrum &scatteringSigma,
                                                  Float g, int axisXGrid, int axisYGrid, int axisZGrid,
-                                                 float *densities, std::shared_ptr<Transform> transformMatrix) :
+                                                 Float *densities, std::shared_ptr<Transform> transformMatrix) :
                     _absorptionSigma(absorptionSigma), _scatteringSigma(scatteringSigma),
                     _g(g), _gridX(axisXGrid), _gridY(axisYGrid), _gridZ(axisZGrid),
                     _densities(densities), _transformMatrix(transformMatrix),
@@ -38,7 +38,7 @@ namespace kaguya {
                 delete _densities;
             }
 
-            core::Spectrum GridDensityMedium::transmittance(const Ray &ray, Sampler *sampler1D) const {
+            core::Spectrum GridDensityMedium::transmittance(const Ray &ray, Sampler *sampler) const {
                 // transform ray from world space to medium space
                 const Vector3F origin = _invTransformMatrix->transformPoint(ray.getOrigin());
                 const Vector3F dir = _invTransformMatrix->transformVector(ray.getDirection());
@@ -57,21 +57,21 @@ namespace kaguya {
                 Float transmittance = 1.0;
                 while (true) {
                     // Sample a travel distance
-                    step -= std::log(1 - sampler1D->sample1D()) / (_totalSigma * _maxDensity);
+                    step -= std::log(1 - sampler->sample1D()) / (_totalSigma * _maxDensity);
 
                     // If ray > maxStep then break
                     if (step >= maxStep) {
                         break;
                     } else {
                         Float d = density(transformedRay.at(step));
-                        transmittance *= 1. - std::max(0.f, (Float) d * _maxInvDensity);
+                        transmittance *= 1. - std::max(Float(0.), (Float) d * _maxInvDensity);
                     }
                 }
                 return Spectrum(transmittance);
             }
 
 
-            core::Spectrum GridDensityMedium::sampleInteraction(const tracer::Ray &ray, Sampler *sampler1D,
+            core::Spectrum GridDensityMedium::sampleInteraction(const tracer::Ray &ray, Sampler *sampler,
                                                                 MediumInteraction *mi, MemoryArena &memoryArena) const {
                 // transform ray from world space to medium space
                 const Vector3F origin = _invTransformMatrix->transformPoint(ray.getOrigin());
@@ -91,7 +91,7 @@ namespace kaguya {
                     Float step = minStep;
                     while (true) {
                         // Sample a travel distance
-                        step -= std::log(1 - sampler1D->sample1D()) / (_totalSigma * _maxDensity);
+                        step -= std::log(1 - sampler->sample1D()) / (_totalSigma * _maxDensity);
 
                         // Is ray hit AABB boundary ?
                         if (step >= maxStep) {
@@ -99,8 +99,8 @@ namespace kaguya {
                         } else {
                             float d = density(transformedRay.at(step));
                             // Sample by probability
-                            if (std::max(0.f, (Float) d * _maxInvDensity)
-                                > sampler1D->sample1D()) {
+                            if (std::max(Float(0.), (Float) d * _maxInvDensity)
+                                > sampler->sample1D()) {
                                 (*mi) = MediumInteraction(ray.at(step), -ray.getDirection(), this,
                                                           ALLOC(memoryArena, HenyeyGreensteinFunction)(_g));
                                 return _scatteringSigma / _totalSigma;

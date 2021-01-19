@@ -12,11 +12,11 @@ namespace kaguya {
                 Light(LightType(type | AREA), mediumBoundary), _intensity(intensity), _geometry(shape) {}
 
         Spectrum AreaLight::sampleFromLight(const Interaction &eye, Vector3F *wi, Float *pdf,
-                                            Sampler *sampler1D,
+                                            Sampler *sampler,
                                             VisibilityTester *visibilityTester) {
             assert(_geometry != nullptr);
             // 从 eye 出发采样一条射线，返回与 shape 的交点
-            SurfaceInteraction intersection = _geometry->getShape()->sampleSurfaceInteraction(eye, sampler1D);
+            SurfaceInteraction intersection = _geometry->getShape()->sampleSurfaceInteraction(eye, sampler);
             // 射线方向
             (*wi) = NORMALIZE(intersection.point - eye.point);
             // 该射线方向的 PDF

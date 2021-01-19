@@ -35,7 +35,7 @@ namespace kaguya {
 
                 Float area() const override;
 
-                SurfaceInteraction sampleSurfacePoint(Sampler *sampler1D) const override;
+                SurfaceInteraction sampleSurfacePoint(Sampler *sampler) const override;
 
                 const AABB &bound() const override;
 

@@ -17,10 +17,9 @@ namespace kaguya {
                 init();
             }
 
-            Triangle::Triangle(const Vector3F &a, const Vector3F &b, const Vector3F &c, const Vector3F &normal1,
-                               const Vector3F &normal2, const Vector3F &normal3, const Vector2f &uv1,
-                               const Vector2f &uv2,
-                               const Vector2f &uv3,
+            Triangle::Triangle(const Vector3F &a, const Vector3F &b, const Vector3F &c,
+                               const Vector3F &normal1, const Vector3F &normal2, const Vector3F &normal3,
+                               const Vector2F &uv1, const Vector2F &uv2, const Vector2F &uv3,
                                std::shared_ptr<Transform> transformMatrix)
                     : _position1(a), _position2(b), _position3(c),
                       _normal1(normal1), _normal2(normal2), _normal3(normal3),
@@ -193,9 +192,9 @@ namespace kaguya {
                                           (_transformedPosition3 - _transformedPosition1)));
             }
 
-            SurfaceInteraction Triangle::sampleSurfacePoint(Sampler *sampler1D) const {
+            SurfaceInteraction Triangle::sampleSurfacePoint(Sampler *sampler) const {
                 // Uniform sampling triangle
-                Vector2F barycentric = math::sampling::triangleUniformSampling(sampler1D);
+                Vector2F barycentric = math::sampling::triangleUniformSampling(sampler);
 
                 SurfaceInteraction si;
                 Vector3F p = _transformedPosition1 * barycentric[0] +

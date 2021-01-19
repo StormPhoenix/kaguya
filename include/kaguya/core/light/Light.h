@@ -42,7 +42,7 @@ namespace kaguya {
              * @return
              */
             virtual Spectrum sampleFromLight(const Interaction &eye, Vector3F *wi, Float *pdf,
-                                             Sampler *sampler1D,
+                                             Sampler *sampler,
                                              VisibilityTester *visibilityTester) = 0;
 
             /**
@@ -61,7 +61,7 @@ namespace kaguya {
              * @return
              */
             virtual Spectrum randomLightRay(Ray *ray, Vector3F *normal, Float *pdfPos,
-                                            Float *pdfDir, Sampler *sampler1D) = 0;
+                                            Float *pdfDir, Sampler *sampler) = 0;
 
             /**
              * light 主动发射光线，并计算其 pdf 函数

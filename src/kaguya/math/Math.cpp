@@ -7,16 +7,16 @@
 
 namespace kaguya {
     namespace math {
-        Float randomDouble(Float min, Float max, Sampler *const sampler1D) {
-            return min + (max - min) * sampler1D->sample1D();
+        Float randomDouble(Float min, Float max, Sampler *const sampler) {
+            return min + (max - min) * sampler->sample1D();
         }
 
-        int randomInt(int min, int max, Sampler *const sampler1D) {
-            int ret = std::min(static_cast<int>(randomDouble(min, max + 1, sampler1D)), max);
+        int randomInt(int min, int max, Sampler *const sampler) {
+            int ret = std::min(static_cast<int>(randomDouble(min, max + 1, sampler)), max);
             if (ret <= max) {
                 return ret;
             } else {
-                return randomInt(min, max, sampler1D);
+                return randomInt(min, max, sampler);
             }
         }
 
@@ -54,18 +54,18 @@ namespace kaguya {
                 // y = 1 - 2 * sampleV
                 Float y = 1 - 2 * sampleV;
                 // x = sin(theta) * cos(phi)
-                Float x = std::sqrt(std::max(0.0f, (1 - y * y))) * std::cos(2 * PI * sampleU);
+                Float x = std::sqrt(std::max(Float(0.), (1 - y * y))) * std::cos(2 * PI * sampleU);
                 // z = sin(theta) * sin(phi)
-                Float z = std::sqrt(std::max(0.0f, (1 - y * y))) * std::sin(2 * PI * sampleU);
+                Float z = std::sqrt(std::max(Float(0.), (1 - y * y))) * std::sin(2 * PI * sampleU);
 
                 return NORMALIZE(Vector3F(x, y, z));
             }
 
-            Vector2F diskUniformSampling(Sampler *const sampler1D, Float radius) {
+            Vector2F diskUniformSampling(Sampler *const sampler, Float radius) {
                 // sampleY = r / Radius
                 // sampleX = theta / (2 * PI)
-                Float sampleY = sampler1D->sample1D();
-                Float sampleX = sampler1D->sample1D();
+                Float sampleY = sampler->sample1D();
+                Float sampleX = sampler->sample1D();
 
                 Float theta = 2 * PI * sampleX;
                 Float r = sampleY * radius;
@@ -92,7 +92,7 @@ namespace kaguya {
 
                 // 计算 cos(theta) sin(theta)
                 Float cosTheta = 1.0 - sampleV + sampleV * cosThetaMax;
-                Float sinTheta = std::sqrt(std::max(0.0f, 1 - cosTheta * cosTheta));
+                Float sinTheta = std::sqrt(std::max(Float(0.), 1 - cosTheta * cosTheta));
                 // 计算 cos(phi) sin(phi)
                 Float cosPhi = std::cos(2 * PI * sampleU);
                 Float sinPhi = std::sin(2 * PI * sampleU);

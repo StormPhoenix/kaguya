@@ -23,7 +23,7 @@ namespace kaguya {
             Spectrum lightRadiance(const Interaction &interaction, const Vector3F &wo) const override;
 
             virtual Spectrum randomLightRay(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
-                                            Sampler *sampler1D) override;
+                                            Sampler *sampler) override;
 
             virtual void randomLightRayPdf(const Ray &ray, const Vector3F &normal,
                                            Float *pdfPos, Float *pdfDir) const override;
