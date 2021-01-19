@@ -33,9 +33,9 @@ using Vector4f = glm::vec4;
 using Matrix4f = glm::mat4x4;
 using Matrix3f = glm::mat3x3;
 
-#define DOUBLE
+//#define KAGUYA_DATA_DOUBLE
 
-#ifndef DOUBLE
+#if defined(KAGUYA_DATA_DOUBLE)
 using Float = float;
 using Vector3F = Vector3f;
 using Vector2F = Vector2f;
@@ -113,7 +113,7 @@ namespace kaguya {
                 std::swap(thetaI, thetaT);
             }
 
-            Float sineI = std::sqrt(std::max(Float(0.), 1 - std::pow(cosineI, 2)));
+            Float sineI = std::sqrt(std::max(Float(0.), Float(1 - std::pow(cosineI, 2))));
             Float sineT = sineI * (thetaI / thetaT);
 
             if (sineT >= 1) {
@@ -121,7 +121,7 @@ namespace kaguya {
                 return 1.0f;
             }
 
-            Float cosineT = std::sqrt(std::max(Float(0.), (1 - std::pow(sineT, 2))));
+            Float cosineT = std::sqrt(std::max(Float(0.), Float(1 - std::pow(sineT, 2))));
             // 计算 R_parallel
             Float parallelR = ((thetaT * cosineI) - (thetaI * cosineT)) /
                               ((thetaT * cosineI) + (thetaI * cosineT));
@@ -171,7 +171,7 @@ namespace kaguya {
                 cosine = -cosine;
             }
 
-            Float sine = std::sqrt(std::max(Float(0.), 1 - std::pow(cosine, 2)));
+            Float sine = std::sqrt(std::max(Float(0.), Float(1 - std::pow(cosine, 2))));
             if (sine * ref_idx >= 1) {
                 return 1.0;
             }

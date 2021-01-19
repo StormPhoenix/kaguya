@@ -22,7 +22,7 @@ namespace kaguya {
         template<int SpectrumSamples>
         class SpectrumTemplate {
         public:
-            SpectrumTemplate(float v = 0.f) {
+            SpectrumTemplate(Float v = 0.f) {
                 for (int i = 0; i < SpectrumSamples; ++i) {
                     value[i] = v;
                 }
@@ -83,25 +83,25 @@ namespace kaguya {
                 return *this;
             }
 
-            SpectrumTemplate operator*(float a) const {
+            SpectrumTemplate operator*(Float a) const {
                 SpectrumTemplate ret = *this;
                 for (int i = 0; i < SpectrumSamples; ++i) ret.value[i] *= a;
                 assert(!ret.hasNans());
                 return ret;
             }
 
-            SpectrumTemplate &operator*=(float a) {
+            SpectrumTemplate &operator*=(Float a) {
                 for (int i = 0; i < SpectrumSamples; ++i) value[i] *= a;
                 assert(!hasNans());
                 return *this;
             }
 
-            friend inline SpectrumTemplate operator*(float a, const SpectrumTemplate &s) {
+            friend inline SpectrumTemplate operator*(Float a, const SpectrumTemplate &s) {
                 assert(!std::isnan(a) && !s.hasNans());
                 return s * a;
             }
 
-            SpectrumTemplate operator/(float a) const {
+            SpectrumTemplate operator/(Float a) const {
                 assert(a != 0);
                 assert(!std::isnan(a));
                 SpectrumTemplate ret = *this;
@@ -110,7 +110,7 @@ namespace kaguya {
                 return ret;
             }
 
-            SpectrumTemplate &operator/=(float a) {
+            SpectrumTemplate &operator/=(Float a) {
                 assert(a != 0);
                 assert(!std::isnan(a));
                 for (int i = 0; i < SpectrumSamples; ++i) value[i] /= a;
@@ -153,7 +153,7 @@ namespace kaguya {
                 return ret;
             }
 
-            SpectrumTemplate truncate(float low = 0, float high = math::infinity) const {
+            SpectrumTemplate truncate(Float low = 0, Float high = math::infinity) const {
                 SpectrumTemplate ret;
                 for (int i = 0; i < SpectrumSamples; ++i)
                     ret.value[i] = math::clamp(value[i], low, high);
@@ -161,8 +161,8 @@ namespace kaguya {
                 return ret;
             }
 
-            float maxValue() const {
-                float m = value[0];
+            Float maxValue() const {
+                Float m = value[0];
                 for (int i = 1; i < SpectrumSamples; ++i)
                     m = std::max(m, value[i]);
                 return m;
@@ -174,38 +174,38 @@ namespace kaguya {
                 return false;
             }
 
-            float &operator[](int i) {
+            Float &operator[](int i) {
                 assert(i >= 0 && i < SpectrumSamples);
                 return value[i];
             }
 
-            float operator[](int i) const {
+            Float operator[](int i) const {
                 assert(i >= 0 && i < SpectrumSamples);
                 return value[i];
             }
 
         protected:
-            float value[SpectrumSamples];
+            Float value[SpectrumSamples];
         };
 
         class RGBSpectrum : public SpectrumTemplate<3> {
             using SpectrumTemplate<3>::value;
         public:
-            RGBSpectrum(float value = 0.0f) : SpectrumTemplate<3>(value) {}
+            RGBSpectrum(Float value = 0.0f) : SpectrumTemplate<3>(value) {}
 
             RGBSpectrum(const SpectrumTemplate<3> &spectrum) : SpectrumTemplate<3>(spectrum) {}
 
-            float r() const { return value[0]; }
+            Float r() const { return value[0]; }
 
-            void r(float r) { value[0] = r; }
+            void r(Float r) { value[0] = r; }
 
-            float g() const { return value[1]; }
+            Float g() const { return value[1]; }
 
-            void g(float g) { value[1] = g; }
+            void g(Float g) { value[1] = g; }
 
-            float b() const { return value[2]; }
+            Float b() const { return value[2]; }
 
-            void b(float b) { value[2] = b; }
+            void b(Float b) { value[2] = b; }
         };
     }
 }

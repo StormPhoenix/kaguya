@@ -202,6 +202,12 @@ namespace kaguya {
                              _transformedPosition3 * (1 - barycentric[0] - barycentric[1]);
                 si.point = p;
 
+                // error bound
+                Point3F pAbsSum = ABS(barycentric[0] * _transformedPosition1) +
+                                  ABS(barycentric[1] * _transformedPosition2) +
+                                  ABS((1 - barycentric[0] - barycentric[1]) * _transformedPosition3);
+                si.error = math::gamma(6) * Vector3F(pAbsSum.x, pAbsSum.y, pAbsSum.z);
+
                 // geometry normal
                 Vector3F ng = NORMALIZE(CROSS(_transformedPosition2 - _transformedPosition1,
                                               _transformedPosition3 - _transformedPosition1));

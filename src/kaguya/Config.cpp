@@ -25,4 +25,28 @@ namespace kaguya {
     int Config::tileSize = 10;
 
     std::string Config::samplerType = "default";
+
+    std::shared_ptr<Scene> Config::nextScene() {
+        // 若场景未构建，则线构建场景
+        if (!isScenePrepared) {
+                scenes.push_back(Scene::sceneTwoSpheresWithPointLight);
+            scenes.push_back(Scene::sceneTwoSpheresWithAreaLight);
+                scenes.push_back(Scene::sceneTwoSpheresWithSpotLight);
+                scenes.push_back(Scene::sceneBunnyWithPointLight);
+                scenes.push_back(Scene::sceneBunnyWithAreaLight);
+//                scenes.push_back(Scene::sceneSmoke);
+//                scenes.push_back(Scene::sceneLightThroughAir);
+//                scenes.push_back(Scene::cornelBoxWater);
+            isScenePrepared = true;
+        }
+
+        // 选取下一个场景
+        if (sceneId < scenes.size()) {
+            std::shared_ptr<Scene> scene = scenes[sceneId]();
+            sceneId++;
+            return scene;
+        } else {
+            return nullptr;
+        }
+    }
 }

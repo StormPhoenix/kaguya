@@ -63,9 +63,7 @@ namespace kaguya {
             Vector3F dirWorld = dirLocal.x * tanX + dirLocal.y * tanY + dirLocal.z * tanZ;
 
             // 设置 ray
-            (*ray) = Ray(si.point, NORMALIZE(dirWorld),
-                         DOT(dirWorld, *normal) > 0 ? _mediumBoundary.outside() : _mediumBoundary.inside());
-
+            (*ray) = si.sendRay(NORMALIZE(dirWorld));
             return lightRadiance(si, dirWorld);
         }
 
