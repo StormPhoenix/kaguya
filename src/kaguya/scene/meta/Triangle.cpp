@@ -84,8 +84,8 @@ namespace kaguya {
 
             bool Triangle::intersect(Ray &ray, SurfaceInteraction &si,
                                      Float minStep, Float maxStep) const {
-
                 /* transform the ray direction, let it to point to z-axis */
+
                 // move ray's origin to (0, 0, 0)
                 Vector3F p0 = _transformedPosition1 - ray.getOrigin();
                 Vector3F p1 = _transformedPosition2 - ray.getOrigin();
@@ -105,6 +105,7 @@ namespace kaguya {
                 Float shearX = -dir[0] / dir[2];
                 Float shearY = -dir[1] / dir[2];
 
+                // transform points to z-axis
                 p0[0] += shearX * p0[2];
                 p0[1] += shearY * p0[2];
 
@@ -152,17 +153,34 @@ namespace kaguya {
                 Float sumMulStep = e0 * p2.z + e1 * p0.z + e2 * p1.z;
 
                 // make sure step > 0 and step < t_max
-                if (sum > 0 && (sumMulStep <= 0 || sumMulStep >= sum * maxStep)) {
+                if (sum > 0 && (sumMulStep <= sum * minStep || sumMulStep >= sum * maxStep)) {
                     return false;
-                } else if (sum < 0 && (sumMulStep >= 0 || sumMulStep <= sum * maxStep)) {
+                } else if (sum < 0 && (sumMulStep >= sum * minStep || sumMulStep <= sum * maxStep)) {
                     return false;
                 }
 
                 Float invSum = 1. / sum;
-                Float step = sumMulStep * invSum;
                 Float b0 = e0 * invSum;
                 Float b1 = e1 * invSum;
                 Float b2 = e2 * invSum;
+                Float step = sumMulStep * invSum;
+
+                Float maxZ = math::maxAbsAxisValue(Vector3F(p0.z, p1.z, p2.z));
+                Float deltaZ = math::gamma(3) * maxZ;
+
+                Float maxX = math::maxAbsAxisValue(Vector3f(p0.x, p1.x, p2.x));
+                Float maxY = math::maxAbsAxisValue(Vector3f(p0.y, p1.y, p2.y));
+
+                Float deltaX = math::gamma(5) * (maxX + maxZ);
+                Float deltaY = math::gamma(5) * (maxY + maxZ);
+
+                Float deltaE = 2 * (math::gamma(2) * maxX * maxY + deltaY * maxX + deltaX * maxY);
+
+                Float maxE = math::maxAbsAxisValue(Vector3f(e0, e1, e2));
+                Float deltaT = 3 * (math::gamma(3) * maxE * maxZ + deltaE * maxZ + deltaZ * maxE) * std::abs(invSum);
+                if (step <= deltaT) {
+                    return false;
+                }
 
                 // calculate float-error
                 Float zError = math::gamma(7) * (std::abs(b0 * p2.z) + std::abs(b1 * p0.z) + std::abs(b2 * p1.z));

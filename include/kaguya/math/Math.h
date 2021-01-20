@@ -185,6 +185,18 @@ namespace kaguya {
 
         int randomInt(int min, int max, Sampler *const sampler);
 
+        inline Float maxAbsAxisValue(const Vector3F v) {
+            Float maxValue = std::abs(v[0]);
+            int axis = 0;
+            for (int i = 1; i < 3; i++) {
+                if (std::abs(v[i]) > maxValue) {
+                    maxValue = std::abs(v[i]);
+                    axis = i;
+                }
+            }
+            return maxValue;
+        }
+
         inline int maxAbsAxis(const Vector3F v) {
             Float maxValue = std::abs(v[0]);
             int axis = 0;
