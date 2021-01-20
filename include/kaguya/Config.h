@@ -46,6 +46,8 @@ namespace kaguya {
         static int tileSize;
         // Sampler type
         static std::string samplerType;
+        // Render type
+        static std::string renderType;
 
         static std::shared_ptr<Camera> buildCamera() {
             // TODO load config file

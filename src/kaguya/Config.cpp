@@ -25,6 +25,7 @@ namespace kaguya {
     int Config::tileSize = 10;
 
     std::string Config::samplerType = "default";
+    std::string Config::renderType = "pt";
 
     std::shared_ptr<Scene> Config::nextScene() {
         // 若场景未构建，则线构建场景
@@ -34,7 +35,7 @@ namespace kaguya {
             scenes.push_back(Scene::sceneTwoSpheresWithSpotLight);
             scenes.push_back(Scene::sceneBunnyWithPointLight);
             scenes.push_back(Scene::sceneBunnyWithAreaLight);
-//            scenes.push_back(Scene::sceneSmoke);
+            scenes.push_back(Scene::sceneSmoke);
 //                scenes.push_back(Scene::sceneLightThroughAir);
 //                scenes.push_back(Scene::cornelBoxWater);
             isScenePrepared = true;
