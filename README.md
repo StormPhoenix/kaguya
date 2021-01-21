@@ -22,6 +22,10 @@ A simple physically based render.
 
 - [ ] Geometry Aggregation 结构调整
 
+- [ ] 自己实现 Transformation，加上 Error 管理
+
+- [ ] 修改 Sphere 实现，扩展成椭圆球体. 
+
 ## Unsolved
 - [ ] 添加 low Discrepancy 序列
     - [ ] 添加 halton 序列
