@@ -16,8 +16,8 @@ namespace kaguya {
 
             class GridDensityMedium : public Medium {
             public:
-                GridDensityMedium(const Spectrum &absorptionSigma,
-                                  const Spectrum &scatteringSigma,
+                GridDensityMedium(const Spectrum &sigma_a,
+                                  const Spectrum &sigma_s,
                                   Float g, int axisXGrid, int axisYGrid, int axisZGrid,
                                   Float *densities,
                                   std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
@@ -47,9 +47,9 @@ namespace kaguya {
                 float d(const Vector3F &coord) const;
 
             private:
-                const Spectrum _absorptionSigma;
-                const Spectrum _scatteringSigma;
-                Float _totalSigma;
+                const Spectrum _sigma_a;
+                const Spectrum _sigma_s;
+                Float _sigma_t;
                 Float _g;
                 Float *_densities = nullptr;
                 std::shared_ptr<Transform> _transformMatrix = nullptr;

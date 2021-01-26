@@ -13,16 +13,16 @@ namespace kaguya {
             using kaguya::scene::acc::AABB;
             using kaguya::core::HenyeyGreensteinFunction;
 
-            GridDensityMedium::GridDensityMedium(const Spectrum &absorptionSigma, const Spectrum &scatteringSigma,
+            GridDensityMedium::GridDensityMedium(const Spectrum &sigma_a, const Spectrum &sigma_s,
                                                  Float g, int axisXGrid, int axisYGrid, int axisZGrid,
                                                  Float *densities, std::shared_ptr<Transform> transformMatrix) :
-                    _absorptionSigma(absorptionSigma), _scatteringSigma(scatteringSigma),
+                    _sigma_a(sigma_a), _sigma_s(sigma_s),
                     _g(g), _gridX(axisXGrid), _gridY(axisYGrid), _gridZ(axisZGrid),
                     _densities(densities), _transformMatrix(transformMatrix),
                     _invTransformMatrix(transformMatrix->inverse()) {
-                _totalSigma = (_absorptionSigma + _scatteringSigma)[0];
+                _sigma_t = (_sigma_a + _sigma_s)[0];
 
-                assert(Spectrum(_totalSigma) == (_absorptionSigma + _scatteringSigma));
+                assert(Spectrum(_sigma_t) == (_sigma_a + _sigma_s));
 
                 float maxDensity = 0;
                 for (int i = 0; i < _gridZ * _gridY * _gridX; i++) {
@@ -57,7 +57,7 @@ namespace kaguya {
                 Float transmittance = 1.0;
                 while (true) {
                     // Sample a travel distance
-                    step -= std::log(1 - sampler->sample1D()) / (_totalSigma * _maxDensity);
+                    step -= std::log(1 - sampler->sample1D()) / (_sigma_t * _maxDensity);
 
                     // If ray > maxStep then break
                     if (step >= maxStep) {
@@ -91,7 +91,7 @@ namespace kaguya {
                     Float step = minStep;
                     while (true) {
                         // Sample a travel distance
-                        step -= std::log(1 - sampler->sample1D()) / (_totalSigma * _maxDensity);
+                        step -= std::log(1 - sampler->sample1D()) / (_sigma_t * _maxDensity);
 
                         // Is ray hit AABB boundary ?
                         if (step >= maxStep) {
@@ -103,7 +103,7 @@ namespace kaguya {
                                 > sampler->sample1D()) {
                                 (*mi) = MediumInteraction(ray.at(step), -ray.getDirection(), this,
                                                           ALLOC(memoryArena, HenyeyGreensteinFunction)(_g));
-                                return _scatteringSigma / _totalSigma;
+                                return _sigma_s / _sigma_t;
                             }
                         }
                     }
