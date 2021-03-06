@@ -36,17 +36,17 @@ using Matrix3f = glm::mat3x3;
 //#define KAGUYA_DATA_DOUBLE
 
 #if defined(KAGUYA_DATA_DOUBLE)
-using Float = float;
-using Vector3F = Vector3f;
-using Vector2F = Vector2f;
-using Matrix4F = Matrix4f;
-using Matrix3F = Matrix3f;
-#else
 using Float = double;
 using Vector3F = Vector3d;
 using Vector2F = Vector2d;
 using Matrix4F = Matrix4d;
 using Matrix3F = Matrix3d;
+#else
+using Float = float;
+using Vector3F = Vector3f;
+using Vector2F = Vector2f;
+using Matrix4F = Matrix4f;
+using Matrix3F = Matrix3f;
 #endif
 
 using Point2F = Vector2F;
@@ -488,6 +488,71 @@ namespace kaguya {
 
                 uint32_t reverseBit32(uint32_t n);
             }
+        }
+
+        namespace spline_curve {
+            /**
+             * Integrate on catmull-rom spline curve
+             * @param len curve length
+             * @param value integration value
+             * @param x integration axis
+             * @param cdf
+             * @return effective albedo
+             */
+            Float integrateCatmullRom(int len, const Float *values, const Float *x, Float *cdf);
+
+            /**
+             * Catmull-Rom interpolation, calculate weights
+             * @param len
+             * @param values
+             * @param x
+             * @param offset
+             * @param weights
+             * @return
+             */
+            bool catmullRomWeights(int len, const Float *values, Float x, int *offset, Float *weights);
+
+            /**
+             * Sample catmull-rom spline
+             * @param len
+             * @param f catmull-rom spline segments
+             * @param F integral of catmull-rom spline
+             * @param x axis of catmull-rom
+             * @param sample sample number
+             * @param fval sampled catmull-spline interpolation value
+             * @param pdf
+             * @return
+             */
+            Float sampleCatmullRom(int len, const Float *f, const Float *F, const Float *x,
+                                   Float sample, Float *fval, Float *pdf);
+
+            /**
+             * Sample 2-dimension catmull-rom spline function
+             * @param rowSize
+             * @param rows
+             * @param colSize
+             * @param cols
+             * @param values
+             * @param cdf
+             * @param albedo
+             * @param sample
+             * @param fval
+             * @param pdf
+             * @return
+             */
+            Float sampleCatmullRom2D(int rowSize, const Float *rows, int colSize, const Float *cols,
+                                     const Float *values, const Float *cdf, Float albedo, Float sample,
+                                     Float *fval = nullptr, Float *pdf = nullptr);
+
+            /**
+             * Invert catmull-rom spline function not its definite integral
+             * @param len
+             * @param values
+             * @param x
+             * @param value
+             * @return
+             */
+            Float invertCatmullRom(int len, const Float *values, const Float *x, Float value);
         }
     }
 }

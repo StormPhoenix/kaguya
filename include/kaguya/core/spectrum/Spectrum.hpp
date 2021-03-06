@@ -33,6 +33,14 @@ namespace kaguya {
                 for (int i = 0; i < SpectrumSamples; ++i) value[i] = s.value[i];
             }
 
+            SpectrumTemplate clamp(Float low = 0, Float high = math::infinity) const {
+                SpectrumTemplate ret;
+                for (int i = 0; i < SpectrumSamples; ++i)
+                    ret.value[i] = math::clamp(value[i], low, high);
+                DCHECK(!ret.HasNaNs());
+                return ret;
+            }
+
             SpectrumTemplate &operator=(const SpectrumTemplate &s) {
                 assert(!s.hasNans());
                 for (int i = 0; i < SpectrumSamples; ++i) value[i] = s.value[i];

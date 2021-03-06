@@ -13,33 +13,34 @@
 
 namespace kaguya {
     namespace core {
+        namespace bssrdf {
 
-        using memory::MemoryArena;
-        using scene::Scene;
+            using memory::MemoryArena;
+            using scene::Scene;
 
-        /*
-         * Bidirectional subsurface scattering reflection distribution function
-         * L_o(p_o, w_o) = \int_A \int_{H^2} S(p_o, p_i, w_o, w_i) L_i(p_i, w_i) cos|\theta_i| d(w_i) d(A)
-         **/
-        class BSSRDF {
-        public:
-            BSSRDF(const SurfaceInteraction &po) : po(po) {}
+            /*
+             * Bidirectional subsurface scattering reflection distribution function
+             * L_o(p_o, w_o) = \int_A \int_{H^2} S(p_o, p_i, w_o, w_i) L_i(p_i, w_i) cos|\theta_i| d(w_i) d(A)
+             **/
+            class BSSRDF {
+            public:
+                BSSRDF(const SurfaceInteraction &po) : po(po) {}
 
-            /**
-             * S(p_o, p_i, w_o, w_i)
-             */
-            virtual Spectrum s(const SurfaceInteraction &si, const Vector3F &wi) = 0;
+                /**
+                 * S(p_o, p_i, w_o, w_i)
+                 */
+                virtual Spectrum S(const SurfaceInteraction &si, const Vector3F &wi) = 0;
 
-            /**
-             * Sample S(p_o, p_i, w_o, w_i)
-             */
-            virtual Spectrum sampleS(const Scene &scene, SurfaceInteraction *si, Float *pdf,
-                                     MemoryArena &memoryArena, Sampler *sampler) = 0;
+                /**
+                 * Sample S(p_o, p_i, w_o, w_i)
+                 */
+                virtual Spectrum sampleS(const Scene &scene, SurfaceInteraction *si, Float *pdf,
+                                         MemoryArena &memoryArena, Sampler *sampler) = 0;
 
-        protected:
-            const SurfaceInteraction &po;
-        };
-
+            protected:
+                const SurfaceInteraction &po;
+            };
+        }
     }
 }
 

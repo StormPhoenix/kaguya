@@ -7,15 +7,16 @@
 
 namespace kaguya {
     namespace core {
+        namespace bssrdf {
+            SeparableBSSRDFAdapter::SeparableBSSRDFAdapter(const SeparableBSSRDF *bssrdf) :
+                    BXDF(BXDFType(BSDF_REFLECTION | BSDF_DIFFUSE)), _bssrdf(bssrdf) {
+                assert(_bssrdf != nullptr);
+            }
 
-        SeparableBSSRDFAdapter::SeparableBSSRDFAdapter(const SeparableBSSRDF *bssrdf) :
-                BXDF(BXDFType(BSDF_REFLECTION | BSDF_DIFFUSE)), _bssrdf(bssrdf) {
-            assert(_bssrdf != nullptr);
-        }
-
-        Spectrum SeparableBSSRDFAdapter::f(const Vector3F &wo, const Vector3F &wi) const {
-            // TODO check radiance transport mode
-            return _bssrdf->subsurfaceWi(wi);
+            Spectrum SeparableBSSRDFAdapter::f(const Vector3F &wo, const Vector3F &wi) const {
+                // TODO check radiance transport mode
+                return _bssrdf->subsurfaceWi(wi);
+            }
         }
     }
 }

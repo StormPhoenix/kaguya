@@ -9,19 +9,19 @@
 
 namespace kaguya {
     namespace core {
+        namespace bssrdf {
+            class SeparableBSSRDF;
 
-        class SeparableBSSRDF;
+            class SeparableBSSRDFAdapter : public BXDF {
+            public:
+                SeparableBSSRDFAdapter(const SeparableBSSRDF *bssrdf);
 
-        class SeparableBSSRDFAdapter : public BXDF {
-        public:
-            SeparableBSSRDFAdapter(const SeparableBSSRDF *bssrdf);
+                virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
 
-            virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
-
-        private:
-            const SeparableBSSRDF *_bssrdf;
-        };
-
+            private:
+                const SeparableBSSRDF *_bssrdf;
+            };
+        }
     }
 }
 
