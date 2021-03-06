@@ -26,13 +26,24 @@ namespace kaguya {
                 // nAlbedoSamples x nRadiusSamples
                 std::unique_ptr<Float[]> profileCDF;
 
+                BSSRDFTable(int nRhoSamples, int nRadiusSamples);
+
                 inline Float evaluate(int albedoIndex, int radiusIndex) const {
                     return profile[albedoIndex * nRadiusSamples + radiusIndex];
                 }
 
             } BSSRDFTable;
 
+            void beamDiffusionForBSSRDFTable(Float g, Float theta, BSSRDFTable *table);
+
             class TabulatedBSSRDF : public SeparableBSSRDF {
+            public:
+                TabulatedBSSRDF(const Spectrum &sigma_a,
+                                const Spectrum &sigma_s,
+                                const BSSRDFTable &table,
+                                const SurfaceInteraction &po,
+                                Material *material, Float theta);
+
             protected:
                 virtual Spectrum Sr(Float radius) const override;
 

@@ -11,6 +11,12 @@
 namespace kaguya {
     namespace core {
         namespace bssrdf {
+
+            // TODO 多项式拟合积分，尚未推导，现在这里记录下来
+            Float fresnelMoment1(Float eta);
+
+            Float fresnelMoment2(Float eta);
+
             /**
              * SeparableBSSRDF
              * S(p_o, p_i, w_o, w_i) = (1 - Fr(w_o)) * S_p(p_o, p_i) * S_w(w_i)
@@ -19,9 +25,7 @@ namespace kaguya {
                 friend class SeparableBSSRDFAdapter;
 
             public:
-                /*
                 SeparableBSSRDF(const SurfaceInteraction &po, Material *material, Float theta);
-                 */
 
                 /**
                  * S(p_o, p_i, w_o, w_i) = (1 - Fr(w_o)) * S_p(p_o, p_i) * S_w(w_i)
@@ -48,7 +52,7 @@ namespace kaguya {
                  * @param si
                  * @return
                  */
-                virtual Spectrum subsurfacePoint(SurfaceInteraction &si) const;
+                virtual Spectrum subsurfacePoint(const SurfaceInteraction &si) const;
 
                 /**
                  * pdf of S_p(p_o, p_i)

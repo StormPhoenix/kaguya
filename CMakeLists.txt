@@ -60,6 +60,7 @@ file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/bsdf/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/bssrdf/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/light/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/phase/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/medium/*.cpp
@@ -75,5 +76,5 @@ file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/pt/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/*.cpp)
 
-add_executable(kaguya ${sources} include/kaguya/core/bssrdf/SeparableBSSRDF.h src/kaguya/core/bssrdf/SeparableBSSRDF.cpp include/kaguya/core/bssrdf/SeparableBSSRDFAdapter.h src/kaguya/core/bssrdf/SeparableBSSRDFAdapter.cpp include/kaguya/core/bsdf/FourierBSDF.h)
+add_executable(kaguya ${sources})
 target_link_libraries(kaguya pthread)

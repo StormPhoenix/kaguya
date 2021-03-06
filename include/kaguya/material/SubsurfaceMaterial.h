@@ -5,13 +5,27 @@
 #ifndef KAGUYA_SUBSURFACEMATERIAL_H
 #define KAGUYA_SUBSURFACEMATERIAL_H
 
+#include <kaguya/core/bssrdf/TabulatedBSSRDF.h>
 #include <kaguya/material/Material.h>
 
 namespace kaguya {
     namespace material {
 
+        using namespace bssrdf;
+
         class SubsurfaceMaterial : public Material {
         public:
+            // TODO
+            SubsurfaceMaterial(Spectrum albedoEff, Spectrum mft, Float g, Float eta);
+
+            virtual BSDF *bsdf(SurfaceInteraction &si, MemoryArena &memoryArena,
+                               TransportMode mode = TransportMode::RADIANCE) override;
+
+        private:
+            BSSRDFTable _table;
+            Spectrum _albedoEff;
+            Spectrum _meanFreePath;
+            Float _theta;
         };
 
     }

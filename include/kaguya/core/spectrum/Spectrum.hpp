@@ -37,7 +37,7 @@ namespace kaguya {
                 SpectrumTemplate ret;
                 for (int i = 0; i < SpectrumSamples; ++i)
                     ret.value[i] = math::clamp(value[i], low, high);
-                DCHECK(!ret.HasNaNs());
+                assert(!ret.hasNans());
                 return ret;
             }
 

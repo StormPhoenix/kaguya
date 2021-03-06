@@ -98,6 +98,11 @@ namespace kaguya {
             return x;
         }
 
+        inline Float phaseFuncHG(Float cosTheta, Float g) {
+            Float denominator = 1 + g * g + 2 * g * cosTheta;
+            return INV_4PI * (1 - g * g) / (denominator * std::sqrt(denominator));
+        }
+
         /**
          * 计算非导体（玻璃、水晶等）的反射概率
          * @param cosineI 值的正负用于表示内部、外部射入

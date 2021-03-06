@@ -8,7 +8,7 @@
 namespace kaguya {
     namespace core {
         namespace bssrdf {
-            // TODO 多项式拟合积分，尚未推导，现在这里记录下来
+
             Float fresnelMoment1(Float eta) {
                 Float eta2 = eta * eta, eta3 = eta2 * eta, eta4 = eta3 * eta,
                         eta5 = eta4 * eta;
@@ -34,22 +34,20 @@ namespace kaguya {
                 }
             }
 
-            /*
             SeparableBSSRDF::SeparableBSSRDF(const SurfaceInteraction &po, Material *material, Float theta) :
                     BSSRDF(po), _material(material), _theta(theta) {
                 // build local coordinate
                 // 构造切线空间
-                 // 此处的实现和 pbrt 中的实现不同，pbrt 用的是 dudp 和纹理相关，但目前没有实现纹理部分
-                 // 暂时用入射光线和法线来构造切线空间
-                _tanY = NORMALIZE(po.getNormal());
-                _tanZ = NORMALIZE(CROSS(po.getDirection(), _tanY));
+                // 此处的实现和 pbrt 中的实现不同，pbrt 用的是 dudp 和纹理相关，但目前没有实现纹理部分
+                // 暂时用入射光线和法线来构造切线空间
+                _tanY = NORMALIZE(po.normal);
+                _tanZ = NORMALIZE(CROSS(po.direction, _tanY));
                 if (!math::isValid(_tanZ)) {
                     math::tangentSpace(_tanY, &_tanX, &_tanZ);
                 } else {
                     _tanX = NORMALIZE(CROSS(_tanY, _tanZ));
                 }
             }
-             */
 
             Spectrum SeparableBSSRDF::sampleS(const Scene &scene, SurfaceInteraction *si, Float *pdf,
                                               MemoryArena &memoryArena, Sampler *sampler) {
@@ -61,6 +59,13 @@ namespace kaguya {
                     si->direction = po.direction;
                 }
                 return sp;
+            }
+
+            Spectrum SeparableBSSRDF::S(const SurfaceInteraction &si, const Vector3F &wi) {
+                Float cosTheta = ABS_DOT(po.direction, po.normal);
+                Float ft = math::fresnelDielectric(cosTheta, 1, _theta);
+                // TODO  wi 是什么坐标系
+                return (1 - ft) * subsurfacePoint(si) * subsurfaceWi(wi);
             }
 
             Spectrum SeparableBSSRDF::sampleSubsurfacePoint(const Scene &scene, SurfaceInteraction *si, Float *pdf,
@@ -152,7 +157,7 @@ namespace kaguya {
                 return subsurfacePoint(*si);
             }
 
-            Spectrum SeparableBSSRDF::subsurfacePoint(SurfaceInteraction &si) const {
+            Spectrum SeparableBSSRDF::subsurfacePoint(const SurfaceInteraction &si) const {
                 return Sr(LENGTH(po.point - si.point));
             }
 
