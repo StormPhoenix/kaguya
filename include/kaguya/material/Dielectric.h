@@ -19,8 +19,8 @@ namespace kaguya {
 
             virtual bool isSpecular() const override;
 
-            virtual BSDF *bsdf(SurfaceInteraction &insect, MemoryArena &memoryArena,
-                               TransportMode mode = TransportMode::RADIANCE) override;
+            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
+                                                     TransportMode mode = TransportMode::RADIANCE) override;
 
 
         private:

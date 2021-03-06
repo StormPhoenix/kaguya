@@ -36,7 +36,7 @@ namespace kaguya {
                  * Sample S(p_o, p_i, w_o, w_i) = (1 - Fr(w_o)) * S_p(p_o, p_i) * S_w(w_i)
                  */
                 virtual Spectrum
-                sampleS(const Scene &scene, SurfaceInteraction *si, Float *pdf, MemoryArena &memoryArena,
+                sampleS(std::shared_ptr<Scene> scene, SurfaceInteraction *si, Float *pdf, MemoryArena &memoryArena,
                         Sampler *sampler) override;
 
             protected:
@@ -44,22 +44,22 @@ namespace kaguya {
                  * Sample S_p(p_o, p_i)
                  * @return
                  */
-                virtual Spectrum sampleSubsurfacePoint(const Scene &scene, SurfaceInteraction *si, Float *pdf,
-                                                       MemoryArena &memoryArena, Sampler *sampler);
+                virtual Spectrum sampleSp(std::shared_ptr<Scene> scene, SurfaceInteraction *si, Float *pdf,
+                                          MemoryArena &memoryArena, Sampler *sampler);
 
                 /**
                  * S_(p_o, p_i)
                  * @param si
                  * @return
                  */
-                virtual Spectrum subsurfacePoint(const SurfaceInteraction &si) const;
+                virtual Spectrum Sp(const SurfaceInteraction &si) const;
 
                 /**
                  * pdf of S_p(p_o, p_i)
                  * @param si
                  * @return
                  */
-                virtual Float subsurfacePointPdf(SurfaceInteraction &si) const;
+                virtual Float SpPdf(SurfaceInteraction &si) const;
 
                 /**
                  * S_p(p_o, p_i) = S_r(|p_o - p_i|)

@@ -18,8 +18,8 @@ namespace kaguya {
             Vector3F worldWi = NORMALIZE(next.point - point);
             switch (type) {
                 case SURFACE:
-                    assert(si.getBSDF() != nullptr);
-                    return si.getBSDF()->f(-si.direction, worldWi);
+                    assert(si.bsdf != nullptr);
+                    return si.bsdf->f(-si.direction, worldWi);
                 case MEDIUM:
                     assert(mi.getPhaseFunction() != nullptr);
                     return mi.getPhaseFunction()->scatterPdf(-mi.direction, worldWi);
@@ -99,8 +99,8 @@ namespace kaguya {
                     return !isDeltaLight();
                 case SURFACE:
                     // 判断 specular 类型
-                    assert(si.getBSDF() != nullptr);
-                    return si.getBSDF()->hasAnyOf(BXDFType(BXDFType::BSDF_DIFFUSE | BXDFType::BSDF_GLOSSY)) > 0;
+                    assert(si.bsdf != nullptr);
+                    return si.bsdf->hasAnyOf(BXDFType(BXDFType::BSDF_DIFFUSE | BXDFType::BSDF_GLOSSY)) > 0;
                 case MEDIUM:
                     return true;
                 default:
@@ -142,7 +142,7 @@ namespace kaguya {
                 Ray cameraRay = Ray(ei.point, ei.direction);
                 ei.camera->rayImportance(cameraRay, pdfPos, pdf);
             } else if (type == SURFACE) {
-                pdf = si.getBSDF()->samplePdf(wo, wi);
+                pdf = si.bsdf->samplePdf(wo, wi);
             } else if (type == MEDIUM) {
                 assert(mi.getPhaseFunction() != nullptr);
                 pdf = mi.getPhaseFunction()->scatterPdf(wo, wi);

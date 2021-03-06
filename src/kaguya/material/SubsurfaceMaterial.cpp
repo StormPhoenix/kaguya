@@ -3,10 +3,13 @@
 //
 
 #include <kaguya/math/Math.h>
+#include <kaguya/core/bsdf/BXDFSpecular.h>
 #include <kaguya/material/SubsurfaceMaterial.h>
 
 namespace kaguya {
     namespace material {
+
+        using kaguya::core::BXDFSpecular;
 
         SubsurfaceMaterial::SubsurfaceMaterial(Spectrum albedoEff, Spectrum mft, Float g, Float eta)
                 : _theta(eta), _albedoEff(albedoEff), _meanFreePath(mft), _table(100, 64) {
@@ -35,13 +38,14 @@ namespace kaguya {
             }
         }
 
-        BSDF *SubsurfaceMaterial::bsdf(SurfaceInteraction &si, MemoryArena &memoryArena, TransportMode mode) {
-            BSDF *bsdf = ALLOC(memoryArena, BSDF)(si);
+        void SubsurfaceMaterial::computeScatteringFunctions(SurfaceInteraction &si, MemoryArena &memoryArena, TransportMode mode) {
+
+            si.bsdf = ALLOC(memoryArena, BSDF)(si);
+            si.bsdf->addBXDF(ALLOC(memoryArena, BXDFSpecular)(1.0f, 1.0f, _theta, mode));
+
             Spectrum sigma_a, sigma_s;
             subsurfaceFromDiffuse(_table, _albedoEff, _meanFreePath, &sigma_a, &sigma_s);
-            BSSRDF *bssrdf = ALLOC(memoryArena, TabulatedBSSRDF)(sigma_a, sigma_s, _table, si, this, _theta);
-            // TODO
-            return nullptr;
+            si.bssrdf = ALLOC(memoryArena, TabulatedBSSRDF)(sigma_a, sigma_s, _table, si, this, _theta);
         }
     }
 }

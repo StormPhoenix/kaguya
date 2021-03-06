@@ -34,7 +34,7 @@ namespace kaguya {
                 /**
                  * Sample S(p_o, p_i, w_o, w_i)
                  */
-                virtual Spectrum sampleS(const Scene &scene, SurfaceInteraction *si, Float *pdf,
+                virtual Spectrum sampleS(std::shared_ptr<Scene> scene, SurfaceInteraction *si, Float *pdf,
                                          MemoryArena &memoryArena, Sampler *sampler) = 0;
 
             protected:

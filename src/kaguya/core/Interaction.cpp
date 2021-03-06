@@ -81,10 +81,9 @@ namespace kaguya {
                 u(u), v(v) {}
 
 
-        BSDF *SurfaceInteraction::buildBSDF(MemoryArena &memoryArena, TransportMode mode) {
+        void SurfaceInteraction::buildScatteringFunction(MemoryArena &memoryArena, TransportMode mode) {
             assert(_material != nullptr);
-            _bsdf = _material->bsdf(*this, memoryArena, mode);
-            return _bsdf;
+            _material->computeScatteringFunctions(*this, memoryArena, mode);
         }
 
         StartEndInteraction::StartEndInteraction(const Camera *camera,

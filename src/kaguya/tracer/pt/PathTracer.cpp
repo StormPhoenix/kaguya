@@ -3,6 +3,7 @@
 //
 
 #include <kaguya/Config.h>
+#include <kaguya/core/bssrdf/BSSRDF.h>
 #include <kaguya/core/Interaction.h>
 #include <kaguya/core/light/AreaLight.h>
 #include <kaguya/core/medium/Medium.h>
@@ -18,6 +19,7 @@ namespace kaguya {
 
         using kaguya::core::Interaction;
         using kaguya::material::Material;
+        using core::bssrdf::BSSRDF;
 
         PathTracer::PathTracer() {
             init();
@@ -38,7 +40,7 @@ namespace kaguya {
             // 最终渲染结果
             Spectrum shaderColor = Spectrum(0);
             // 光线是否是 delta distribution
-            bool isSpecular = false;
+            bool isSpecularBounce = false;
             // 保存历次反射计算的 (f(p, wi, wo) * G(wo, wi)) / p(wi)
             Spectrum beta = 1.0;
             // 散射光线
@@ -70,11 +72,11 @@ namespace kaguya {
                     Vector3F worldWi;
                     mi.getPhaseFunction()->sampleScatter(worldWo, &worldWi, sampler);
                     scatterRay = mi.sendRay(worldWi);
-                    isSpecular = false;
+                    isSpecularBounce = false;
                 } else {
                     // handle surface interaction
-                    // 此处参考 pbrt 的写法，需要判断 bounce = 0 和 isSpecular 两种特殊情况
-                    if (bounce == 0 || isSpecular) {
+                    // 此处参考 pbrt 的写法，需要判断 bounce = 0 和 isSpecularBounce 两种特殊情况
+                    if (bounce == 0 || isSpecularBounce) {
                         if (isIntersected) {
                             // 如果有交点，则直接从交点上取值
                             if (si.getAreaLight() != nullptr) {
@@ -100,11 +102,11 @@ namespace kaguya {
                         continue;
                     }
 
-                    BSDF *bsdf = si.buildBSDF(memoryArena);
-                    assert(bsdf != nullptr);
+                    si.buildScatteringFunction(memoryArena);
+                    assert(si.bsdf != nullptr);
 
                     // 判断是否向光源采样
-                    if (bsdf->allIncludeOf(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
+                    if (si.bsdf->allIncludeOf(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
                         shaderColor += (beta * sampleDirectLight(scene, si, sampler));
                     }
 
@@ -116,7 +118,8 @@ namespace kaguya {
                     // p(wi)
                     Float samplePdf = 0;
                     // f(p, wo, wi)
-                    Spectrum f = bsdf->sampleF(worldWo, &worldWi, &samplePdf, sampler, BSDF_ALL, &bxdfType);
+                    Spectrum f = si.bsdf->sampleF(worldWo, &worldWi, &samplePdf, sampler, BSDF_ALL, &bxdfType);
+                    isSpecularBounce = (bxdfType & BSDF_SPECULAR) > 0;
 
                     // cosine
                     Float cosine = ABS_DOT(si.rendering.normal, NORMALIZE(worldWi));
@@ -124,7 +127,28 @@ namespace kaguya {
                     beta *= (f * cosine / samplePdf);
                     // 设置下一次打击光线
                     scatterRay = si.sendRay(NORMALIZE(worldWi));
-                    isSpecular = (bxdfType & BSDF_SPECULAR) > 0;
+
+                    if (si.bssrdf && (bxdfType & BXDFType::BSDF_TRANSMISSION)) {
+                        // Subsurface
+                        SurfaceInteraction pi;
+                        Float pdf = 0;
+                        Spectrum S = si.bssrdf->sampleS(scene, &pi, &pdf, memoryArena, sampler);
+                        if (S.isBlack() || pdf == 0) {
+                            break;
+                        }
+
+                        beta *= S / pdf;
+                        shaderColor += beta * sampleDirectLight(scene, pi, sampler);
+
+                        Spectrum f = pi.bsdf->sampleF(-pi.direction, &worldWi, &pdf, sampler, BSDF_ALL, &bxdfType);
+                        if (f.isBlack() || pdf == 0) {
+                            break;
+                        }
+
+                        beta *= f * ABS_DOT(worldWi, pi.rendering.normal) / pdf;
+                        isSpecularBounce = (bxdfType & BSDF_SPECULAR) > 0;
+                        scatterRay = pi.sendRay(NORMALIZE(worldWi));
+                    }
                 }
 
                 // TODO 透明介质透射考虑 折射率 refraction
@@ -169,11 +193,11 @@ namespace kaguya {
                 } else {
                     // handle surface interaction
                     const SurfaceInteraction &si = (const SurfaceInteraction &) eye;
-                    assert(si.getBSDF() != nullptr);
+                    assert(si.bsdf != nullptr);
 
                     Float cosine = ABS_DOT(eye.normal, wi);
-                    scatteringPdf = si.getBSDF()->samplePdf(-eye.direction, wi);
-                    f = si.getBSDF()->f(-eye.direction, wi) * cosine;
+                    scatteringPdf = si.bsdf->samplePdf(-eye.direction, wi);
+                    f = si.bsdf->f(-eye.direction, wi) * cosine;
                 }
 
                 if (!f.isBlack()) {
@@ -207,10 +231,10 @@ namespace kaguya {
                 } else {
                     // handle surface interaction
                     const SurfaceInteraction &si = (const SurfaceInteraction &) eye;
-                    assert(si.getBSDF() != nullptr);
+                    assert(si.bsdf != nullptr);
 
                     BXDFType sampleType;
-                    f = si.getBSDF()->sampleF(wo, &wi, &scatteringPdf, sampler, BSDF_ALL, &sampleType);
+                    f = si.bsdf->sampleF(wo, &wi, &scatteringPdf, sampler, BSDF_ALL, &sampleType);
                     f *= ABS_DOT(-si.direction, wi);
                     sampleSpecular = (sampleType & BXDFType::BSDF_SPECULAR) != 0;
                 }

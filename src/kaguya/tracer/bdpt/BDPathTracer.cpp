@@ -277,8 +277,8 @@ namespace kaguya {
                         }
 
                         // build BSDF
-                        BSDF *bsdf = si.buildBSDF(memoryArena, mode);
-                        assert(bsdf != nullptr);
+                        si.buildScatteringFunction(memoryArena, mode);
+                        assert(si.bsdf != nullptr);
 
                         // 添加新点 TODO 默认只有 Surface 类型
                         vertex = PathVertex::createSurfaceVertex(si, pdfPreWi, preVertex, beta);
@@ -288,8 +288,8 @@ namespace kaguya {
                         Vector3F worldWo = -si.direction;
                         Vector3F worldWi = Vector3F(0);
                         BXDFType sampleType;
-                        Spectrum f = bsdf->sampleF(worldWo, &worldWi, &pdfPreWi, sampler,
-                                                   BXDFType::BSDF_ALL, &sampleType);
+                        Spectrum f = si.bsdf->sampleF(worldWo, &worldWi, &pdfPreWi, sampler,
+                                                      BXDFType::BSDF_ALL, &sampleType);
 
                         // 判断采样是否有效
                         if (std::abs(pdfPreWi) < math::EPSILON || f.isBlack()) {
@@ -306,7 +306,7 @@ namespace kaguya {
                         beta *= (f * cosine / pdfPreWi);
 
                         // 计算向后 pdfWo
-                        pdfWo = bsdf->samplePdf(worldWi, worldWo);
+                        pdfWo = si.bsdf->samplePdf(worldWi, worldWo);
 
                         // 如果 bsdf 反射含有 delta 成分，则前后 pdf 都赋值为 0
                         if (sampleType & BXDFType::BSDF_SPECULAR) {

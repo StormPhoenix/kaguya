@@ -49,13 +49,13 @@ namespace kaguya {
                 }
             }
 
-            Spectrum SeparableBSSRDF::sampleS(const Scene &scene, SurfaceInteraction *si, Float *pdf,
+            Spectrum SeparableBSSRDF::sampleS(std::shared_ptr<Scene> scene, SurfaceInteraction *si, Float *pdf,
                                               MemoryArena &memoryArena, Sampler *sampler) {
                 // Sampling S_p(p_o, p_i)
-                Spectrum sp = sampleSubsurfacePoint(scene, si, pdf, memoryArena, sampler);
+                Spectrum sp = sampleSp(scene, si, pdf, memoryArena, sampler);
                 if (!sp.isBlack()) {
-                    si->setBSDF(ALLOC(memoryArena, BSDF)(*si));
-                    si->getBSDF()->addBXDF(ALLOC(memoryArena, SeparableBSSRDFAdapter)(this));
+                    si->bsdf = ALLOC(memoryArena, BSDF)(*si);
+                    si->bsdf->addBXDF(ALLOC(memoryArena, SeparableBSSRDFAdapter)(this));
                     si->direction = po.direction;
                 }
                 return sp;
@@ -65,11 +65,11 @@ namespace kaguya {
                 Float cosTheta = ABS_DOT(po.direction, po.normal);
                 Float ft = math::fresnelDielectric(cosTheta, 1, _theta);
                 // TODO  wi 是什么坐标系
-                return (1 - ft) * subsurfacePoint(si) * subsurfaceWi(wi);
+                return (1 - ft) * Sp(si) * subsurfaceWi(wi);
             }
 
-            Spectrum SeparableBSSRDF::sampleSubsurfacePoint(const Scene &scene, SurfaceInteraction *si, Float *pdf,
-                                                            MemoryArena &memoryArena, Sampler *sampler) {
+            Spectrum SeparableBSSRDF::sampleSp(std::shared_ptr<Scene> scene, SurfaceInteraction *si, Float *pdf,
+                                               MemoryArena &memoryArena, Sampler *sampler) {
                 // Randomly chose probe ray direction
                 Vector3F ry, rx, rz;
 
@@ -126,7 +126,7 @@ namespace kaguya {
                 while (true) {
                     Ray probeRay = origin.sendRayTo(target);
                     if (probeRay.getDirection() == Vector3F(0., 0., 0.) ||
-                        !scene.intersect(probeRay, pChain->si)) {
+                        !scene->intersect(probeRay, pChain->si)) {
                         break;
                     }
 
@@ -153,15 +153,15 @@ namespace kaguya {
                 *si = pChain->si;
 
                 // Get pdf
-                *pdf = subsurfacePointPdf(*si) / found;
-                return subsurfacePoint(*si);
+                *pdf = SpPdf(*si) / found;
+                return Sp(*si);
             }
 
-            Spectrum SeparableBSSRDF::subsurfacePoint(const SurfaceInteraction &si) const {
+            Spectrum SeparableBSSRDF::Sp(const SurfaceInteraction &si) const {
                 return Sr(LENGTH(po.point - si.point));
             }
 
-            Float SeparableBSSRDF::subsurfacePointPdf(SurfaceInteraction &si) const {
+            Float SeparableBSSRDF::SpPdf(SurfaceInteraction &si) const {
                 Vector3F dir = po.point - si.point;
                 Vector3F dirLocal = Vector3F(DOT(_tanX, dir), DOT(_tanY, dir), DOT(_tanZ, dir));
                 Vector3F normalLocal = Vector3F(DOT(_tanX, si.normal),

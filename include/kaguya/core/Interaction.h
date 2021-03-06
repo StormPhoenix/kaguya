@@ -27,6 +27,11 @@ namespace kaguya {
     }
 
     namespace core {
+
+        namespace bssrdf {
+            class BSSRDF;
+        }
+
         class AreaLight;
 
         class Light;
@@ -38,6 +43,7 @@ namespace kaguya {
         using kaguya::tracer::Ray;
         using kaguya::material::Material;
         using kaguya::memory::MemoryArena;
+        using bssrdf::BSSRDF;
 
         inline Vector3F offsetOrigin(const Vector3F &origin, const Vector3F &error,
                                      const Vector3F &normal, const Vector3F &direction);
@@ -125,20 +131,21 @@ namespace kaguya {
                                MediumBound &mediumBoundary, Float u = 0, Float v = 0,
                                Material *material = nullptr);
 
-            BSDF *buildBSDF(MemoryArena &memoryArena, TransportMode mode = TransportMode::RADIANCE);
+            void buildScatteringFunction(MemoryArena &memoryArena, TransportMode mode = TransportMode::RADIANCE);
 
             virtual void reset() override {
                 Interaction::reset();
-                _bsdf = nullptr;
+                bsdf = nullptr;
                 _areaLight = nullptr;
             }
 
             // 击中点纹理坐标
             Float u, v;
+            // 击中点处的 BSDF
+            BSDF *bsdf = nullptr;
+            BSSRDF *bssrdf = nullptr;
 
         protected:
-            // 击中点处的 BSDF
-            BSDF *_bsdf = nullptr;
             // 如果被击中物体是 AreaLight，则这一项应该被赋值
             AreaLight *_areaLight = nullptr;
             // TODO modify to geometry
@@ -159,14 +166,6 @@ namespace kaguya {
 
             void setAreaLight(AreaLight *areaLight) {
                 _areaLight = areaLight;
-            }
-
-            BSDF *getBSDF() const {
-                return _bsdf;
-            }
-
-            void setBSDF(BSDF *bsdf) {
-                _bsdf = bsdf;
             }
         };
 

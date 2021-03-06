@@ -15,10 +15,9 @@ namespace kaguya {
 
         class SubsurfaceMaterial : public Material {
         public:
-            // TODO
             SubsurfaceMaterial(Spectrum albedoEff, Spectrum mft, Float g, Float eta);
 
-            virtual BSDF *bsdf(SurfaceInteraction &si, MemoryArena &memoryArena,
+            virtual void computeScatteringFunctions(SurfaceInteraction &si, MemoryArena &memoryArena,
                                TransportMode mode = TransportMode::RADIANCE) override;
 
         private:

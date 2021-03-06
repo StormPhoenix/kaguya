@@ -127,6 +127,12 @@ namespace kaguya {
             static std::shared_ptr<Scene> sceneBunnyWithAreaLight();
 
             /**
+             * 构建 Cornel box，加载 bunny 模型，次表面散射材质
+             */
+            static std::shared_ptr<Scene> sceneBunnySubsurfaceWithAreaLight();
+
+
+            /**
              * 构建 bunny，采用点光源
              */
             static std::shared_ptr<Scene> sceneBunnyWithPointLight();
