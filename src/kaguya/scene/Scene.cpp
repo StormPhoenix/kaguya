@@ -167,6 +167,36 @@ namespace kaguya {
 
 
         std::vector<std::shared_ptr<Geometry>>
+        Scene::testBottomPlane(const std::shared_ptr<Material> material,
+                              const std::shared_ptr<Medium> insideMedium,
+                              const std::shared_ptr<Medium> outsideMedium) {
+            const Vector3F a1(10.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -10.5 * MODEL_SCALE);
+            const Vector3F a2(-10.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -10.5 * MODEL_SCALE);
+            const Vector3F a3(-10.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, 10.5 * MODEL_SCALE);
+            const Vector3F a4(10.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, 10.5 * MODEL_SCALE);
+
+            const Normal3F n(0, 1, 0);
+            const Vector2f default_uv(0);
+
+            std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
+                                                                                 n, n, n,
+                                                                                 default_uv, default_uv, default_uv);
+            std::shared_ptr<Geometry> gt1 = std::make_shared<Geometry>(tri1, material, insideMedium, outsideMedium,
+                                                                       nullptr);
+
+            std::shared_ptr<meta::Shape> tri2 = std::make_shared<meta::Triangle>(a1, a2, a3,
+                                                                                 n, n, n,
+                                                                                 default_uv, default_uv, default_uv);
+            std::shared_ptr<Geometry> gt2 = std::make_shared<Geometry>(tri2, material, insideMedium, outsideMedium,
+                                                                       nullptr);
+            std::vector<std::shared_ptr<Geometry>> v;
+            v.push_back(gt1);
+            v.push_back(gt2);
+            return v;
+        }
+
+
+        std::vector<std::shared_ptr<Geometry>>
         Scene::testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
                                 std::vector<std::shared_ptr<Light>> &lights, const std::shared_ptr<Material> material) {
             const Vector3F a1(0.2 * MODEL_SCALE, 0.46 * MODEL_SCALE, -0.2 * MODEL_SCALE);
@@ -266,6 +296,23 @@ namespace kaguya {
             Float scale = 0.4 * MODEL_SCALE;
             Matrix4F mat(1.0f);
             mat = TRANSLATE(mat, Vector3F(0, -scale / 1.2, 0));
+            mat = SCALE(mat, Vector3F(scale, scale, scale));
+            std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(mat);
+            std::shared_ptr<Aggregation> bunny = std::make_shared<TriangleMesh>(bunnyVertexes, material, inside,
+                                                                                outside,
+                                                                                areaLight, transformMatrix);
+            return bunny;
+        }
+
+        std::shared_ptr<Aggregation> Scene::testSubsurfaceBunny(const std::shared_ptr<Material> material,
+                                                      const std::shared_ptr<Medium> inside,
+                                                      const std::shared_ptr<Medium> outside,
+                                                      const std::shared_ptr<AreaLight> areaLight) {
+            std::vector<Vertex> bunnyVertexes = kaguya::utils::ObjLoader::loadModel("./resource/objects/bunny.obj");
+
+            Float scale = 0.4 * MODEL_SCALE;
+            Matrix4F mat(1.0f);
+            mat = TRANSLATE(mat, Vector3F(0, -scale / 0.8, 0));
             mat = SCALE(mat, Vector3F(scale, scale, scale));
             std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(mat);
             std::shared_ptr<Aggregation> bunny = std::make_shared<TriangleMesh>(bunnyVertexes, material, inside,
@@ -739,23 +786,8 @@ namespace kaguya {
             std::vector<std::shared_ptr<Intersectable>> objects;
 
             // walls
-            std::vector<std::shared_ptr<Geometry>> leftWall =
-                    testLeftWall(lambertLeft, airMedium, airMedium);
-            objects.insert(objects.end(), leftWall.begin(), leftWall.end());
-
-            std::vector<std::shared_ptr<Geometry>> rightWall =
-                    testRightWall(lambertRight, airMedium, airMedium);
-            objects.insert(objects.end(), rightWall.begin(), rightWall.end());
-
-            std::vector<std::shared_ptr<Geometry>> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
+            std::vector<std::shared_ptr<Geometry>> bottomWall = testBottomPlane(lambertBottom, airMedium, airMedium);
             objects.insert(objects.end(), bottomWall.begin(), bottomWall.end());
-
-
-            std::vector<std::shared_ptr<Geometry>> topWall = testTopWall(lambertTop, airMedium, airMedium);
-            objects.insert(objects.end(), topWall.begin(), topWall.end());
-
-            std::vector<std::shared_ptr<Geometry>> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
-            objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
             // Subsurface Material
             Spectrum albedoEff(0.99);
@@ -766,7 +798,7 @@ namespace kaguya {
 
             // load model
 //            std::shared_ptr<Intersectable> bunny = testBunny(lambertFront, bunnyMedium, airMedium, nullptr);
-            std::shared_ptr<Intersectable> bunny = testBunny(subsurfaceMaterial, bunnyMedium, airMedium, nullptr);
+            std::shared_ptr<Intersectable> bunny = testSubsurfaceBunny(subsurfaceMaterial, bunnyMedium, airMedium, nullptr);
 //            std::shared_ptr<Intersectable> bunny = testBunny(glass, bunnyMedium, airMedium, nullptr);
 //            std::shared_ptr<Intersectable> bunny = testBunny(nullptr, bunnyMedium, airMedium, nullptr);
 

@@ -56,10 +56,10 @@ namespace kaguya {
 
                 /**
                  * pdf of S_p(p_o, p_i)
-                 * @param si
+                 * @param pi
                  * @return
                  */
-                virtual Float SpPdf(SurfaceInteraction &si) const;
+                virtual Float SpPdf(SurfaceInteraction &pi) const;
 
                 /**
                  * S_p(p_o, p_i) = S_r(|p_o - p_i|)

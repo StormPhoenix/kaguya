@@ -23,11 +23,17 @@ A simple physically based render.
 - [ ] Geometry Aggregation 结构调整
 
 ## Unsolved
+- [ ]
+
+
 - [ ] SubsurfaceMaterial 渲染错误
-    - [ ] 材质的 bsdf 有没有错误（SubsurfaceMaterial 仅仅使用 bsdf，省略 bssrdf）
+    - [x] 材质的 bsdf 有没有错误（SubsurfaceMaterial 仅仅使用 bsdf，省略 bssrdf）
     - [x] sampleS()，检查 BSSRDFTable 数据、插值结果、采样的 pi (经过检查，catmull-rom、TabulatedBSSRDF、Table 赋值都没有错误)
     - [x] 采样得到的 pi.bsdf->sampleF() 经常返回 0.3 左右的值。检查是因为场景的 MODEL_SCALE 参数和 sigma_t 参数不匹配，导致射线击不中场景
-    - [ ] 修改 sigma_t 参数，射线依然无法击中。
+    - [x] 修改 sigma_t 参数，射线依然无法击中（实际上是能击中的，但是 PT 里面的 uniformSampleLight 用的不是 rendering.normal，导致采样的光线为 0）
+    - [ ] Subsurface Bunny 下面会透光，这是不允许的
+        - [ ] 降低兔子靠近下平面，光线越来越明显
+    - [ ] Bunny 表面呈现血管纹路，猜测是 found、额外的 pdf 造成的
     
 - [ ] 添加 low Discrepancy 序列
     - [ ] 添加 halton 序列

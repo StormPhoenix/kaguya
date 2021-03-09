@@ -82,6 +82,7 @@ namespace kaguya {
                 rx = _tanZ;
                 rz = _tanX;
 
+                // TODO 删除冗余代码
                 /*
                 if (u < 1.0) {
                     ry = _tanY;
@@ -178,15 +179,17 @@ namespace kaguya {
                 return Sr(LENGTH(po.point - si.point));
             }
 
-            Float SeparableBSSRDF::SpPdf(SurfaceInteraction &si) const {
-                Vector3F dir = po.point - si.point;
+            Float SeparableBSSRDF::SpPdf(SurfaceInteraction &pi) const {
+                Vector3F dir = po.point - pi.point;
                 Vector3F dirLocal = Vector3F(DOT(_tanX, dir), DOT(_tanY, dir), DOT(_tanZ, dir));
-                Vector3F normalLocal = Vector3F(DOT(_tanX, si.normal),
-                                                DOT(_tanY, si.normal),
-                                                DOT(_tanZ, si.normal));
+                Vector3F normalLocal = Vector3F(DOT(_tanX, pi.normal),
+                                                DOT(_tanY, pi.normal),
+                                                DOT(_tanZ, pi.normal));
 
                 // Channel pdf for _tanX \ _tanY \ _tanZ
-                Float probAxis[3] = {0.25, 0.5, 0.25};
+                // TODO 删除冗余代码
+                Float probAxis[3] = {0., 1.0, 0.};
+//                Float probAxis[3] = {0.25, 0.5, 0.25};
 
                 // Radius for three axis
                 Float projRadius[3] = {std::sqrt(dirLocal.y * dirLocal.y + dirLocal.z * dirLocal.z),
