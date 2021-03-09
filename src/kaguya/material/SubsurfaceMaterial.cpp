@@ -29,10 +29,11 @@ namespace kaguya {
         void subsurfaceFromDiffuse(const BSSRDFTable &table, const Spectrum &albedoEff,
                                    const Spectrum &meanFreePath, Spectrum *sigma_a,
                                    Spectrum *sigma_s) {
+
             for (int ch = 0; ch < SPECTRUM_CHANNEL; ch++) {
                 Float rho = math::spline_curve::invertCatmullRom(
-                        table.nAlbedoSamples, table.albedoEffSamples.get(),
-                        table.albedoSamples.get(), albedoEff[ch]);
+                        table.nAlbedoSamples, table.albedoSamples.get(),
+                        table.albedoEffSamples.get(), albedoEff[ch]);
                 (*sigma_s)[ch] = rho / meanFreePath[ch];
                 (*sigma_a)[ch] = (1 - rho) / meanFreePath[ch];
             }

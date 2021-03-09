@@ -498,66 +498,33 @@ namespace kaguya {
         namespace spline_curve {
             /**
              * Integrate on catmull-rom spline curve
-             * @param len curve length
-             * @param value integration value
-             * @param x integration axis
-             * @param cdf
-             * @return effective albedo
              */
-            Float integrateCatmullRom(int len, const Float *values, const Float *x, Float *cdf);
+            Float integrateCatmullRom(int n, const Float *nodes, const Float *values, Float *cdf);
 
             /**
              * Catmull-Rom interpolation, calculate weights
-             * @param len
-             * @param values
-             * @param x
-             * @param offset
-             * @param weights
-             * @return
              */
-            bool catmullRomWeights(int len, const Float *values, Float x, int *offset, Float *weights);
+            bool catmullRomWeights(int size, const Float *nodes, Float x, int *offset, Float *weights);
 
             /**
              * Sample catmull-rom spline
-             * @param len
-             * @param f catmull-rom spline segments
-             * @param F integral of catmull-rom spline
-             * @param x axis of catmull-rom
-             * @param sample sample number
-             * @param fval sampled catmull-spline interpolation value
-             * @param pdf
-             * @return
              */
-            Float sampleCatmullRom(int len, const Float *f, const Float *F, const Float *x,
-                                   Float sample, Float *fval, Float *pdf);
+            Float sampleCatmullRom(int size, const Float *nodes, const Float *f,
+                                   const Float *cdf, Float sample, Float *fval = nullptr,
+                                   Float *pdf = nullptr);
 
             /**
              * Sample 2-dimension catmull-rom spline function
-             * @param rowSize
-             * @param rows
-             * @param colSize
-             * @param cols
-             * @param values
-             * @param cdf
-             * @param albedo
-             * @param sample
-             * @param fval
-             * @param pdf
-             * @return
              */
-            Float sampleCatmullRom2D(int rowSize, const Float *rows, int colSize, const Float *cols,
-                                     const Float *values, const Float *cdf, Float albedo, Float sample,
+            Float sampleCatmullRom2D(int size1, int size2, const Float *nodes1,
+                                     const Float *nodes2, const Float *values,
+                                     const Float *cdf, Float alpha, Float sample,
                                      Float *fval = nullptr, Float *pdf = nullptr);
 
             /**
              * Invert catmull-rom spline function not its definite integral
-             * @param len
-             * @param values
-             * @param x
-             * @param value
-             * @return
              */
-            Float invertCatmullRom(int len, const Float *values, const Float *x, Float value);
+            Float invertCatmullRom(int n, const Float *x, const Float *values, Float u);
         }
     }
 }

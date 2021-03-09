@@ -11,9 +11,6 @@
 #include <kaguya/scene/meta/Shape.h>
 #include <kaguya/tracer/pt/PathTracer.h>
 
-
-#include <iostream>
-
 namespace kaguya {
     namespace tracer {
 
@@ -140,7 +137,9 @@ namespace kaguya {
                         beta *= S / pdf;
                         shaderColor += beta * sampleDirectLight(scene, pi, sampler);
 
+                        // TODO pi.direction = -rendering.normal
                         Spectrum f = pi.bsdf->sampleF(-pi.direction, &worldWi, &pdf, sampler, BSDF_ALL, &bxdfType);
+
                         if (f.isBlack() || pdf == 0) {
                             break;
                         }
@@ -152,7 +151,6 @@ namespace kaguya {
                 }
 
                 // TODO 透明介质透射考虑 折射率 refraction
-
                 // Terminate path tracing with Russian Roulette
                 if (bounce > _russianRouletteBounce) {
                     if (sampler->sample1D() < _russianRoulette) {
@@ -161,6 +159,7 @@ namespace kaguya {
                     beta /= (1 - _russianRoulette);
                 }
             }
+
             return shaderColor;
         }
 
@@ -235,7 +234,7 @@ namespace kaguya {
 
                     BXDFType sampleType;
                     f = si.bsdf->sampleF(wo, &wi, &scatteringPdf, sampler, BSDF_ALL, &sampleType);
-                    f *= ABS_DOT(-si.direction, wi);
+                    f *= ABS_DOT(si.rendering.normal, wi);
                     sampleSpecular = (sampleType & BXDFType::BSDF_SPECULAR) != 0;
                 }
 

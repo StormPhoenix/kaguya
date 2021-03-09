@@ -23,6 +23,12 @@ A simple physically based render.
 - [ ] Geometry Aggregation 结构调整
 
 ## Unsolved
+- [ ] SubsurfaceMaterial 渲染错误
+    - [ ] 材质的 bsdf 有没有错误（SubsurfaceMaterial 仅仅使用 bsdf，省略 bssrdf）
+    - [x] sampleS()，检查 BSSRDFTable 数据、插值结果、采样的 pi (经过检查，catmull-rom、TabulatedBSSRDF、Table 赋值都没有错误)
+    - [x] 采样得到的 pi.bsdf->sampleF() 经常返回 0.3 左右的值。检查是因为场景的 MODEL_SCALE 参数和 sigma_t 参数不匹配，导致射线击不中场景
+    - [ ] 修改 sigma_t 参数，射线依然无法击中。
+    
 - [ ] 添加 low Discrepancy 序列
     - [ ] 添加 halton 序列
         - [x] 添加 halton sampling 渲染的效果反而不如 c++ 自带的随机数生成程序

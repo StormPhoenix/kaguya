@@ -1035,61 +1035,54 @@ namespace kaguya {
                 }
             }
 
-            Float integrateCatmullRom(int len, const Float *values, const Float *x, Float *cdf) {
-                Float effAlbedo = 0;
+            Float integrateCatmullRom(int n, const Float *x, const Float *values,
+                                      Float *cdf) {
+                Float sum = 0;
                 cdf[0] = 0;
-                for (int i = 0; i < len - 1; i++) {
-                    Float x0 = x[i];
-                    Float x1 = x[i + 1];
+                for (int i = 0; i < n - 1; ++i) {
+                    // Look up $x_i$ and function values of spline segment _i_
+                    Float x0 = x[i], x1 = x[i + 1];
+                    Float f0 = values[i], f1 = values[i + 1];
                     Float width = x1 - x0;
 
-                    Float f0 = values[i];
-                    Float f1 = values[i + 1];
-
-                    // Derivatives
+                    // Approximate derivatives using finite differences
                     Float d0, d1;
-                    if (i > 0) {
+                    if (i > 0)
                         d0 = width * (f1 - values[i - 1]) / (x1 - x[i - 1]);
-                    } else {
+                    else
                         d0 = f1 - f0;
-                    }
-
-                    if (i + 2 < len) {
+                    if (i + 2 < n)
                         d1 = width * (values[i + 2] - f0) / (x[i + 2] - x0);
-                    } else {
+                    else
                         d1 = f1 - f0;
-                    }
 
-                    // Approximate integration
-                    effAlbedo += width * ((f0 + f1) * 0.5f + (d0 - d1) * (1.f / 12.f));
-                    cdf[i + 1] = effAlbedo;
+                    // Keep a running sum and build a cumulative distribution function
+                    sum += ((d0 - d1) * (1.f / 12.f) + (f0 + f1) * .5f) * width;
+                    cdf[i + 1] = sum;
                 }
-                return effAlbedo;
+                return sum;
             }
 
-            bool catmullRomWeights(int len, const Float *array, Float x, int *offset, Float *weights) {
-                // Check x range [values[0], values[len - 1]]
-                if (x < array[0] || x > array[len - 1]) {
-                    return false;
-                }
+            bool catmullRomWeights(int size, const Float *nodes, Float x, int *offset,
+                                   Float *weights) {
+                // Return _false_ if _x_ is out of bounds
+                if (!(x >= nodes[0] && x <= nodes[size - 1])) return false;
 
-                // Find index of x, binary search
-                int idx = intervalSearch(len, array, x);
-
-                // Set offset
+                // Search for the interval _idx_ containing _x_
+                int idx = intervalSearch(size, [&](int i) { return nodes[i] <= x; });
                 *offset = idx - 1;
-                Float x0 = array[idx];
-                Float x1 = array[idx + 1];
+                Float x0 = nodes[idx], x1 = nodes[idx + 1];
 
-                // Compute weight
+                // Compute the $t$ parameter and powers
                 Float t = (x - x0) / (x1 - x0), t2 = t * t, t3 = t2 * t;
 
+                // Compute initial node weights $w_1$ and $w_2$
                 weights[1] = 2 * t3 - 3 * t2 + 1;
                 weights[2] = -2 * t3 + 3 * t2;
 
                 // Compute first node weight $w_0$
                 if (idx > 0) {
-                    Float w0 = (t3 - 2 * t2 + t) * (x1 - x0) / (x1 - array[idx - 1]);
+                    Float w0 = (t3 - 2 * t2 + t) * (x1 - x0) / (x1 - nodes[idx - 1]);
                     weights[0] = -w0;
                     weights[2] += w0;
                 } else {
@@ -1100,8 +1093,8 @@ namespace kaguya {
                 }
 
                 // Compute last node weight $w_3$
-                if (idx + 2 < len) {
-                    Float w3 = (t3 - t2) * (x1 - x0) / (array[idx + 2] - x0);
+                if (idx + 2 < size) {
+                    Float w3 = (t3 - t2) * (x1 - x0) / (nodes[idx + 2] - x0);
                     weights[1] -= w3;
                     weights[3] = w3;
                 } else {
@@ -1113,156 +1106,129 @@ namespace kaguya {
                 return true;
             }
 
-            Float sampleCatmullRom(int len, const Float *f, const Float *F, const Float *x,
-                                   Float sample, Float *fval, Float *pdf) {
-                // Rescale sample to spline interval
-                sample *= F[len - 1];
+            Float sampleCatmullRom(int n, const Float *x, const Float *f, const Float *F,
+                                   Float u, Float *fval, Float *pdf) {
+                // Map _u_ to a spline interval by inverting _F_
+                u *= F[n - 1];
+                int i = intervalSearch(n, [&](int i) { return F[i] <= u; });
 
-                // Find interval
-                int idx = intervalSearch(len, F, sample);
-
-                // Look up x and F
-                Float x0 = x[idx], x1 = x[idx + 1];
-                Float f0 = f[idx], f1 = f[idx + 1];
+                // Look up $x_i$ and function values of spline segment _i_
+                Float x0 = x[i], x1 = x[i + 1];
+                Float f0 = f[i], f1 = f[i + 1];
                 Float width = x1 - x0;
 
                 // Approximate derivatives using finite differences
                 Float d0, d1;
-                if (idx > 0)
-                    d0 = width * (f1 - f[idx - 1]) / (x1 - x[idx - 1]);
+                if (i > 0)
+                    d0 = width * (f1 - f[i - 1]) / (x1 - x[i - 1]);
                 else
                     d0 = f1 - f0;
-                if (idx + 2 < len)
-                    d1 = width * (f[idx + 2] - f0) / (x[idx + 2] - x0);
+                if (i + 2 < n)
+                    d1 = width * (f[i + 2] - f0) / (x[i + 2] - x0);
                 else
                     d1 = f1 - f0;
 
-                // Rescale sample to spline segment
-                sample = (sample - F[idx]) / width;
+                // Re-scale _u_ for continous spline sampling step
+                u = (u - F[i]) / width;
 
-                // Invert definite integral over spline segment
+                // Invert definite integral over spline segment and return solution
+
+                // Set initial guess for $t$ by importance sampling a linear interpolant
                 Float t;
-                if (f0 != f1) {
-                    t = (f0 - std::sqrt(std::max((Float) 0, f0 * f0 + 2 * sample * (f1 - f0)))) /
+                if (f0 != f1)
+                    t = (f0 - std::sqrt(std::max((Float) 0, f0 * f0 + 2 * u * (f1 - f0)))) /
                         (f0 - f1);
-                } else {
-                    t = sample / f0;
-                }
-
-                // Function Fhat is the definite integral over the (assumed nonnegative) interpolant fhat, and so it increases monotonically
+                else
+                    t = u / f0;
                 Float a = 0, b = 1, Fhat, fhat;
                 while (true) {
-                    if (!(t > a && t < b)) {
-                        t = 0.5f * (a + b);
-                    }
+                    // Fall back to a bisection step when _t_ is out of bounds
+                    if (!(t > a && t < b)) t = 0.5f * (a + b);
 
-                    // Evaluate function fhat and its definite integral Fhat
+                    // Evaluate target function and its derivative in Horner form
+                    Fhat = t * (f0 +
+                                t * (.5f * d0 +
+                                     t * ((1.f / 3.f) * (-2 * d0 - d1) + f1 - f0 +
+                                          t * (.25f * (d0 + d1) + .5f * (f0 - f1)))));
                     fhat = f0 +
                            t * (d0 +
                                 t * (-2 * d0 - d1 + 3 * (f1 - f0) +
                                      t * (d0 + d1 + 2 * (f0 - f1))));
 
-                    Fhat = t * (f0 +
-                                t * (.5f * d0 +
-                                     t * ((1.f / 3.f) * (-2 * d0 - d1) + f1 - f0 +
-                                          t * (.25f * (d0 + d1) + .5f * (f0 - f1)))));
-
                     // Stop the iteration if converged
-                    if (std::abs(Fhat - sample) < 1e-6f || b - a < 1e-6f) {
-                        break;
-                    }
+                    if (std::abs(Fhat - u) < 1e-6f || b - a < 1e-6f) break;
 
-                    // Update bisection bounds
-                    if (Fhat - sample < 0) {
+                    // Update bisection bounds using updated _t_
+                    if (Fhat - u < 0)
                         a = t;
-                    } else {
+                    else
                         b = t;
-                    }
 
-                    // Newton step
-                    t -= (Fhat - sample) / fhat;
+                    // Perform a Newton step
+                    t -= (Fhat - u) / fhat;
                 }
 
-                if (fval != nullptr) {
-                    *fval = fhat;
-                }
-
-                if (pdf != nullptr) {
-                    *pdf = fhat / F[len - 1];
-                }
-
+                // Return the sample position and function value
+                if (fval) *fval = fhat;
+                if (pdf) *pdf = fhat / F[n - 1];
                 return x0 + width * t;
             }
 
-            Float sampleCatmullRom2D(int rowSize, const Float *rows, int colSize, const Float *cols,
-                                     const Float *values, const Float *cdf, Float albedo, Float sample,
-                                     Float *fval, Float *pdf) {
-                int rowOffset;
+            Float sampleCatmullRom2D(int size1, int size2, const Float *nodes1,
+                                     const Float *nodes2, const Float *values,
+                                     const Float *cdf, Float alpha, Float u, Float *fval,
+                                     Float *pdf) {
+                // Determine offset and coefficients for the _alpha_ parameter
+                int offset;
                 Float weights[4];
+                if (!catmullRomWeights(size1, nodes1, alpha, &offset, weights)) return 0;
 
-                if (!catmullRomWeights(rowSize, rows, albedo, &rowOffset, weights)) {
-                    return 0;
-                }
-
-                // ----------- radius samples ------------
-                // +
-                // +
-                // +
-                // albedo sample1
-                // -> albedo do interpolation
-                // albedo sample2
-                // +
-                // +
-                // +
-
-                // Define interpolation function
+                // Define a lambda function to interpolate table entries
                 auto interpolate = [&](const Float *array, int idx) {
                     Float value = 0;
-                    for (int i = 0; i < 4; i++) {
-                        if (weights[i] != 0) {
-                            value += array[(rowOffset + i) * colSize + idx] * weights[i];
-                        }
-                    }
+                    for (int i = 0; i < 4; ++i)
+                        if (weights[i] != 0)
+                            value += array[(offset + i) * size2 + idx] * weights[i];
                     return value;
                 };
 
-                Float maximumVal = interpolate(cdf, colSize - 1);
-                sample *= maximumVal;
+                // Map _u_ to a spline interval by inverting the interpolated _cdf_
+                Float maximum = interpolate(cdf, size2 - 1);
+                u *= maximum;
+                int idx =
+                        intervalSearch(size2, [&](int i) { return interpolate(cdf, i) <= u; });
 
-                int idx = intervalSearch(colSize, [&](int i) { return interpolate(cdf, i) <= sample; });
-
-                Float f0 = interpolate(values, idx);
-                Float f1 = interpolate(values, idx + 1);
-
-                Float x0 = cols[idx];
-                Float x1 = cols[idx + 1];
+                // Look up node positions and interpolated function values
+                Float f0 = interpolate(values, idx), f1 = interpolate(values, idx + 1);
+                Float x0 = nodes2[idx], x1 = nodes2[idx + 1];
                 Float width = x1 - x0;
                 Float d0, d1;
 
-                sample = (sample - interpolate(cdf, idx)) / width;
+                // Re-scale _u_ using the interpolated _cdf_
+                u = (u - interpolate(cdf, idx)) / width;
 
-                // Approximate derivatives
-                if (idx > 0) {
+                // Approximate derivatives using finite differences of the interpolant
+                if (idx > 0)
                     d0 = width * (f1 - interpolate(values, idx - 1)) /
-                         (x1 - cols[idx - 1]);
-                } else {
+                         (x1 - nodes2[idx - 1]);
+                else
                     d0 = f1 - f0;
-                }
-                if (idx + 2 < colSize) {
+                if (idx + 2 < size2)
                     d1 = width * (interpolate(values, idx + 2) - f0) /
-                         (cols[idx + 2] - x0);
-                } else {
+                         (nodes2[idx + 2] - x0);
+                else
                     d1 = f1 - f0;
-                }
 
+                // Invert definite integral over spline segment and return solution
+
+                // Set initial guess for $t$ by importance sampling a linear interpolant
                 Float t;
                 if (f0 != f1)
-                    t = (f0 - std::sqrt(std::max((Float) 0, f0 * f0 + 2 * sample * (f1 - f0)))) /
+                    t = (f0 - std::sqrt(std::max((Float) 0, f0 * f0 + 2 * u * (f1 - f0)))) /
                         (f0 - f1);
                 else
-                    t = sample / f0;
+                    t = u / f0;
                 Float a = 0, b = 1, Fhat, fhat;
-
                 while (true) {
                     // Fall back to a bisection step when _t_ is out of bounds
                     if (!(t >= a && t <= b)) t = 0.5f * (a + b);
@@ -1278,51 +1244,51 @@ namespace kaguya {
                                      t * (d0 + d1 + 2 * (f0 - f1))));
 
                     // Stop the iteration if converged
-                    if (std::abs(Fhat - sample) < 1e-6f || b - a < 1e-6f) break;
+                    if (std::abs(Fhat - u) < 1e-6f || b - a < 1e-6f) break;
 
                     // Update bisection bounds using updated _t_
-                    if (Fhat - sample < 0)
+                    if (Fhat - u < 0)
                         a = t;
                     else
                         b = t;
 
                     // Perform a Newton step
-                    t -= (Fhat - sample) / fhat;
+                    t -= (Fhat - u) / fhat;
                 }
 
                 // Return the sample position and function value
                 if (fval) *fval = fhat;
-                if (pdf) *pdf = fhat / maximumVal;
+                if (pdf) *pdf = fhat / maximum;
                 return x0 + width * t;
             }
 
-            Float invertCatmullRom(int len, const Float *values, const Float *x, Float value) {
-                if (value <= values[0]) {
+            Float invertCatmullRom(int n, const Float *x, const Float *values, Float u) {
+                if (!(u > values[0])) {
                     return x[0];
-                } else if (value >= values[len - 1]) {
-                    return x[len - 1];
+                } else if (!(u < values[n - 1])) {
+                    return x[n - 1];
                 }
 
-                // Find spline interval
-                int idx = intervalSearch(len, values, value);
+                // Map _u_ to a spline interval by inverting _values_
+                int i = intervalSearch(n, [&](int i) { return values[i] <= u; });
 
-                Float x0 = x[idx], x1 = x[idx + 1];
-                Float f0 = values[idx], f1 = values[idx + 1];
+                // Look up $x_i$ and function values of spline segment _i_
+                Float x0 = x[i], x1 = x[i + 1];
+                Float f0 = values[i], f1 = values[i + 1];
                 Float width = x1 - x0;
 
                 // Approximate derivatives using finite differences
                 Float d0, d1;
-                if (idx > 0) {
-                    d0 = width * (f1 - values[idx - 1]) / (x1 - x[idx - 1]);
-                } else {
+                if (i > 0)
+                    d0 = width * (f1 - values[i - 1]) / (x1 - x[i - 1]);
+                else
                     d0 = f1 - f0;
-                }
-                if (idx + 2 < len) {
-                    d1 = width * (values[idx + 2] - f0) / (x[idx + 2] - x0);
-                } else {
+                if (i + 2 < n)
+                    d1 = width * (values[i + 2] - f0) / (x[i + 2] - x0);
+                else
                     d1 = f1 - f0;
-                }
 
+                // Invert the spline interpolant using Newton-Bisection
                 Float a = 0, b = 1, t = .5f;
                 Float Fhat, fhat;
                 while (true) {
@@ -1341,16 +1307,16 @@ namespace kaguya {
                            (3 * t2 - 4 * t + 1) * d0 + (3 * t2 - 2 * t) * d1;
 
                     // Stop the iteration if converged
-                    if (std::abs(Fhat - value) < 1e-6f || b - a < 1e-6f) break;
+                    if (std::abs(Fhat - u) < 1e-6f || b - a < 1e-6f) break;
 
                     // Update bisection bounds using updated _t_
-                    if (Fhat - value < 0)
+                    if (Fhat - u < 0)
                         a = t;
                     else
                         b = t;
 
                     // Perform a Newton step
-                    t -= (Fhat - value) / fhat;
+                    t -= (Fhat - u) / fhat;
                 }
                 return x0 + t * width;
             }

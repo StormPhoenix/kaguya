@@ -4,6 +4,7 @@
 
 #include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/core/bssrdf/SeparableBSSRDF.h>
+#include <iostream>
 
 namespace kaguya {
     namespace core {
@@ -49,14 +50,16 @@ namespace kaguya {
                 }
             }
 
-            Spectrum SeparableBSSRDF::sampleS(std::shared_ptr<Scene> scene, SurfaceInteraction *si, Float *pdf,
+            Spectrum SeparableBSSRDF::sampleS(std::shared_ptr<Scene> scene, SurfaceInteraction *pi, Float *pdf,
                                               MemoryArena &memoryArena, Sampler *sampler) {
                 // Sampling S_p(p_o, p_i)
-                Spectrum sp = sampleSp(scene, si, pdf, memoryArena, sampler);
+                Spectrum sp = sampleSp(scene, pi, pdf, memoryArena, sampler);
                 if (!sp.isBlack()) {
-                    si->bsdf = ALLOC(memoryArena, BSDF)(*si);
-                    si->bsdf->addBXDF(ALLOC(memoryArena, SeparableBSSRDFAdapter)(this));
-                    si->direction = po.direction;
+                    pi->bsdf = ALLOC(memoryArena, BSDF)(*pi);
+                    pi->bsdf->addBXDF(ALLOC(memoryArena, SeparableBSSRDFAdapter)(this));
+                    // TODO delete why
+//                    si->direction = po.direction;
+                    pi->direction = -pi->rendering.normal;
                 }
                 return sp;
             }
@@ -68,13 +71,19 @@ namespace kaguya {
                 return (1 - ft) * Sp(si) * subsurfaceWi(wi);
             }
 
-            Spectrum SeparableBSSRDF::sampleSp(std::shared_ptr<Scene> scene, SurfaceInteraction *si, Float *pdf,
+            Spectrum SeparableBSSRDF::sampleSp(std::shared_ptr<Scene> scene, SurfaceInteraction *pi, Float *pdf,
                                                MemoryArena &memoryArena, Sampler *sampler) {
                 // Randomly chose probe ray direction
                 Vector3F ry, rx, rz;
 
                 Float u = sampler->sample1D();
-                if (u < 0.5) {
+
+                ry = _tanY;
+                rx = _tanZ;
+                rz = _tanX;
+
+                /*
+                if (u < 1.0) {
                     ry = _tanY;
                     rx = _tanZ;
                     rz = _tanX;
@@ -90,13 +99,14 @@ namespace kaguya {
                     ry = _tanX;
                     u = (u - 0.75) * 4;
                 }
+                 */
 
                 // Randomly chose spectrum channel, and get Sr
-                int spectrumChannel = math::clamp(int(u * (SPECTRUM_CHANNEL)), 0, SPECTRUM_CHANNEL - 1);
+                int channel = math::clamp(int(u * (SPECTRUM_CHANNEL)), 0, SPECTRUM_CHANNEL - 1);
                 // reuse u
-                u = SPECTRUM_CHANNEL * u - spectrumChannel;
+                u = SPECTRUM_CHANNEL * u - channel;
 
-                Float radius = sampleSr(spectrumChannel, u);
+                Float radius = sampleSr(channel, sampler->sample1D());
                 if (radius < 0) {
                     return Spectrum(0);
                 }
@@ -104,14 +114,19 @@ namespace kaguya {
                 // Sample probe ray phi angle
                 Float phi = 2 * math::PI * sampler->sample1D();
 
-                Float maxRadius = sampleSr(spectrumChannel, 0.999);
+                Float maxRadius = sampleSr(channel, 0.999);
+                if (radius >= maxRadius) {
+                    return Spectrum(0.f);
+                }
+
                 // Set probe ray range
                 Float range = 2 * std::sqrt(std::pow(maxRadius, 2) - std::pow(radius, 2));
 
                 Interaction origin;
                 // TODO check ry direction
-                origin.point = po.point + radius * (rx * std::cos(phi) + rz * std::sin(phi)) + range * 0.5f * ry;
-                Point3F target = origin.point - range * ry;
+                origin.point = po.point + radius * (rx * std::cos(phi) + rz * std::sin(phi)) - range * 0.5f * ry;
+
+                Point3F target = origin.point + range * ry;
 
                 // Build intersection chain structure
                 struct InteractionChain {
@@ -123,8 +138,10 @@ namespace kaguya {
                 // Do intersection
                 InteractionChain *pChain = chain;
                 int found = 0;
+
                 while (true) {
                     Ray probeRay = origin.sendRayTo(target);
+
                     if (probeRay.getDirection() == Vector3F(0., 0., 0.) ||
                         !scene->intersect(probeRay, pChain->si)) {
                         break;
@@ -150,11 +167,11 @@ namespace kaguya {
                     pChain = pChain->next;
                     chosenIndex--;
                 }
-                *si = pChain->si;
+                *pi = pChain->si;
 
                 // Get pdf
-                *pdf = SpPdf(*si) / found;
-                return Sp(*si);
+                *pdf = SpPdf(*pi) / found;
+                return Sp(*pi);
             }
 
             Spectrum SeparableBSSRDF::Sp(const SurfaceInteraction &si) const {

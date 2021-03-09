@@ -1,7 +1,7 @@
 //
 // Created by Storm Phoenix on 2020/10/2.
 //
-
+#include <iostream>
 #include <kaguya/scene/meta/Triangle.h>
 
 namespace kaguya {
@@ -141,6 +141,7 @@ namespace kaguya {
                 }
 
                 Float sum = e0 + e1 + e2;
+
                 if (sum == 0) {
                     return false;
                 }

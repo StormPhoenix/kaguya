@@ -758,13 +758,14 @@ namespace kaguya {
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
             // Subsurface Material
-            Spectrum albedoEff(0.5);
-            Spectrum mft(1.0);
+            Spectrum albedoEff(0.99);
+            Spectrum mft(0.001);
             Float g = 0.0f;
             Float theta = 1.33f;
             std::shared_ptr<Material> subsurfaceMaterial = std::make_shared<SubsurfaceMaterial>(albedoEff, mft, g, theta);
 
             // load model
+//            std::shared_ptr<Intersectable> bunny = testBunny(lambertFront, bunnyMedium, airMedium, nullptr);
             std::shared_ptr<Intersectable> bunny = testBunny(subsurfaceMaterial, bunnyMedium, airMedium, nullptr);
 //            std::shared_ptr<Intersectable> bunny = testBunny(glass, bunnyMedium, airMedium, nullptr);
 //            std::shared_ptr<Intersectable> bunny = testBunny(nullptr, bunnyMedium, airMedium, nullptr);
@@ -789,7 +790,7 @@ namespace kaguya {
             camera->setResolutionWidth(Config::resolutionWidth);
             camera->setResolutionHeight(Config::resolutionHeight);
             scene->_camera = camera;
-            scene->_sceneName = "bunny-with-area-light";
+            scene->_sceneName = "bunny-subsurface-material-with-area-light";
 
             return scene;
         }
