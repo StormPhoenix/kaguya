@@ -97,9 +97,12 @@ namespace kaguya {
                 Vector3F wo = toObjectSpace(worldWo);
                 Vector3F wi = Vector3F(0.0f);
                 Float samplePdf;
-                Spectrum f = bxdf->sampleF(wo, &wi, &samplePdf, sampler);
+                Spectrum f = bxdf->sampleF(wo, &wi, &samplePdf, sampler, sampleType);
                 // 一般来说 surfacePointPdf = 0 的情况不会发生
                 if (samplePdf == 0) {
+                    if (sampleType != nullptr) {
+                        *sampleType = BXDFType(0);
+                    }
                     return Spectrum(0.0);
                 }
 

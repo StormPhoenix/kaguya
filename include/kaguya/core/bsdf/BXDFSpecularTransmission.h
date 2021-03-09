@@ -30,7 +30,7 @@ namespace kaguya {
             virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
 
             virtual Spectrum sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
-                                     Sampler *const sampler) override;
+                                     Sampler *const sampler, BXDFType *sampleType) override;
 
             virtual Float samplePdf(const Vector3F &wo, const Vector3F &wi) const override;
 

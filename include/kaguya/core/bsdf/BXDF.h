@@ -52,7 +52,7 @@ namespace kaguya {
              * @return 辐射系数
              */
             virtual Spectrum sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
-                                     Sampler *const sampler);
+                                     Sampler *const sampler, BXDFType *sampleType);
 
             /**
              * wo 与 wi 之间的采样 PDF

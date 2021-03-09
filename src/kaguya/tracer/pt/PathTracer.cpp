@@ -125,7 +125,7 @@ namespace kaguya {
                     // 设置下一次打击光线
                     scatterRay = si.sendRay(NORMALIZE(worldWi));
 
-                    if (si.bssrdf && (bxdfType & BXDFType::BSDF_TRANSMISSION)) {
+                    if (si.bssrdf != nullptr && (bxdfType & BXDFType::BSDF_TRANSMISSION)) {
                         // Subsurface
                         SurfaceInteraction pi;
                         Float pdf = 0;
