@@ -199,6 +199,7 @@ namespace kaguya {
                 si.normal = _geometryNormal;
                 si.rendering.normal = normal;
                 si.direction = ray.getDirection();
+                si.wo = -NORMALIZE(si.direction);
                 si.u = _uv1.x * b1 + _uv2.x * b2 + _uv3.x * b0;
                 si.v = _uv1.y * b1 + _uv2.y * b2 + _uv3.y * b0;
                 si.error = error;

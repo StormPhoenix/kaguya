@@ -57,6 +57,7 @@ namespace kaguya {
                         Vector3F outwardNormal = computeNormal(si.point);
                         si.normal = si.rendering.normal = outwardNormal;
                         si.direction = ray.getDirection();
+                        si.wo = -NORMALIZE(si.direction);
                         return true;
                     }
 
@@ -75,6 +76,7 @@ namespace kaguya {
                         Vector3F outwardNormal = computeNormal(si.point);
                         si.normal = si.rendering.normal = outwardNormal;
                         si.direction = ray.getDirection();
+                        si.wo = -NORMALIZE(si.direction);
                         return true;
                     } else {
                         return false;

@@ -91,6 +91,7 @@ namespace kaguya {
             assert(camera != nullptr);
             point = ray.getOrigin();
             direction = ray.getDirection();
+            wo = -NORMALIZE(direction);
             normal = rendering.normal = camera->getFront();
         }
 
@@ -104,6 +105,7 @@ namespace kaguya {
                 light(light) {
             point = p;
             direction = dir;
+            wo = -NORMALIZE(direction);
             normal = rendering.normal = n;
         }
 

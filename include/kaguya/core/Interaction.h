@@ -96,8 +96,10 @@ namespace kaguya {
             struct {
                 Normal3F normal;
             } rendering;
-            // 发生 Interaction 的光线的方向
+            // 发射 Interaction 的光线的方向
             Vector3F direction;
+            // f(wo, wi) 的参数
+            Vector3F wo;
             // 击中点
             Vector3F point;
             // 击中点法线方向，发现永远指向物体表面外侧

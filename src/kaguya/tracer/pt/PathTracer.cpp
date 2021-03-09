@@ -136,9 +136,7 @@ namespace kaguya {
 
                         beta *= S / pdf;
                         shaderColor += beta * sampleDirectLight(scene, pi, sampler);
-
-                        // TODO pi.direction = -rendering.normal
-                        Spectrum f = pi.bsdf->sampleF(-pi.direction, &worldWi, &pdf, sampler, BSDF_ALL, &bxdfType);
+                        Spectrum f = pi.bsdf->sampleF(pi.wo, &worldWi, &pdf, sampler, BSDF_ALL, &bxdfType);
 
                         if (f.isBlack() || pdf == 0) {
                             break;
@@ -194,7 +192,7 @@ namespace kaguya {
                     const SurfaceInteraction &si = (const SurfaceInteraction &) eye;
                     assert(si.bsdf != nullptr);
 
-                    Float cosine = ABS_DOT(eye.normal, wi);
+                    Float cosine = ABS_DOT(eye.rendering.normal, wi);
                     scatteringPdf = si.bsdf->samplePdf(-eye.direction, wi);
                     f = si.bsdf->f(-eye.direction, wi) * cosine;
                 }

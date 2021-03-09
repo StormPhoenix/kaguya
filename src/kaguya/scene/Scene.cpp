@@ -759,7 +759,7 @@ namespace kaguya {
 
             // Subsurface Material
             Spectrum albedoEff(0.99);
-            Spectrum mft(0.001);
+            Spectrum mft(0.01);
             Float g = 0.0f;
             Float theta = 1.33f;
             std::shared_ptr<Material> subsurfaceMaterial = std::make_shared<SubsurfaceMaterial>(albedoEff, mft, g, theta);

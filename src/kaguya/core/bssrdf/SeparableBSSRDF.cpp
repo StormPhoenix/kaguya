@@ -58,8 +58,8 @@ namespace kaguya {
                     pi->bsdf = ALLOC(memoryArena, BSDF)(*pi);
                     pi->bsdf->addBXDF(ALLOC(memoryArena, SeparableBSSRDFAdapter)(this));
                     // TODO delete why
-//                    si->direction = po.direction;
                     pi->direction = -pi->rendering.normal;
+                    pi->wo = pi->rendering.normal;
                 }
                 return sp;
             }
