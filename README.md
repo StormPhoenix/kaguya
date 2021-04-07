@@ -3,6 +3,10 @@
 A simple physically based render.
     
 ## TODO
+- [ ] Photon Mapping 开发
+    - [x] 研究 Photon Mapping、Progressive Photon Mapping 和 Stochastic Progressive Photon Mapping
+    - [ ] 开发 SPPM Tracer 
+
 - [ ] Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法，写成文档记录下来
 - [ ] Triangle sampling strategy 计算方法记录。
 - [ ] Medium sampling method.
@@ -23,8 +27,6 @@ A simple physically based render.
 - [ ] Geometry Aggregation 结构调整
 
 ## Unsolved
-- [ ]
-
 
 - [ ] SubsurfaceMaterial 渲染错误
     - [x] 材质的 bsdf 有没有错误（SubsurfaceMaterial 仅仅使用 bsdf，省略 bssrdf）
@@ -33,7 +35,9 @@ A simple physically based render.
     - [x] 修改 sigma_t 参数，射线依然无法击中（实际上是能击中的，但是 PT 里面的 uniformSampleLight 用的不是 rendering.normal，导致采样的光线为 0）
     - [ ] Subsurface Bunny 下面会透光，这是不允许的
         - [ ] 降低兔子靠近下平面，光线越来越明显
-    - [ ] Bunny 表面呈现血管纹路，猜测是 found、额外的 pdf 造成的
+    - [x] Bunny 表面呈现血管纹路，猜测是 found、额外的 pdf 造成的 (已解决：去掉额外的 x \ z 轴的采样)
+    
+    - [ ] Bunny 耳朵边缘部分存在噪点，应该在采样 Sr 半径时考虑射线与 Surface 的夹角，判断使用哪一条轴做采样
     
 - [ ] 添加 low Discrepancy 序列
     - [ ] 添加 halton 序列

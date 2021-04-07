@@ -83,6 +83,12 @@ namespace kaguya {
                     // Add contribution from dipole for depth $\depthreal$ to _Ed_
                     Float E = phiD * cPhi + EDn * cE;
                     Float kappa = 1 - std::exp(-2 * sigma_t_prime * (dr + zr));
+
+                    // First albedo', ratio of the importance sampling weight of the sampling strategy
+                    //      an d the sigma_s' in Equation 15.33
+                    // Second albedo' is the additional scattering event
+                    //      in Grosjean's non-classical monopole in Equation 15.23
+                    // Kappa -> Habel et al.(2013) for details
                     Ed += kappa * albedo_prime * albedo_prime * E;
                 }
                 return Ed / nSamples;
