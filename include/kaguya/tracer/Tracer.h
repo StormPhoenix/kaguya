@@ -34,8 +34,11 @@ namespace kaguya {
             virtual std::shared_ptr<Light> uniformSampleLight(std::shared_ptr<Scene> scene, Float *lightPdf, Sampler *sampler);
 
         private:
+//            virtual std::function<void(const int, const int, Sampler *)> render() = 0;
+
             // Rendering implementation
-            virtual std::function<void(const int, const int, Sampler *)> render() = 0;
+            // startRow, endRow, startCol, endCol
+            virtual std::function<void(const int, const int, const int, const int, Sampler*)> render() = 0;
 
         protected:
             // 场景

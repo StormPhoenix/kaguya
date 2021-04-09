@@ -90,6 +90,11 @@ namespace kaguya {
             testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
                              std::vector<std::shared_ptr<Light>> &lights, const std::shared_ptr<Material> material);
 
+            static std::vector<std::shared_ptr<Geometry>>
+            testTopAreaLightByTime(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
+                                   std::vector<std::shared_ptr<Light>> &lights,
+                                   const std::shared_ptr<Material> material, Float t);
+
             static std::vector<std::shared_ptr<Geometry>> testBottomWall(const std::shared_ptr<Material> material,
                                                                          const std::shared_ptr<Medium> insideMedium,
                                                                          const std::shared_ptr<Medium> outsideMedium);
@@ -126,6 +131,8 @@ namespace kaguya {
 
             static std::shared_ptr<Scene> cornelBoxWater();
 
+            static std::shared_ptr<Scene> sceneTwoBox();
+
             static std::shared_ptr<Scene> sceneLightThroughAir();
 
 #endif
@@ -139,7 +146,6 @@ namespace kaguya {
              * 构建 Cornel box，加载 bunny 模型，次表面散射材质
              */
             static std::shared_ptr<Scene> sceneBunnySubsurfaceWithAreaLight();
-
 
             /**
              * 构建 bunny，采用点光源

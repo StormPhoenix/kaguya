@@ -71,12 +71,7 @@ namespace kaguya {
                         task->activeRender++;
                         // release lock
                         lock.unlock();
-                        for (int row = rowStart; row <= rowEnd; row++) {
-                            for (int col = colStart; col <= colEnd; col++) {
-                                task->func2D(row, col, sampler);
-                            }
-                        }
-
+                        task->func2D(rowStart, rowEnd, colStart, colEnd, sampler);
                         lock.lock();
                         task->activeRender--;
                         if (task->isFinished()) {
@@ -105,7 +100,7 @@ namespace kaguya {
             barrier->wait();
         }
 
-        void RenderPool::addRenderTask(std::function<void(const int, const int, Sampler *)> func2D,
+        void RenderPool::addRenderTask(std::function<void(const int, const int, const int, const int, Sampler *)> func2D,
                                        int renderWidth, int renderHeight) {
             assert(_threadCount > 0);
 

@@ -26,7 +26,7 @@ namespace kaguya {
             static RenderPool *getInstance();
 
         public:
-            void addRenderTask(std::function<void(int, int, Sampler *)> func2D,
+            void addRenderTask(std::function<void(const int, const int, const int, const int, Sampler *)> func2D,
                                int renderWidth, int renderHeight);
 
             void shutdown();

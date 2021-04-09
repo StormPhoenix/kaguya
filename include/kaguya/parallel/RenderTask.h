@@ -18,7 +18,7 @@ namespace kaguya {
 
         class RenderTask {
         public:
-            RenderTask(const std::function<void(const int, const int, Sampler *)> &func2D,
+            RenderTask(const std::function<void(const int, const int, const int, const int, Sampler *)> &func2D,
                        int renderWidth, int renderHeight);
 
             /**
@@ -43,7 +43,7 @@ namespace kaguya {
 
         public:
             // render function
-            const std::function<void(const int, const int, Sampler *)> func2D;
+            const std::function<void(const int, const int, const int, const int, Sampler *)> func2D;
 
             // next render task
             RenderTask *next = nullptr;

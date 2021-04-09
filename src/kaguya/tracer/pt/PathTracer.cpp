@@ -278,28 +278,35 @@ namespace kaguya {
             }
         }
 
-        std::function<void(const int, const int, Sampler *)> PathTracer::render() {
-            auto renderFunc = [this](const int row, const int col, Sampler *sampler) -> void {
-                // set current sampling pixel
-                sampler->forPixel(Point2F(row, col));
+        std::function<void(const int, const int, const int, const int, Sampler *)> PathTracer::render() {
+            auto renderFunc = [this](const int startRow, const int endRow,
+                                     const int startCol, const int endCol,
+                                     Sampler *sampler) -> void {
 
-                Spectrum ans = {0};
-                const Float sampleWeight = 1.0 / _samplePerPixel;
-                // 做 _samplePerPixel 次采样
-                for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
-                    MemoryArena arena;
-                    auto u = (col + sampler->sample1D()) / Float(_camera->getResolutionWidth());
-                    auto v = (row + sampler->sample1D()) / Float(_camera->getResolutionHeight());
+                for (int row = startRow; row <= endRow; row++) {
+                    for (int col = startCol; col <= endCol; col++) {
+                        // set current sampling pixel
+                        sampler->forPixel(Point2F(row, col));
 
-                    Ray sampleRay = _camera->sendRay(u, v);
-                    Spectrum shaderColor = shaderOfProgression(sampleRay, _scene, sampler, arena);
+                        Spectrum ans = {0};
+                        const Float sampleWeight = 1.0 / _samplePerPixel;
+                        // 做 _samplePerPixel 次采样
+                        for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
+                            MemoryArena arena;
+                            auto u = (col + sampler->sample1D()) / Float(_camera->getResolutionWidth());
+                            auto v = (row + sampler->sample1D()) / Float(_camera->getResolutionHeight());
 
-                    ans += shaderColor;
-                    arena.clean();
-                    sampler->nextSampleRound();
+                            Ray sampleRay = _camera->sendRay(u, v);
+                            Spectrum shaderColor = shaderOfProgression(sampleRay, _scene, sampler, arena);
+
+                            ans += shaderColor;
+                            arena.clean();
+                            sampler->nextSampleRound();
+                        }
+                        ans *= sampleWeight;
+                        _filmPlane->addSpectrum(ans, row, col);
+                    }
                 }
-                ans *= sampleWeight;
-                _filmPlane->addSpectrum(ans, row, col);
             };
 
             return renderFunc;
