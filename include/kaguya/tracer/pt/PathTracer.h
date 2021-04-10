@@ -29,19 +29,6 @@ namespace kaguya {
             virtual void init();
 
             /**
-             * 在 eye 处对光源采样
-             * @param scene scene
-             * @param eye
-             * @param sampleRay eye 处出发的射线
-             * @param lightPdf 采样概率
-             * @return
-             */
-            Spectrum sampleDirectLight(std::shared_ptr<Scene> scene, const Interaction &eye, Sampler *sampler);
-
-            Spectrum evaluateDirectLight(std::shared_ptr<Scene> scene, const Interaction &eye,
-                                         const std::shared_ptr<Light> light, Sampler *sampler);
-
-            /**
              * Path Tracing 渲染代码，渐进式实现
              * @param ray
              * @param scene

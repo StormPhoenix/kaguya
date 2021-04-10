@@ -64,14 +64,14 @@ namespace kaguya {
             Float samplePdf(const Vector3F &worldWo, const Vector3F &worldWi, BXDFType type = BSDF_ALL) const;
 
             /**
-             * 计算属于 bxdfType 类型集合的材质有多少个
+             * 统计 bxdf type 属性仅在 @param bxdfType 内的 bxdf 个数
              * @param bxdfType
              * @return
              */
             int allIncludeOf(BXDFType bxdfType);
 
             /**
-             * 计算包含 bxdfType 类型集合的材质有多少个
+             * 统计包含 @param bxdfType 的所有 bxdf 个数
              * @param bxdfType
              * @return
              */

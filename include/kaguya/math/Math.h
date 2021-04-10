@@ -53,6 +53,7 @@ using Point2F = Vector2F;
 using Point3F = Vector3F;
 using Normal3F = Vector3F;
 using Point2I = Vector2i;
+using Point3I = Vector3i;
 
 #define ROTATE(matrix, radius, axis) glm::rotate(matrix, glm::radians(radius), axis)
 #define TRANSLATE(matrix, offset) glm::translate(matrix, offset)
@@ -87,10 +88,52 @@ namespace kaguya {
         using namespace kaguya;
         using sampler::Sampler;
 
+        class Bound3 {
+        public:
+            Bound3() {
+                Float minNum = std::numeric_limits<Float>::lowest();
+                Float maxNum = std::numeric_limits<Float>::max();
+                _min = Point3F(maxNum, maxNum, maxNum);
+                _max = Point3F(minNum, minNum, minNum);
+            }
+
+            Bound3(const Point3F &p) : _min(p), _max(p) {}
+
+            Bound3(const Point3F &min, const Point3F &max) : _min(min), _max(max) {}
+
+            void expand(Float delta) {
+                _min -= delta;
+                _max += delta;
+            }
+
+            Vector3F diagonal() {
+                return _max - _min;
+            }
+
+            void merge(const Bound3 &b) {
+                _min = {std::min(_min.x, b._min.x),
+                        std::min(_min.y, b._min.y),
+                        std::min(_min.z, b._min.z)};
+
+                _max = {std::max(_max.x, b._max.x),
+                        std::max(_max.y, b._max.y),
+                        std::max(_max.z, b._max.z)};
+            }
+
+            Vector3F offset(const Point3F &p) const {
+                return p - _min;
+            }
+
+        private:
+            Vector3F _min;
+            Vector3F _max;
+        };
+
         inline Float degreesToRadians(double degrees) {
             return degrees * PI / 180;
         }
 
+        /* [min, max] */
         template<typename T, typename U, typename V>
         T clamp(T x, U min, V max) {
             if (x < min) return min;
