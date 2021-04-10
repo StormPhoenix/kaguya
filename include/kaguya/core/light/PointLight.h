@@ -19,27 +19,27 @@ namespace kaguya {
              * @param intensity
              * @return
              */
-            static std::shared_ptr<PointLight> buildPointLight(const Vector3F &center, const Spectrum &intensity, const MediumBound mediumBoundary);
+            static std::shared_ptr<PointLight> buildPointLight(const Vector3F &center, const Spectrum &intensity, const MediumBoundary mediumBoundary);
 
             /**
              * 点光源
              * @param center 光源位置
              * @param intensity 光源处，单位立体角的光通量
              */
-            PointLight(const Vector3F &center, const Spectrum &intensity, const MediumBound &mediumBoundary);
+            PointLight(const Vector3F &center, const Spectrum &intensity, const MediumBoundary &mediumBoundary);
 
-            virtual Spectrum sampleFromLight(const Interaction &eye,
-                                             Vector3F *wi, Float *pdf,
-                                             Sampler *sampler,
-                                             VisibilityTester *visibilityTester) override;
+            virtual Spectrum sampleLi(const Interaction &eye,
+                                      Vector3F *wi, Float *pdf,
+                                      Sampler *sampler,
+                                      VisibilityTester *visibilityTester) override;
 
-            virtual Float sampleFromLightPdf(const Interaction &eye, const Vector3F &dir) override;
+            virtual Float pdfLi(const Interaction &eye, const Vector3F &dir) override;
 
-            virtual Spectrum randomLightRay(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
-                                            Sampler *sampler) override;
+            virtual Spectrum sampleLe(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
+                                      Sampler *sampler) override;
 
-            virtual void randomLightRayPdf(const Ray &ray, const Vector3F &normal,
-                                           Float *pdfPos, Float *pdfDir) const override;
+            virtual void pdfLe(const Ray &ray, const Vector3F &normal,
+                               Float *pdfPos, Float *pdfDir) const override;
 
         private:
             // 单位立体角的光强

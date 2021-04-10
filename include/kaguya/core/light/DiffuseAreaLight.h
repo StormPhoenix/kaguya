@@ -17,22 +17,22 @@ namespace kaguya {
         public:
             DiffuseAreaLight(const Spectrum &intensity,
                              std::shared_ptr<Geometry> shape,
-                             const MediumBound &mediumBoundary,
+                             const MediumBoundary &mediumBoundary,
                              bool singleSide = true);
 
             Spectrum lightRadiance(const Interaction &interaction, const Vector3F &wo) const override;
 
-            virtual Spectrum randomLightRay(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
-                                            Sampler *sampler) override;
+            virtual Spectrum sampleLe(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
+                                      Sampler *sampler) override;
 
-            virtual void randomLightRayPdf(const Ray &ray, const Vector3F &normal,
-                                           Float *pdfPos, Float *pdfDir) const override;
+            virtual void pdfLe(const Ray &ray, const Vector3F &normal,
+                               Float *pdfPos, Float *pdfDir) const override;
 
         public:
             // 构造漫反射区域灯光
             static std::shared_ptr<AreaLight> buildDiffuseAreaLight(const Spectrum &intensity,
                                                                     std::shared_ptr<Geometry> geometry,
-                                                                    const MediumBound &mediumBoundary,
+                                                                    const MediumBoundary &mediumBoundary,
                                                                     bool singleSide = true);
 
         private:

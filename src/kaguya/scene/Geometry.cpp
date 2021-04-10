@@ -2,13 +2,13 @@
 // Created by Storm Phoenix on 2020/12/16.
 //
 
-#include <kaguya/core/medium/MediumBound.h>
+#include <kaguya/core/medium/MediumBoundary.h>
 #include <kaguya/scene/Geometry.h>
 
 namespace kaguya {
     namespace scene {
 
-        using kaguya::core::medium::MediumBound;
+        using kaguya::core::medium::MediumBoundary;
 
         Geometry::Geometry(const std::shared_ptr<meta::Shape> shape,
                            const std::shared_ptr<Material> material,
@@ -24,7 +24,7 @@ namespace kaguya {
             bool ret = _shape->intersect(ray, si, minStep, maxStep);
             if (ret) {
                 // medium
-                si.setMediumBoundary(MediumBound(_inside.get(), _outside.get()));
+                si.setMediumBoundary(MediumBoundary(_inside.get(), _outside.get()));
                 // material
                 _material != nullptr ? si.setMaterial(_material.get()) : si.setMaterial(nullptr);
                 // area light

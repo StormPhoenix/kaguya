@@ -15,18 +15,18 @@ namespace kaguya {
         public:
             static std::shared_ptr<SpotLight>
             buildSpotLight(const Vector3F &center, const Vector3F &dir, const Spectrum &intensity,
-                           const MediumBound &mediumBoundary) {
+                           const MediumBoundary &mediumBoundary) {
                 std::shared_ptr<SpotLight> light = std::make_shared<SpotLight>(center, dir, intensity, mediumBoundary,
                                                                                15, 20);
                 return light;
             }
 
-            virtual Spectrum sampleFromLight(const Interaction &eye,
-                                             Vector3F *wi, Float *pdf,
-                                             Sampler *sampler,
-                                             VisibilityTester *visibilityTester) override;
+            virtual Spectrum sampleLi(const Interaction &eye,
+                                      Vector3F *wi, Float *pdf,
+                                      Sampler *sampler,
+                                      VisibilityTester *visibilityTester) override;
 
-            virtual Float sampleFromLightPdf(const Interaction &eye, const Vector3F &dir) override;
+            virtual Float pdfLi(const Interaction &eye, const Vector3F &dir) override;
 
             /**
              * 聚光灯
@@ -36,14 +36,14 @@ namespace kaguya {
              * @param fallOffRange 聚光灯高光区半角
              * @param totalRange 聚光灯所有区域半角
              */
-            SpotLight(const Vector3F eye, const Vector3F dir, Spectrum intensity, const MediumBound &mediumBoundary,
+            SpotLight(const Vector3F eye, const Vector3F dir, Spectrum intensity, const MediumBoundary &mediumBoundary,
                       Float fallOffRange = 30, Float totalRange = 45);
 
-            virtual Spectrum randomLightRay(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
-                                            Sampler *sampler) override;
+            virtual Spectrum sampleLe(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
+                                      Sampler *sampler) override;
 
-            virtual void randomLightRayPdf(const Ray &ray, const Vector3F &normal,
-                                           Float *pdfPos, Float *pdfDir) const override;
+            virtual void pdfLe(const Ray &ray, const Vector3F &normal,
+                               Float *pdfPos, Float *pdfDir) const override;
 
         private:
             Spectrum fallOffWeight(const Vector3F &wo);

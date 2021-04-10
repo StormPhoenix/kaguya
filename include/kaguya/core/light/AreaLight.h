@@ -26,7 +26,7 @@ namespace kaguya {
              * @param intensity
              * @param shape
              */
-            AreaLight(const Spectrum &intensity, std::shared_ptr<Geometry> shape, LightType type, const MediumBound &mediumBoundary);
+            AreaLight(const Spectrum &intensity, std::shared_ptr<Geometry> shape, LightType type, const MediumBoundary &mediumBoundary);
 
             /**
              * 计算 AreaLight 表面某一点 point，方向为 wo 的亮度。
@@ -36,11 +36,11 @@ namespace kaguya {
              */
             virtual Spectrum lightRadiance(const Interaction &interaction, const Vector3F &wo) const = 0;
 
-            virtual Spectrum sampleFromLight(const Interaction &eye, Vector3F *wi, Float *pdf,
-                                             Sampler *sampler,
-                                             VisibilityTester *visibilityTester) override;
+            virtual Spectrum sampleLi(const Interaction &eye, Vector3F *wi, Float *pdf,
+                                      Sampler *sampler,
+                                      VisibilityTester *visibilityTester) override;
 
-            virtual Float sampleFromLightPdf(const Interaction &eye, const Vector3F &dir) override;
+            virtual Float pdfLi(const Interaction &eye, const Vector3F &dir) override;
 
         protected:
             const Spectrum _intensity;

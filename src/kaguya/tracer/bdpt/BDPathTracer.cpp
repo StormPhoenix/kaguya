@@ -136,8 +136,8 @@ namespace kaguya {
                     Float sampleLightPdf;
                     VisibilityTester visibilityTester;
                     // 直接对光源采样，同时 visibilityTester 会保存两端交点
-                    Spectrum sampleIntensity = light->sampleFromLight(pt.getInteraction(), &worldWi, &sampleLightPdf,
-                                                                      sampler, &visibilityTester);
+                    Spectrum sampleIntensity = light->sampleLi(pt.getInteraction(), &worldWi, &sampleLightPdf,
+                                                               sampler, &visibilityTester);
 
                     if (std::abs(sampleLightPdf - 0) < math::EPSILON || sampleIntensity.isBlack() ||
                         !visibilityTester.isVisible(scene)) {
@@ -219,8 +219,8 @@ namespace kaguya {
             // 光源发射光线
             Ray scatterRay;
             // 采样光源发射
-            Spectrum intensity = light->randomLightRay(&scatterRay, &lightNormal,
-                                                       &pdfPos, &pdfDir, sampler);
+            Spectrum intensity = light->sampleLe(&scatterRay, &lightNormal,
+                                                 &pdfPos, &pdfDir, sampler);
             // 创建光源点
             // TODO 没有考虑多光源情况
             lightSubPath[0] = PathVertex::createLightVertex(light.get(), scatterRay.getOrigin(),

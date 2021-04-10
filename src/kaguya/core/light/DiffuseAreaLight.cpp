@@ -10,7 +10,7 @@ namespace kaguya {
 
         std::shared_ptr<AreaLight> DiffuseAreaLight::buildDiffuseAreaLight(const Spectrum &intensity,
                                                                            std::shared_ptr<Geometry> geometry,
-                                                                           const MediumBound &mediumBoundary,
+                                                                           const MediumBoundary &mediumBoundary,
                                                                            bool singleSide) {
             std::shared_ptr<AreaLight> light =
                     std::make_shared<DiffuseAreaLight>(intensity, geometry, mediumBoundary, singleSide);
@@ -20,12 +20,12 @@ namespace kaguya {
 
         DiffuseAreaLight::DiffuseAreaLight(const Spectrum &intensity,
                                            std::shared_ptr<Geometry> shape,
-                                           const MediumBound &mediumBoundary,
+                                           const MediumBoundary &mediumBoundary,
                                            bool singleSide) :
                 AreaLight(intensity, shape, AREA, mediumBoundary), _singleSide(singleSide) {}
 
-        Spectrum DiffuseAreaLight::randomLightRay(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
-                                                  Sampler *sampler) {
+        Spectrum DiffuseAreaLight::sampleLe(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
+                                            Sampler *sampler) {
             assert(_geometry != nullptr);
 
             // 采样位置
@@ -67,8 +67,8 @@ namespace kaguya {
             return lightRadiance(si, dirWorld);
         }
 
-        void DiffuseAreaLight::randomLightRayPdf(const Ray &ray, const Vector3F &normal,
-                                                 Float *pdfPos, Float *pdfDir) const {
+        void DiffuseAreaLight::pdfLe(const Ray &ray, const Vector3F &normal,
+                                     Float *pdfPos, Float *pdfDir) const {
             assert(_geometry != nullptr);
             // 创建 SurfaceInteraction
             SurfaceInteraction si;

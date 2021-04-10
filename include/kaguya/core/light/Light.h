@@ -14,7 +14,7 @@ namespace kaguya {
     namespace core {
 
         namespace medium {
-            class MediumBound;
+            class MediumBoundary;
         }
 
         using medium::Medium;
@@ -30,7 +30,7 @@ namespace kaguya {
 
         class Light {
         public:
-            Light(LightType type, const MediumBound &mediumBoundary) :
+            Light(LightType type, const MediumBoundary &mediumBoundary) :
                     _type(type), _mediumBoundary(mediumBoundary) {}
 
             /**
@@ -41,9 +41,9 @@ namespace kaguya {
              * @param visibilityTester 用于判断 ray 是否击中光源
              * @return
              */
-            virtual Spectrum sampleFromLight(const Interaction &eye, Vector3F *wi, Float *pdf,
-                                             Sampler *sampler,
-                                             VisibilityTester *visibilityTester) = 0;
+            virtual Spectrum sampleLi(const Interaction &eye, Vector3F *wi, Float *pdf,
+                                      Sampler *sampler,
+                                      VisibilityTester *visibilityTester) = 0;
 
             /**
              * 计算 eye 朝 dir 方向射向 Light 的 pdf
@@ -51,7 +51,7 @@ namespace kaguya {
              * @param dir
              * @return
              */
-            virtual Float sampleFromLightPdf(const Interaction &eye, const Vector3F &dir) = 0;
+            virtual Float pdfLi(const Interaction &eye, const Vector3F &dir) = 0;
 
             /**
              * light 主动发射光线
@@ -60,8 +60,8 @@ namespace kaguya {
              * @param pdfDir 射线方向 pdf
              * @return
              */
-            virtual Spectrum randomLightRay(Ray *ray, Vector3F *normal, Float *pdfPos,
-                                            Float *pdfDir, Sampler *sampler) = 0;
+            virtual Spectrum sampleLe(Ray *ray, Vector3F *normal, Float *pdfPos,
+                                      Float *pdfDir, Sampler *sampler) = 0;
 
             /**
              * light 主动发射光线，并计算其 pdf 函数
@@ -72,15 +72,15 @@ namespace kaguya {
              * @param pdfDir
              * @return
              */
-            virtual void randomLightRayPdf(const Ray &ray, const Vector3F &normal,
-                                           Float *pdfPos, Float *pdfDir) const = 0;
+            virtual void pdfLe(const Ray &ray, const Vector3F &normal,
+                               Float *pdfPos, Float *pdfDir) const = 0;
 
             /**
              * 计算从 ray->origin 起点开始，ray->direction 朝向的 Radiance
              * @param ray
              * @return
              */
-            virtual Spectrum lightRadiance(const Ray &ray) const { return Spectrum(0.0); }
+            virtual Spectrum Le(const Ray &ray) const { return Spectrum(0.0); }
 
             /**
              * 判断光源是否是尖端分布
@@ -92,7 +92,7 @@ namespace kaguya {
 
         protected:
             const LightType _type;
-            MediumBound _mediumBoundary;
+            MediumBoundary _mediumBoundary;
         };
 
     }

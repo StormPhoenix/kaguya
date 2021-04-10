@@ -52,7 +52,7 @@ namespace kaguya {
             dirToEye = NORMALIZE(dirToEye);
 
             if (type == PathVertexType::LIGHT && ei.light != nullptr) {
-                return ei.light->lightRadiance(Ray(point, dirToEye));
+                return ei.light->Le(Ray(point, dirToEye));
             } else {
                 return si.getAreaLight()->lightRadiance(si, dirToEye);
             }
@@ -168,7 +168,7 @@ namespace kaguya {
             Float pdfPos = 0;
             Float pdfDir = 0;
             // 计算光源采样的 pdf
-            light->randomLightRayPdf(ray, normal, &pdfPos, &pdfDir);
+            light->pdfLe(ray, normal, &pdfPos, &pdfDir);
 
             // 计算 next 的 density pdf
             pdfDir /= distSquare;
@@ -191,7 +191,7 @@ namespace kaguya {
             Ray ray = Ray(point, dirToNext);
             Float pdfPos = 0;
             Float pdfDir = 0;
-            light->randomLightRayPdf(ray, normal, &pdfPos, &pdfDir);
+            light->pdfLe(ray, normal, &pdfPos, &pdfDir);
             return pdfPos;
         }
     }

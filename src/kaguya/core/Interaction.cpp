@@ -32,7 +32,7 @@ namespace kaguya {
 
         Interaction::Interaction(const Vector3F &point,
                                  const Vector3F &direction, const Vector3F &normal,
-                                 const MediumBound &mediumBoundary, Material *material) :
+                                 const MediumBoundary &mediumBoundary, Material *material) :
                 point(point), direction(direction), normal(normal),
                 _mediumBoundary(mediumBoundary), _material(material) {}
 
@@ -75,7 +75,7 @@ namespace kaguya {
 
         SurfaceInteraction::SurfaceInteraction(const Vector3F &point, const Vector3F &direction,
                                                const Vector3F &normal,
-                                               MediumBound &mediumBoundary,
+                                               MediumBoundary &mediumBoundary,
                                                Float u, Float v, Material *material) :
                 Interaction(point, direction, normal, mediumBoundary, material),
                 u(u), v(v) {}

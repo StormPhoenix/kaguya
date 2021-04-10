@@ -87,9 +87,9 @@ namespace kaguya {
 
             Spectrum ret(0);
             // 对光源采样采样
-            Spectrum lumi = light->sampleFromLight(eye, &wi,
-                                                   &lightPdf, sampler,
-                                                   &visibilityTester);
+            Spectrum lumi = light->sampleLi(eye, &wi,
+                                            &lightPdf, sampler,
+                                            &visibilityTester);
 
             // 排除对光源采样贡献为 0 的情况
             if (lightPdf > math::EPSILON && !lumi.isBlack()) {
@@ -155,7 +155,7 @@ namespace kaguya {
                     Float weight = 1.0;
                     if (!sampleSpecular) {
                         // sample1d light pdf
-                        lightPdf = light->sampleFromLightPdf(eye, wi);
+                        lightPdf = light->pdfLi(eye, wi);
                         if (lightPdf == 0) {
                             return ret;
                         }

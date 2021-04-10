@@ -365,7 +365,7 @@ namespace kaguya {
                                                                const std::shared_ptr<Medium> outside,
                                                                bool singleSide) {
             std::shared_ptr<AreaLight> light = DiffuseAreaLight::buildDiffuseAreaLight(
-                    spectrum, geometry, MediumBound(inside.get(), outside.get()), singleSide);
+                    spectrum, geometry, MediumBoundary(inside.get(), outside.get()), singleSide);
             return light;
         }
 
@@ -855,7 +855,7 @@ namespace kaguya {
             // build point light
             std::shared_ptr<PointLight> light = PointLight::buildPointLight(
                     Vector3F(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), lightSpectrum,
-                    MediumBound(airMedium.get(), airMedium.get()));
+                    MediumBoundary(airMedium.get(), airMedium.get()));
             scene->_lights.push_back(light);
 
 
@@ -1363,7 +1363,7 @@ namespace kaguya {
             // build point light
             std::shared_ptr<SpotLight> light = SpotLight::buildSpotLight(
                     Vector3F(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), Vector3F(0.0, -1, 0.0),
-                    spotLightSpectrum, MediumBound(airMedium.get(), airMedium.get()));
+                    spotLightSpectrum, MediumBoundary(airMedium.get(), airMedium.get()));
             scene->_lights.push_back(light);
 
             objects.push_back(glassSphere);
@@ -1490,7 +1490,7 @@ namespace kaguya {
             // build point light
             std::shared_ptr<PointLight> light = PointLight::buildPointLight(
                     Vector3F(0.0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), lightSpectrum,
-                    MediumBound(airMedium.get(), airMedium.get()));
+                    MediumBoundary(airMedium.get(), airMedium.get()));
             scene->_lights.push_back(light);
 
             objects.push_back(glassSphere);
@@ -1614,7 +1614,7 @@ namespace kaguya {
             // build point light
             std::shared_ptr<PointLight> light = PointLight::buildPointLight(
                     Vector3F(0.0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), pointLightSpectrum,
-                    MediumBound(airMedium.get(), airMedium.get()));
+                    MediumBoundary(airMedium.get(), airMedium.get()));
             scene->_lights.push_back(light);
 
             objects.push_back(glassSphere);

@@ -8,7 +8,7 @@ namespace kaguya {
     namespace core {
 
         SpotLight::SpotLight(const Vector3F center, const Vector3F dir, Spectrum intensity,
-                             const MediumBound &mediumBoundary, Float fallOffRange, Float totalRange) :
+                             const MediumBoundary &mediumBoundary, Float fallOffRange, Float totalRange) :
                 Light(DELTA_POSITION, mediumBoundary),
                 _center(center), _dir(NORMALIZE(dir)),
                 _intensity(intensity) {
@@ -18,10 +18,10 @@ namespace kaguya {
             _cosTotalRange = std::cos(math::DEGREES_TO_RADIANS(totalRange));
         }
 
-        Spectrum SpotLight::sampleFromLight(const Interaction &eye,
-                                            Vector3F *wi, Float *pdf,
-                                            Sampler *sampler,
-                                            VisibilityTester *visibilityTester) {
+        Spectrum SpotLight::sampleLi(const Interaction &eye,
+                                     Vector3F *wi, Float *pdf,
+                                     Sampler *sampler,
+                                     VisibilityTester *visibilityTester) {
             (*wi) = NORMALIZE(_center - eye.point);
             (*pdf) = 1.0;
 
@@ -34,12 +34,12 @@ namespace kaguya {
             return _intensity * fallOffWeight(-(*wi)) / std::pow(LENGTH(_center - eye.point), 2);
         }
 
-        Float SpotLight::sampleFromLightPdf(const Interaction &eye, const Vector3F &dir) {
+        Float SpotLight::pdfLi(const Interaction &eye, const Vector3F &dir) {
             return 0;
         }
 
-        Spectrum SpotLight::randomLightRay(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
-                                           Sampler *sampler) {
+        Spectrum SpotLight::sampleLe(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
+                                     Sampler *sampler) {
             // 在局部坐标空间中均匀采样射线
             Vector3F dirLocal = math::sampling::coneUniformSampling(_cosTotalRange, sampler);
 
@@ -62,8 +62,8 @@ namespace kaguya {
             return _intensity * fallOffWeight(dirWorld);
         }
 
-        void SpotLight::randomLightRayPdf(const Ray &ray, const Vector3F &,
-                                          Float *pdfPos, Float *pdfDir) const {
+        void SpotLight::pdfLe(const Ray &ray, const Vector3F &,
+                              Float *pdfPos, Float *pdfDir) const {
             (*pdfPos) = 0;
             (*pdfDir) = std::cos(DOT(ray.getDirection(), _dir)) >= _cosTotalRange ?
                         math::sampling::coneUniformSamplePdf(_cosTotalRange) : 0;
