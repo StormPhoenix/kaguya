@@ -40,6 +40,9 @@ namespace kaguya {
             // M, new photons
             std::atomic<int> M;
 
+            // N, total photons
+            Float N = 0.;
+
             // Phi
             AtomicFloat phi[SPECTRUM_CHANNEL];
 
@@ -51,10 +54,10 @@ namespace kaguya {
         } SPPMPixel;
 
         typedef struct SPPMPixelNode {
-            const SPPMPixel *pixel;
+            SPPMPixel *pixel;
             SPPMPixelNode *next = nullptr;
 
-            SPPMPixelNode(const SPPMPixel *pixel) : pixel(pixel) {
+            SPPMPixelNode(SPPMPixel *pixel) : pixel(pixel) {
                 next = nullptr;
             }
         } SPPMPixelNode;
@@ -231,8 +234,12 @@ namespace kaguya {
 
                     int gridRes[3];
                     Float gridSize;
-                    Bound3 boxBound;
-                    /* Grid size computation */
+                    Bound3 vpsBound;
+
+                    int hashSize = nPixels;
+                    std::vector<std::atomic<SPPMPixelNode *>> pixelHashTable(hashSize);
+
+                    /* Grid bound computation */
                     {
                         Float gridSize = 0;
                         for (int i = 0; i < nPixels; i++) {
@@ -245,8 +252,8 @@ namespace kaguya {
                             {
                                 Bound3 vpBound = {pixel.vp.p};
                                 vpBound.expand(pixel.searchRadius);
-                                vpBound.merge(boxBound);
-                                boxBound = vpBound;
+                                vpBound.merge(vpsBound);
+                                vpsBound = vpBound;
                             }
 
                             // Search max radius
@@ -255,26 +262,24 @@ namespace kaguya {
 
                         /* Resolution computation */
                         {
-                            Vector3F diagonal = boxBound.diagonal();
+                            Vector3F diagonal = vpsBound.diagonal();
                             for (int axis = 0; axis < 3; axis++) {
                                 gridRes[axis] = int(diagonal[axis] / gridSize) + 1;
                             }
                         }
 
                         /* Hash table */
-                        int hashSize = nPixels;
-                        std::vector<std::atomic<SPPMPixelNode *>> pixelHashTable(hashSize);
                         {
                             for (int i = 0; i < nPixels; i++) {
-                                const SPPMPixel &pixel = pixels[i];
+                                SPPMPixel &pixel = pixels[i];
                                 if (!pixel.vp.beta.isBlack()) {
                                     Float searchRadius = pixel.searchRadius;
                                     Point3F vpMin = pixel.vp.p - searchRadius;
                                     Point3F vpMax = pixel.vp.p + searchRadius;
 
                                     Point3I vpIdxMin, vpIdxMax;
-                                    indexOfGrid(vpMin, boxBound, gridRes, gridSize, &vpIdxMin);
-                                    indexOfGrid(vpMax, boxBound, gridRes, gridSize, &vpIdxMax);
+                                    indexOfGrid(vpMin, vpsBound, gridRes, gridSize, &vpIdxMin);
+                                    indexOfGrid(vpMax, vpsBound, gridRes, gridSize, &vpIdxMax);
 
                                     for (int x = vpIdxMin[0]; x <= vpIdxMax[0]; x++) {
                                         for (int y = vpIdxMin[1]; y <= vpIdxMax[1]; y++) {
@@ -293,33 +298,152 @@ namespace kaguya {
                         }
                     }
 
-                    // Trace photons
+                    /* Trace photons */
                     {
                         for (int photon = 0; photon < _shootPhotonsPerIter; photon++) {
                             // Uniform sample light
                             Float lightPdf = 0;
                             std::shared_ptr<Light> light = uniformSampleLight(_scene, &lightPdf, sampler);
 
+                            Ray photonRay;
+                            Spectrum beta;
+
                             // Sample photon ray
-                            // TODO
+                            {
+                                Vector3F lightNormal;
+                                Float pdfPos, pdfDir;
+                                Spectrum radiance = light->sampleLe(&photonRay, &lightNormal,
+                                                                    &pdfPos, &pdfDir, sampler);
+                                if (radiance.isBlack() || pdfPos == 0. || pdfDir == 0.) {
+                                    continue;
+                                }
 
-                            for (int bounce = 0; bounce < _maxDepth; bounce++) {
-
+                                beta *= radiance * ABS_DOT(lightNormal, photonRay.getDirection())
+                                        / (pdfPos * pdfDir * lightPdf);
+                                if (beta.isBlack()) {
+                                    continue;
+                                }
                             }
 
-                            // Loop depth
-                            // Find diffuse material point, and search visible points
-                            // 这里需要一个 HashMap 查找附近所有的 visible points
+                            SurfaceInteraction si;
+                            for (int bounce = 0; bounce < _maxDepth; bounce++) {
+                                bool foundIntersection = _scene->intersect(photonRay, si);
+                                if (!foundIntersection) {
+                                    break;
+                                }
 
-                            // Density estimate
-                            // 估算光照，加入到 SPPM Pixel 里
-                            // ?? Intensity 是如何体现在 photon 上面的
-                            // 每收到一个 paritcle
-                            // 增加 M ++
-                            // 增加 Phi -> 粒子对 visible point 的贡献
+                                // Add contribution to visible point
+                                {
+                                    // Skip first intersection, for reason of indirect light
+                                    if (bounce > 0) {
+                                        Point3I indexOfPhoton;
+                                        indexOfGrid(si.point, vpsBound, gridRes, gridSize, &indexOfPhoton);
 
-                            // 修改 R （radius）
-                            // 修改 Ld
+                                        unsigned int hash = hashOfIndex(indexOfPhoton, hashSize);
+                                        // TODO std::memory_order_relaxed 的用法
+                                        for (SPPMPixelNode *node = pixelHashTable[hash].load(std::memory_order_relaxed);
+                                             node != nullptr; node = node->next) {
+                                            SPPMPixel &pixel = *(node->pixel);
+
+                                            Float searchRadius = pixel.searchRadius;
+                                            if (distanceSquare(pixel.vp.p, si.point) >= searchRadius * searchRadius) {
+                                                continue;
+                                            }
+
+                                            // Contribution computation
+                                            Vector3F wi = -photonRay.getDirection();
+                                            Spectrum phi = beta * pixel.vp.bsdf->f(pixel.vp.wo, wi, BSDF_ALL);
+                                            for (int i = 0; i < SPECTRUM_CHANNEL; i++) {
+                                                pixel.phi[i].add(phi[i]);
+                                            }
+                                            pixel.M++;
+                                        }
+                                    }
+                                }
+
+                                // TODO 考虑 BSSRDF
+
+                                if (si.getMaterial() == nullptr) {
+                                    photonRay = si.sendRay(photonRay.getDirection());
+                                    bounce--;
+                                    continue;
+                                }
+
+                                si.buildScatteringFunction(arena);
+                                assert(si.bsdf != nullptr);
+
+                                Vector3F wo = -photonRay.getDirection();
+                                Vector3F wi;
+                                Float samplePdf = 0;
+
+                                Spectrum f = si.bsdf->sampleF(wo, &wi, &samplePdf, sampler, BSDF_ALL, nullptr);
+                                if (f.isBlack() || samplePdf == 0.) {
+                                    break;
+                                }
+                                Spectrum newBeta = beta * f * ABS_DOT(wi, si.rendering.normal) / samplePdf;
+
+                                // Russian Roulette
+                                Float terminateProb = std::max(1. - newBeta.r() / beta.r(), 0.);
+                                if (sampler->sample1D() < terminateProb) {
+                                    break;
+                                }
+                                beta = newBeta / (1 - terminateProb);
+
+                                // Next bounce
+                                photonRay = si.sendRay(wi);
+                            }
+                        }
+                    }
+
+                    /* Density estimation */
+                    {
+                        for (int i = 0; i < nPixels; i++) {
+                            SPPMPixel &pixel = pixels[i];
+
+                            if (pixel.M > 0) {
+                                Float newN = pixel.N + _gamma * pixel.M;
+                                Float totalN = pixel.N + pixel.M;
+
+                                Float oldRadius = pixel.searchRadius;
+                                Float newRadius = oldRadius * std::sqrt(newN / totalN);
+
+                                Spectrum phi;
+                                for (int i = 0; i < SPECTRUM_CHANNEL; i ++) {
+                                    phi[i] = pixel.phi[i];
+                                }
+                                pixel.tau = (pixel.tau + pixel.vp.beta * phi) * ((newRadius * newRadius) / (oldRadius * oldRadius));
+                                pixel.N = newN;
+                                pixel.M = 0;
+                                pixel.searchRadius = newRadius;
+
+                                for (int i = 0; i < SPECTRUM_CHANNEL; i ++) {
+                                    pixel.phi[i] = 0.;
+                                }
+                            }
+
+                            // Clear visible point
+                            pixel.vp.beta = 0.;
+                            pixel.vp.bsdf = nullptr;
+                        }
+                    }
+
+                    /* Write to image buffer */
+                    {
+                        if (iter == nIterations - 1 || (iter + 1) % _writeFrequence == 0) {
+                            for (int row = startRow; row <= endRow; row++) {
+                                for (int col = startCol; col <= endCol; col++) {
+                                    int offsetRow = row - startRow;
+                                    int offsetCol = col - startCol;
+                                    SPPMPixel &pixel = pixels[offsetRow * (endCol - startCol + 1) + offsetCol];
+
+                                    // Direct light
+                                    Spectrum L = pixel.Ld / (iter + 1);
+                                    // Indirect light
+                                    Float radius = pixel.searchRadius;
+                                    L += pixel.tau / ((iter + 1) * _shootPhotonsPerIter * PI * radius * radius);
+                                    _filmPlane->addSpectrum(L, row, col);
+                                }
+                            }
                         }
                     }
 
@@ -327,10 +451,6 @@ namespace kaguya {
                     sampler->nextSampleRound();
                 }
             };
-
-            // TODO
-            // Writing file plane
-
             return renderFunc;
         }
 

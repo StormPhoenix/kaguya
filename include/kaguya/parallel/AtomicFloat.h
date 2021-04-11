@@ -22,6 +22,10 @@ namespace kaguya {
                 return bits2float(bits);
             }
 
+            operator Float() const {
+                return bits2float(bits);
+            }
+
             Float operator=(Float val) {
                 bits = float2bits(val);
                 return val;

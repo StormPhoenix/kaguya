@@ -30,7 +30,9 @@ namespace kaguya {
 
             // 采样位置
             SurfaceInteraction si = _geometry->getShape()->sampleSurfacePoint(sampler);
-            *normal = si.normal;
+            if (normal != nullptr) {
+                *normal = si.normal;
+            }
 
             // 采样位置 pdf
             *pdfPos = _geometry->getShape()->surfacePointPdf(si);

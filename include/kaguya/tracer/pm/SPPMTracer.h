@@ -18,6 +18,10 @@ namespace kaguya {
             virtual std::function<void(const int, const int, const int, const int, Sampler *)> render() override;
 
         private:
+            int _writeFrequence = 20;
+
+            Float _gamma = 2.0 / 3.0;
+
             int _samplePerPixels = 300;
 
             int _shootPhotonsPerIter = 8192;

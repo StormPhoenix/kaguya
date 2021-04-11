@@ -133,6 +133,15 @@ namespace kaguya {
             return degrees * PI / 180;
         }
 
+        inline Float distance(const Point3F &p1, const Point3F &p2) {
+            return (p2 - p1).length();
+        }
+
+        inline Float distanceSquare(const Point3F &p1, const Point3F &p2) {
+            Float len = (p2 - p1).length();
+            return len * len;
+        }
+
         /* [min, max] */
         template<typename T, typename U, typename V>
         T clamp(T x, U min, V max) {
