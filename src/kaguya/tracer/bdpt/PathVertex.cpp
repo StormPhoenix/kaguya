@@ -54,7 +54,7 @@ namespace kaguya {
             if (type == PathVertexType::LIGHT && ei.light != nullptr) {
                 return ei.light->Le(Ray(point, dirToEye));
             } else {
-                return si.getAreaLight()->lightRadiance(si, dirToEye);
+                return si.getAreaLight()->L(si, dirToEye);
             }
         }
 

@@ -34,7 +34,7 @@ namespace kaguya {
              * @param wo
              * @return
              */
-            virtual Spectrum lightRadiance(const Interaction &interaction, const Vector3F &wo) const = 0;
+            virtual Spectrum L(const Interaction &interaction, const Vector3F &wo) const = 0;
 
             virtual Spectrum sampleLi(const Interaction &eye, Vector3F *wi, Float *pdf,
                                       Sampler *sampler,

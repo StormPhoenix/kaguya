@@ -2,6 +2,7 @@
 // Created by Storm Phoenix on 2021/4/8.
 //
 
+#include <kaguya/Config.h>
 #include <kaguya/parallel/AtomicFloat.h>
 #include <kaguya/tracer/pm/SPPMTracer.h>
 
@@ -79,12 +80,14 @@ namespace kaguya {
                                    (p.z * 83492791)) % hashSize;
         }
 
-        /* TODO
-         * 每次发射一堆 photons 却只处理一个 visible points，效率非常低下
-         *
-         * RenderPool 每次只渲染一个 pixel 的结构必须要重构了。这个不会很麻烦，只要将
-         * RenderTask 里面的 func2D 修改成 range 形式即可（现在是按照 pixel-wise 的方式渲染的）
-         **/
+        SPPMTracer::SPPMTracer() {
+            _gamma = Config::searchRadiusDecay;
+            _samplePerPixels = Config::samplePerPixel;
+            _shootPhotonsPerIter = Config::photonPerIteration;
+            _maxDepth = Config::maxBounce;
+            _initialRadius = Config::initialSearchRadius;
+        }
+
         std::function<void(const int, const int, const int, const int, Sampler *)> SPPMTracer::render() {
             // TODO 创建保存 3D-Grid 的 HashMap 数据结构
 
@@ -104,6 +107,11 @@ namespace kaguya {
                     pixels[i].searchRadius = _initialRadius;
                 }
 
+                // For tile index
+                int tileX = startCol / Config::tileSize;
+                int tileY = startRow / Config::tileSize;
+                sampler->forPixel(Point2F(tileY, tileX));
+
                 // Loop iterations
                 int nIterations = _samplePerPixels;
                 for (int iter = 0; iter < nIterations; iter++) {
@@ -113,8 +121,6 @@ namespace kaguya {
                     {
                         for (int row = startRow; row <= endRow; row++) {
                             for (int col = startCol; col <= endCol; col++) {
-                                sampler->forPixel(Point2F(row, col));
-
                                 // 选取 pixel
                                 int offsetRow = row - startRow;
                                 int offsetCol = col - startCol;
@@ -126,6 +132,8 @@ namespace kaguya {
                                 Ray cameraRay = _camera->sendRay(u, v);
                                 Spectrum beta(1.0f);
                                 bool isSpecularBounce = false;
+
+                                // TODO 由于第一次遇到 diffuse material 就 break，那么每次 camera bounce 得到的路径都是固定的 ... 那有什么做 camera bounce 的必要呢
 
                                 // Intersect with scenes
                                 for (int bounce = 0; bounce < _maxDepth; bounce++) {
@@ -160,8 +168,8 @@ namespace kaguya {
                                                 pixel.vp.beta = 0;
                                                 break;
                                             } else if (si.getAreaLight() != nullptr) {
-                                                pixel.Ld +=
-                                                        si.getAreaLight()->lightRadiance(si, -si.direction) * beta;
+                                                // TODO delete 临时注释 Ld
+//                                                pixel.Ld += si.getAreaLight()->L(si, -si.direction) * beta;
                                             }
                                         }
 
@@ -181,6 +189,13 @@ namespace kaguya {
                                         si.buildScatteringFunction(arena);
                                         assert(si.bsdf != nullptr);
 
+                                        // Sample from direct light
+                                        /* TODO delete Ld 临时注释 Ld
+                                        if (si.bsdf->allIncludeOf(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
+                                            pixel.Ld += beta * sampleDirectLight(_scene, si, sampler);
+                                        }
+                                         */
+
                                         // Judge visible point
                                         bool isDiffuse = si.bsdf->allIncludeOf(BXDFType(BSDF_DIFFUSE
                                                                                         | BSDF_REFLECTION
@@ -198,7 +213,7 @@ namespace kaguya {
                                         }
 
                                         /* Keep tracing ray */
-                                        if (bounce == _maxDepth - 1) {
+                                        if (bounce < _maxDepth - 1) {
                                             Vector3F wi(0.0);
                                             Float samplePdf = 0;
                                             BXDFType sampleType;
@@ -241,7 +256,6 @@ namespace kaguya {
 
                     /* Grid bound computation */
                     {
-                        Float gridSize = 0;
                         for (int i = 0; i < nPixels; i++) {
                             const SPPMPixel &pixel = pixels[i];
                             if (pixel.vp.beta.isBlack()) {
@@ -272,6 +286,7 @@ namespace kaguya {
                         {
                             for (int i = 0; i < nPixels; i++) {
                                 SPPMPixel &pixel = pixels[i];
+
                                 if (!pixel.vp.beta.isBlack()) {
                                     Float searchRadius = pixel.searchRadius;
                                     Point3F vpMin = pixel.vp.p - searchRadius;
@@ -318,8 +333,8 @@ namespace kaguya {
                                     continue;
                                 }
 
-                                beta *= radiance * ABS_DOT(lightNormal, photonRay.getDirection())
-                                        / (pdfPos * pdfDir * lightPdf);
+                                beta = radiance * ABS_DOT(lightNormal, photonRay.getDirection())
+                                       / (pdfPos * pdfDir * lightPdf);
                                 if (beta.isBlack()) {
                                     continue;
                                 }
@@ -441,6 +456,7 @@ namespace kaguya {
                                     // Indirect light
                                     Float radius = pixel.searchRadius;
                                     L += pixel.tau / ((iter + 1) * _shootPhotonsPerIter * PI * radius * radius);
+
                                     _filmPlane->addSpectrum(L, row, col);
                                 }
                             }

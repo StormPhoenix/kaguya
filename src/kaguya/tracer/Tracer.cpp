@@ -170,7 +170,7 @@ namespace kaguya {
                     Spectrum misLumi(0.0);
                     if (foundIntersection) {
                         if (misSI.getAreaLight() != nullptr && misSI.getAreaLight() == light.get()) {
-                            misLumi = misSI.getAreaLight()->lightRadiance(misSI, -misRay.getDirection());
+                            misLumi = misSI.getAreaLight()->L(misSI, -misRay.getDirection());
                         }
                     }
                     if (!misLumi.isBlack()) {

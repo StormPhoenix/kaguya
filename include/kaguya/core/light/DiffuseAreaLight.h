@@ -20,7 +20,7 @@ namespace kaguya {
                              const MediumBoundary &mediumBoundary,
                              bool singleSide = true);
 
-            Spectrum lightRadiance(const Interaction &interaction, const Vector3F &wo) const override;
+            Spectrum L(const Interaction &interaction, const Vector3F &wo) const override;
 
             virtual Spectrum sampleLe(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
                                       Sampler *sampler) override;

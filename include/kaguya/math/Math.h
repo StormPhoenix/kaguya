@@ -138,7 +138,7 @@ namespace kaguya {
         }
 
         inline Float distanceSquare(const Point3F &p1, const Point3F &p2) {
-            Float len = (p2 - p1).length();
+            Float len = LENGTH(p2 - p1);
             return len * len;
         }
 

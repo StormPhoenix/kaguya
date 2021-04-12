@@ -4,6 +4,7 @@
 #include <kaguya/scene/meta/Vertex.h>
 #include <kaguya/tracer/pt/PathTracer.h>
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
+#include <kaguya/tracer/pm/SPPMTracer.h>
 
 #include <iostream>
 #include <clipp.h>
@@ -26,7 +27,7 @@ int main(int argc, char *argv[]) {
                     option("-rt", "--render-type") & value("render type", render),
                     option("-st", "--sampler-type") & value("sampler type", Config::samplerType),
                     option("-ssp", "--sample1d-per-pixel") & value("sample1d per pixel", Config::samplePerPixel),
-                    option("-d", "--max-depth") & value("max scatter depth", Config::maxScatterDepth),
+                    option("-d", "--max-depth") & value("max scatter depth", Config::maxBounce),
                     option("-rb", "--russian-prob") & value("russian roulette probability", Config::russianRoulette),
                     option("-rd", "--russian-depth") & value("russian roulette depth", Config::russianRouletteDepth),
                     option("-kn", "--kernel") & value("rendering kernel count", Config::kernelCount),
@@ -38,7 +39,7 @@ int main(int argc, char *argv[]) {
         char filenameTemplate[80];
         sprintf(filenameTemplate, "ssp=%d_max-depth=%d_render-type=%s_%dx%d.png",
                 Config::samplePerPixel,
-                Config::maxScatterDepth,
+                Config::maxBounce,
                 render.c_str(),
                 Config::resolutionWidth,
                 Config::resolutionHeight);
@@ -52,8 +53,10 @@ int main(int argc, char *argv[]) {
 
     if (render == "bdpt") {
         tracer = new BDPathTracer();
-    }else if (render == "pt"){
+    } else if (render == "pt") {
         tracer = new PathTracer();
+    } else if (render == "sppm") {
+        tracer = new SPPMTracer();
     } else {
         cout << "not support render type: " << render << endl;
     }

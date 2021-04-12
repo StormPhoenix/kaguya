@@ -66,7 +66,7 @@ namespace kaguya {
 
             // 设置 ray
             (*ray) = si.sendRay(NORMALIZE(dirWorld));
-            return lightRadiance(si, dirWorld);
+            return L(si, dirWorld);
         }
 
         void DiffuseAreaLight::pdfLe(const Ray &ray, const Vector3F &normal,
@@ -82,7 +82,7 @@ namespace kaguya {
                                                                                               cosTheta);
         }
 
-        Spectrum DiffuseAreaLight::lightRadiance(const Interaction &interaction, const Vector3F &wo) const {
+        Spectrum DiffuseAreaLight::L(const Interaction &interaction, const Vector3F &wo) const {
             Float cosine = DOT(interaction.normal, wo);
             return (!_singleSide || cosine > 0) ? _intensity : Spectrum(0.0);
 

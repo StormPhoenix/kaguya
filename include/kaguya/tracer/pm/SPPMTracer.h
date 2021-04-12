@@ -12,7 +12,7 @@ namespace kaguya {
 
         class SPPMTracer : public Tracer {
         public:
-            SPPMTracer(Float initialRadius = 1.0f);
+            SPPMTracer();
 
         private:
             virtual std::function<void(const int, const int, const int, const int, Sampler *)> render() override;

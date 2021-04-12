@@ -17,12 +17,16 @@ namespace kaguya {
     Float Config::russianRoulette = 0.135;
     Float Config::sampleLightProb = 0.3f;
     int Config::kernelCount = 1;
-    int Config::maxScatterDepth = 15;
+    int Config::maxBounce = 15;
     int Config::samplePerPixel = 10;
 
     int Config::resolutionWidth = 100;
     int Config::resolutionHeight = 100;
-    int Config::tileSize = 10;
+    int Config::tileSize = 50;
+
+    Float Config::initialSearchRadius = 0.8f;
+    Float Config::searchRadiusDecay = 2.0 / 3.0;
+    int Config::photonPerIteration = 1024;
 
     std::string Config::samplerType = "default";
 

@@ -33,7 +33,7 @@ namespace kaguya {
         // 终止概率
         static Float russianRoulette;
         // 最大散射深度
-        static int maxScatterDepth;
+        static int maxBounce;
         // 每像素采样次数
         static int samplePerPixel;
         // 对光源采样概率
@@ -46,6 +46,14 @@ namespace kaguya {
         static int tileSize;
         // Sampler type
         static std::string samplerType;
+
+        /* SPPM config */
+        // 初始搜索半径
+        static Float initialSearchRadius;
+        // 光子收集半径衰减速率
+        static Float searchRadiusDecay;
+        // 每轮光子发射数量
+        static int photonPerIteration;
 
         static std::shared_ptr<Camera> buildCamera() {
             // TODO load config file

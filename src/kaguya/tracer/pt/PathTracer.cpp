@@ -5,10 +5,6 @@
 #include <kaguya/Config.h>
 #include <kaguya/core/bssrdf/BSSRDF.h>
 #include <kaguya/core/Interaction.h>
-#include <kaguya/core/light/AreaLight.h>
-#include <kaguya/core/medium/Medium.h>
-#include <kaguya/material/Material.h>
-#include <kaguya/scene/meta/Shape.h>
 #include <kaguya/tracer/pt/PathTracer.h>
 
 namespace kaguya {
@@ -25,7 +21,7 @@ namespace kaguya {
         void PathTracer::init() {
             _samplePerPixel = Config::samplePerPixel;
             _sampleLightProb = Config::sampleLightProb;
-            _maxDepth = Config::maxScatterDepth;
+            _maxDepth = Config::maxBounce;
             _russianRouletteBounce = Config::russianRouletteDepth;
             _russianRoulette = Config::russianRoulette;
         }
@@ -77,7 +73,7 @@ namespace kaguya {
                         if (isIntersected) {
                             // 如果有交点，则直接从交点上取值
                             if (si.getAreaLight() != nullptr) {
-                                shaderColor += (si.getAreaLight()->lightRadiance(
+                                shaderColor += (si.getAreaLight()->L(
                                         si, -si.direction) * beta);
                             }
                         } else {
