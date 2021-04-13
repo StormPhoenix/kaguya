@@ -4,6 +4,7 @@
 
 #include <kaguya/Config.h>
 #include <kaguya/parallel/AtomicFloat.h>
+#include <kaguya/sampler/SamplerFactory.hpp>
 #include <kaguya/tracer/pm/SPPMTracer.h>
 
 namespace kaguya {
@@ -89,8 +90,6 @@ namespace kaguya {
         }
 
         std::function<void(const int, const int, const int, const int, Sampler *)> SPPMTracer::render() {
-            // TODO 创建保存 3D-Grid 的 HashMap 数据结构
-
             auto renderFunc = [this](const int startRow, const int endRow,
                                      const int startCol, const int endCol,
                                      Sampler *sampler) -> void {
@@ -112,10 +111,13 @@ namespace kaguya {
                 int tileY = startRow / Config::tileSize;
                 sampler->forPixel(Point2F(tileY, tileX));
 
-                // Loop iterations
+                // Halton sampler for photon tracing
                 int nIterations = _samplePerPixels;
-                for (int iter = 0; iter < nIterations; iter++) {
+                Sampler *haltonSampler = sampler::SamplerFactory::newSimpleHalton(nIterations * _shootPhotonsPerIter);
+                haltonSampler->forPixel({0, 0});
 
+                // Loop iterations
+                for (int iter = 0; iter < nIterations; iter++) {
                     MemoryArena arena;
                     // Generate camera ray for each pixels
                     {
@@ -168,8 +170,7 @@ namespace kaguya {
                                                 pixel.vp.beta = 0;
                                                 break;
                                             } else if (si.getAreaLight() != nullptr) {
-                                                // TODO delete 临时注释 Ld
-//                                                pixel.Ld += si.getAreaLight()->L(si, -si.direction) * beta;
+                                                pixel.Ld += si.getAreaLight()->L(si, -si.direction) * beta;
                                             }
                                         }
 
@@ -190,11 +191,9 @@ namespace kaguya {
                                         assert(si.bsdf != nullptr);
 
                                         // Sample from direct light
-                                        /* TODO delete Ld 临时注释 Ld
                                         if (si.bsdf->allIncludeOf(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
                                             pixel.Ld += beta * sampleDirectLight(_scene, si, sampler);
                                         }
-                                         */
 
                                         // Judge visible point
                                         bool isDiffuse = si.bsdf->allIncludeOf(BXDFType(BSDF_DIFFUSE
@@ -318,7 +317,7 @@ namespace kaguya {
                         for (int photon = 0; photon < _shootPhotonsPerIter; photon++) {
                             // Uniform sample light
                             Float lightPdf = 0;
-                            std::shared_ptr<Light> light = uniformSampleLight(_scene, &lightPdf, sampler);
+                            std::shared_ptr<Light> light = uniformSampleLight(_scene, &lightPdf, haltonSampler);
 
                             Ray photonRay;
                             Spectrum beta;
@@ -328,7 +327,7 @@ namespace kaguya {
                                 Vector3F lightNormal;
                                 Float pdfPos, pdfDir;
                                 Spectrum radiance = light->sampleLe(&photonRay, &lightNormal,
-                                                                    &pdfPos, &pdfDir, sampler);
+                                                                    &pdfPos, &pdfDir, haltonSampler);
                                 if (radiance.isBlack() || pdfPos == 0. || pdfDir == 0.) {
                                     continue;
                                 }
@@ -391,7 +390,7 @@ namespace kaguya {
                                 Vector3F wi;
                                 Float samplePdf = 0;
 
-                                Spectrum f = si.bsdf->sampleF(wo, &wi, &samplePdf, sampler, BSDF_ALL, nullptr);
+                                Spectrum f = si.bsdf->sampleF(wo, &wi, &samplePdf, haltonSampler, BSDF_ALL, nullptr);
                                 if (f.isBlack() || samplePdf == 0.) {
                                     break;
                                 }
@@ -399,7 +398,7 @@ namespace kaguya {
 
                                 // Russian Roulette
                                 Float terminateProb = std::max(1. - newBeta.r() / beta.r(), 0.);
-                                if (sampler->sample1D() < terminateProb) {
+                                if (haltonSampler->sample1D() < terminateProb) {
                                     break;
                                 }
                                 beta = newBeta / (1 - terminateProb);
@@ -407,6 +406,8 @@ namespace kaguya {
                                 // Next bounce
                                 photonRay = si.sendRay(wi);
                             }
+
+                            haltonSampler->nextSampleRound();
                         }
                     }
 
@@ -457,7 +458,7 @@ namespace kaguya {
                                     Float radius = pixel.searchRadius;
                                     L += pixel.tau / ((iter + 1) * _shootPhotonsPerIter * PI * radius * radius);
 
-                                    _filmPlane->addSpectrum(L, row, col);
+                                    _filmPlane->setSpectrum(L, row, col);
                                 }
                             }
                         }
@@ -466,6 +467,8 @@ namespace kaguya {
                     arena.clean();
                     sampler->nextSampleRound();
                 }
+
+                delete haltonSampler;
             };
             return renderFunc;
         }

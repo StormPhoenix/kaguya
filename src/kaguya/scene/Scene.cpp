@@ -237,10 +237,11 @@ namespace kaguya {
         std::vector<std::shared_ptr<Geometry>>
         Scene::testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
                                 std::vector<std::shared_ptr<Light>> &lights, const std::shared_ptr<Material> material) {
-            const Vector3F a1(0.2 * MODEL_SCALE, 0.46 * MODEL_SCALE, -0.2 * MODEL_SCALE);
-            const Vector3F a2(-0.2 * MODEL_SCALE, 0.46 * MODEL_SCALE, -0.2 * MODEL_SCALE);
-            const Vector3F a3(-0.2 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0.2 * MODEL_SCALE);
-            const Vector3F a4(0.2 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0.2 * MODEL_SCALE);
+            Float top = 0.40;
+            const Vector3F a1(0.2 * MODEL_SCALE, top * MODEL_SCALE, -0.2 * MODEL_SCALE);
+            const Vector3F a2(-0.2 * MODEL_SCALE, top * MODEL_SCALE, -0.2 * MODEL_SCALE);
+            const Vector3F a3(-0.2 * MODEL_SCALE, top * MODEL_SCALE, 0.2 * MODEL_SCALE);
+            const Vector3F a4(0.2 * MODEL_SCALE, top * MODEL_SCALE, 0.2 * MODEL_SCALE);
 
             const Normal3F n(0, -1, 0);
             const Vector2f default_uv(0);
@@ -604,7 +605,7 @@ namespace kaguya {
             mat1 = ROTATE(mat1, Float(5.0), Vector3F(0, 1, 0));
             mat1 = SCALE(mat1, Vector3F(scale, scale, scale));
             std::shared_ptr<Transform> transformMatrix1 = std::make_shared<Transform>(mat1);
-            Box box2 = Box(metal, airMedium, airMedium, transformMatrix1);
+            Box box2 = Box(lambertFront, airMedium, airMedium, transformMatrix1);
             std::vector<std::shared_ptr<Intersectable>> boxes2 = box2.aggregation();
             objects.insert(objects.end(), boxes2.begin(), boxes2.end());
 

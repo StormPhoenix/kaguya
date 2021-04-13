@@ -53,7 +53,7 @@ namespace kaguya {
             barrier.reset();
 
             // create sampler
-            Sampler *sampler = sampler::SamplerFactory::newSamplerInstance();
+            Sampler *sampler = sampler::SamplerFactory::newSampler();
 
             std::unique_lock<std::mutex> lock(_taskMutex);
             // running rendering function

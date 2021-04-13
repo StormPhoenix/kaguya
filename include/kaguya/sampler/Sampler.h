@@ -14,7 +14,7 @@ namespace kaguya {
 
         class Sampler {
         public:
-            Sampler(int samplePerPixel);
+            Sampler(int nSamples);
 
             /**
              * Set current sampling pixel
@@ -39,7 +39,7 @@ namespace kaguya {
             Point2I currentPixel;
 
             // sample times
-            const int samplePerPixel;
+            const int nSamples;
 
             // random number seed
             int randomSeed = 0;

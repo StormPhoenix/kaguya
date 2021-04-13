@@ -7,7 +7,7 @@
 namespace kaguya {
     namespace sampler {
 
-        DefaultSampler::DefaultSampler(int samplePerPixel) : Sampler(samplePerPixel) {
+        DefaultSampler::DefaultSampler(int nSamples) : Sampler(nSamples) {
             std::random_device rd;  //Will be used to obtain a seed for the random number engine
             generator = std::mt19937(rd());
             distribution = std::uniform_real_distribution<Float>(0.0, 1.0);
@@ -28,8 +28,11 @@ namespace kaguya {
             return true;
         }
 
-        Sampler *DefaultSampler::newInstance() {
-            return new DefaultSampler(Config::samplePerPixel);
+        Sampler *DefaultSampler::newInstance(int nSamples) {
+            if (nSamples <= 0) {
+                nSamples = Config::samplePerPixel;
+            }
+            return new DefaultSampler(nSamples);
         }
 
     }

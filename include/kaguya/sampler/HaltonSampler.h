@@ -12,8 +12,6 @@ namespace kaguya {
 
         class HaltonSampler : public Sampler {
         public:
-            HaltonSampler(int samplePerPixel);
-
             virtual void forPixel(const Point2F pixel) override;
 
             virtual bool nextSampleRound() override;
@@ -22,7 +20,11 @@ namespace kaguya {
 
             virtual Vector2F sample2D() override;
 
+            ~HaltonSampler() {}
+
         private:
+            HaltonSampler(int nSamples);
+
             /**
              * Calculate new random seed
              *
@@ -56,7 +58,7 @@ namespace kaguya {
         public:
 
             // TODO move to factory
-                static Sampler *newInstance();
+                static Sampler *newInstance(int nSamples);
             };
     }
 }

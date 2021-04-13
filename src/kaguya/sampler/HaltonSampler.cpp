@@ -28,7 +28,7 @@ namespace kaguya {
 
             bool HaltonSampler::isPrimesValid = false;
 
-            HaltonSampler::HaltonSampler(int samplePerPixel) : Sampler(samplePerPixel) {
+            HaltonSampler::HaltonSampler(int nSamples) : Sampler(nSamples) {
                 // First two dimension scale
                 for (int i = 0; i < 2; i++) {
                     int scale = 1;
@@ -62,7 +62,7 @@ namespace kaguya {
 
             static std::mutex singleInstance;
 
-            Sampler *HaltonSampler::newInstance() {
+            Sampler *HaltonSampler::newInstance(int nSamples) {
                 // TODO add locker
                 if (!isPrimesValid) {
                     {
@@ -73,7 +73,7 @@ namespace kaguya {
                         }
                     }
                 }
-                return new HaltonSampler(Config::samplePerPixel);
+                return new HaltonSampler(nSamples);
             }
 
         Float HaltonSampler::sample1D() {

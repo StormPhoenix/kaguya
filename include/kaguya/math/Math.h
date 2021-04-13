@@ -75,6 +75,15 @@ namespace kaguya {
 
     namespace math {
 
+        const double doubleOneMinusEpsilon = 0x1.fffffffffffffp-1;
+        const float floatOneMinusEpsilon = 0x1.fffffep-1;
+
+#if defined(KAGUYA_DATA_DOUBLE)
+        const Float ONE_MINUS_EPSILON = doubleOneMinusEpsilon;
+#else
+        const Float ONE_MINUS_EPSILON = floatOneMinusEpsilon;
+#endif
+
         constexpr Float MAX_FLOAT = std::numeric_limits<Float>::max();
         constexpr Float infinity = std::numeric_limits<Float>::infinity();
         constexpr Float epsilon = std::numeric_limits<Float>::epsilon() * 0.5;
@@ -524,7 +533,7 @@ namespace kaguya {
 
                 std::vector<uint16_t> computePermutationArray(bool initFaure = true);
 
-                Float radicalReverse(const int dimension, uint64_t n);
+                Float radicalReverse(const int dimension, uint64_t a);
 
                 template<int base>
                 uint16_t inverseRadicalReverse(uint64_t reversed, int digitsCount) {

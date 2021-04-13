@@ -12,8 +12,6 @@ namespace kaguya {
 
         class DefaultSampler : public Sampler {
         public:
-            DefaultSampler(int samplePerPixel);
-
             virtual Float sample1D() override;
 
             virtual Vector2F sample2D() override;
@@ -22,7 +20,10 @@ namespace kaguya {
 
             virtual ~DefaultSampler() override {}
 
-            static Sampler *newInstance();
+            static Sampler *newInstance(int nSamples = -1);
+
+        private:
+            DefaultSampler(int nSamples);
 
         private:
             std::uniform_real_distribution<Float> distribution;

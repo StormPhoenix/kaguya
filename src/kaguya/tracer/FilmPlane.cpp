@@ -38,6 +38,24 @@ namespace kaguya {
             // writeLock is automatically released when lock goes out of scope
         }
 
+        void FilmPlane::setSpectrum(const Spectrum &spectrum, int row, int col) {
+            assert(_bitmap != nullptr);
+            if (row < 0 || row >= _resolutionHeight ||
+                col < 0 || col >= _resolutionWidth) {
+                return;
+            }
+
+            int offset = (row * _resolutionWidth + col) * _channel;
+            // lock_guard will release the lock when exits stack
+            {
+                std::lock_guard<std::mutex> lock(writeLock);
+                for (int channel = 0; channel < _channel; channel++) {
+                    *(_bitmap + offset + channel) = spectrum[channel];
+                }
+            }
+            // writeLock is automatically released when lock goes out of scope
+        }
+
 
         Float FilmPlane::getSpectrum(int row, int col, int channel) const {
             int offset = (row * _resolutionWidth + col) * _channel;

@@ -7,8 +7,8 @@
 namespace kaguya {
     namespace sampler {
 
-        Sampler::Sampler(int samplePerPixel) :
-                samplePerPixel(samplePerPixel),
+        Sampler::Sampler(int nSamples) :
+                nSamples(nSamples),
                 randomSeed(0) {}
 
         void Sampler::forPixel(const Point2F pixel) {
@@ -18,7 +18,7 @@ namespace kaguya {
 
         bool Sampler::nextSampleRound() {
             randomSeed++;
-            return randomSeed < samplePerPixel;
+            return randomSeed < nSamples;
         }
     }
 }

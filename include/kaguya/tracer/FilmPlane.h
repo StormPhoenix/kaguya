@@ -21,6 +21,8 @@ namespace kaguya {
 
             void addSpectrum(const Spectrum &spectrum, int row, int col);
 
+            void setSpectrum(const Spectrum &spectrum, int row, int col);
+
             Float getSpectrum(int row, int col, int channel) const;
 
             void writeImage(char const *filename) const;
