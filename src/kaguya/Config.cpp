@@ -24,9 +24,9 @@ namespace kaguya {
     int Config::resolutionHeight = 100;
     int Config::tileSize = 50;
 
-    Float Config::initialSearchRadius = 0.8f;
-    Float Config::searchRadiusDecay = 1.0 / 2.0;
-    int Config::photonPerIteration = 2048;
+    Float Config::initialSearchRadius = 1.0f;
+    Float Config::searchRadiusDecay = 2.0 / 3.0;
+    int Config::photonPerIteration = 4096;
 
     std::string Config::samplerType = "default";
 

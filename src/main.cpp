@@ -24,13 +24,22 @@ int main(int argc, char *argv[]) {
 
     auto cli = (
             value("output name", Config::filenamePrefix),
+
+                    /* For general settings */
                     option("-rt", "--render-type") & value("render type", render),
                     option("-st", "--sampler-type") & value("sampler type", Config::samplerType),
-                    option("-ssp", "--sample1d-per-pixel") & value("sample1d per pixel", Config::samplePerPixel),
+                    option("-ssp", "--sample-per-pixel") & value("sample per pixel", Config::samplePerPixel),
                     option("-d", "--max-depth") & value("max scatter depth", Config::maxBounce),
                     option("-rb", "--russian-prob") & value("russian roulette probability", Config::russianRoulette),
                     option("-rd", "--russian-depth") & value("russian roulette depth", Config::russianRouletteDepth),
                     option("-kn", "--kernel") & value("rendering kernel count", Config::kernelCount),
+
+                    /* For stochastic progressive photon mapping settings */
+                    option("-sr", "--initial-search-radius") & value("initial search radius", Config::initialSearchRadius),
+                    option("-srd", "--search-radius-decay") & value("search radius decay", Config::searchRadiusDecay),
+                    option("-pc", "--photon-count") & value("photon count", Config::photonPerIteration),
+
+                    /* Outputs settings */
                     option("-h", "--height") & value("image height", Config::resolutionHeight),
                     option("-w", "--width") & value("image width", Config::resolutionWidth)
     );

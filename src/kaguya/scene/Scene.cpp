@@ -237,7 +237,7 @@ namespace kaguya {
         std::vector<std::shared_ptr<Geometry>>
         Scene::testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
                                 std::vector<std::shared_ptr<Light>> &lights, const std::shared_ptr<Material> material) {
-            Float top = 0.40;
+            Float top = 0.46;
             const Vector3F a1(0.2 * MODEL_SCALE, top * MODEL_SCALE, -0.2 * MODEL_SCALE);
             const Vector3F a2(-0.2 * MODEL_SCALE, top * MODEL_SCALE, -0.2 * MODEL_SCALE);
             const Vector3F a3(-0.2 * MODEL_SCALE, top * MODEL_SCALE, 0.2 * MODEL_SCALE);
