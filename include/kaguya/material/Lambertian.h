@@ -6,7 +6,7 @@
 #define KAGUYA_LAMBERTIAN_H
 
 #include <kaguya/material/Material.h>
-#include <kaguya/material/Texture.h>
+#include <kaguya/material/texture/Texture.h>
 #include <memory>
 
 namespace kaguya {

@@ -6,7 +6,7 @@
 #define KAGUYA_DIELECTRIC_H
 
 #include <kaguya/material/Material.h>
-#include <kaguya/material/Texture.h>
+#include <kaguya/material/texture/Texture.h>
 
 namespace kaguya {
     namespace material {

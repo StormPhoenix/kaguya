@@ -2,7 +2,7 @@
 // Created by Storm Phoenix on 2020/10/1.
 //
 
-#include <kaguya/material/ConstantTexture.h>
+#include <kaguya/material/texture/ConstantTexture.h>
 
 namespace kaguya {
     namespace material {

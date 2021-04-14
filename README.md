@@ -4,6 +4,11 @@ A simple physically based render.
     
 ## TODO
 - [ ] 添加纹理
+    - [x] 添加 ImageTexture
+    - [x] 简单 2D 线性映射纹理
+    - [ ] ImageTexture 细节检查
+    - [ ] Sphere2D 映射
+    - [ ] 多通道纹理
 - [ ] HaltonSampler 代码写的可能有问题
 - [ ] Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法，写成文档记录下来
 - [ ] Triangle sampling strategy 计算方法记录。

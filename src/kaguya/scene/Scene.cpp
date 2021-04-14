@@ -20,7 +20,8 @@
 #include <kaguya/material/Lambertian.h>
 #include <kaguya/material/Metal.h>
 #include <kaguya/material/SubsurfaceMaterial.h>
-#include <kaguya/material/ConstantTexture.h>
+#include <kaguya/material/texture/ConstantTexture.h>
+#include <kaguya/material/texture/ImageTexture.h>
 #include <kaguya/utils/ObjLoader.h>
 #include <kaguya/core/medium/GridDensityMedium.h>
 
@@ -310,13 +311,15 @@ namespace kaguya {
 
             std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
                                                                                  n, n, n,
-                                                                                 default_uv, default_uv, default_uv);
+                                                                                 Vector2F(1, 1), Vector2F(0, 0),
+                                                                                 Vector2F(1, 0));
             std::shared_ptr<Geometry> gt1 = std::make_shared<Geometry>(tri1, material, insideMedium, outsideMedium,
                                                                        nullptr);
 
             std::shared_ptr<meta::Shape> tri2 = std::make_shared<meta::Triangle>(a1, a2, a3,
                                                                                  n, n, n,
-                                                                                 default_uv, default_uv, default_uv);
+                                                                                 Vector2F(1, 1), Vector2F(0, 1),
+                                                                                 Vector2F(0, 0));
             std::shared_ptr<Geometry> gt2 = std::make_shared<Geometry>(tri2, material, insideMedium, outsideMedium,
                                                                        nullptr);
             std::vector<std::shared_ptr<Geometry>> v;
@@ -556,12 +559,16 @@ namespace kaguya {
             lightSpectrum.g(Float(222.0) / 255.0 * lightIntensity);
             lightSpectrum.b(Float(180.0) / 255.0 * lightIntensity);
 
+            // Image texture
+            std::shared_ptr<Texture> imageTexture = std::make_shared<ImageTexture>("./resource/texture/texture1.jpg");
+
             // lambertian materials
             std::shared_ptr<Material> lambertLeft = std::make_shared<Lambertian>(red);
             std::shared_ptr<Material> lambertRight = std::make_shared<Lambertian>(green);
             std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
+            std::shared_ptr<Material> lambertFront2 = std::make_shared<Lambertian>(imageTexture);
             std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
             std::shared_ptr<Material> metal = std::make_shared<Metal>();
 
@@ -586,7 +593,7 @@ namespace kaguya {
             std::vector<std::shared_ptr<Geometry>> topWall = testTopWall(lambertTop, airMedium, airMedium);
             objects.insert(objects.end(), topWall.begin(), topWall.end());
 
-            std::vector<std::shared_ptr<Geometry>> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
+            std::vector<std::shared_ptr<Geometry>> frontWall = testFrontWall(lambertFront2, airMedium, airMedium);
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
             Float scale = 0.25 * MODEL_SCALE;
@@ -847,7 +854,7 @@ namespace kaguya {
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
             // load model
-            std::shared_ptr<Intersectable> bunny = testBunny(glass, nullptr, airMedium, nullptr);
+            std::shared_ptr<Intersectable> bunny = testBunny(glass, nullptr, nullptr, nullptr);
             objects.push_back(bunny);
 
             // build scene object
@@ -1071,7 +1078,8 @@ namespace kaguya {
 
 //            std::shared_ptr<Medium> airMedium = testAirMedium();
             std::shared_ptr<Medium> airMedium = nullptr;
-            std::shared_ptr<Medium> bunnyMedium = testSmokeMedium();
+//            std::shared_ptr<Medium> bunnyMedium = testSmokeMedium();
+            std::shared_ptr<Medium> bunnyMedium = nullptr;
 //            std::shared_ptr<Medium> bunnyMedium = nullptr;
 
             // objects
