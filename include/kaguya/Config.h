@@ -46,6 +46,8 @@ namespace kaguya {
         static int tileSize;
         // Sampler type
         static std::string samplerType;
+        // Render type
+        static std::string renderType;
 
         /* SPPM config */
         // 初始搜索半径

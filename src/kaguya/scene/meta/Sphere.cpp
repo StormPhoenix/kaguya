@@ -88,22 +88,26 @@ namespace kaguya {
             }
 
             SurfaceInteraction Sphere::sampleSurfacePoint(Sampler *sampler) const {
-                // sample1d outward normal
-                Vector3F normal = math::sampling::sphereUniformSampling(sampler);
-                if (_transformMatrix != nullptr) {
-                    normal = _transformMatrix->transformNormal(normal);
-                }
-
                 SurfaceInteraction si;
+                // Sample outward normal
+                Vector3F nLocal = math::sampling::sphereUniformSampling(sampler);
 
-                // point
-                Vector3F point = _transformedCenter + _radius * normal;
-                si.point = point;
+                // World normal
+                Vector3F nWorld = _transformMatrix != nullptr ? _transformMatrix->transformNormal(nLocal) : nLocal;
 
+                // Project pLocal to sphere surface to compute error bound
+                Vector3F p = nWorld * _radius + _transformedCenter;
+                p = (p - _transformedCenter) * (_radius / LENGTH(p - _transformedCenter)) + _transformedCenter;
+                si.point = p;
+
+                Vector3F pError = math::gamma(5) * ABS(p);
+                si.error = pError;
+
+                // Reverse orientation
                 if (!_outward) {
-                    normal = -normal;
+                    nWorld = -nWorld;
                 }
-                si.normal = si.rendering.normal = normal;
+                si.normal = si.rendering.normal = nWorld;
                 return si;
             }
 

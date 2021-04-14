@@ -24,6 +24,10 @@ A simple physically based render.
 
 - [ ] Geometry Aggregation 结构调整
 
+- [ ] 自己实现 Transformation，加上 Error 管理
+
+- [ ] 修改 Sphere 实现，扩展成椭圆球体. 
+
 ## Unsolved
 - [ ] SubsurfaceMaterial 渲染错误
     - [x] 材质的 bsdf 有没有错误（SubsurfaceMaterial 仅仅使用 bsdf，省略 bssrdf）

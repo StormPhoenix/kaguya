@@ -2,6 +2,7 @@
 #include <kaguya/math/Math.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/meta/Vertex.h>
+#include <kaguya/tracer/TracerFactory.h>
 #include <kaguya/tracer/pt/PathTracer.h>
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
 #include <kaguya/tracer/pm/SPPMTracer.h>
@@ -16,17 +17,11 @@ using namespace clipp;
 using namespace std;
 
 int main(int argc, char *argv[]) {
-
-//    PathTracer pathTracer = PathTracer();
-//    pathTracer.run();
-
-    string render = "bdpt";
-
     auto cli = (
             value("output name", Config::filenamePrefix),
 
                     /* For general settings */
-                    option("-rt", "--render-type") & value("render type", render),
+                    option("-rt", "--render-type") & value("render type", Config::renderType),
                     option("-st", "--sampler-type") & value("sampler type", Config::samplerType),
                     option("-ssp", "--sample-per-pixel") & value("sample per pixel", Config::samplePerPixel),
                     option("-d", "--max-depth") & value("max scatter depth", Config::maxBounce),
@@ -49,7 +44,7 @@ int main(int argc, char *argv[]) {
         sprintf(filenameTemplate, "ssp=%d_max-depth=%d_render-type=%s_%dx%d.png",
                 Config::samplePerPixel,
                 Config::maxBounce,
-                render.c_str(),
+                Config::renderType.c_str(),
                 Config::resolutionWidth,
                 Config::resolutionHeight);
         Config::filenameSufix = string(filenameTemplate);
@@ -58,20 +53,9 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    Tracer *tracer = nullptr;
-
-    if (render == "bdpt") {
-        tracer = new BDPathTracer();
-    } else if (render == "pt") {
-        tracer = new PathTracer();
-    } else if (render == "sppm") {
-        tracer = new SPPMTracer();
-    } else {
-        cout << "not support render type: " << render << endl;
-    }
-
+    Tracer *tracer = TracerFactory::newTracer();
     if (tracer != nullptr) {
-        cout << "using render type: " << render << endl;
+        cout << "using render type: " << Config::renderType << endl;
         tracer->run();
         delete tracer;
     }

@@ -29,6 +29,7 @@ namespace kaguya {
     int Config::photonPerIteration = 4096;
 
     std::string Config::samplerType = "default";
+    std::string Config::renderType = "pt";
 
     std::shared_ptr<Scene> Config::nextScene() {
         // 若场景未构建，则线构建场景
