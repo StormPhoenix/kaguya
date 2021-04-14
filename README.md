@@ -3,9 +3,8 @@
 A simple physically based render.
     
 ## TODO
-- [ ] HaltonSampler 代码写的可能有问题
-    
 - [ ] 添加纹理
+- [ ] HaltonSampler 代码写的可能有问题
 - [ ] Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法，写成文档记录下来
 - [ ] Triangle sampling strategy 计算方法记录。
 - [ ] Medium sampling method.
@@ -24,12 +23,6 @@ A simple physically based render.
 - [ ] Geometry Aggregation 结构调整
 
 ## Unsolved
-- [x] Photon Mapping 开发
-    - [x] 研究 Photon Mapping、Progressive Photon Mapping 和 Stochastic Progressive Photon Mapping
-    - [x] 开发 SPPM Tracer
-    - [x] bugfix: 增加 Iteration，画面会越来越亮（FilmPlane::addSpectrum() 改成 setSpectrum()）
-    - [x] bugfix: 画面出现和 tileSize 大小一致的分界线 (photon tracing pass 在不同 tile 下的 photon 分布不一致导致)
-
 - [ ] SubsurfaceMaterial 渲染错误
     - [x] 材质的 bsdf 有没有错误（SubsurfaceMaterial 仅仅使用 bsdf，省略 bssrdf）
     - [x] sampleS()，检查 BSSRDFTable 数据、插值结果、采样的 pi (经过检查，catmull-rom、TabulatedBSSRDF、Table 赋值都没有错误)
@@ -77,7 +70,11 @@ A simple physically based render.
     无法在光线传输过程中确定碰撞位置两端的折射率。程序采用的是将外界材质的折射率固定设置为空气折射率（1.0）
     
 ## Solved
-- [x] add BSSRDF
+- [x] Photon Mapping 开发
+    - [x] 研究 Photon Mapping、Progressive Photon Mapping 和 Stochastic Progressive Photon Mapping
+    - [x] 开发 SPPM Tracer
+    - [x] bugfix: 增加 Iteration，画面会越来越亮（FilmPlane::addSpectrum() 改成 setSpectrum()）
+    - [x] bugfix: 画面出现和 tileSize 大小一致的分界线 (photon tracing pass 在不同 tile 下的 photon 分布不一致导致)
 
 - [x] Add multiple light source
     - [x] Delete Wall.h

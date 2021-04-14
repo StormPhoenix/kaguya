@@ -6,6 +6,7 @@
 #define KAGUYA_ATOMICFLOAT_H
 
 #include <kaguya/math/Math.h>
+#include <atomic>
 
 namespace kaguya {
     namespace parallel {
