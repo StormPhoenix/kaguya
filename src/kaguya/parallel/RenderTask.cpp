@@ -41,10 +41,6 @@ namespace kaguya {
                 } else {
                     _nextTileXCount++;
                 }
-
-                tileRecord++;
-                std::cout << "\r" << float(tileRecord) * 100 / (_totalTileYCount * _totalTileXCount) << " %"
-                          << std::flush;
                 return true;
             } else {
                 return false;
@@ -53,7 +49,24 @@ namespace kaguya {
 
         bool RenderTask::isFinished() {
             return !(_nextTileXCount >= 0 && _nextTileXCount < _totalTileXCount &&
-                     _nextTileYCount >= 0 && _nextTileYCount < _totalTileYCount) && (activeRender == 0);
+                     _nextTileYCount >= 0 && _nextTileYCount < _totalTileYCount) && (_activeRender == 0);
+        }
+
+        void RenderTask::renderEnter() {
+            _activeRender++;
+            if (!progressFlag) {
+                progressFlag = true;
+                std::cout << "\r" << 0 << " %" << std::flush;
+            }
+        }
+
+        void RenderTask::renderLeave() {
+            _activeRender--;
+            tileRecord++;
+            if (progressFlag) {
+                std::cout << "\r" << float(tileRecord) * 100 / (_totalTileYCount * _totalTileXCount) << " %"
+                          << std::flush;
+            }
         }
 
         void RenderTask::waitUntilFinished() {

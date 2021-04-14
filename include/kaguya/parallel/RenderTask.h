@@ -33,6 +33,10 @@ namespace kaguya {
             bool renderRange(int &rowStart, int &rowEnd,
                              int &colStart, int &colEnd);
 
+            void renderEnter();
+
+            void renderLeave();
+
             bool isFinished();
 
             void waitUntilFinished();
@@ -48,10 +52,13 @@ namespace kaguya {
             // next render task
             RenderTask *next = nullptr;
 
-            // active render
-            int activeRender = 0;
 
         private:
+            // progress flag
+            bool progressFlag = false;
+
+            // active render
+            int _activeRender = 0;
             const int _renderWidth;
             const int _renderHeight;
             // task mutex
@@ -61,8 +68,8 @@ namespace kaguya {
             // next render range
             int _nextTileXCount;
             int _nextTileYCount;
-
             const int _tileSize = Config::tileSize;
+
 
             // total tile count
             int _totalTileXCount;

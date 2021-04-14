@@ -68,12 +68,12 @@ namespace kaguya {
                     // get rendering task from task
                     int rowStart, rowEnd, colStart, colEnd;
                     if (task->renderRange(rowStart, rowEnd, colStart, colEnd)) {
-                        task->activeRender++;
+                        task->renderEnter();
                         // release lock
                         lock.unlock();
                         task->func2D(rowStart, rowEnd, colStart, colEnd, sampler);
                         lock.lock();
-                        task->activeRender--;
+                        task->renderLeave();
                         if (task->isFinished()) {
                             task->notifyMaster();
                             delete task;
