@@ -13,6 +13,8 @@ A simple physically based render.
     - [ ] Delta tracing - reject sampling, Delta tracing's sampling strategy is a little different 
             from reject sampling.
             
+- [ ] HaltonSampler 代码写的可能有问题
+
 - [ ] Error propagation inference
     - [ ] Remove eposilon.
     
