@@ -6,6 +6,7 @@
 #include <kaguya/tracer/TracerFactory.h>
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
 #include <kaguya/tracer/pt/PathTracer.h>
+#include <kaguya/tracer/pm/SPPMTracer.h>
 
 namespace kaguya {
     namespace tracer {
@@ -17,6 +18,8 @@ namespace kaguya {
                 tracer = new BDPathTracer();
             } else if (render == "pt") {
                 tracer = new PathTracer();
+            } else if (render == "sppm") {
+                tracer = new SPPMTracer();
             } else {
                 std::cout << "not support render type: " << render << std::endl;
             }
