@@ -110,7 +110,7 @@ namespace kaguya {
             blue_spectrum.b(1.0);
 
             // light spectrum
-            Float areaLightIntensity = 15;
+            Float areaLightIntensity = 125;
             area_light_spectrum.r(Float(249.0) / 255.0 * areaLightIntensity);
             area_light_spectrum.g(Float(222.0) / 255.0 * areaLightIntensity);
             area_light_spectrum.b(Float(180.0) / 255.0 * areaLightIntensity);
@@ -311,7 +311,7 @@ namespace kaguya {
         std::vector<std::shared_ptr<Geometry>>
         Scene::testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
                                 std::vector<std::shared_ptr<Light>> &lights, const std::shared_ptr<Material> material) {
-            Float top = 0.46;
+            Float top = 2.46;
             const Vector3F a1(0.2 * MODEL_SCALE, top * MODEL_SCALE, -0.2 * MODEL_SCALE);
             const Vector3F a2(-0.2 * MODEL_SCALE, top * MODEL_SCALE, -0.2 * MODEL_SCALE);
             const Vector3F a3(-0.2 * MODEL_SCALE, top * MODEL_SCALE, 0.2 * MODEL_SCALE);
@@ -405,14 +405,18 @@ namespace kaguya {
         std::shared_ptr<Aggregation> Scene::testBunny(const std::shared_ptr<Material> material,
                                                       const std::shared_ptr<Medium> inside,
                                                       const std::shared_ptr<Medium> outside,
-                                                      const std::shared_ptr<AreaLight> areaLight) {
+                                                      const std::shared_ptr<AreaLight> areaLight,
+                                                      const std::shared_ptr<transform::Transform> transform) {
             std::vector<Vertex> bunnyVertexes = kaguya::utils::ObjLoader::loadModel("./resource/objects/bunny.obj");
 
-            Float scale = 0.4 * MODEL_SCALE;
-            Matrix4F mat(1.0f);
-            mat = TRANSLATE(mat, Vector3F(0, -scale / 1.2, 0));
-            mat = SCALE(mat, Vector3F(scale, scale, scale));
-            std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(mat);
+            std::shared_ptr<Transform> transformMatrix = transform;
+            if (transformMatrix == nullptr) {
+                Float scale = 0.4 * MODEL_SCALE;
+                Matrix4F mat(1.0f);
+                mat = TRANSLATE(mat, Vector3F(0, -scale / 1.2, 0));
+                mat = SCALE(mat, Vector3F(scale, scale, scale));
+                transformMatrix = std::make_shared<Transform>(mat);
+            }
             std::shared_ptr<Aggregation> bunny = std::make_shared<TriangleMesh>(bunnyVertexes, material, inside,
                                                                                 outside,
                                                                                 areaLight, transformMatrix);
@@ -779,6 +783,86 @@ namespace kaguya {
             camera->setResolutionHeight(Config::resolutionHeight);
             scene->_camera = camera;
             scene->_sceneName = "cornell-box-with-water";
+
+            return scene;
+        }
+
+        std::shared_ptr<Scene> Scene::sceneDeskAndBunny() {
+            // white
+            Spectrum whiteSpectrum = Spectrum(0.0);
+            whiteSpectrum.r(0.73);
+            whiteSpectrum.g(0.73);
+            whiteSpectrum.b(0.73);
+            std::shared_ptr<Texture<Spectrum>> white = std::make_shared<ConstantTexture<Spectrum>>(whiteSpectrum);
+            std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
+
+            std::shared_ptr<TextureMapping2D> textureMapping = std::make_shared<UVMapping2D>();
+            std::shared_ptr<Texture<Spectrum>> imageTextureLocal = std::make_shared<ImageTexture<Spectrum>>(
+                    "./resource/texture/texture4.jpg", textureMapping);
+
+            std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(imageTextureLocal);
+
+            const float planeWidthHeightRatio = 780.0 / 1040.0;
+
+            const Vector3F a1(2 * MODEL_SCALE, -0.5 * MODEL_SCALE, -2 * planeWidthHeightRatio * MODEL_SCALE);
+            const Vector3F a2(-2 * MODEL_SCALE, -0.5 * MODEL_SCALE, -2 * planeWidthHeightRatio * MODEL_SCALE);
+            const Vector3F a3(-2 * MODEL_SCALE, -0.5 * MODEL_SCALE, 2 * planeWidthHeightRatio * MODEL_SCALE);
+            const Vector3F a4(2 * MODEL_SCALE, -0.5 * MODEL_SCALE, 2 * planeWidthHeightRatio * MODEL_SCALE);
+
+            const Normal3F n(0, 1, 0);
+
+            std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
+                                                                                 n, n, n,
+                                                                                 Point2F(1, 0), Point2F(0, 1),
+                                                                                 Point2F(0, 0));
+            std::shared_ptr<Geometry> gt1 = std::make_shared<Geometry>(tri1, lambertBottom, nullptr, nullptr,
+                                                                       nullptr);
+
+            std::shared_ptr<meta::Shape> tri2 = std::make_shared<meta::Triangle>(a1, a2, a3,
+                                                                                 n, n, n,
+                                                                                 Point2F(1, 0), Point2F(1, 1),
+                                                                                 Point2F(0, 1));
+            std::shared_ptr<Geometry> gt2 = std::make_shared<Geometry>(tri2, lambertBottom, nullptr, nullptr,
+                                                                       nullptr);
+            std::vector<std::shared_ptr<Geometry>> desk;
+            desk.push_back(gt1);
+            desk.push_back(gt2);
+
+            // objects
+            std::vector<std::shared_ptr<Intersectable>> objects;
+            objects.insert(objects.end(), desk.begin(), desk.end());
+
+            // load model
+            std::shared_ptr<Material> metal = std::make_shared<Metal>();
+
+            Float scale = 0.4 * MODEL_SCALE;
+            Matrix4F mat(1.0f);
+            mat = TRANSLATE(mat, Vector3F(scale * 1.2, -scale / 0.8, 0));
+            mat = SCALE(mat, Vector3F(scale, scale, scale));
+            mat = ROTATE(mat, Float(45.0), Vector3F(0, 1, 0));
+            std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(mat);
+            std::shared_ptr<Intersectable> bunny = testBunny(metal, nullptr, nullptr, nullptr, transformMatrix);
+            objects.push_back(bunny);
+
+            // build scene object
+            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+
+            // build area light
+            auto lightWall = testTopAreaLight(area_light_spectrum, nullptr, scene->_lights, lambertTop);
+            objects.insert(objects.end(), lightWall.begin(), lightWall.end());
+
+            // scene
+            std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);
+            scene->_world = bvh;
+
+            // build camera
+            auto eye = Vector3F(2.2 * MODEL_SCALE, 0.5 * MODEL_SCALE, 1.2);
+            auto dir = Vector3F(-0.95f, -0.6f, -0.3f);
+            std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, nullptr);
+            camera->setResolutionWidth(Config::resolutionWidth);
+            camera->setResolutionHeight(Config::resolutionHeight);
+            scene->_camera = camera;
+            scene->_sceneName = "girl-friend";
 
             return scene;
         }

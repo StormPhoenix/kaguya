@@ -28,6 +28,7 @@ using namespace kaguya::material;
 #include <kaguya/core/light/DiffuseAreaLight.h>
 #include <kaguya/core/light/PointLight.h>
 #include <kaguya/core/light/SpotLight.h>
+#include <kaguya/core/Transform.h>
 
 using namespace kaguya::core;
 
@@ -116,7 +117,8 @@ namespace kaguya {
             static std::shared_ptr<Aggregation> testBunny(const std::shared_ptr<Material> material,
                                                           const std::shared_ptr<Medium> inside = nullptr,
                                                           const std::shared_ptr<Medium> outside = nullptr,
-                                                          const std::shared_ptr<AreaLight> areaLight = nullptr);
+                                                          const std::shared_ptr<AreaLight> areaLight = nullptr,
+                                                          const std::shared_ptr<transform::Transform> transform = nullptr);
 
             static std::shared_ptr<Aggregation> testSubsurfaceBunny(const std::shared_ptr<Material> material,
                                                           const std::shared_ptr<Medium> inside = nullptr,
@@ -134,6 +136,8 @@ namespace kaguya {
             static std::shared_ptr<Scene> cornelBoxWater();
 
             static std::shared_ptr<Scene> sceneTwoBox();
+
+            static std::shared_ptr<Scene> sceneDeskAndBunny();
 
             static std::shared_ptr<Scene> sceneLightThroughAir();
 

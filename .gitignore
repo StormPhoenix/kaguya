@@ -3,6 +3,7 @@
 /cmake-build-release
 /output
 /resource
+*.zip
 
 *.png
 temp.txt

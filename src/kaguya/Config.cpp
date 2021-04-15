@@ -37,7 +37,7 @@ namespace kaguya {
             Scene::initSceneComponents();
 //            scenes.push_back(Scene::sceneTwoBox);
 //            scenes.push_back(Scene::sceneTwoSpheresWithPointLight);
-            scenes.push_back(Scene::sceneTwoSpheresWithAreaLight);
+            scenes.push_back(Scene::sceneDeskAndBunny);
 //            scenes.push_back(Scene::sceneTwoSpheresWithSpotLight);
 //            scenes.push_back(Scene::sceneBunnyWithPointLight);
 //            scenes.push_back(Scene::sceneBunnySubsurfaceWithAreaLight);
