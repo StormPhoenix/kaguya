@@ -346,6 +346,12 @@ namespace kaguya {
                                     break;
                                 }
 
+                                if (si.getMaterial() == nullptr) {
+                                    photonRay = si.sendRay(photonRay.getDirection());
+                                    bounce--;
+                                    continue;
+                                }
+
                                 // Add contribution to visible point
                                 {
                                     // Skip first intersection, for reason of indirect light
@@ -376,12 +382,6 @@ namespace kaguya {
                                 }
 
                                 // TODO 考虑 BSSRDF
-
-                                if (si.getMaterial() == nullptr) {
-                                    photonRay = si.sendRay(photonRay.getDirection());
-                                    bounce--;
-                                    continue;
-                                }
 
                                 si.buildScatteringFunction(arena);
                                 assert(si.bsdf != nullptr);
