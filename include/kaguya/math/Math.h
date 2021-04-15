@@ -90,6 +90,7 @@ namespace kaguya {
         constexpr Float shadowEpsilon = 0.0001;
         const double PI = 3.1415926535897932385;
         const Float INV_PI = 1.0 / PI;
+        const Float INV_2PI = 1.0 / (2 * PI);
         const Float INV_4PI = 1.0 / (4 * PI);
         const Float EPSILON = 10e-6f;
         const Float REFRACTION_INDEX_WATER = 1.0f;

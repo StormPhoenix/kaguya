@@ -5,21 +5,20 @@
 #ifndef KAGUYA_METAL_H
 #define KAGUYA_METAL_H
 
-#include <kaguya/core/spectrum/Spectrum.hpp>
-
-#include <kaguya/material/Material.h>
 #include <kaguya/math/Math.h>
+#include <kaguya/material/Material.h>
+#include <kaguya/material/texture/Texture.h>
 
 namespace kaguya {
     namespace material {
-
+        using namespace texture;
         using kaguya::core::Spectrum;
 
         class Metal : public Material {
         public:
             Metal();
 
-            Metal(const Spectrum &albedo, Float fuzzy = 0);
+            Metal(std::shared_ptr<Texture<Spectrum>> albedo, Float fuzzy = 0);
 
             virtual bool isSpecular() const override;
 
@@ -28,7 +27,7 @@ namespace kaguya {
 
         private:
             // 反射率
-            Spectrum _albedo;
+            std::shared_ptr<Texture<Spectrum>> _albedo;
             // 毛玻璃效果系数
             Float _fuzzy;
         };

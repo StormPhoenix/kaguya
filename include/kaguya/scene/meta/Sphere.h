@@ -19,17 +19,9 @@ namespace kaguya {
 
             class Sphere : public Shape {
             public:
+                Sphere(const Vector3F &center, Float radius, bool outward = true);
 
-                /**
-                 * 球体
-                 * @param center 中心
-                 * @param radius 半径
-                 * @param material 材质
-                 * @param outward 是否向外
-                 * @param transformMatrix 变换矩阵
-                 */
-                Sphere(const Vector3F &center, Float radius, bool outward = true,
-                       std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
+                Sphere(std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(), bool outward = true);
 
                 bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const override;
 

@@ -68,6 +68,8 @@ namespace kaguya {
 
 #ifdef TEST_SCENE
 
+            static void initSceneComponents();
+
             static Float *testSmokeData();
 
             static std::shared_ptr<Medium> testAirMedium();

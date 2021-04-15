@@ -7,16 +7,37 @@
 namespace kaguya {
     namespace scene {
         namespace meta {
-            Sphere::Sphere(const Vector3F &center, Float radius, bool outward,
-                           std::shared_ptr<Transform> transformMatrix) {
+
+            Sphere::Sphere(const Vector3F &center, Float radius, bool outward) {
                 assert(radius > 0);
 
-                _center = center;
-                _transformedCenter = transformMatrix->transformPoint(_center);
+                Matrix4F transformMat(1.0f);
+                transformMat = TRANSLATE(transformMat, Vector3F(center[0], center[1], center[2]));
+                transformMat = SCALE(transformMat, Vector3F(radius, radius, radius));
+                _transformMatrix = std::make_shared<Transform>(transformMat);
+                _inverseTransformMatrix = _transformMatrix->inverse();
+
+                _center = Vector3F(0.);
+                _transformedCenter = center;
                 _radius = radius;
                 _outward = outward;
-                _transformMatrix = transformMatrix;
 
+                // build bounding box
+                _aabb = AABB(_transformedCenter - Vector3F(_radius, _radius, _radius),
+                             _transformedCenter + Vector3F(_radius, _radius, _radius));
+            }
+
+            Sphere::Sphere(std::shared_ptr<Transform> transformMatrix, bool outward) {
+                _transformMatrix = transformMatrix;
+                if (_transformMatrix == nullptr) {
+                    _transformMatrix = std::make_shared<Transform>();
+                }
+                _inverseTransformMatrix = _transformMatrix->inverse();
+                _center = Vector3F(0.);
+                _transformedCenter = _transformMatrix->transformPoint(_center);
+                _radius = LENGTH(
+                        Vector3F(_transformMatrix->transformPoint(Vector3F(1.0, 0.0, 0.0)) - _transformedCenter));
+                _outward = outward;
                 // build bounding box
                 _aabb = AABB(_transformedCenter - Vector3F(_radius, _radius, _radius),
                              _transformedCenter + Vector3F(_radius, _radius, _radius));
@@ -43,7 +64,7 @@ namespace kaguya {
                     Float root = (-halfB - sqrt(discriminant)) / a;
                     if (root > minStep && root < maxStep) {
                         Vector3F origin = ray.at(root);
-                        origin = (origin - _center) * (_radius / LENGTH(origin - _center)) + _center;
+                        origin = (origin - _transformedCenter) * (_radius / LENGTH(origin - _transformedCenter)) + _transformedCenter;
                         si.point = origin;
                         si.u = 0;
                         si.v = 0;
@@ -64,7 +85,7 @@ namespace kaguya {
                     root = (-halfB + sqrt(discriminant)) / a;
                     if (root > minStep && root < maxStep) {
                         Vector3F origin = ray.at(root);
-                        origin = (origin - _center) * (_radius / LENGTH(origin - _center)) + _center;
+                        origin = (origin - _transformedCenter) * (_radius / LENGTH(origin - _transformedCenter)) + _transformedCenter;
                         si.point = origin;
                         si.u = 0;
                         si.v = 0;

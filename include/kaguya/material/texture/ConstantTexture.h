@@ -5,25 +5,32 @@
 #ifndef KAGUYA_CONSTANTTEXTURE_H
 #define KAGUYA_CONSTANTTEXTURE_H
 
-#include <kaguya/material/texture/Texture.h>
 #include <kaguya/core/Core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
+#include <kaguya/material/texture/Texture.h>
 
 namespace kaguya {
     namespace material {
+        namespace texture {
 
-        class ConstantTexture : public Texture {
-        public:
-            ConstantTexture();
+            template<typename T>
+            class ConstantTexture : public Texture<T> {
+            public:
+                ConstantTexture() {
+                    _albedo = T(0.0);
+                }
 
-            ConstantTexture(const Spectrum &albedo);
+                ConstantTexture(const T &albedo) : _albedo(albedo) {}
 
-            Spectrum sample(Float u, Float v) override;
+                virtual T evaluate(const SurfaceInteraction &si) override {
+                    return _albedo;
+                }
 
-        private:
-            Spectrum _albedo;
-        };
+            private:
+                T _albedo;
+            };
 
+        }
     }
 }
 

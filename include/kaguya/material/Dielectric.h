@@ -5,28 +5,32 @@
 #ifndef KAGUYA_DIELECTRIC_H
 #define KAGUYA_DIELECTRIC_H
 
+#include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/material/Material.h>
 #include <kaguya/material/texture/Texture.h>
 
 namespace kaguya {
     namespace material {
 
+        using namespace texture;
+        using namespace core;
+
         class Dielectric : public Material {
         public:
-            Dielectric(std::shared_ptr<Texture> albedo);
+            Dielectric(std::shared_ptr<Texture<Spectrum>> albedo);
 
-            Dielectric(std::shared_ptr<Texture> albedo, Float refractiveIndex);
+            Dielectric(std::shared_ptr<Texture<Spectrum>> albedo, Float refractiveIndex);
 
             virtual bool isSpecular() const override;
 
             virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
-                                                     TransportMode mode = TransportMode::RADIANCE) override;
+                                                    TransportMode mode = TransportMode::RADIANCE) override;
 
 
         private:
             Float _refractiveIndex;
 
-            std::shared_ptr<Texture> _albedo = nullptr;
+            std::shared_ptr<Texture<Spectrum>> _albedo = nullptr;
         };
 
     }

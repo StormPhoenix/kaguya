@@ -5,36 +5,20 @@
 #ifndef KAGUYA_TEXTURE_H
 #define KAGUYA_TEXTURE_H
 
-#include <kaguya/core/Core.h>
 #include <kaguya/core/Interaction.h>
-#include <kaguya/math/Math.h>
 
 namespace kaguya {
     namespace material {
+        namespace texture {
 
-        using kaguya::core::Spectrum;
-        using kaguya::core::SurfaceInteraction;
+            using namespace core;
 
-        class Texture {
-        public:
-            /**
-             * TODO parameter type -> SurfaceInteraction &
-             * TODO Spectrum -> T
-             * 纹理采样
-             * @param u 纹理坐标 - x
-             * @param v 纹理坐标 - y
-             * @return
-             */
-            virtual Spectrum sample(Float u, Float v) = 0;
-
-            /**
-             * TODO Spectrum -> T
-             * @param si
-             * @return
-             */
-            Spectrum evaluate(SurfaceInteraction &si) { return 0; }
-        };
-
+            template<typename T>
+            class Texture {
+            public:
+                virtual T evaluate(const SurfaceInteraction &si) = 0;
+            };
+        }
     }
 }
 

@@ -3,12 +3,8 @@
 A simple physically based render.
     
 ## TODO
-- [ ] 添加纹理
-    - [x] 添加 ImageTexture
-    - [x] 简单 2D 线性映射纹理
-    - [ ] ImageTexture 细节检查
-    - [ ] Sphere2D 映射
-    - [ ] 多通道纹理
+
+    
 - [ ] HaltonSampler 代码写的可能有问题
 - [ ] Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法，写成文档记录下来
 - [ ] Triangle sampling strategy 计算方法记录。
@@ -81,6 +77,13 @@ A simple physically based render.
     无法在光线传输过程中确定碰撞位置两端的折射率。程序采用的是将外界材质的折射率固定设置为空气折射率（1.0）
     
 ## Solved
+- [x] 添加纹理
+    - [x] 添加 ImageTexture
+    - [x] 简单 2D 线性映射纹理
+    - [x] ImageTexture 细节检查
+    - [x] 多通道纹理
+    - [x] Sphere2D 映射
+
 - [x] Photon Mapping 开发
     - [x] 研究 Photon Mapping、Progressive Photon Mapping 和 Stochastic Progressive Photon Mapping
     - [x] 开发 SPPM Tracer

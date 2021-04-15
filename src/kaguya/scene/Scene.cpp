@@ -22,6 +22,8 @@
 #include <kaguya/material/SubsurfaceMaterial.h>
 #include <kaguya/material/texture/ConstantTexture.h>
 #include <kaguya/material/texture/ImageTexture.h>
+#include <kaguya/material/texture/UVMapping2D.h>
+#include <kaguya/material/texture/SphericalMapping2D.h>
 #include <kaguya/utils/ObjLoader.h>
 #include <kaguya/core/medium/GridDensityMedium.h>
 
@@ -38,11 +40,82 @@ namespace kaguya {
     namespace scene {
 
         using namespace kaguya::material;
+        using namespace kaguya::material::texture;
         using namespace kaguya::scene::acc;
         using namespace kaguya::core;
 
-
 #ifdef TEST_SCENE
+
+        // Image texture UVMapping
+        std::shared_ptr<Texture<Spectrum>> imageTexture1 = nullptr;
+        Spectrum blue_spectrum(0.);
+        Spectrum area_light_spectrum(0.);
+        Spectrum total_white_spectrum(1.0);
+
+        std::shared_ptr<Geometry>
+        buildSphere(const Vector3F &center, const Float &radius, std::shared_ptr<Material> material) {
+            // Transform
+            Matrix4F sphereMat(1.0f);
+            sphereMat = TRANSLATE(sphereMat, center);
+            sphereMat = SCALE(sphereMat, Vector3F(radius, radius, radius));
+            std::shared_ptr<Transform> metalSphereTransform = std::make_shared<Transform>(sphereMat);
+
+            std::shared_ptr<Shape> metalSphereShape = std::make_shared<meta::Sphere>(metalSphereTransform);
+            std::shared_ptr<Geometry> metalSphere = std::make_shared<Geometry>(metalSphereShape, material,
+                                                                               nullptr, nullptr);
+            return metalSphere;
+        }
+
+        std::shared_ptr<Geometry> buildMetalSphere(const Vector3F &center, const Float &radius) {
+            std::shared_ptr<Material> metal = std::make_shared<Metal>();
+            return buildSphere(center, radius, metal);
+        }
+
+        std::shared_ptr<Geometry> buildGlassSphere(const Vector3F &center, const Float &radius) {
+            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
+                    total_white_spectrum);
+            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
+            return buildSphere(center, radius, glass);
+        }
+
+        std::shared_ptr<Geometry> buildLambSphere(const Vector3F &center, const Float &radius) {
+            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
+                    total_white_spectrum);
+            std::shared_ptr<Material> lamb = std::make_shared<Lambertian>(totalWhite);
+            return buildSphere(center, radius, lamb);
+        }
+
+        std::shared_ptr<Geometry> buildLambSphereImageTexture(const Vector3F &center, const Float &radius) {
+            // Transform
+            Matrix4F sphereMat(1.0f);
+            sphereMat = TRANSLATE(sphereMat, center);
+            sphereMat = SCALE(sphereMat, Vector3F(radius, radius, radius));
+            std::shared_ptr<Transform> transform = std::make_shared<Transform>(sphereMat);
+            std::shared_ptr<TextureMapping2D> textureMapping2D = std::make_shared<SphericalMapping2D>(transform);
+
+            std::shared_ptr<Texture<Spectrum>> imageTextureLocal = std::make_shared<ImageTexture<Spectrum>>("./resource/texture/texture1.jpg", textureMapping2D);
+            std::shared_ptr<Material> lamb = std::make_shared<Lambertian>(imageTextureLocal);
+            return buildSphere(center, radius, lamb);
+        }
+
+        void Scene::initSceneComponents() {
+
+            imageTexture1 = std::make_shared<ImageTexture<Spectrum>>(
+                    "./resource/texture/texture1.jpg");
+
+            // blue
+            blue_spectrum = Spectrum(0.0);
+            blue_spectrum.r(0);
+            blue_spectrum.g(0);
+            blue_spectrum.b(1.0);
+
+            // light spectrum
+            Float areaLightIntensity = 15;
+            area_light_spectrum.r(Float(249.0) / 255.0 * areaLightIntensity);
+            area_light_spectrum.g(Float(222.0) / 255.0 * areaLightIntensity);
+            area_light_spectrum.b(Float(180.0) / 255.0 * areaLightIntensity);
+
+        }
 
         Float *Scene::testSmokeData() {
             std::cout << "load smoke data ... " << std::endl;
@@ -378,56 +451,35 @@ namespace kaguya {
             // albedos
             // total white
             Spectrum totalWhiteSpectrum = Spectrum(1.0);
-            std::shared_ptr<Texture> totalWhite = std::make_shared<ConstantTexture>(totalWhiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
+                    totalWhiteSpectrum);
 
             // white
             Spectrum whiteSpectrum = Spectrum(0.0);
             whiteSpectrum.r(0.73);
             whiteSpectrum.g(0.73);
             whiteSpectrum.b(0.73);
-            std::shared_ptr<Texture> white = std::make_shared<ConstantTexture>(whiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> white = std::make_shared<ConstantTexture<Spectrum>>(whiteSpectrum);
 
             // red
             Spectrum redSpectrum = Spectrum(0.0);
             redSpectrum.r(0.65);
             redSpectrum.g(0.05);
             redSpectrum.b(0.05);
-            std::shared_ptr<Texture> red = std::make_shared<ConstantTexture>(redSpectrum);
+            std::shared_ptr<Texture<Spectrum>> red = std::make_shared<ConstantTexture<Spectrum>>(redSpectrum);
 
-            // lake blue
-            Spectrum lakeBlueSpectrum = Spectrum(0.0);
-            lakeBlueSpectrum.r(30.0 / 255);
-            lakeBlueSpectrum.g(144.0 / 255);
-            lakeBlueSpectrum.b(200.0 / 255);
-            std::shared_ptr<Texture> lakeBlue = std::make_shared<ConstantTexture>(lakeBlueSpectrum);
 
             // green
             Spectrum greenSpectrum = Spectrum(0.0);
             greenSpectrum.r(0.12);
             greenSpectrum.g(0.45);
             greenSpectrum.b(0.15);
-            std::shared_ptr<Texture> green = std::make_shared<ConstantTexture>(greenSpectrum);
+            std::shared_ptr<Texture<Spectrum>> green = std::make_shared<ConstantTexture<Spectrum>>(greenSpectrum);
 
-            // blue
-            Spectrum blueSpectrum = Spectrum(0.0);
-            blueSpectrum.r(0);
-            blueSpectrum.g(0);
-            blueSpectrum.b(1.0);
-            std::shared_ptr<Texture> blue = std::make_shared<ConstantTexture>(blueSpectrum);
+            std::shared_ptr<Texture<Spectrum>> blue = std::make_shared<ConstantTexture<Spectrum>>(blue_spectrum);
 
-            // pink
-            Spectrum pinkSpectrum = Spectrum(0.0);
-            pinkSpectrum.r(255.0 / 255);
-            pinkSpectrum.g(192.0 / 255);
-            pinkSpectrum.b(203.0 / 255);
-            std::shared_ptr<Texture> pink = std::make_shared<ConstantTexture>(pinkSpectrum);
 
-            // light spectrum
-            Spectrum areaLightSpectrum = Spectrum(0.0);
-            Float areaLightIntensity = 15;
-            areaLightSpectrum.r(Float(249.0) / 255.0 * areaLightIntensity);
-            areaLightSpectrum.g(Float(222.0) / 255.0 * areaLightIntensity);
-            areaLightSpectrum.b(Float(180.0) / 255.0 * areaLightIntensity);
+
 
             // lambertian materials
             std::shared_ptr<Material> lambertLeft = std::make_shared<Lambertian>(red);
@@ -484,7 +536,7 @@ namespace kaguya {
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 
             // build area light
-            auto lightWall = testTopAreaLight(areaLightSpectrum, airMedium, scene->_lights, lambertTop);
+            auto lightWall = testTopAreaLight(area_light_spectrum, airMedium, scene->_lights, lambertTop);
             objects.insert(objects.end(), lightWall.begin(), lightWall.end());
 
             // scene
@@ -508,49 +560,35 @@ namespace kaguya {
             // albedos
             // total white
             Spectrum totalWhiteSpectrum = Spectrum(1.0);
-            std::shared_ptr<Texture> totalWhite = std::make_shared<ConstantTexture>(totalWhiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
+                    totalWhiteSpectrum);
 
             // white
             Spectrum whiteSpectrum = Spectrum(0.0);
             whiteSpectrum.r(0.73);
             whiteSpectrum.g(0.73);
             whiteSpectrum.b(0.73);
-            std::shared_ptr<Texture> white = std::make_shared<ConstantTexture>(whiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> white = std::make_shared<ConstantTexture<Spectrum>>(whiteSpectrum);
 
             // red
             Spectrum redSpectrum = Spectrum(0.0);
             redSpectrum.r(0.65);
             redSpectrum.g(0.05);
             redSpectrum.b(0.05);
-            std::shared_ptr<Texture> red = std::make_shared<ConstantTexture>(redSpectrum);
+            std::shared_ptr<Texture<Spectrum>> red = std::make_shared<ConstantTexture<Spectrum>>(redSpectrum);
 
-            // lake blue
-            Spectrum lakeBlueSpectrum = Spectrum(0.0);
-            lakeBlueSpectrum.r(30.0 / 255);
-            lakeBlueSpectrum.g(144.0 / 255);
-            lakeBlueSpectrum.b(200.0 / 255);
-            std::shared_ptr<Texture> lakeBlue = std::make_shared<ConstantTexture>(lakeBlueSpectrum);
 
             // green
             Spectrum greenSpectrum = Spectrum(0.0);
             greenSpectrum.r(0.12);
             greenSpectrum.g(0.45);
             greenSpectrum.b(0.15);
-            std::shared_ptr<Texture> green = std::make_shared<ConstantTexture>(greenSpectrum);
+            std::shared_ptr<Texture<Spectrum>> green = std::make_shared<ConstantTexture<Spectrum>>(greenSpectrum);
 
             // blue
-            Spectrum blueSpectrum = Spectrum(0.0);
-            blueSpectrum.r(0);
-            blueSpectrum.g(0);
-            blueSpectrum.b(1.0);
-            std::shared_ptr<Texture> blue = std::make_shared<ConstantTexture>(blueSpectrum);
+            std::shared_ptr<Texture<Spectrum>> blue = std::make_shared<ConstantTexture<Spectrum>>(blue_spectrum);
 
-            // pink
-            Spectrum pinkSpectrum = Spectrum(0.0);
-            pinkSpectrum.r(255.0 / 255);
-            pinkSpectrum.g(192.0 / 255);
-            pinkSpectrum.b(203.0 / 255);
-            std::shared_ptr<Texture> pink = std::make_shared<ConstantTexture>(pinkSpectrum);
+
 
             // light spectrum
             Spectrum lightSpectrum = Spectrum(0.0);
@@ -559,16 +597,13 @@ namespace kaguya {
             lightSpectrum.g(Float(222.0) / 255.0 * lightIntensity);
             lightSpectrum.b(Float(180.0) / 255.0 * lightIntensity);
 
-            // Image texture
-            std::shared_ptr<Texture> imageTexture = std::make_shared<ImageTexture>("./resource/texture/texture1.jpg");
-
             // lambertian materials
             std::shared_ptr<Material> lambertLeft = std::make_shared<Lambertian>(red);
             std::shared_ptr<Material> lambertRight = std::make_shared<Lambertian>(green);
             std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> lambertFront2 = std::make_shared<Lambertian>(imageTexture);
+            std::shared_ptr<Material> lambertFront2 = std::make_shared<Lambertian>(imageTexture1);
             std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
             std::shared_ptr<Material> metal = std::make_shared<Metal>();
 
@@ -644,49 +679,35 @@ namespace kaguya {
             // albedos
             // total white
             Spectrum totalWhiteSpectrum = Spectrum(1.0);
-            std::shared_ptr<Texture> totalWhite = std::make_shared<ConstantTexture>(totalWhiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
+                    totalWhiteSpectrum);
 
             // white
             Spectrum whiteSpectrum = Spectrum(0.0);
             whiteSpectrum.r(0.73);
             whiteSpectrum.g(0.73);
             whiteSpectrum.b(0.73);
-            std::shared_ptr<Texture> white = std::make_shared<ConstantTexture>(whiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> white = std::make_shared<ConstantTexture<Spectrum>>(whiteSpectrum);
 
             // red
             Spectrum redSpectrum = Spectrum(0.0);
             redSpectrum.r(0.65);
             redSpectrum.g(0.05);
             redSpectrum.b(0.05);
-            std::shared_ptr<Texture> red = std::make_shared<ConstantTexture>(redSpectrum);
+            std::shared_ptr<Texture<Spectrum>> red = std::make_shared<ConstantTexture<Spectrum>>(redSpectrum);
 
-            // lake blue
-            Spectrum lakeBlueSpectrum = Spectrum(0.0);
-            lakeBlueSpectrum.r(30.0 / 255);
-            lakeBlueSpectrum.g(144.0 / 255);
-            lakeBlueSpectrum.b(200.0 / 255);
-            std::shared_ptr<Texture> lakeBlue = std::make_shared<ConstantTexture>(lakeBlueSpectrum);
 
             // green
             Spectrum greenSpectrum = Spectrum(0.0);
             greenSpectrum.r(0.12);
             greenSpectrum.g(0.45);
             greenSpectrum.b(0.15);
-            std::shared_ptr<Texture> green = std::make_shared<ConstantTexture>(greenSpectrum);
+            std::shared_ptr<Texture<Spectrum>> green = std::make_shared<ConstantTexture<Spectrum>>(greenSpectrum);
 
             // blue
-            Spectrum blueSpectrum = Spectrum(0.0);
-            blueSpectrum.r(0);
-            blueSpectrum.g(0);
-            blueSpectrum.b(1.0);
-            std::shared_ptr<Texture> blue = std::make_shared<ConstantTexture>(blueSpectrum);
+            std::shared_ptr<Texture<Spectrum>> blue = std::make_shared<ConstantTexture<Spectrum>>(blue_spectrum);
 
-            // pink
-            Spectrum pinkSpectrum = Spectrum(0.0);
-            pinkSpectrum.r(255.0 / 255);
-            pinkSpectrum.g(192.0 / 255);
-            pinkSpectrum.b(203.0 / 255);
-            std::shared_ptr<Texture> pink = std::make_shared<ConstantTexture>(pinkSpectrum);
+
 
             // light spectrum
             Spectrum lightSpectrum = Spectrum(0.0);
@@ -769,49 +790,35 @@ namespace kaguya {
             // albedos
             // total white
             Spectrum totalWhiteSpectrum = Spectrum(1.0);
-            std::shared_ptr<Texture> totalWhite = std::make_shared<ConstantTexture>(totalWhiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
+                    totalWhiteSpectrum);
 
             // white
             Spectrum whiteSpectrum = Spectrum(0.0);
             whiteSpectrum.r(0.73);
             whiteSpectrum.g(0.73);
             whiteSpectrum.b(0.73);
-            std::shared_ptr<Texture> white = std::make_shared<ConstantTexture>(whiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> white = std::make_shared<ConstantTexture<Spectrum>>(whiteSpectrum);
 
             // red
             Spectrum redSpectrum = Spectrum(0.0);
             redSpectrum.r(0.65);
             redSpectrum.g(0.05);
             redSpectrum.b(0.05);
-            std::shared_ptr<Texture> red = std::make_shared<ConstantTexture>(redSpectrum);
+            std::shared_ptr<Texture<Spectrum>> red = std::make_shared<ConstantTexture<Spectrum>>(redSpectrum);
 
-            // lake blue
-            Spectrum lakeBlueSpectrum = Spectrum(0.0);
-            lakeBlueSpectrum.r(30.0 / 255);
-            lakeBlueSpectrum.g(144.0 / 255);
-            lakeBlueSpectrum.b(200.0 / 255);
-            std::shared_ptr<Texture> lakeBlue = std::make_shared<ConstantTexture>(lakeBlueSpectrum);
 
             // green
             Spectrum greenSpectrum = Spectrum(0.0);
             greenSpectrum.r(0.12);
             greenSpectrum.g(0.45);
             greenSpectrum.b(0.15);
-            std::shared_ptr<Texture> green = std::make_shared<ConstantTexture>(greenSpectrum);
+            std::shared_ptr<Texture<Spectrum>> green = std::make_shared<ConstantTexture<Spectrum>>(greenSpectrum);
 
             // blue
-            Spectrum blueSpectrum = Spectrum(0.0);
-            blueSpectrum.r(0);
-            blueSpectrum.g(0);
-            blueSpectrum.b(1.0);
-            std::shared_ptr<Texture> blue = std::make_shared<ConstantTexture>(blueSpectrum);
+            std::shared_ptr<Texture<Spectrum>> blue = std::make_shared<ConstantTexture<Spectrum>>(blue_spectrum);
 
-            // pink
-            Spectrum pinkSpectrum = Spectrum(0.0);
-            pinkSpectrum.r(255.0 / 255);
-            pinkSpectrum.g(192.0 / 255);
-            pinkSpectrum.b(203.0 / 255);
-            std::shared_ptr<Texture> pink = std::make_shared<ConstantTexture>(pinkSpectrum);
+
 
             // light spectrum
             Spectrum lightSpectrum = Spectrum(0.0);
@@ -889,49 +896,35 @@ namespace kaguya {
             // albedos
             // total white
             Spectrum totalWhiteSpectrum = Spectrum(1.0);
-            std::shared_ptr<Texture> totalWhite = std::make_shared<ConstantTexture>(totalWhiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
+                    totalWhiteSpectrum);
 
             // white
             Spectrum whiteSpectrum = Spectrum(0.0);
             whiteSpectrum.r(0.73);
             whiteSpectrum.g(0.73);
             whiteSpectrum.b(0.73);
-            std::shared_ptr<Texture> white = std::make_shared<ConstantTexture>(whiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> white = std::make_shared<ConstantTexture<Spectrum>>(whiteSpectrum);
 
             // red
             Spectrum redSpectrum = Spectrum(0.0);
             redSpectrum.r(0.65);
             redSpectrum.g(0.05);
             redSpectrum.b(0.05);
-            std::shared_ptr<Texture> red = std::make_shared<ConstantTexture>(redSpectrum);
+            std::shared_ptr<Texture<Spectrum>> red = std::make_shared<ConstantTexture<Spectrum>>(redSpectrum);
 
-            // lake blue
-            Spectrum lakeBlueSpectrum = Spectrum(0.0);
-            lakeBlueSpectrum.r(30.0 / 255);
-            lakeBlueSpectrum.g(144.0 / 255);
-            lakeBlueSpectrum.b(200.0 / 255);
-            std::shared_ptr<Texture> lakeBlue = std::make_shared<ConstantTexture>(lakeBlueSpectrum);
 
             // green
             Spectrum greenSpectrum = Spectrum(0.0);
             greenSpectrum.r(0.12);
             greenSpectrum.g(0.45);
             greenSpectrum.b(0.15);
-            std::shared_ptr<Texture> green = std::make_shared<ConstantTexture>(greenSpectrum);
+            std::shared_ptr<Texture<Spectrum>> green = std::make_shared<ConstantTexture<Spectrum>>(greenSpectrum);
 
             // blue
-            Spectrum blueSpectrum = Spectrum(0.0);
-            blueSpectrum.r(0);
-            blueSpectrum.g(0);
-            blueSpectrum.b(1.0);
-            std::shared_ptr<Texture> blue = std::make_shared<ConstantTexture>(blueSpectrum);
+            std::shared_ptr<Texture<Spectrum>> blue = std::make_shared<ConstantTexture<Spectrum>>(blue_spectrum);
 
-            // pink
-            Spectrum pinkSpectrum = Spectrum(0.0);
-            pinkSpectrum.r(255.0 / 255);
-            pinkSpectrum.g(192.0 / 255);
-            pinkSpectrum.b(203.0 / 255);
-            std::shared_ptr<Texture> pink = std::make_shared<ConstantTexture>(pinkSpectrum);
+
 
             // light spectrum
             Spectrum lightSpectrum = Spectrum(0.0);
@@ -1010,49 +1003,35 @@ namespace kaguya {
             // albedos
             // total white
             Spectrum totalWhiteSpectrum = Spectrum(1.0);
-            std::shared_ptr<Texture> totalWhite = std::make_shared<ConstantTexture>(totalWhiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
+                    totalWhiteSpectrum);
 
             // white
             Spectrum whiteSpectrum = Spectrum(0.0);
             whiteSpectrum.r(0.73);
             whiteSpectrum.g(0.73);
             whiteSpectrum.b(0.73);
-            std::shared_ptr<Texture> white = std::make_shared<ConstantTexture>(whiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> white = std::make_shared<ConstantTexture<Spectrum>>(whiteSpectrum);
 
             // red
             Spectrum redSpectrum = Spectrum(0.0);
             redSpectrum.r(0.65);
             redSpectrum.g(0.05);
             redSpectrum.b(0.05);
-            std::shared_ptr<Texture> red = std::make_shared<ConstantTexture>(redSpectrum);
+            std::shared_ptr<Texture<Spectrum>> red = std::make_shared<ConstantTexture<Spectrum>>(redSpectrum);
 
-            // lake blue
-            Spectrum lakeBlueSpectrum = Spectrum(0.0);
-            lakeBlueSpectrum.r(30.0 / 255);
-            lakeBlueSpectrum.g(144.0 / 255);
-            lakeBlueSpectrum.b(200.0 / 255);
-            std::shared_ptr<Texture> lakeBlue = std::make_shared<ConstantTexture>(lakeBlueSpectrum);
 
             // green
             Spectrum greenSpectrum = Spectrum(0.0);
             greenSpectrum.r(0.12);
             greenSpectrum.g(0.45);
             greenSpectrum.b(0.15);
-            std::shared_ptr<Texture> green = std::make_shared<ConstantTexture>(greenSpectrum);
+            std::shared_ptr<Texture<Spectrum>> green = std::make_shared<ConstantTexture<Spectrum>>(greenSpectrum);
 
             // blue
-            Spectrum blueSpectrum = Spectrum(0.0);
-            blueSpectrum.r(0);
-            blueSpectrum.g(0);
-            blueSpectrum.b(1.0);
-            std::shared_ptr<Texture> blue = std::make_shared<ConstantTexture>(blueSpectrum);
+            std::shared_ptr<Texture<Spectrum>> blue = std::make_shared<ConstantTexture<Spectrum>>(blue_spectrum);
 
-            // pink
-            Spectrum pinkSpectrum = Spectrum(0.0);
-            pinkSpectrum.r(255.0 / 255);
-            pinkSpectrum.g(192.0 / 255);
-            pinkSpectrum.b(203.0 / 255);
-            std::shared_ptr<Texture> pink = std::make_shared<ConstantTexture>(pinkSpectrum);
+
 
             // light spectrum
             Spectrum lightSpectrum = Spectrum(0.0);
@@ -1138,56 +1117,36 @@ namespace kaguya {
             // albedos
             // total white
             Spectrum totalWhiteSpectrum = Spectrum(1.0);
-            std::shared_ptr<Texture> totalWhite = std::make_shared<ConstantTexture>(totalWhiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
+                    totalWhiteSpectrum);
 
             // white
             Spectrum whiteSpectrum = Spectrum(0.0);
             whiteSpectrum.r(0.73);
             whiteSpectrum.g(0.73);
             whiteSpectrum.b(0.73);
-            std::shared_ptr<Texture> white = std::make_shared<ConstantTexture>(whiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> white = std::make_shared<ConstantTexture<Spectrum>>(whiteSpectrum);
 
             // red
             Spectrum redSpectrum = Spectrum(0.0);
             redSpectrum.r(0.65);
             redSpectrum.g(0.05);
             redSpectrum.b(0.05);
-            std::shared_ptr<Texture> red = std::make_shared<ConstantTexture>(redSpectrum);
+            std::shared_ptr<Texture<Spectrum>> red = std::make_shared<ConstantTexture<Spectrum>>(redSpectrum);
 
-            // lake blue
-            Spectrum lakeBlueSpectrum = Spectrum(0.0);
-            lakeBlueSpectrum.r(30.0 / 255);
-            lakeBlueSpectrum.g(144.0 / 255);
-            lakeBlueSpectrum.b(200.0 / 255);
-            std::shared_ptr<Texture> lakeBlue = std::make_shared<ConstantTexture>(lakeBlueSpectrum);
 
             // green
             Spectrum greenSpectrum = Spectrum(0.0);
             greenSpectrum.r(0.12);
             greenSpectrum.g(0.45);
             greenSpectrum.b(0.15);
-            std::shared_ptr<Texture> green = std::make_shared<ConstantTexture>(greenSpectrum);
+            std::shared_ptr<Texture<Spectrum>> green = std::make_shared<ConstantTexture<Spectrum>>(greenSpectrum);
 
             // blue
-            Spectrum blueSpectrum = Spectrum(0.0);
-            blueSpectrum.r(0);
-            blueSpectrum.g(0);
-            blueSpectrum.b(1.0);
-            std::shared_ptr<Texture> blue = std::make_shared<ConstantTexture>(blueSpectrum);
+            std::shared_ptr<Texture<Spectrum>> blue = std::make_shared<ConstantTexture<Spectrum>>(blue_spectrum);
 
-            // pink
-            Spectrum pinkSpectrum = Spectrum(0.0);
-            pinkSpectrum.r(255.0 / 255);
-            pinkSpectrum.g(192.0 / 255);
-            pinkSpectrum.b(203.0 / 255);
-            std::shared_ptr<Texture> pink = std::make_shared<ConstantTexture>(pinkSpectrum);
-
-            // light spectrum
-            Spectrum areaLightSpectrum = Spectrum(0.0);
-            Float areaLightIntensity = 15;
-            areaLightSpectrum.r(Float(249.0) / 255.0 * areaLightIntensity);
-            areaLightSpectrum.g(Float(222.0) / 255.0 * areaLightIntensity);
-            areaLightSpectrum.b(Float(180.0) / 255.0 * areaLightIntensity);
+            // objects
+            std::vector<std::shared_ptr<Intersectable>> objects;
 
             // lambertian materials
             std::shared_ptr<Material> lambertLeft = std::make_shared<Lambertian>(red);
@@ -1196,13 +1155,9 @@ namespace kaguya {
             std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
-            std::shared_ptr<Material> metal = std::make_shared<Metal>();
 
 //            std::shared_ptr<Medium> airMedium = testAirMedium();
             std::shared_ptr<Medium> airMedium = nullptr;
-
-            // objects
-            std::vector<std::shared_ptr<Intersectable>> objects;
 
             // walls
             std::vector<std::shared_ptr<Geometry>> leftWall =
@@ -1223,21 +1178,18 @@ namespace kaguya {
             std::vector<std::shared_ptr<Geometry>> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
-            std::shared_ptr<Shape> glassSphereShape = std::make_shared<meta::Sphere>(
+            std::shared_ptr<Geometry> glassSphere = buildGlassSphere(
                     Vector3F(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
-            std::shared_ptr<Geometry> glassSphere = std::make_shared<Geometry>(glassSphereShape, glass,
-                                                                               nullptr, airMedium);
 
-            std::shared_ptr<Shape> metalSphereShape = std::make_shared<meta::Sphere>(
-                    Vector3F(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE);
-            std::shared_ptr<Geometry> metalSphere = std::make_shared<Geometry>(metalSphereShape, metal,
-                                                                               nullptr, airMedium);
+            std::shared_ptr<Geometry> metalSphere = buildLambSphereImageTexture(
+                    Vector3F(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE),
+                    0.2 * MODEL_SCALE);
 
             // build scene object
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 
             // build area light
-            auto lightWall = testTopAreaLight(areaLightSpectrum, airMedium, scene->_lights, lambertTop);
+            auto lightWall = testTopAreaLight(area_light_spectrum, airMedium, scene->_lights, lambertTop);
             objects.insert(objects.end(), lightWall.begin(), lightWall.end());
 
             objects.push_back(glassSphere);
@@ -1265,49 +1217,35 @@ namespace kaguya {
             // albedos
             // total white
             Spectrum totalWhiteSpectrum = Spectrum(1.0);
-            std::shared_ptr<Texture> totalWhite = std::make_shared<ConstantTexture>(totalWhiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
+                    totalWhiteSpectrum);
 
             // white
             Spectrum whiteSpectrum = Spectrum(0.0);
             whiteSpectrum.r(0.73);
             whiteSpectrum.g(0.73);
             whiteSpectrum.b(0.73);
-            std::shared_ptr<Texture> white = std::make_shared<ConstantTexture>(whiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> white = std::make_shared<ConstantTexture<Spectrum>>(whiteSpectrum);
 
             // red
             Spectrum redSpectrum = Spectrum(0.0);
             redSpectrum.r(0.65);
             redSpectrum.g(0.05);
             redSpectrum.b(0.05);
-            std::shared_ptr<Texture> red = std::make_shared<ConstantTexture>(redSpectrum);
+            std::shared_ptr<Texture<Spectrum>> red = std::make_shared<ConstantTexture<Spectrum>>(redSpectrum);
 
-            // lake blue
-            Spectrum lakeBlueSpectrum = Spectrum(0.0);
-            lakeBlueSpectrum.r(30.0 / 255);
-            lakeBlueSpectrum.g(144.0 / 255);
-            lakeBlueSpectrum.b(200.0 / 255);
-            std::shared_ptr<Texture> lakeBlue = std::make_shared<ConstantTexture>(lakeBlueSpectrum);
 
             // green
             Spectrum greenSpectrum = Spectrum(0.0);
             greenSpectrum.r(0.12);
             greenSpectrum.g(0.45);
             greenSpectrum.b(0.15);
-            std::shared_ptr<Texture> green = std::make_shared<ConstantTexture>(greenSpectrum);
+            std::shared_ptr<Texture<Spectrum>> green = std::make_shared<ConstantTexture<Spectrum>>(greenSpectrum);
 
             // blue
-            Spectrum blueSpectrum = Spectrum(0.0);
-            blueSpectrum.r(0);
-            blueSpectrum.g(0);
-            blueSpectrum.b(1.0);
-            std::shared_ptr<Texture> blue = std::make_shared<ConstantTexture>(blueSpectrum);
+            std::shared_ptr<Texture<Spectrum>> blue = std::make_shared<ConstantTexture<Spectrum>>(blue_spectrum);
 
-            // pink
-            Spectrum pinkSpectrum = Spectrum(0.0);
-            pinkSpectrum.r(255.0 / 255);
-            pinkSpectrum.g(192.0 / 255);
-            pinkSpectrum.b(203.0 / 255);
-            std::shared_ptr<Texture> pink = std::make_shared<ConstantTexture>(pinkSpectrum);
+
 
             // light spectrum
             Spectrum spotLightSpectrum = Spectrum(0.0);
@@ -1322,7 +1260,6 @@ namespace kaguya {
             std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
             std::shared_ptr<Material> metal = std::make_shared<Metal>();
 
             // medium
@@ -1355,16 +1292,8 @@ namespace kaguya {
             std::vector<std::shared_ptr<Geometry>> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
-            std::shared_ptr<Shape> glassSphereShape = std::make_shared<meta::Sphere>(
-                    Vector3F(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
-            std::shared_ptr<Geometry> glassSphere = std::make_shared<Geometry>(glassSphereShape, glass,
-                                                                               nullptr, airMedium);
-
-
-            std::shared_ptr<Shape> metalSphereShape = std::make_shared<meta::Sphere>(
-                    Vector3F(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE);
-            std::shared_ptr<Geometry> metalSphere = std::make_shared<Geometry>(metalSphereShape, metal,
-                                                                               nullptr, airMedium);
+            std::shared_ptr<Geometry> glassSphere = buildGlassSphere(Vector3F(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
+            std::shared_ptr<Geometry> metalSphere = buildMetalSphere(Vector3F(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE), 0.2 * MODEL_SCALE);
 
             // build scene object
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
@@ -1399,49 +1328,35 @@ namespace kaguya {
             // albedos
             // total white
             Spectrum totalWhiteSpectrum = Spectrum(1.0);
-            std::shared_ptr<Texture> totalWhite = std::make_shared<ConstantTexture>(totalWhiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
+                    totalWhiteSpectrum);
 
             // white
             Spectrum whiteSpectrum = Spectrum(0.0);
             whiteSpectrum.r(0.73);
             whiteSpectrum.g(0.73);
             whiteSpectrum.b(0.73);
-            std::shared_ptr<Texture> white = std::make_shared<ConstantTexture>(whiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> white = std::make_shared<ConstantTexture<Spectrum>>(whiteSpectrum);
 
             // red
             Spectrum redSpectrum = Spectrum(0.0);
             redSpectrum.r(0.65);
             redSpectrum.g(0.05);
             redSpectrum.b(0.05);
-            std::shared_ptr<Texture> red = std::make_shared<ConstantTexture>(redSpectrum);
+            std::shared_ptr<Texture<Spectrum>> red = std::make_shared<ConstantTexture<Spectrum>>(redSpectrum);
 
-            // lake blue
-            Spectrum lakeBlueSpectrum = Spectrum(0.0);
-            lakeBlueSpectrum.r(30.0 / 255);
-            lakeBlueSpectrum.g(144.0 / 255);
-            lakeBlueSpectrum.b(200.0 / 255);
-            std::shared_ptr<Texture> lakeBlue = std::make_shared<ConstantTexture>(lakeBlueSpectrum);
 
             // green
             Spectrum greenSpectrum = Spectrum(0.0);
             greenSpectrum.r(0.12);
             greenSpectrum.g(0.45);
             greenSpectrum.b(0.15);
-            std::shared_ptr<Texture> green = std::make_shared<ConstantTexture>(greenSpectrum);
+            std::shared_ptr<Texture<Spectrum>> green = std::make_shared<ConstantTexture<Spectrum>>(greenSpectrum);
 
             // blue
-            Spectrum blueSpectrum = Spectrum(0.0);
-            blueSpectrum.r(0);
-            blueSpectrum.g(0);
-            blueSpectrum.b(1.0);
-            std::shared_ptr<Texture> blue = std::make_shared<ConstantTexture>(blueSpectrum);
+            std::shared_ptr<Texture<Spectrum>> blue = std::make_shared<ConstantTexture<Spectrum>>(blue_spectrum);
 
-            // pink
-            Spectrum pinkSpectrum = Spectrum(0.0);
-            pinkSpectrum.r(255.0 / 255);
-            pinkSpectrum.g(192.0 / 255);
-            pinkSpectrum.b(203.0 / 255);
-            std::shared_ptr<Texture> pink = std::make_shared<ConstantTexture>(pinkSpectrum);
+
 
             // light spectrum
             Spectrum lightSpectrum = Spectrum(0.0);
@@ -1526,49 +1441,35 @@ namespace kaguya {
             // albedos
             // total white
             Spectrum totalWhiteSpectrum = Spectrum(1.0);
-            std::shared_ptr<Texture> totalWhite = std::make_shared<ConstantTexture>(totalWhiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
+                    totalWhiteSpectrum);
 
             // white
             Spectrum whiteSpectrum = Spectrum(0.0);
             whiteSpectrum.r(0.73);
             whiteSpectrum.g(0.73);
             whiteSpectrum.b(0.73);
-            std::shared_ptr<Texture> white = std::make_shared<ConstantTexture>(whiteSpectrum);
+            std::shared_ptr<Texture<Spectrum>> white = std::make_shared<ConstantTexture<Spectrum>>(whiteSpectrum);
 
             // red
             Spectrum redSpectrum = Spectrum(0.0);
             redSpectrum.r(0.65);
             redSpectrum.g(0.05);
             redSpectrum.b(0.05);
-            std::shared_ptr<Texture> red = std::make_shared<ConstantTexture>(redSpectrum);
+            std::shared_ptr<Texture<Spectrum>> red = std::make_shared<ConstantTexture<Spectrum>>(redSpectrum);
 
-            // lake blue
-            Spectrum lakeBlueSpectrum = Spectrum(0.0);
-            lakeBlueSpectrum.r(30.0 / 255);
-            lakeBlueSpectrum.g(144.0 / 255);
-            lakeBlueSpectrum.b(200.0 / 255);
-            std::shared_ptr<Texture> lakeBlue = std::make_shared<ConstantTexture>(lakeBlueSpectrum);
 
             // green
             Spectrum greenSpectrum = Spectrum(0.0);
             greenSpectrum.r(0.12);
             greenSpectrum.g(0.45);
             greenSpectrum.b(0.15);
-            std::shared_ptr<Texture> green = std::make_shared<ConstantTexture>(greenSpectrum);
+            std::shared_ptr<Texture<Spectrum>> green = std::make_shared<ConstantTexture<Spectrum>>(greenSpectrum);
 
             // blue
-            Spectrum blueSpectrum = Spectrum(0.0);
-            blueSpectrum.r(0);
-            blueSpectrum.g(0);
-            blueSpectrum.b(1.0);
-            std::shared_ptr<Texture> blue = std::make_shared<ConstantTexture>(blueSpectrum);
+            std::shared_ptr<Texture<Spectrum>> blue = std::make_shared<ConstantTexture<Spectrum>>(blue_spectrum);
 
-            // pink
-            Spectrum pinkSpectrum = Spectrum(0.0);
-            pinkSpectrum.r(255.0 / 255);
-            pinkSpectrum.g(192.0 / 255);
-            pinkSpectrum.b(203.0 / 255);
-            std::shared_ptr<Texture> pink = std::make_shared<ConstantTexture>(pinkSpectrum);
+
 
             // light spectrum
             Spectrum pointLightSpectrum = Spectrum(0.0);

@@ -192,6 +192,10 @@ namespace kaguya {
                 return value[i];
             }
 
+            int channels() {
+                return SpectrumSamples;
+            }
+
         protected:
             Float value[SpectrumSamples];
         };

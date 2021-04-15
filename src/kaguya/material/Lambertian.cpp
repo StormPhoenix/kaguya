@@ -12,10 +12,10 @@ namespace kaguya {
         using kaguya::core::BSDF;
         using kaguya::core::BXDFLambertianReflection;
 
-        Lambertian::Lambertian(std::shared_ptr<Texture> albedo) : _albedo(albedo) {}
+        Lambertian::Lambertian(std::shared_ptr<Texture<Spectrum>> albedo) : _albedo(albedo) {}
 
         void Lambertian::computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena, TransportMode mode) {
-            Spectrum albedo = _albedo->sample(insect.u, insect.v);
+            Spectrum albedo = _albedo->evaluate(insect);
             BXDFLambertianReflection *lambertianBXDF =
                     ALLOC(memoryArena, BXDFLambertianReflection)(albedo);
             insect.bsdf = ALLOC(memoryArena, BSDF)(insect);
