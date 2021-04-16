@@ -23,6 +23,8 @@ namespace kaguya {
 
         class Geometry final : public Intersectable {
         public:
+            typedef std::shared_ptr<Geometry> Ptr;
+
             Geometry(const std::shared_ptr<meta::Shape> shape,
                      const std::shared_ptr<Material> material,
                      const std::shared_ptr<Medium> inside = nullptr,

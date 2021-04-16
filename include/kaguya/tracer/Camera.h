@@ -10,6 +10,7 @@
 #include <kaguya/tracer/Ray.h>
 #include <kaguya/tracer/FilmPlane.h>
 #include <kaguya/utils/VisibilityTester.h>
+#include <kaguya/core/Transform.h>
 
 namespace kaguya {
 
@@ -24,10 +25,13 @@ namespace kaguya {
         using kaguya::core::Interaction;
         using kaguya::utils::VisibilityTester;
         using kaguya::core::medium::Medium;
+        using kaguya::core::transform::Transform;
         using kaguya::sampler::Sampler;
 
         class Camera {
         public:
+            Camera(std::shared_ptr<Transform> transformMat, Float fov, Float near = 1.0, Float far = 10000);
+
             /**
              * 初始化相机
              * @param eye 相机位置
@@ -149,7 +153,7 @@ namespace kaguya {
             // 相机光圈大小
             Float _lensRadius = 0.025;
             // 默认焦距为 10
-            const Float _focal = 10;
+            Float _focal = 10;
             // medium
             std::shared_ptr<Medium> _medium;
         };

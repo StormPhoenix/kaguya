@@ -15,9 +15,11 @@ namespace kaguya {
 
             class Transform {
             public:
+                typedef std::shared_ptr<Transform> Ptr;
+
                 Transform();
 
-                Transform(Matrix4d transformMatrix);
+                Transform(Matrix4F transformMatrix);
 
                 Vector3F transformPoint(const Vector3F &p) const;
 
@@ -25,11 +27,13 @@ namespace kaguya {
 
                 Vector3F transformNormal(const Vector3F &n) const;
 
+                Matrix4F mat() const;
+
                 std::shared_ptr<Transform> inverse() const;
 
             private:
                 bool _identity = false;
-                Matrix4d _transformMatrix;
+                Matrix4F _transformMatrix;
             };
 
         }

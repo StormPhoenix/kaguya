@@ -5,6 +5,21 @@
 #include <kaguya/Config.h>
 
 namespace kaguya {
+
+    std::string Config::Camera::type = "perspective";
+    std::string Config::Camera::filename = "kaguya";
+    std::string Config::Camera::filmType = "ldrfilm";
+    int Config::Camera::width = 1024;
+    int Config::Camera::height = 1024;
+    std::string Config::Camera::fileFormat = "png";
+    std::string Config::Camera::pixelFormat = "rgb";
+    float Config::Camera::gamma = 0.;
+    bool Config::Camera::banner = false;
+    std::string Config::Camera::rfilter = "tent";
+
+    std::string Config::Sampler::type = "independent";
+    int Config::Sampler::sampleCount = 100;
+
     // 初始化场景
     int Config::sceneId = 0;
     bool Config::isScenePrepared = false;
@@ -35,9 +50,9 @@ namespace kaguya {
         // 若场景未构建，则线构建场景
         if (!isScenePrepared) {
             Scene::initSceneComponents();
-//            scenes.push_back(Scene::sceneTwoBox);
+            scenes.push_back(Scene::sceneTwoBox);
 //            scenes.push_back(Scene::sceneTwoSpheresWithPointLight);
-            scenes.push_back(Scene::sceneDeskAndBunny);
+//            scenes.push_back(Scene::sceneDeskAndBunny);
 //            scenes.push_back(Scene::sceneTwoSpheresWithSpotLight);
 //            scenes.push_back(Scene::sceneBunnyWithPointLight);
 //            scenes.push_back(Scene::sceneBunnySubsurfaceWithAreaLight);

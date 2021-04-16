@@ -23,6 +23,8 @@ namespace kaguya {
             // 三角形数据
             class Triangle : public Shape {
             public:
+                typedef std::shared_ptr<Triangle> Ptr;
+
                 Triangle(const Vertex &a, const Vertex &b, const Vertex &c,
                          std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 

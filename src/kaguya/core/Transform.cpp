@@ -9,7 +9,7 @@ namespace kaguya {
         namespace transform {
             Transform::Transform() : _identity(true) {}
 
-            Transform::Transform(Matrix4d transformMatrix) :
+            Transform::Transform(Matrix4F transformMatrix) :
                     _transformMatrix(transformMatrix),
                     _identity(false) {}
 
@@ -35,6 +35,10 @@ namespace kaguya {
                 }
                 Vector3F ret = INVERSE_TRANSPOSE(_transformMatrix) * Vector4d(n, 0.0f);
                 return NORMALIZE(ret);
+            }
+
+            Matrix4F Transform::mat() const {
+                return _transformMatrix;
             }
 
             std::shared_ptr<Transform> Transform::inverse() const {

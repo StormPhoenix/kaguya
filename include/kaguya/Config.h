@@ -22,6 +22,28 @@ namespace kaguya {
 
     class Config {
     public:
+
+        class Camera {
+        public:
+            static std::string type;
+            static std::string filename;
+            static std::string filmType;
+            static int width;
+            static int height;
+            static std::string fileFormat;
+            static std::string pixelFormat;
+            static float gamma;
+            static bool banner;
+            static std::string rfilter;
+        };
+
+        class Sampler {
+        public:
+            static std::string type;
+            static int sampleCount;
+        };
+
+        // TODO delete
         // 输出图像名称前缀
         static std::string filenamePrefix;
         // 图像名称后缀

@@ -214,6 +214,9 @@ namespace kaguya {
 //                return _lights;
 //            }
 
+            void setCamera(std::shared_ptr<Camera> camera);
+
+
         protected:
             // scene name
             std::string _sceneName;

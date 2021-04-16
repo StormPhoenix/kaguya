@@ -17,6 +17,8 @@
 #include <functional>
 #include <random>
 
+#include <kaguya/Common.h>
+
 using Vector2d = glm::dvec2;
 using Vector2f = glm::vec2;
 using Vector2i = glm::int2;
@@ -61,6 +63,7 @@ using Point3I = Vector3i;
 #define INVERSE(matrix) glm::inverse(matrix)
 #define INVERSE_TRANSPOSE(matrix) glm::inverseTranspose(matrix)
 #define DETERMINANT(x) glm::determinant(x)
+#define PERSPECTIVE(fovy, aspect, zNear, zFar) glm::perspective(glm::radians(fovy), aspect, zNear, zFar)
 #define DOT(x, y) glm::dot(x, y)
 #define ABS(x) glm::abs(x)
 #define ABS_DOT(x, y) std::abs(glm::dot(x, y))
@@ -207,10 +210,10 @@ namespace kaguya {
 
         inline bool intersectBound(const Vector3F &origin, const Vector3F &direction,
                                    const Vector3F &boundMin, const Vector3F &boundMax,
-                                   Float *stepMin, Float *maxStep) {
-            assert(stepMin != nullptr && maxStep != nullptr);
+                                   Float *stepMin, Float *stepMax) {
+            ASSERT(stepMin != nullptr && stepMax != nullptr, "stepMin | maxStep is nullptr");
 
-            Float t0 = *stepMin, t1 = *maxStep;
+            Float t0 = *stepMin, t1 = *stepMax;
             for (int axis = 0; axis < 3; ++axis) {
                 Float invStep = 1 / direction[axis];
                 Float near = (boundMin[axis] - origin[axis]) * invStep;
@@ -228,7 +231,7 @@ namespace kaguya {
             }
 
             *stepMin = t0;
-            *maxStep = t1;
+            *stepMax = t1;
             return true;
         }
 

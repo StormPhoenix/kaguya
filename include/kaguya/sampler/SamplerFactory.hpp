@@ -5,6 +5,7 @@
 #ifndef KAGUYA_SAMPLERFACTORY_HPP
 #define KAGUYA_SAMPLERFACTORY_HPP
 
+#include <kaguya/Common.h>
 #include <kaguya/Config.h>
 #include <kaguya/sampler/SimpleHaltonSampler.h>
 #include <kaguya/sampler/HaltonSampler.h>
@@ -18,7 +19,7 @@ namespace kaguya {
                 if (nSamples <= 0) {
                     nSamples = Config::samplePerPixel;
                 }
-                assert(nSamples > 0);
+                ASSERT(nSamples > 0, "nSamples <= 0.");
 
                 if (Config::samplerType == "halton") {
                     return HaltonSampler::newInstance(nSamples);
@@ -31,7 +32,7 @@ namespace kaguya {
                 if (nSamples <= 0) {
                     nSamples = Config::samplePerPixel;
                 }
-                assert(nSamples > 0);
+                ASSERT(nSamples > 0, "nSamples <= 0.");
                 return SimpleHaltonSampler::newInstance(nSamples);
             }
 
@@ -39,7 +40,7 @@ namespace kaguya {
                 if (nSamples <= 0) {
                     nSamples = Config::samplePerPixel;
                 }
-                assert(nSamples > 0);
+                ASSERT(nSamples > 0, "nSamples <= 0.");
                 return HaltonSampler::newInstance(nSamples);
             }
         };

@@ -7,6 +7,8 @@
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
 #include <kaguya/tracer/pm/SPPMTracer.h>
 
+#include <kaguya/scene/importer/xml/XmlSceneImporter.h>
+
 #include <iostream>
 #include <clipp.h>
 
@@ -53,12 +55,17 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
+    /*
+     * TODO delete
     Tracer *tracer = TracerFactory::newTracer();
     if (tracer != nullptr) {
         cout << "using render type: " << Config::renderType << endl;
         tracer->run();
         delete tracer;
     }
+     */
+
+    kaguya::scene::importer::XmlSceneImporter().importScene("./resource/scenes/cornel-box/scene.xml");
 
     return 0;
 }

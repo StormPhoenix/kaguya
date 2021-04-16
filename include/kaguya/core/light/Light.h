@@ -25,7 +25,8 @@ namespace kaguya {
         typedef enum LightType {
             DELTA_POSITION = 1 << 0,
             DELTA_DIRECTION = 1 << 1,
-            AREA = 1 << 2
+            AREA = 1 << 2,
+            INFINITE = 1 << 3
         } LightType;
 
         class Light {

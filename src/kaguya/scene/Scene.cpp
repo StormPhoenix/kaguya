@@ -38,7 +38,6 @@
 
 namespace kaguya {
     namespace scene {
-
         using namespace kaguya::material;
         using namespace kaguya::material::texture;
         using namespace kaguya::scene::acc;
@@ -311,7 +310,7 @@ namespace kaguya {
         std::vector<std::shared_ptr<Geometry>>
         Scene::testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
                                 std::vector<std::shared_ptr<Light>> &lights, const std::shared_ptr<Material> material) {
-            Float top = 2.46;
+            Float top = 0.46;
             const Vector3F a1(0.2 * MODEL_SCALE, top * MODEL_SCALE, -0.2 * MODEL_SCALE);
             const Vector3F a2(-0.2 * MODEL_SCALE, top * MODEL_SCALE, -0.2 * MODEL_SCALE);
             const Vector3F a3(-0.2 * MODEL_SCALE, top * MODEL_SCALE, 0.2 * MODEL_SCALE);
@@ -1627,6 +1626,10 @@ namespace kaguya {
             scene->_sceneName = "light_through-air";
 
             return scene;
+        }
+
+        void Scene::setCamera(std::shared_ptr<Camera> camera) {
+            _camera = camera;
         }
 
         bool Scene::intersect(Ray &ray, SurfaceInteraction &si) const {

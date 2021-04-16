@@ -2,6 +2,7 @@
 // Created by Storm Phoenix on 2020/9/30.
 //
 
+#include <kaguya/Config.h>
 #include <kaguya/tracer/Camera.h>
 #include <kaguya/core/medium/MediumBoundary.h>
 
@@ -9,6 +10,28 @@ namespace kaguya {
     namespace tracer {
 
         using kaguya::core::medium::MediumBoundary;
+
+        Camera::Camera(std::shared_ptr<Transform> transformMat, Float fov, Float near, Float far) {
+            if (transformMat == nullptr) {
+                transformMat = std::make_shared<Transform>();
+            }
+            _eye = transformMat->transformPoint(Vector3F(0, 0, 0));
+            _front = transformMat->transformVector(Vector3F(0, 0, 1));
+            _right = transformMat->transformVector(Vector3F(-1, 0, 0));
+            _up = NORMALIZE(CROSS(_right, _front));
+            _focal = near;
+
+            _resolutionHeight = Config::Camera::height;
+            _resolutionWidth = Config::Camera::width;
+
+            Float aspect = Float(Config::Camera::width) / Config::Camera::height;
+            _halfWindowHeight = tan(math::DEGREES_TO_RADIANS(fov / 2)) * _focal;
+            _halfWindowWidth = _halfWindowHeight * aspect;
+            _area = 4 * _halfWindowHeight * _halfWindowWidth;
+            _leftBottomCorner = _eye + _focal * _front - _halfWindowWidth * _right - _halfWindowHeight * _up;
+            _rightTopCorner = _eye + _focal * _front + _halfWindowWidth * _right + _halfWindowHeight * _up;
+            _diagonalVector = _rightTopCorner - _leftBottomCorner;
+        }
 
         Camera::Camera(const Vector3F &eye, const Vector3F &direction, const std::shared_ptr<Medium> medium, float fov,
                        float aspect) : _medium(medium) {

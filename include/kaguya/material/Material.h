@@ -27,12 +27,15 @@ namespace kaguya {
          */
         class Material {
         public:
+
+            typedef std::shared_ptr<Material> Ptr;
+
             /**
              * 计算材质的 bsdf
              * @param insect ray 与 shape 的相交点
              */
             virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
-                                                     TransportMode mode = TransportMode::RADIANCE) = 0;
+                                                    TransportMode mode = TransportMode::RADIANCE) = 0;
 
             /**
              * TODO delete 逐渐删除 isSpecular

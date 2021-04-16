@@ -16,6 +16,8 @@ namespace kaguya {
             template<typename T>
             class Texture {
             public:
+                typedef std::shared_ptr<Texture<T>> Ptr;
+
                 virtual T evaluate(const SurfaceInteraction &si) = 0;
             };
         }

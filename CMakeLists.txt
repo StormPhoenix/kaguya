@@ -69,13 +69,16 @@ file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/sampler/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/parallel/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/accumulation/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/importer/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/importer/xml/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/meta/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/utils/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/bdpt/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/pm/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/pt/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/*.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/pugixml/*.cpp)
 
 add_executable(kaguya ${sources})
 target_link_libraries(kaguya pthread)

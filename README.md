@@ -1,24 +1,41 @@
 # Kaguya Render
 
 A simple physically based render.
-    
-## TODO
+   
+## Processing
+- [ ] 场景导入
+    - [ ] XML
+    - [ ] clean *.h files
+    - [ ] Camera 内部变换修改成矩阵形式
+
 - [ ] 添加环境光贴图
+    - [ ] PathVertex::emit() 修改成 Le()
+    - [ ] 考虑 EnvironmentLight(EL) 在 PT \ BDPT \ SPPM 三种情况下如何处理
+        - [ ] BDPT
+            - [ ] connectible() cameraPath 最后一个 Vertex 是 EL
+            - [ ] connectPath() cameraPath 最后一个 Vertex 是 EL，则调过 connect 步骤
+            - [ ] randomWalk() for cameraPath
+        - [ ] PT
+            - [ ] Path tracing 未击中
+        - [ ] SPPM
+            - [ ] Visible point 未击中
+    - [ ] Light::Le() 
+    
+- [ ] 断言 assert 替换 -> ASSERT
+
+## TODO
+- [ ] 修正 C++ template 特化语法
     
 - [ ] HaltonSampler 代码写的可能有问题
 - [ ] Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法，写成文档记录下来
 - [ ] Triangle sampling strategy 计算方法记录。
 - [ ] Medium sampling method.
-- [ ] Background texture mapping.
 - [ ] Regular tracing, ray marching, delta tracking, ratio tracking article
     - [ ] Delta tracing - reject sampling, Delta tracing's sampling strategy is a little different 
             from reject sampling.
             
 - [ ] HaltonSampler 代码写的可能有问题
 
-- [ ] Error propagation inference
-    - [ ] Remove eposilon.
-    
 - [ ] 编写实时展现渲染进度的功能。
 
 - [ ] 添加 Stratified Sampler、Sobel Sampler
@@ -26,8 +43,6 @@ A simple physically based render.
 - [ ] Geometry Aggregation 结构调整
 
 - [ ] 自己实现 Transformation，加上 Error 管理
-
-- [ ] 修改 Sphere 实现，扩展成椭圆球体. 
 
 ## Unsolved
 - [ ] SubsurfaceMaterial 渲染错误
@@ -40,33 +55,8 @@ A simple physically based render.
     - [x] Bunny 表面呈现血管纹路，猜测是 found、额外的 pdf 造成的 (已解决：去掉额外的 x \ z 轴的采样)
     
     - [ ] Bunny 耳朵边缘部分存在噪点，应该在采样 Sr 半径时考虑射线与 Surface 的夹角，判断使用哪一条轴做采样
-    
-- [ ] 添加 low Discrepancy 序列
-    - [ ] 添加 halton 序列
-        - [x] 添加 halton sampling 渲染的效果反而不如 c++ 自带的随机数生成程序
-        - [x] 对照 PBRT 的 HaltonSampler 、检查 halton + Faure 都没有错误 
-        - [x] 使用 PT 的情况下，halton 和 random 的效果没有什么差别，仅仅只是 halton 的噪点看起来更均匀
-    - [x] 添加 Faure permutation
-
-- [ ] Math.h 用到 Sampler 的地方全部替换成 double
 
 - [ ] Ray direction 和 step 的关系，direction 长度可以不为 1。    
-
-- [ ] Add information for each *assert* phrase
-    
-- [ ] 数值计算中用的都是 double，但 epsilon 的计算用的是 float，如果用 double 的 epsilon，会让误差区间计算不准确，
-    无法约束求交    
-    
-- [ ] Add subsurface scattering
-    - [ ] add **BSSRDF**
-    - [ ] modify *path tracer*
-    - [ ] modify *bd path tracer*  
-
-- [ ] Add background light.
-
-- [ ] Delete variable *isFrontFace*
-
-- [ ] 去掉 Interaction 里面的 frontFace
 
 - [ ] Move *struct Vertex* to new package
 
@@ -89,6 +79,13 @@ A simple physically based render.
     - [x] 开发 SPPM Tracer
     - [x] bugfix: 增加 Iteration，画面会越来越亮（FilmPlane::addSpectrum() 改成 setSpectrum()）
     - [x] bugfix: 画面出现和 tileSize 大小一致的分界线 (photon tracing pass 在不同 tile 下的 photon 分布不一致导致)
+
+- [x] 添加 low Discrepancy 序列
+    - [x] 添加 halton 序列
+        - [x] 添加 halton sampling 渲染的效果反而不如 c++ 自带的随机数生成程序
+        - [x] 对照 PBRT 的 HaltonSampler 、检查 halton + Faure 都没有错误 
+        - [x] 使用 PT 的情况下，halton 和 random 的效果没有什么差别，仅仅只是 halton 的噪点看起来更均匀
+    - [x] 添加 Faure permutation
 
 - [x] Add multiple light source
     - [x] Delete Wall.h

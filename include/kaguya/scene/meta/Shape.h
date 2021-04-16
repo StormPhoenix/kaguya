@@ -27,6 +27,9 @@ namespace kaguya {
 
             class Shape {
             public:
+
+                typedef std::shared_ptr<Shape> Ptr;
+
                 virtual bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const = 0;
 
                 virtual const AABB &bound() const = 0;
