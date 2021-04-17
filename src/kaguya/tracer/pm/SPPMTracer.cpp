@@ -83,9 +83,9 @@ namespace kaguya {
 
         SPPMTracer::SPPMTracer() {
             _gamma = Config::searchRadiusDecay;
-            _samplePerPixels = Config::samplePerPixel;
+            _samplePerPixels = Config::Tracer::sampleNum;
             _shootPhotonsPerIter = Config::photonPerIteration;
-            _maxDepth = Config::maxBounce;
+            _maxDepth = Config::Tracer::maxDepth;
             _initialRadius = Config::initialSearchRadius;
         }
 

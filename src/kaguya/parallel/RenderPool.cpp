@@ -26,7 +26,7 @@ namespace kaguya {
         RenderTask *RenderPool::_taskQueue = nullptr;
 
         RenderPool *RenderPool::getInstance() {
-            const int threadsCount = Config::kernelCount;
+            const int threadsCount = Config::Parallel::kernelCount;
             if (_pool == nullptr) {
                 {
                     std::lock_guard<std::mutex> poolLock(_poolMutex);

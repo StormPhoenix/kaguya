@@ -30,7 +30,7 @@ namespace kaguya {
 
         Sampler *DefaultSampler::newInstance(int nSamples) {
             if (nSamples <= 0) {
-                nSamples = Config::samplePerPixel;
+                nSamples = Config::Tracer::sampleNum;
             }
             return new DefaultSampler(nSamples);
         }

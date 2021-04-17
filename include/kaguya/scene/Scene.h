@@ -174,6 +174,11 @@ namespace kaguya {
             static std::shared_ptr<Scene> sceneTwoSpheresWithSpotLight();
 
             /**
+             * 构建 Cornel-box 场景测试
+             */
+             static std::shared_ptr<Scene> sceneCornelBoxXml();
+
+            /**
              * Intersect with scene，record the interaction
              * @param ray
              * @param si
@@ -201,22 +206,27 @@ namespace kaguya {
                 return _camera;
             }
 
-            const std::vector<std::shared_ptr<Light>> getLights() const {
+            const std::vector<std::shared_ptr<Light>> &getLights() const {
                 return _lights;
+            }
+
+            void addLight(Light::Ptr light) {
+                _lights.push_back(light);
             }
 
             const std::string getName() const {
                 return _sceneName;
             }
 
-            // TODO 增加多个光源选项
-//            const std::vector<std::shared_ptr<DiffuseLight>> &getLights() {
-//                return _lights;
-//            }
-
             void setCamera(std::shared_ptr<Camera> camera);
 
+            void setWorld(Intersectable::Ptr world) {
+                _world = world;
+            }
 
+            void setSceneName(std::string filename) {
+                _sceneName = filename;
+            }
         protected:
             // scene name
             std::string _sceneName;
@@ -224,9 +234,6 @@ namespace kaguya {
             std::shared_ptr<Intersectable> _world = nullptr;
             // camera
             std::shared_ptr<Camera> _camera = nullptr;
-            // TODO 单个光源 用于测试
-//            std::shared_ptr<Light> _light = nullptr;
-            // TODO 增加多个光源选项
             std::vector<std::shared_ptr<Light>> _lights;
         };
 

@@ -67,6 +67,7 @@ namespace kaguya {
                 transform::Transform transformMat;
                 std::map<std::string, AttrVal> container;
                 std::string materialId;
+                bool hasAreaLight = false;
             } ParseInfo;
 
             class XmlSceneImporter : public SceneImporter {
@@ -92,15 +93,22 @@ namespace kaguya {
 
                 void handleTagRGB(pugi::xml_node &node, ParseInfo &parentParseInfo);
 
+                void handleTagEmitter(pugi::xml_node &node, ParseInfo &info, ParseInfo &parent);
+
                 std::shared_ptr<std::vector<Shape::Ptr>> createRectangleShape(ParseInfo &info);
 
+                std::shared_ptr<std::vector<Shape::Ptr>> createCubeShape(ParseInfo &info);
+
                 Material::Ptr createDiffuseMaterial(ParseInfo &info);
+
+                Material::Ptr createDielectricMaterial(ParseInfo &info);
 
             private:
                 std::map<std::string, TagType> _nodeTypeMap;
                 std::shared_ptr<Scene> _scene;
                 std::map<std::string, Material::Ptr> _materialMap;
-                std::shared_ptr<std::vector<Geometry::Ptr>> _geometries;
+                // TODO 修改成 Intersectable
+                std::vector<Intersectable::Ptr> _shapes;
             };
 
         }

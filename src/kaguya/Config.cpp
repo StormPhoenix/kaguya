@@ -3,6 +3,7 @@
 //
 
 #include <kaguya/Config.h>
+#include <kaguya/scene/importer/xml/XmlSceneImporter.h>
 
 namespace kaguya {
 
@@ -21,22 +22,19 @@ namespace kaguya {
     int Config::Sampler::sampleCount = 100;
 
     // 初始化场景
-    int Config::sceneId = 0;
+    int Config::sceneId = -1;
     bool Config::isScenePrepared = false;
     std::vector<std::function<std::shared_ptr<Scene>()>> Config::scenes;
 
     std::string Config::filenamePrefix = "render";
-    std::string Config::filenameSufix = "";
 
     int Config::russianRouletteDepth = 3;
     Float Config::russianRoulette = 0.135;
     Float Config::sampleLightProb = 0.3f;
-    int Config::kernelCount = 1;
-    int Config::maxBounce = 15;
-    int Config::samplePerPixel = 10;
+    int Config::Parallel::kernelCount = 1;
+    int Config::Tracer::maxDepth = 15;
+    int Config::Tracer::sampleNum = 10;
 
-    int Config::resolutionWidth = 100;
-    int Config::resolutionHeight = 100;
     int Config::tileSize = 50;
 
     Float Config::initialSearchRadius = 1.0f;
@@ -47,10 +45,22 @@ namespace kaguya {
     std::string Config::renderType = "pt";
 
     std::shared_ptr<Scene> Config::nextScene() {
+        std::vector<std::string> sceneList = {{"./resource/scenes/cornel-box/scene.xml"},};
+        using namespace kaguya::scene::importer;
+        XmlSceneImporter importer = XmlSceneImporter();
+        sceneId++;
+        if (sceneId < sceneList.size()) {
+            return importer.importScene(sceneList[sceneId]);
+        } else {
+            return nullptr;
+        }
+
+        /* TODO delete
         // 若场景未构建，则线构建场景
         if (!isScenePrepared) {
             Scene::initSceneComponents();
-            scenes.push_back(Scene::sceneTwoBox);
+            scenes.push_back(Scene::sceneCornelBoxXml);
+//            scenes.push_back(Scene::sceneTwoBox);
 //            scenes.push_back(Scene::sceneTwoSpheresWithPointLight);
 //            scenes.push_back(Scene::sceneDeskAndBunny);
 //            scenes.push_back(Scene::sceneTwoSpheresWithSpotLight);
@@ -66,13 +76,14 @@ namespace kaguya {
             isScenePrepared = true;
         }
 
+        sceneId++;
         // 选取下一个场景
         if (sceneId < scenes.size()) {
             std::shared_ptr<Scene> scene = scenes[sceneId]();
-            sceneId++;
             return scene;
         } else {
             return nullptr;
         }
+         */
     }
 }

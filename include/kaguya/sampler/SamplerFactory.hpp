@@ -17,7 +17,7 @@ namespace kaguya {
         public:
             static Sampler *newSampler(int nSamples = -1) {
                 if (nSamples <= 0) {
-                    nSamples = Config::samplePerPixel;
+                    nSamples = Config::Tracer::sampleNum;
                 }
                 ASSERT(nSamples > 0, "nSamples <= 0.");
 
@@ -30,7 +30,7 @@ namespace kaguya {
 
             static Sampler *newSimpleHalton(int nSamples = -1) {
                 if (nSamples <= 0) {
-                    nSamples = Config::samplePerPixel;
+                    nSamples = Config::Tracer::sampleNum;
                 }
                 ASSERT(nSamples > 0, "nSamples <= 0.");
                 return SimpleHaltonSampler::newInstance(nSamples);
@@ -38,7 +38,7 @@ namespace kaguya {
 
             static Sampler *newHaltonSampler(int nSamples = -1) {
                 if (nSamples <= 0) {
-                    nSamples = Config::samplePerPixel;
+                    nSamples = Config::Tracer::sampleNum;
                 }
                 ASSERT(nSamples > 0, "nSamples <= 0.");
                 return HaltonSampler::newInstance(nSamples);

@@ -9,33 +9,32 @@ namespace kaguya {
     namespace core {
 
         std::shared_ptr<AreaLight> DiffuseAreaLight::buildDiffuseAreaLight(const Spectrum &intensity,
-                                                                           std::shared_ptr<Geometry> geometry,
+                                                                           std::shared_ptr<Shape> shape,
                                                                            const MediumBoundary &mediumBoundary,
                                                                            bool singleSide) {
             std::shared_ptr<AreaLight> light =
-                    std::make_shared<DiffuseAreaLight>(intensity, geometry, mediumBoundary, singleSide);
-            geometry->setAreaLight(light);
+                    std::make_shared<DiffuseAreaLight>(intensity, shape, mediumBoundary, singleSide);
             return light;
         }
 
         DiffuseAreaLight::DiffuseAreaLight(const Spectrum &intensity,
-                                           std::shared_ptr<Geometry> shape,
+                                           std::shared_ptr<Shape> shape,
                                            const MediumBoundary &mediumBoundary,
                                            bool singleSide) :
                 AreaLight(intensity, shape, AREA, mediumBoundary), _singleSide(singleSide) {}
 
         Spectrum DiffuseAreaLight::sampleLe(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
                                             Sampler *sampler) {
-            assert(_geometry != nullptr);
+            assert(_shape != nullptr);
 
             // 采样位置
-            SurfaceInteraction si = _geometry->getShape()->sampleSurfacePoint(sampler);
+            SurfaceInteraction si = _shape->sampleSurfacePoint(sampler);
             if (normal != nullptr) {
                 *normal = si.normal;
             }
 
             // 采样位置 pdf
-            *pdfPos = _geometry->getShape()->surfacePointPdf(si);
+            *pdfPos = _shape->surfacePointPdf(si);
 
             Vector3F dirLocal;
             // 判断区域光是否是双面发光
@@ -71,11 +70,11 @@ namespace kaguya {
 
         void DiffuseAreaLight::pdfLe(const Ray &ray, const Vector3F &normal,
                                      Float *pdfPos, Float *pdfDir) const {
-            assert(_geometry != nullptr);
+            assert(_shape != nullptr);
             // 创建 SurfaceInteraction
             SurfaceInteraction si;
             si.point = ray.getOrigin();
-            (*pdfPos) = _geometry->getShape()->surfacePointPdf(si);
+            (*pdfPos) = _shape->surfacePointPdf(si);
             Float cosTheta = ABS_DOT(normal, ray.getDirection());
             (*pdfDir) = _singleSide ? math::sampling::hemiCosineSamplePdf(cosTheta) : 0.5 *
                                                                                       math::sampling::hemiCosineSamplePdf(

@@ -18,6 +18,7 @@ namespace kaguya {
 
         class Intersectable {
         public:
+            typedef std::shared_ptr<Intersectable> Ptr;
             /**
              * 求交判定
              * @param ray

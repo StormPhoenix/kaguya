@@ -30,6 +30,7 @@ namespace kaguya {
 
         class Camera {
         public:
+            typedef std::shared_ptr<Camera> Ptr;
             Camera(std::shared_ptr<Transform> transformMat, Float fov, Float near = 1.0, Float far = 10000);
 
             /**

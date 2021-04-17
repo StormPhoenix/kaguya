@@ -5,9 +5,11 @@
 #include <kaguya/Config.h>
 #include <kaguya/core/Transform.h>
 #include <kaguya/scene/meta/Triangle.h>
+#include <kaguya/scene/accumulation/BVH.h>
 #include <kaguya/material/texture/Texture.h>
 #include <kaguya/material/texture/ConstantTexture.h>
 #include <kaguya/material/Lambertian.h>
+#include <kaguya/material/Dielectric.h>
 #include <kaguya/scene/importer/xml/XmlSceneImporter.h>
 
 namespace kaguya {
@@ -17,6 +19,7 @@ namespace kaguya {
             using namespace material;
             using namespace material::texture;
             using namespace scene::meta;
+            using namespace scene::acc;
             using namespace core::transform;
 
             std::string getOffset(long pos, std::string xml_file) {
@@ -71,11 +74,7 @@ namespace kaguya {
             void handleTagBoolean(pugi::xml_node &node, ParseInfo &parentParseInfo) {
                 std::string name = node.attribute("name").value();
                 std::string value = node.attribute("value").value();
-
-
                 ASSERT(value == "true" || value == "false", "Can't convert " + value + " to bool type");
-
-                std::cout << "Handel bool value: " + name + " " + value << std::endl;
 
                 AttrVal &attr = parentParseInfo.container[name];
                 attr.type = AttrVal::Attr_Boolean;
@@ -90,8 +89,6 @@ namespace kaguya {
                 std::string name = node.attribute("name").value();
                 std::string value = node.attribute("value").value();
 
-                std::cout << "Handel string value: " + name + " " + value << std::endl;
-
                 AttrVal &attr = parentParseInfo.container[name];
                 attr.type = AttrVal::Attr_String;
                 attr.value.stringValue = value;
@@ -103,10 +100,7 @@ namespace kaguya {
 
                 char *tmp = nullptr;
                 int ret = strtol(value.c_str(), &tmp, 10);
-
                 ASSERT(*tmp == '\0', "Can't convert " + value + " to int type");
-
-                std::cout << "Handel int value: " + name + " " + value << std::endl;
 
                 AttrVal &attr = parentParseInfo.container[name];
                 attr.type = AttrVal::Attr_Integer;
@@ -126,8 +120,6 @@ namespace kaguya {
 
                 ASSERT(*tmp == '\0', "Can't convert " + value + " to float type");
 
-                std::cout << "Handel float value: " + name + " " + value << std::endl;
-
                 AttrVal &attr = parentParseInfo.container[name];
                 attr.type = AttrVal::Attr_Float;
                 attr.value.floatValue = ret;
@@ -146,7 +138,7 @@ namespace kaguya {
                             continue;
                         }
                         tmp++;
-                        ret[i][j] = strtod(tmp, &tmp);
+                        ret[j][i] = strtod(tmp, &tmp);
                     }
                 }
 #else
@@ -157,11 +149,10 @@ namespace kaguya {
                             continue;
                         }
                         tmp++;
-                        ret[i][j] = strtof(tmp, &tmp);
+                        ret[j][i] = strtof(tmp, &tmp);
                     }
                 }
 #endif
-                std::cout << "Handel matrix " << std::endl;
                 parentParseInfo.transformMat = transform::Transform(ret);
             }
 
@@ -172,14 +163,6 @@ namespace kaguya {
                 AttrVal &attrVal = parentParseInfo.container[name];
                 attrVal.type = AttrVal::Attr_Transform;
                 attrVal.value.transformValue = parseInfo.transformMat;
-
-                std::cout << "Handel transform value: " + name << std::endl;
-                for (int i = 0; i < 4; i++) {
-                    for (int j = 0; j < 4; j++) {
-                        std::cout << attrVal.value.transformValue.mat()[i][j] << " ";
-                    }
-                    std::cout << std::endl;
-                }
             }
 
             void handleTagFilm(pugi::xml_node &node, ParseInfo &parseInfo) {
@@ -193,18 +176,17 @@ namespace kaguya {
                 Config::Camera::gamma = parseInfo.container["gamma"].value.floatValue;
                 Config::Camera::banner = parseInfo.container["banner"].value.boolValue;
                 Config::Camera::rfilter = parseInfo.container["rfilter"].value.stringValue;
-
-                std::cout << "Handel film value: " << std::endl;
             }
 
             void handleTagSampler(pugi::xml_node &node, ParseInfo &parseInfo) {
                 Config::Sampler::type = node.attribute("type").value();
                 Config::Sampler::sampleCount = parseInfo.container["sampleCount"].value.intValue;
-                std::cout << "Handel sampler value: " << std::endl;
             }
 
             void XmlSceneImporter::handleTagSensor(pugi::xml_node &node, ParseInfo &parseInfo) {
                 Config::Camera::type = node.attribute("type").value();
+                ASSERT(Config::Camera::type == "perspective", "Only support perspective camera for now.");
+
                 Float fov = parseInfo.container["fov"].value.floatValue;
                 transform::Transform toWorldMat = parseInfo.container["toWorld"].value.transformValue;
                 std::shared_ptr<transform::Transform> toWorld = std::make_shared<transform::Transform>(toWorldMat);
@@ -220,11 +202,30 @@ namespace kaguya {
                 Material::Ptr material = nullptr;
                 if (type == "diffuse") {
                     material = createDiffuseMaterial(parseInfo);
+                } else if (type == "dielectric") {
+                    material = createDielectricMaterial(parseInfo);
                 } else {
                     // TODO
-                    ASSERT(type == "diffuse", "Only support diffuse material for now");
+                    ASSERT(false, "Only support diffuse material for now");
                 }
                 _materialMap[id] = material;
+            }
+
+            Material::Ptr XmlSceneImporter::createDielectricMaterial(ParseInfo &info) {
+                Material::Ptr material = nullptr;
+                auto intIORType = info.container["intIOR"].type;
+                auto extIORType = info.container["extIOR"].type;
+                ASSERT(intIORType == AttrVal::Attr_Float && extIORType == AttrVal::Attr_Float,
+                       "Only support float type IOR for now");
+
+                // thetaT
+                Float intIOR = info.container["intIOR"].value.floatValue;
+                // thetaI
+                Float extIOR = info.container["extIOR"].value.floatValue;
+                // 临时用 1.0 spectrum 代替
+                Texture<Spectrum>::Ptr texture = std::make_shared<ConstantTexture<Spectrum>>(1.0);
+                material = std::make_shared<Dielectric>(texture, extIOR, intIOR);
+                return material;
             }
 
             Material::Ptr XmlSceneImporter::createDiffuseMaterial(ParseInfo &info) {
@@ -259,15 +260,64 @@ namespace kaguya {
                 vertices[3] = Point3F(-1, 1, 0);
 
                 auto tri1 = std::make_shared<Triangle>(vertices[0], vertices[1], vertices[2], normal, normal, normal,
-                                                       Vector2F(0, 0), Vector2F(1, 0), Vector2F(1, 1));
+                                                       Vector2F(0, 0), Vector2F(1, 0), Vector2F(1, 1),
+                                                       toWorld);
 
                 auto tri2 = std::make_shared<Triangle>(vertices[2], vertices[3], vertices[0], normal, normal, normal,
-                                                       Vector2F(1, 1), Vector2F(0, 1), Vector2F(0, 0));
+                                                       Vector2F(1, 1), Vector2F(0, 1), Vector2F(0, 0),
+                                                       toWorld);
 
                 std::shared_ptr<std::vector<Shape::Ptr>> ret = std::make_shared<std::vector<Shape::Ptr>>();
                 ret->push_back(tri1);
                 ret->push_back(tri2);
 
+                return ret;
+            }
+
+            std::shared_ptr<std::vector<Shape::Ptr>> XmlSceneImporter::createCubeShape(ParseInfo &info) {
+                Vector3F vertices[] = {
+                        {1,  -1, -1},
+                        {1,  -1, 1},
+                        {-1, -1, 1},
+                        {-1, -1, -1},
+                        {1,  1,  -1},
+                        {-1, 1,  -1},
+                        {-1, 1,  1},
+                        {1,  1,  1}
+                };
+
+                Vector3i indices[] = {
+                        {7, 2, 1},
+                        {7, 6, 2},
+                        {4, 1, 0},
+                        {4, 7, 1},
+                        {5, 0, 3},
+                        {5, 4, 0},
+                        {6, 3, 2},
+                        {6, 5, 3},
+                        {4, 6, 7},
+                        {4, 5, 6},
+                        {1, 2, 3},
+                        {1, 3, 0}
+                };
+
+                auto transformMat = info.container["toWorld"].value.transformValue;
+                Transform::Ptr toWorld = std::make_shared<Transform>(transformMat.mat());
+
+                std::shared_ptr<std::vector<Shape::Ptr>> ret = std::make_shared<std::vector<Shape::Ptr>>();
+                for (int i = 0; i < 12; i++) {
+                    Vector3i index = indices[i];
+                    Vector3F v1 = vertices[index[0]];
+                    Vector3F v2 = vertices[index[1]];
+                    Vector3F v3 = vertices[index[2]];
+                    Normal3F normal = NORMALIZE(CROSS(v2 - v1, v3 - v1));
+                    Vector2F textureCoord = Vector2F(0, 0);
+                    Shape::Ptr shape = std::make_shared<Triangle>(
+                            v1, v2, v3, normal, normal, normal,
+                            textureCoord, textureCoord, textureCoord,
+                            toWorld);
+                    ret->push_back(shape);
+                }
                 return ret;
             }
 
@@ -277,8 +327,10 @@ namespace kaguya {
 
                 if (type == "rectangle") {
                     shapes = createRectangleShape(parseInfo);
+                } else if (type == "cube") {
+                    shapes = createCubeShape(parseInfo);
                 } else {
-                    ASSERT(type == "rectangle", "Only support rectangle shape for now");
+                    ASSERT(false, "Only support rectangle shape for now");
                 }
 
                 Material::Ptr material = nullptr;
@@ -286,12 +338,27 @@ namespace kaguya {
                     material = _materialMap[parseInfo.materialId];
                 }
 
-                for (auto it = shapes->begin(); it != shapes->begin(); it++) {
-                    auto geometry = std::make_shared<Geometry>(*it, material);
-                    _geometries->push_back(geometry);
+                AreaLight::Ptr light = nullptr;
+                if (parseInfo.hasAreaLight) {
+                    auto radianceType = parseInfo.container["radiance"].type;
+                    if (radianceType == AttrVal::Attr_Spectrum) {
+                        Spectrum radiance = parseInfo.container["radiance"].value.spectrumValue;
+                        for (auto it = shapes->begin(); it != shapes->end(); it++) {
+                            light = std::make_shared<DiffuseAreaLight>(radiance, *it, nullptr, true);
+                            _scene->addLight(light);
+                        }
+                    } else {
+                        ASSERT(false, "Only support spectrum radiance for now.");
+                    }
                 }
 
-                // TODO light
+                for (auto it = shapes->begin(); it != shapes->end(); it++) {
+                    Geometry::Ptr geometry = std::make_shared<Geometry>(*it, material);
+                    if (parseInfo.hasAreaLight) {
+                        geometry->setAreaLight(light);
+                    }
+                    _shapes.push_back(geometry);
+                }
             }
 
             void XmlSceneImporter::handleTagRef(pugi::xml_node &node, ParseInfo &info) {
@@ -321,9 +388,25 @@ namespace kaguya {
                         ret[i] = strtof(tmp, &tmp);
                     }
 #endif
-                    AttrVal &attrVal = parentParseInfo.container["reflectance"];
+                    std::string name = node.attribute("name").value();
+                    AttrVal &attrVal = parentParseInfo.container[name];
                     attrVal.type = AttrVal::Attr_Spectrum;
                     attrVal.value.spectrumValue = ret;
+                }
+            }
+
+            void XmlSceneImporter::handleTagEmitter(pugi::xml_node &node, ParseInfo &info, ParseInfo &parent) {
+                std::string type = node.attribute("type").value();
+                if (type == "area") {
+                    parent.hasAreaLight = true;
+                    auto radianceType = info.container["radiance"].type;
+                    if (radianceType == AttrVal::Attr_Spectrum) {
+                        parent.container["radiance"] = info.container["radiance"];
+                    } else {
+                        ASSERT(false, "Only support spectrum type radiance.");
+                    }
+                } else {
+                    ASSERT(false, "Only support area type for now");
                 }
             }
 
@@ -371,8 +454,11 @@ namespace kaguya {
                     case Tag_RGB:
                         handleTagRGB(node, parentParseInfo);
                         break;
+                    case Tag_Emitter:
+                        handleTagEmitter(node, parseInfo, parentParseInfo);
+                        break;
                     default:
-                        std::cout << "Unsupport tag type: " << tagType << std::endl;
+                        std::cout << "Unsupport tag type: " << node.name() << std::endl;
                 }
             }
 
@@ -392,13 +478,15 @@ namespace kaguya {
 
                 ASSERT(ret, "Error while parsing \"" + xml_file + "\": " + ret.description()
                             + " (at " + getOffset(ret.offset, xml_file) + ")");
-
                 _scene = std::make_shared<Scene>();
 
                 ParseInfo parseInfo;
                 parseXml(*xml_doc.begin(), parseInfo);
 
-                return nullptr;
+                std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(_shapes);
+                _scene->setWorld(bvh);
+                _scene->setSceneName(Config::Camera::filename);
+                return _scene;
             }
         }
     }

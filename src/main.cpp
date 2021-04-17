@@ -7,8 +7,6 @@
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
 #include <kaguya/tracer/pm/SPPMTracer.h>
 
-#include <kaguya/scene/importer/xml/XmlSceneImporter.h>
-
 #include <iostream>
 #include <clipp.h>
 
@@ -25,11 +23,11 @@ int main(int argc, char *argv[]) {
                     /* For general settings */
                     option("-rt", "--render-type") & value("render type", Config::renderType),
                     option("-st", "--sampler-type") & value("sampler type", Config::samplerType),
-                    option("-ssp", "--sample-per-pixel") & value("sample per pixel", Config::samplePerPixel),
-                    option("-d", "--max-depth") & value("max scatter depth", Config::maxBounce),
+                    option("-ssp", "--sample-per-pixel") & value("sample per pixel", Config::Tracer::sampleNum),
+                    option("-d", "--max-depth") & value("max scatter depth", Config::Tracer::maxDepth),
                     option("-rb", "--russian-prob") & value("russian roulette probability", Config::russianRoulette),
                     option("-rd", "--russian-depth") & value("russian roulette depth", Config::russianRouletteDepth),
-                    option("-kn", "--kernel") & value("rendering kernel count", Config::kernelCount),
+                    option("-kn", "--kernel") & value("rendering kernel count", Config::Parallel::kernelCount),
 
                     /* For stochastic progressive photon mapping settings */
                     option("-sr", "--initial-search-radius") & value("initial search radius", Config::initialSearchRadius),
@@ -37,35 +35,21 @@ int main(int argc, char *argv[]) {
                     option("-pc", "--photon-count") & value("photon count", Config::photonPerIteration),
 
                     /* Outputs settings */
-                    option("-h", "--height") & value("image height", Config::resolutionHeight),
-                    option("-w", "--width") & value("image width", Config::resolutionWidth)
+                    option("-h", "--height") & value("image height", Config::Camera::height),
+                    option("-w", "--width") & value("image width", Config::Camera::width)
     );
 
-    if (parse(argc, argv, cli)) {
-        char filenameTemplate[80];
-        sprintf(filenameTemplate, "ssp=%d_max-depth=%d_render-type=%s_%dx%d.png",
-                Config::samplePerPixel,
-                Config::maxBounce,
-                Config::renderType.c_str(),
-                Config::resolutionWidth,
-                Config::resolutionHeight);
-        Config::filenameSufix = string(filenameTemplate);
-    } else {
+    if (!parse(argc, argv, cli)) {
         cout << make_man_page(cli, argv[0]);
         return 0;
     }
 
-    /*
-     * TODO delete
     Tracer *tracer = TracerFactory::newTracer();
     if (tracer != nullptr) {
         cout << "using render type: " << Config::renderType << endl;
         tracer->run();
         delete tracer;
     }
-     */
-
-    kaguya::scene::importer::XmlSceneImporter().importScene("./resource/scenes/cornel-box/scene.xml");
 
     return 0;
 }

@@ -51,25 +51,23 @@ namespace kaguya {
 
             private:
                 // 定点数据
-                const Vector3F _position1;
-                const Vector3F _position2;
-                const Vector3F _position3;
+                const Vector3F _p1;
+                const Vector3F _p2;
+                const Vector3F _p3;
 
                 // world space 中的顶点坐标
-                Point3F _transformedPosition1;
-                Point3F _transformedPosition2;
-                Point3F _transformedPosition3;
+                Point3F _p1World;
+                Point3F _p2World;
+                Point3F _p3World;
 
-                const Normal3F _normal1;
-                const Normal3F _normal2;
-                const Normal3F _normal3;
+                const Normal3F _n1;
+                const Normal3F _n2;
+                const Normal3F _n3;
 
                 // world space 中的法线坐标
-                Normal3F _transformedNormal1;
-                Normal3F _transformedNormal2;
-                Normal3F _transformedNormal3;
-
-                Normal3F _geometryNormal;
+                Normal3F _n1World;
+                Normal3F _n2World;
+                Normal3F _n3World;
 
                 const Vector2f _uv1;
                 const Vector2f _uv2;

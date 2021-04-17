@@ -31,6 +31,8 @@ namespace kaguya {
 
         class Light {
         public:
+            typedef std::shared_ptr<Light> Ptr;
+
             Light(LightType type, const MediumBoundary &mediumBoundary) :
                     _type(type), _mediumBoundary(mediumBoundary) {}
 

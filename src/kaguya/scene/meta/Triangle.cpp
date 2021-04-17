@@ -9,8 +9,8 @@ namespace kaguya {
         namespace meta {
             Triangle::Triangle(const Vertex &a, const Vertex &b, const Vertex &c,
                                std::shared_ptr<Transform> transformMatrix)
-                    : _position1(a.position), _position2(b.position), _position3(c.position),
-                      _normal1(a.normal), _normal2(b.normal), _normal3(c.normal),
+                    : _p1(a.position), _p2(b.position), _p3(c.position),
+                      _n1(a.normal), _n2(b.normal), _n3(c.normal),
                       _uv1(Vector2F(a.u, a.v)), _uv2(Vector2F(b.u, b.v)), _uv3(Vector2F(c.u, c.v)),
                       _transformMatrix(transformMatrix) {
                 assert(transformMatrix != nullptr);
@@ -21,8 +21,8 @@ namespace kaguya {
                                const Vector3F &normal1, const Vector3F &normal2, const Vector3F &normal3,
                                const Vector2F &uv1, const Vector2F &uv2, const Vector2F &uv3,
                                std::shared_ptr<Transform> transformMatrix)
-                    : _position1(a), _position2(b), _position3(c),
-                      _normal1(normal1), _normal2(normal2), _normal3(normal3),
+                    : _p1(a), _p2(b), _p3(c),
+                      _n1(normal1), _n2(normal2), _n3(normal3),
                       _uv1(uv1), _uv2(uv2), _uv3(uv3),
                       _transformMatrix(transformMatrix) {
                 assert(transformMatrix != nullptr);
@@ -31,52 +31,45 @@ namespace kaguya {
 
             void Triangle::init() {
                 // 创建 AABB
-                _transformedPosition1 = _transformMatrix->transformPoint(_position1);
-                _transformedPosition2 = _transformMatrix->transformPoint(_position2);
-                _transformedPosition3 = _transformMatrix->transformPoint(_position3);
+                _p1World = _transformMatrix->transformPoint(_p1);
+                _p2World = _transformMatrix->transformPoint(_p2);
+                _p3World = _transformMatrix->transformPoint(_p3);
 
                 // 计算变换后的法线，参考 https://blog.csdn.net/lawest/article/details/98328127
-                _transformedNormal1 = _transformMatrix->transformNormal(_normal1);
-                _transformedNormal2 = _transformMatrix->transformNormal(_normal2);
-                _transformedNormal3 = _transformMatrix->transformNormal(_normal3);
-
-                // Calculate geometry normal
-                _geometryNormal = NORMALIZE(CROSS(_transformedPosition3 - _transformedPosition2,
-                                                  _transformedPosition1 - _transformedPosition2));
-                if (DOT(_geometryNormal, _transformedNormal1) < 0) {
-                    _geometryNormal = -_geometryNormal;
-                }
+                _n1World = _transformMatrix->transformNormal(_n1);
+                _n2World = _transformMatrix->transformNormal(_n2);
+                _n3World = _transformMatrix->transformNormal(_n3);
 
                 Float minX =
                         std::min(
-                                std::min(_transformedPosition1[0], _transformedPosition2[0]),
-                                _transformedPosition3[0]
+                                std::min(_p1World[0], _p2World[0]),
+                                _p3World[0]
                         ) - 0.0001;
                 Float minY =
                         std::min(
-                                std::min(_transformedPosition1[1], _transformedPosition2[1]),
-                                _transformedPosition3[1]
+                                std::min(_p1World[1], _p2World[1]),
+                                _p3World[1]
                         ) - 0.0001;
                 Float minZ =
                         std::min(
-                                std::min(_transformedPosition1[2], _transformedPosition2[2]),
-                                _transformedPosition3[2]
+                                std::min(_p1World[2], _p2World[2]),
+                                _p3World[2]
                         ) - 0.0001;
 
                 Float maxX =
                         std::max(
-                                std::max(_transformedPosition1[0], _transformedPosition2[0]),
-                                _transformedPosition3[0]
+                                std::max(_p1World[0], _p2World[0]),
+                                _p3World[0]
                         ) + 0.0001;
                 Float maxY =
                         std::max(
-                                std::max(_transformedPosition1[1], _transformedPosition2[1]),
-                                _transformedPosition3[1]
+                                std::max(_p1World[1], _p2World[1]),
+                                _p3World[1]
                         ) + 0.0001;
                 Float maxZ =
                         std::max(
-                                std::max(_transformedPosition1[2], _transformedPosition2[2]),
-                                _transformedPosition3[2]
+                                std::max(_p1World[2], _p2World[2]),
+                                _p3World[2]
                         ) + 0.0001;
 
                 _aabb = AABB(Vector3F(minX, minY, minZ), Vector3F(maxX, maxY, maxZ));
@@ -87,9 +80,9 @@ namespace kaguya {
                 /* transform the ray direction, let it to point to z-axis */
 
                 // move ray's origin to (0, 0, 0)
-                Vector3F p0 = _transformedPosition1 - ray.getOrigin();
-                Vector3F p1 = _transformedPosition2 - ray.getOrigin();
-                Vector3F p2 = _transformedPosition3 - ray.getOrigin();
+                Vector3F p0 = _p1World - ray.getOrigin();
+                Vector3F p1 = _p2World - ray.getOrigin();
+                Vector3F p2 = _p3World - ray.getOrigin();
 
                 // swap axis
                 int zAxis = math::maxAbsAxis(ray.getDirection());
@@ -108,10 +101,8 @@ namespace kaguya {
                 // transform points to z-axis
                 p0[0] += shearX * p0[2];
                 p0[1] += shearY * p0[2];
-
                 p1[0] += shearX * p1[2];
                 p1[1] += shearY * p1[2];
-
                 p2[0] += shearX * p2[2];
                 p2[1] += shearY * p2[2];
 
@@ -169,15 +160,15 @@ namespace kaguya {
                 Float maxZ = math::maxAbsAxisValue(Vector3F(p0.z, p1.z, p2.z));
                 Float deltaZ = math::gamma(3) * maxZ;
 
-                Float maxX = math::maxAbsAxisValue(Vector3f(p0.x, p1.x, p2.x));
-                Float maxY = math::maxAbsAxisValue(Vector3f(p0.y, p1.y, p2.y));
+                Float maxX = math::maxAbsAxisValue(Vector3F(p0.x, p1.x, p2.x));
+                Float maxY = math::maxAbsAxisValue(Vector3F(p0.y, p1.y, p2.y));
 
                 Float deltaX = math::gamma(5) * (maxX + maxZ);
                 Float deltaY = math::gamma(5) * (maxY + maxZ);
 
                 Float deltaE = 2 * (math::gamma(2) * maxX * maxY + deltaY * maxX + deltaX * maxY);
 
-                Float maxE = math::maxAbsAxisValue(Vector3f(e0, e1, e2));
+                Float maxE = math::maxAbsAxisValue(Vector3F(e0, e1, e2));
                 Float deltaT = 3 * (math::gamma(3) * maxE * maxZ + deltaE * maxZ + deltaZ * maxE) * std::abs(invSum);
                 if (step <= deltaT) {
                     return false;
@@ -189,27 +180,23 @@ namespace kaguya {
                 Float yError = math::gamma(7) * (std::abs(b0 * p2.y) + std::abs(b1 * p0.y) + std::abs(b2 * p1.y));
                 Vector3F error = Vector3F(xError, yError, zError);
 
-                ray.setStep(step);
-                si.point = ray.at(step);
+                si.point = b1 * _p1World + b2 * _p2World + b0 * _p3World;
+                si.normal = NORMALIZE(CROSS(_p2World - _p1World, _p3World - _p1World));
+                si.rendering.normal = b1 * _n1World + b2 * _n2World + b0 * _n3World;
 
-                Vector3F normal = b0 * _transformedNormal3 +
-                                  b1 * _transformedNormal1 +
-                                  b2 * _transformedNormal2;
-
-                si.normal = _geometryNormal;
-                si.rendering.normal = normal;
                 si.direction = ray.getDirection();
                 si.wo = -NORMALIZE(si.direction);
                 si.u = _uv1.x * b1 + _uv2.x * b2 + _uv3.x * b0;
                 si.v = _uv1.y * b1 + _uv2.y * b2 + _uv3.y * b0;
                 si.error = error;
                 si.setAreaLight(nullptr);
+                ray.setStep(step);
                 return true;
             }
 
             Float Triangle::area() const {
-                return 0.5 * LENGTH(CROSS((_transformedPosition2 - _transformedPosition1),
-                                          (_transformedPosition3 - _transformedPosition1)));
+                return 0.5 * LENGTH(CROSS((_p2World - _p1World),
+                                          (_p3World - _p1World)));
             }
 
             SurfaceInteraction Triangle::sampleSurfacePoint(Sampler *sampler) const {
@@ -217,25 +204,25 @@ namespace kaguya {
                 Vector2F barycentric = math::sampling::triangleUniformSampling(sampler);
 
                 SurfaceInteraction si;
-                Vector3F p = _transformedPosition1 * barycentric[0] +
-                             _transformedPosition2 * barycentric[1] +
-                             _transformedPosition3 * (1 - barycentric[0] - barycentric[1]);
+                Vector3F p = _p1World * barycentric[0] +
+                             _p2World * barycentric[1] +
+                             _p3World * (1 - barycentric[0] - barycentric[1]);
                 si.point = p;
 
                 // error bound
-                Point3F pAbsSum = ABS(barycentric[0] * _transformedPosition1) +
-                                  ABS(barycentric[1] * _transformedPosition2) +
-                                  ABS((1 - barycentric[0] - barycentric[1]) * _transformedPosition3);
+                Point3F pAbsSum = ABS(barycentric[0] * _p1World) +
+                                  ABS(barycentric[1] * _p2World) +
+                                  ABS((1 - barycentric[0] - barycentric[1]) * _p3World);
                 si.error = math::gamma(6) * Vector3F(pAbsSum.x, pAbsSum.y, pAbsSum.z);
 
                 // geometry normal
-                Vector3F ng = NORMALIZE(CROSS(_transformedPosition2 - _transformedPosition1,
-                                              _transformedPosition3 - _transformedPosition1));
+                Vector3F ng = NORMALIZE(CROSS(_p2World - _p1World,
+                                              _p3World - _p1World));
 
                 // shading normal
-                Vector3F ns = _transformedNormal1 * barycentric[0] +
-                              _transformedNormal2 * barycentric[1] +
-                              _transformedNormal3 * (1 - barycentric[0] - barycentric[1]);
+                Vector3F ns = _n1World * barycentric[0] +
+                              _n2World * barycentric[1] +
+                              _n3World * (1 - barycentric[0] - barycentric[1]);
 
                 // correct geometry normal
                 if (DOT(ng, ns) < 0) {

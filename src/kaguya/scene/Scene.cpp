@@ -15,6 +15,7 @@
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/accumulation/BVH.h>
 #include <kaguya/scene/meta/Sphere.h>
+#include <kaguya/scene/meta/Triangle.h>
 #include <kaguya/scene/aggregation/TriangleMesh.h>
 #include <kaguya/material/Dielectric.h>
 #include <kaguya/material/Lambertian.h>
@@ -41,6 +42,7 @@ namespace kaguya {
         using namespace kaguya::material;
         using namespace kaguya::material::texture;
         using namespace kaguya::scene::acc;
+        using namespace kaguya::scene::meta;
         using namespace kaguya::core;
 
 #ifdef TEST_SCENE
@@ -147,6 +149,100 @@ namespace kaguya {
 //                sigmaA.b(0.014f);
             std::shared_ptr<Medium> airMedium = std::make_shared<IsotropicMedium>(sigmaA, 0.1, 0);
             return airMedium;
+        }
+
+        std::shared_ptr<Scene> Scene::sceneCornelBoxXml() {
+            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+            //
+//            Matrix4F floorMat =
+            // No matrix
+            Texture<Spectrum>::Ptr texture = std::make_shared<ConstantTexture<Spectrum>>(Spectrum(0.73));
+            Material::Ptr material = std::make_shared<Lambertian>(texture);
+            Spectrum r(15);
+
+            // Floor shape
+            Normal3F normal = {0, 1, 0};
+            Point2F uv = {0, 0};
+            Vector3F a1 = {-0.99999994, 0.0000000874227978, -1};
+            Vector3F a2 = {-1, 0.0000000874227978, 0.99999994};
+            Vector3F a3 = {0.99999994, -0.0000000874227978, 1};
+            Shape::Ptr tri1 = std::make_shared<Triangle>(a1, a2, a3,
+                                                         normal, normal, normal,
+                                                         uv, uv, uv);
+            Geometry::Ptr gtri1 = std::make_shared<Geometry>(tri1, material, nullptr, nullptr, nullptr);
+
+            Vector3F b1 = {0.99999994, -0.0000000874227978, 1};
+            Vector3F b2 = {1, -0.0000000874227978, -0.99999994};
+            Vector3F b3 = {-0.99999994, 0.0000000874227978, -1};
+            Triangle::Ptr tri2 = std::make_shared<Triangle>(b1, b2, b3,
+                                                            normal, normal, normal,
+                                                            uv, uv, uv);
+            Geometry::Ptr gtri2 = std::make_shared<Geometry>(tri2, material, nullptr, nullptr, nullptr);
+
+
+            // Light shape
+            Vector3F la1 = {-0.23999998, 1.98000002, -0.220000014};
+            Vector3F la2 = {0.230000019, 1.98000002, -0.219999984};
+            Vector3F la3 = {0.229999989, 1.98000002, 0.160000011};
+
+
+            Triangle::Ptr l1 = std::make_shared<Triangle>(la1, la2, la3,
+                                                          -normal, -normal, -normal,
+                                                          uv, uv, uv);
+            AreaLight::Ptr areaL1 = std::make_shared<DiffuseAreaLight>(r, l1, nullptr, true);
+            scene->addLight(areaL1);
+            Geometry::Ptr gl1 = std::make_shared<Geometry>(l1, material, nullptr, nullptr, areaL1);
+
+
+            Vector3F lb1 = {0.229999989, 1.98000002, 0.160000011};
+            Vector3F lb2 = {-0.24000001, 1.98000002, 0.159999982};
+            Vector3F lb3 = {-0.23999998, 1.98000002, -0.220000014};
+            Triangle::Ptr l2 = std::make_shared<Triangle>(lb1, lb2, lb3,
+                                                          -normal, -normal, -normal,
+                                                          uv, uv, uv);
+            AreaLight::Ptr areaL2 = std::make_shared<DiffuseAreaLight>(r, l2, nullptr, true);
+            scene->addLight(areaL2);
+            Geometry::Ptr gl2 = std::make_shared<Geometry>(l2, material, nullptr, nullptr, areaL2);
+
+            // Shapes
+            std::vector<Intersectable::Ptr> shapes;
+            shapes.push_back(gtri1);
+            shapes.push_back(gtri2);
+            shapes.push_back(gl1);
+            shapes.push_back(gl2);
+
+            // Camera
+            Matrix4F cMat;
+            cMat[0][0] = -1;
+            cMat[1][0] = 0;
+            cMat[2][0] = 0;
+            cMat[3][0] = 0;
+
+            cMat[0][1] = 0;
+            cMat[1][1] = 1;
+            cMat[2][1] = 0;
+            cMat[3][1] = 1;
+
+            cMat[0][2] = 0;
+            cMat[1][2] = 0;
+            cMat[2][2] = -1;
+            cMat[3][2] = 6.8;
+
+            cMat[0][3] = 0;
+            cMat[1][3] = 0;
+            cMat[2][3] = 0;
+            cMat[3][3] = 1;
+            Transform::Ptr transform = std::make_shared<Transform>(cMat);
+
+            Camera::Ptr camera = std::make_shared<Camera>(transform, 19.5);
+            scene->_camera = camera;
+
+            // Build
+            std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(shapes);
+            scene->_world = bvh;
+            scene->_sceneName = "compare";
+
+            return scene;
         }
 
         std::vector<std::shared_ptr<Geometry>>
@@ -445,7 +541,8 @@ namespace kaguya {
                                                                const std::shared_ptr<Medium> outside,
                                                                bool singleSide) {
             std::shared_ptr<AreaLight> light = DiffuseAreaLight::buildDiffuseAreaLight(
-                    spectrum, geometry, MediumBoundary(inside.get(), outside.get()), singleSide);
+                    spectrum, geometry->getShape(), MediumBoundary(inside.get(), outside.get()), singleSide);
+            geometry->setAreaLight(light);
             return light;
         }
 
@@ -550,8 +647,8 @@ namespace kaguya {
             auto eye = Vector3F(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
             auto dir = Vector3F(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
-            camera->setResolutionWidth(Config::resolutionWidth);
-            camera->setResolutionHeight(Config::resolutionHeight);
+            camera->setResolutionWidth(Config::Camera::width);
+            camera->setResolutionHeight(Config::Camera::height);
             scene->_camera = camera;
             scene->_sceneName = "smoke-with-area-light";
 
@@ -669,8 +766,8 @@ namespace kaguya {
             auto eye = Vector3F(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
             auto dir = Vector3F(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
-            camera->setResolutionWidth(Config::resolutionWidth);
-            camera->setResolutionHeight(Config::resolutionHeight);
+            camera->setResolutionWidth(Config::Camera::width);
+            camera->setResolutionHeight(Config::Camera::height);
             scene->_camera = camera;
             scene->_sceneName = "scene-two-boxes";
 
@@ -778,8 +875,8 @@ namespace kaguya {
             auto eye = Vector3F(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
             auto dir = Vector3F(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
-            camera->setResolutionWidth(Config::resolutionWidth);
-            camera->setResolutionHeight(Config::resolutionHeight);
+            camera->setResolutionWidth(Config::Camera::width);
+            camera->setResolutionHeight(Config::Camera::height);
             scene->_camera = camera;
             scene->_sceneName = "cornell-box-with-water";
 
@@ -858,8 +955,8 @@ namespace kaguya {
             auto eye = Vector3F(2.2 * MODEL_SCALE, 0.5 * MODEL_SCALE, 1.2);
             auto dir = Vector3F(-0.95f, -0.6f, -0.3f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, nullptr);
-            camera->setResolutionWidth(Config::resolutionWidth);
-            camera->setResolutionHeight(Config::resolutionHeight);
+            camera->setResolutionWidth(Config::Camera::width);
+            camera->setResolutionHeight(Config::Camera::height);
             scene->_camera = camera;
             scene->_sceneName = "girl-friend";
 
@@ -965,8 +1062,8 @@ namespace kaguya {
             auto eye = Vector3F(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
             auto dir = Vector3F(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
-            camera->setResolutionWidth(Config::resolutionWidth);
-            camera->setResolutionHeight(Config::resolutionHeight);
+            camera->setResolutionWidth(Config::Camera::width);
+            camera->setResolutionHeight(Config::Camera::height);
             scene->_camera = camera;
 
             scene->_sceneName = "bunny-with-point-light";
@@ -1073,8 +1170,8 @@ namespace kaguya {
             auto eye = Vector3F(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
             auto dir = Vector3F(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
-            camera->setResolutionWidth(Config::resolutionWidth);
-            camera->setResolutionHeight(Config::resolutionHeight);
+            camera->setResolutionWidth(Config::Camera::width);
+            camera->setResolutionHeight(Config::Camera::height);
             scene->_camera = camera;
             scene->_sceneName = "bunny-subsurface-material-with-area-light";
 
@@ -1187,8 +1284,8 @@ namespace kaguya {
             auto eye = Vector3F(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
             auto dir = Vector3F(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
-            camera->setResolutionWidth(Config::resolutionWidth);
-            camera->setResolutionHeight(Config::resolutionHeight);
+            camera->setResolutionWidth(Config::Camera::width);
+            camera->setResolutionHeight(Config::Camera::height);
             scene->_camera = camera;
             scene->_sceneName = "bunny-with-area-light";
 
@@ -1287,8 +1384,8 @@ namespace kaguya {
             auto eye = Vector3F(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
             auto dir = Vector3F(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
-            camera->setResolutionWidth(Config::resolutionWidth);
-            camera->setResolutionHeight(Config::resolutionHeight);
+            camera->setResolutionWidth(Config::Camera::width);
+            camera->setResolutionHeight(Config::Camera::height);
             scene->_camera = camera;
             scene->_sceneName = "two-spheres-with-area-light";
 
@@ -1398,8 +1495,8 @@ namespace kaguya {
             auto eye = Vector3F(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
             auto dir = Vector3F(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
-            camera->setResolutionWidth(Config::resolutionWidth);
-            camera->setResolutionHeight(Config::resolutionHeight);
+            camera->setResolutionWidth(Config::Camera::width);
+            camera->setResolutionHeight(Config::Camera::height);
             scene->_camera = camera;
             scene->_sceneName = "two-spheres-with-spot-light";
 
@@ -1511,8 +1608,8 @@ namespace kaguya {
             auto eye = Vector3F(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
             auto dir = Vector3F(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
-            camera->setResolutionWidth(Config::resolutionWidth);
-            camera->setResolutionHeight(Config::resolutionHeight);
+            camera->setResolutionWidth(Config::Camera::width);
+            camera->setResolutionHeight(Config::Camera::height);
             scene->_camera = camera;
             scene->_sceneName = "two-spheres-with-point-light";
 
@@ -1620,8 +1717,8 @@ namespace kaguya {
             auto eye = Vector3F(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
             auto dir = Vector3F(0.0f, 0.0f, -1.0f);
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
-            camera->setResolutionWidth(Config::resolutionWidth);
-            camera->setResolutionHeight(Config::resolutionHeight);
+            camera->setResolutionWidth(Config::Camera::width);
+            camera->setResolutionHeight(Config::Camera::height);
             scene->_camera = camera;
             scene->_sceneName = "light_through-air";
 

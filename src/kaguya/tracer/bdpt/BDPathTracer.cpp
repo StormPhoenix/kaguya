@@ -57,9 +57,9 @@ namespace kaguya {
         }
 
         void BDPathTracer::init() {
-            _samplePerPixel = Config::samplePerPixel;
+            _samplePerPixel = Config::Tracer::sampleNum;
             _sampleLightProb = Config::sampleLightProb;
-            _maxDepth = Config::maxBounce;
+            _maxDepth = Config::Tracer::maxDepth;
             _russianRouletteBounce = Config::russianRouletteDepth;
             _russianRoulette = Config::russianRoulette;
         }

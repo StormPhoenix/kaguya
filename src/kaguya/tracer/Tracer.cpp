@@ -36,8 +36,7 @@ namespace kaguya {
                 // write to image
                 std::cout << std::endl << "scene " << _scene->getName() << " completed." << std::endl;
                 _filmPlane->writeImage((Config::filenamePrefix + "_" +
-                                        _scene->getName() + "_" +
-                                        Config::filenameSufix).c_str());
+                                        _scene->getName()).c_str());
 
                 delete _filmPlane;
                 _filmPlane = nullptr;

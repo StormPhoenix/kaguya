@@ -37,7 +37,7 @@ namespace kaguya {
 
         Sampler *SimpleHaltonSampler::newInstance(int nSamples) {
             if (nSamples <= 0) {
-                nSamples = Config::samplePerPixel;
+                nSamples = Config::Tracer::sampleNum;
             }
             return new SimpleHaltonSampler(nSamples);
         }

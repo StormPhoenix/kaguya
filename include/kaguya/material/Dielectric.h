@@ -21,6 +21,8 @@ namespace kaguya {
 
             Dielectric(std::shared_ptr<Texture<Spectrum>> albedo, Float refractiveIndex);
 
+            Dielectric(std::shared_ptr<Texture<Spectrum>> albedo, Float thetaI, Float thetaT);
+
             virtual bool isSpecular() const override;
 
             virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
@@ -28,8 +30,7 @@ namespace kaguya {
 
 
         private:
-            Float _refractiveIndex;
-
+            Float _thetaI, _thetaT;
             std::shared_ptr<Texture<Spectrum>> _albedo = nullptr;
         };
 

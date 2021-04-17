@@ -7,6 +7,9 @@ A simple physically based render.
     - [ ] XML
     - [ ] clean *.h files
     - [ ] Camera 内部变换修改成矩阵形式
+    - [ ] XmlImporter 创建 Scene 的代码分离开
+
+- [ ] AreaLight 使用 shape 而不是 geometry 
 
 - [ ] 添加环境光贴图
     - [ ] PathVertex::emit() 修改成 Le()
