@@ -12,6 +12,7 @@ A simple physically based render.
     - [x] 删除 Assimp
     - [x] 重构 TriangleMesh
     - [ ] Intersectable 和 Shape 重构
+    - [ ] 测试 bunny 焦散，以及为什么 water-caustic 无法成像。
     
 - [ ] 第三方库 ext
 

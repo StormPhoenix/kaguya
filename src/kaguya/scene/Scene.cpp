@@ -245,6 +245,7 @@ namespace kaguya {
 
             return scene;
         }
+         */
 
         std::vector<std::shared_ptr<Geometry>>
         Scene::testLeftWall(const std::shared_ptr<Material> material,
@@ -335,7 +336,7 @@ namespace kaguya {
             return v;
         }
 
-
+/*
         std::vector<std::shared_ptr<Geometry>>
         Scene::testBottomPlane(const std::shared_ptr<Material> material,
                               const std::shared_ptr<Medium> insideMedium,
@@ -438,6 +439,7 @@ namespace kaguya {
             return v;
         }
 
+ */
         std::vector<std::shared_ptr<Geometry>> Scene::testTopWall(const std::shared_ptr<Material> material,
                                                                   const std::shared_ptr<Medium> insideMedium,
                                                                   const std::shared_ptr<Medium> outsideMedium) {
@@ -497,7 +499,7 @@ namespace kaguya {
             return v;
         }
 
-
+/*
 
         std::shared_ptr<Aggregation> Scene::testSubsurfaceBunny(const std::shared_ptr<Material> material,
                                                       const std::shared_ptr<Medium> inside,
@@ -949,7 +951,6 @@ namespace kaguya {
          */
 
 #endif
-        /*
 
         std::shared_ptr<Scene> Scene::sceneBunnyWithPointLight() {
             // For testing
@@ -984,8 +985,6 @@ namespace kaguya {
             // blue
             std::shared_ptr<Texture<Spectrum>> blue = std::make_shared<ConstantTexture<Spectrum>>(blue_spectrum);
 
-
-
             // light spectrum
             Spectrum lightSpectrum = Spectrum(0.0);
             Float lightIntensity = 12;
@@ -1002,7 +1001,8 @@ namespace kaguya {
             std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
             std::shared_ptr<Material> metal = std::make_shared<Metal>();
 
-            std::shared_ptr<Medium> airMedium = testAirMedium();
+//            std::shared_ptr<Medium> airMedium = testAirMedium();
+            std::shared_ptr<Medium> airMedium = nullptr;
 
             // objects
             std::vector<std::shared_ptr<Intersectable>> objects;
@@ -1027,8 +1027,26 @@ namespace kaguya {
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
             // load model
-            std::shared_ptr<Intersectable> bunny = testBunny(glass, nullptr, nullptr, nullptr);
-            objects.push_back(bunny);
+            std::vector<Vector3F> vertices;
+            std::vector<Normal3F> normals;
+            std::vector<Point2F> texcoords;
+            std::vector<TriMesh::TriIndex> indics;
+            bool good = kaguya::utils::ObjLoader::loadObj("./resource/objects/bunny.obj", vertices, normals, texcoords,
+                                                          indics);
+            ASSERT(good, "Load *.obj model failed: /resource/objects/bunny.obj ");
+
+            Transform::Ptr toWorld = nullptr;
+            Float scale = 0.4 * MODEL_SCALE;
+            Matrix4F mat(1.0f);
+            mat = TRANSLATE(mat, Vector3F(0, -scale / 1.2, 0));
+            mat = SCALE(mat, Vector3F(scale, scale, scale));
+            toWorld = std::make_shared<Transform>(mat);
+            TriMesh::Ptr tris = std::make_shared<TriangleMesh>(vertices, normals, texcoords, indics, toWorld);
+
+            for (auto it = tris->triangles()->begin(); it != tris->triangles()->end(); it++) {
+                Geometry::Ptr geometry = std::make_shared<Geometry>(*it, glass);
+                objects.push_back(geometry);
+            }
 
             // build scene object
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
@@ -1052,11 +1070,12 @@ namespace kaguya {
             camera->setResolutionHeight(Config::Camera::height);
             scene->_camera = camera;
 
-            scene->_sceneName = "bunny-with-point-light";
+            scene->_sceneName = "bunny-with-point-light.png";
 
             return scene;
         }
 
+        /*
         std::shared_ptr<Scene> Scene::sceneBunnySubsurfaceWithAreaLight() {
             // For testing
             // albedos

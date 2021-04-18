@@ -47,6 +47,7 @@ namespace kaguya {
     std::string Config::renderType = "pt";
 
     std::shared_ptr<Scene> Config::nextScene() {
+        /*
         std::vector<std::string> sceneList = {{"resource/scenes/water-caustic/"},};
         using namespace kaguya::scene::importer;
         XmlSceneImporter importer = XmlSceneImporter();
@@ -58,17 +59,18 @@ namespace kaguya {
         } else {
             return nullptr;
         }
+         */
 
-        /* TODO delete
+//        /* TODO delete
         // 若场景未构建，则线构建场景
         if (!isScenePrepared) {
-            Scene::initSceneComponents();
-            scenes.push_back(Scene::sceneCornelBoxXml);
+//            Scene::initSceneComponents();
+//            scenes.push_back(Scene::sceneCornelBoxXml);
 //            scenes.push_back(Scene::sceneTwoBox);
 //            scenes.push_back(Scene::sceneTwoSpheresWithPointLight);
 //            scenes.push_back(Scene::sceneDeskAndBunny);
 //            scenes.push_back(Scene::sceneTwoSpheresWithSpotLight);
-//            scenes.push_back(Scene::sceneBunnyWithPointLight);
+            scenes.push_back(Scene::sceneBunnyWithPointLight);
 //            scenes.push_back(Scene::sceneBunnySubsurfaceWithAreaLight);
 //            for (int i = 0; i < 200; i++) {
 //                scenes.push_back(Scene::sceneBunnySubsurfaceWithAreaLightByTime);
@@ -88,6 +90,6 @@ namespace kaguya {
         } else {
             return nullptr;
         }
-         */
+//         */
     }
 }

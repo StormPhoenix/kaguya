@@ -79,6 +79,7 @@ namespace kaguya {
             static std::shared_ptr<Medium> testSmokeMedium() {
                 return std::make_shared<IsotropicMedium>(0.1, 1.2, 0);
             }
+             */
 
             static std::vector<std::shared_ptr<Geometry>>
             testLeftWall(const std::shared_ptr<Material> material,
@@ -90,6 +91,7 @@ namespace kaguya {
                           const std::shared_ptr<Medium> insideMedium,
                           const std::shared_ptr<Medium> outsideMedium);
 
+            /*
             static std::vector<std::shared_ptr<Geometry>>
             testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
                              std::vector<std::shared_ptr<Light>> &lights, const std::shared_ptr<Material> material);
@@ -98,14 +100,10 @@ namespace kaguya {
             testTopAreaLightByTime(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
                                    std::vector<std::shared_ptr<Light>> &lights,
                                    const std::shared_ptr<Material> material, Float t);
-
+            */
             static std::vector<std::shared_ptr<Geometry>> testBottomWall(const std::shared_ptr<Material> material,
                                                                          const std::shared_ptr<Medium> insideMedium,
                                                                          const std::shared_ptr<Medium> outsideMedium);
-
-            static std::vector<std::shared_ptr<Geometry>> testBottomPlane(const std::shared_ptr<Material> material,
-                                                                          const std::shared_ptr<Medium> insideMedium,
-                                                                          const std::shared_ptr<Medium> outsideMedium);
 
             static std::vector<std::shared_ptr<Geometry>> testTopWall(const std::shared_ptr<Material> material,
                                                                       const std::shared_ptr<Medium> insideMedium,
@@ -114,6 +112,13 @@ namespace kaguya {
             static std::vector<std::shared_ptr<Geometry>> testFrontWall(const std::shared_ptr<Material> material,
                                                                         const std::shared_ptr<Medium> insideMedium,
                                                                         const std::shared_ptr<Medium> outsideMedium);
+
+            /*
+            static std::vector<std::shared_ptr<Geometry>> testBottomPlane(const std::shared_ptr<Material> material,
+                                                                          const std::shared_ptr<Medium> insideMedium,
+                                                                          const std::shared_ptr<Medium> outsideMedium);
+
+
 
             static std::shared_ptr<Aggregation> testSubsurfaceBunny(const std::shared_ptr<Material> material,
                                                           const std::shared_ptr<Medium> inside = nullptr,

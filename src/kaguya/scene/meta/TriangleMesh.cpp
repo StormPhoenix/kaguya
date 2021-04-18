@@ -16,6 +16,10 @@ namespace kaguya {
                                    std::vector<Point2F> &texcoords, std::vector<TriIndex> &indics,
                                    std::shared_ptr<Transform> transformMatrix) {
             _triangles = std::make_shared<std::vector<Shape::Ptr>>();
+
+            bool texFlag = texcoords.size() > 0;
+            bool normalFlag = normals.size() > 0;
+
             for (auto it = indics.begin(); it != indics.end(); it++) {
                 const TriIndex &index = *it;
                 Vector3F v1, v2, v3;
@@ -25,18 +29,22 @@ namespace kaguya {
                     v3 = vertices[index.v3.vertexIndex];
                 }
 
-                Normal3F n1, n2, n3;
+                Normal3F n1(0), n2(0), n3(0);
                 {
-                    n1 = normals[index.v1.normalIndex];
-                    n2 = normals[index.v2.normalIndex];
-                    n3 = normals[index.v3.normalIndex];
+                    if (normalFlag) {
+                        n1 = normals[index.v1.normalIndex];
+                        n2 = normals[index.v2.normalIndex];
+                        n3 = normals[index.v3.normalIndex];
+                    }
                 }
 
-                Point2F t1, t2, t3;
+                Point2F t1(0), t2(0), t3(0);
                 {
-                    t1 = texcoords[index.v1.texcoordIndex];
-                    t2 = texcoords[index.v2.texcoordIndex];
-                    t3 = texcoords[index.v3.texcoordIndex];
+                    if (texFlag) {
+                        t1 = texcoords[index.v1.texcoordIndex];
+                        t2 = texcoords[index.v2.texcoordIndex];
+                        t3 = texcoords[index.v3.texcoordIndex];
+                    }
                 }
 
                 Shape::Ptr tri = std::make_shared<Triangle>(v1, v2, v3, n1, n2, n3,

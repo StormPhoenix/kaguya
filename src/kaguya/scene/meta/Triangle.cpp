@@ -16,6 +16,7 @@ namespace kaguya {
                       _uv1(uv1), _uv2(uv2), _uv3(uv3),
                       _transformMatrix(transformMatrix) {
                 assert(transformMatrix != nullptr);
+                usingNg = (LENGTH(_n1) == 0 || LENGTH(_n2) == 0 || LENGTH(_n3) == 0);
                 init();
             }
 
@@ -26,9 +27,11 @@ namespace kaguya {
                 _p3World = _transformMatrix->transformPoint(_p3);
 
                 // 计算变换后的法线，参考 https://blog.csdn.net/lawest/article/details/98328127
-                _n1World = _transformMatrix->transformNormal(_n1);
-                _n2World = _transformMatrix->transformNormal(_n2);
-                _n3World = _transformMatrix->transformNormal(_n3);
+                if (!usingNg) {
+                    _n1World = _transformMatrix->transformNormal(_n1);
+                    _n2World = _transformMatrix->transformNormal(_n2);
+                    _n3World = _transformMatrix->transformNormal(_n3);
+                }
 
                 Float minX =
                         std::min(
@@ -172,7 +175,11 @@ namespace kaguya {
 
                 si.point = b1 * _p1World + b2 * _p2World + b0 * _p3World;
                 si.normal = NORMALIZE(CROSS(_p2World - _p1World, _p3World - _p1World));
-                si.rendering.normal = b1 * _n1World + b2 * _n2World + b0 * _n3World;
+                if (usingNg) {
+                    si.rendering.normal = si.normal;
+                } else {
+                    si.rendering.normal = b1 * _n1World + b2 * _n2World + b0 * _n3World;
+                }
 
                 si.direction = ray.getDirection();
                 si.wo = -NORMALIZE(si.direction);
@@ -210,9 +217,14 @@ namespace kaguya {
                                               _p3World - _p1World));
 
                 // shading normal
-                Vector3F ns = _n1World * barycentric[0] +
-                              _n2World * barycentric[1] +
-                              _n3World * (1 - barycentric[0] - barycentric[1]);
+                Vector3F ns(0);
+                if (usingNg) {
+                    ns = ng;
+                } else {
+                    ns = _n1World * barycentric[0] +
+                         _n2World * barycentric[1] +
+                         _n3World * (1 - barycentric[0] - barycentric[1]);
+                }
 
                 // correct geometry normal
                 if (DOT(ng, ns) < 0) {

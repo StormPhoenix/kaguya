@@ -56,6 +56,9 @@ namespace kaguya {
                 Point3F _p2World;
                 Point3F _p3World;
 
+                // 采用 geometry normal
+                bool usingNg = false;
+
                 const Normal3F _n1;
                 const Normal3F _n2;
                 const Normal3F _n3;
