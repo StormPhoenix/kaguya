@@ -154,6 +154,7 @@ namespace kaguya {
             const Intersectable *_geometry;
 
         public:
+            // TODO delete
             void setGeometry(const Intersectable *geometry) {
                 _geometry = geometry;
             }

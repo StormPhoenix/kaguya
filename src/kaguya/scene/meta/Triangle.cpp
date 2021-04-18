@@ -7,16 +7,6 @@
 namespace kaguya {
     namespace scene {
         namespace meta {
-            Triangle::Triangle(const Vertex &a, const Vertex &b, const Vertex &c,
-                               std::shared_ptr<Transform> transformMatrix)
-                    : _p1(a.position), _p2(b.position), _p3(c.position),
-                      _n1(a.normal), _n2(b.normal), _n3(c.normal),
-                      _uv1(Vector2F(a.u, a.v)), _uv2(Vector2F(b.u, b.v)), _uv3(Vector2F(c.u, c.v)),
-                      _transformMatrix(transformMatrix) {
-                assert(transformMatrix != nullptr);
-                init();
-            }
-
             Triangle::Triangle(const Vector3F &a, const Vector3F &b, const Vector3F &c,
                                const Vector3F &normal1, const Vector3F &normal2, const Vector3F &normal3,
                                const Vector2F &uv1, const Vector2F &uv2, const Vector2F &uv3,

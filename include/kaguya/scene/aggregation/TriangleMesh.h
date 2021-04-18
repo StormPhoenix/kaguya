@@ -7,7 +7,6 @@
 
 #include <kaguya/core/Transform.h>
 #include <kaguya/scene/meta/Shape.h>
-#include <kaguya/scene/meta/Vertex.h>
 #include <kaguya/scene/accumulation/BVH.h>
 
 #include <vector>
@@ -15,35 +14,46 @@
 namespace kaguya {
     namespace scene {
 
+        // TODO delete
+        using namespace scene::meta;
         using kaguya::scene::acc::BVH;
         using kaguya::core::transform::Transform;
 
         class TriangleMesh final : public BVH {
         public:
-            TriangleMesh(std::vector<Vertex> &vertices,
-                         const std::shared_ptr<Material> material,
-                         const std::shared_ptr<Medium> inside = nullptr,
-                         const std::shared_ptr<Medium> outside = nullptr,
-                         const std::shared_ptr<AreaLight> areaLight = nullptr,
+
+            typedef struct Index {
+                Index(const int &vertexIndex = 0, const int &normalIndex = 0, const int &texcoordIndex = 0)
+                        : vertexIndex(vertexIndex), normalIndex(normalIndex), texcoordIndex(texcoordIndex) {};
+
+                int vertexIndex;
+                int normalIndex;
+                int texcoordIndex;
+            } Index;
+
+            typedef struct TriangleIndex {
+                TriangleIndex(const Index &v1, const Index &v2, const Index &v3, const int materialId)
+                        : v1(v1), v2(v2), v3(v3), materialId(materialId) {}
+
+                Index v1, v2, v3;
+                int materialId;
+            } TriIndex;
+
+            typedef std::shared_ptr<TriangleMesh> Ptr;
+
+            TriangleMesh(std::vector<Vector3F> &vertices, std::vector<Normal3F> &normals,
+                         std::vector<Point2F> &texcoords, std::vector<TriIndex> &indics,
                          std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
-            virtual bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const override;
+            const std::shared_ptr<std::vector<Shape::Ptr>> triangles() const;
 
             virtual ~TriangleMesh() {}
 
-        protected:
-            void buildMeshes();
-
         private:
-            std::vector<Vertex> &_vertices;
-            std::vector<std::shared_ptr<Intersectable>> _triangles;
-            const std::shared_ptr<Material> _material;
-            const std::shared_ptr<Medium> _inside;
-            const std::shared_ptr<Medium> _outside;
-            const std::shared_ptr<AreaLight> _areaLight;
-            std::shared_ptr<Transform> _transformMatrix = nullptr;
+            std::shared_ptr<std::vector<Shape::Ptr>> _triangles;
         };
 
+        typedef TriangleMesh TriMesh;
     }
 }
 

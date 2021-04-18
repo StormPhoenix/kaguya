@@ -9,38 +9,45 @@
 namespace kaguya {
     namespace scene {
 
-        TriangleMesh::TriangleMesh(std::vector<Vertex> &vertices,
-                                   const std::shared_ptr<Material> material,
-                                   const std::shared_ptr<Medium> inside,
-                                   const std::shared_ptr<Medium> outside,
-                                   const std::shared_ptr<AreaLight> areaLight,
-                                   std::shared_ptr<Transform> transformMatrix)
-                : BVH(), _vertices(vertices), _material(material), _inside(inside),
-                  _outside(outside), _areaLight(areaLight), _transformMatrix(transformMatrix) {
-            buildMeshes();
+        // TODO delete
+        using namespace meta;
+
+        TriangleMesh::TriangleMesh(std::vector<Vector3F> &vertices, std::vector<Normal3F> &normals,
+                                   std::vector<Point2F> &texcoords, std::vector<TriIndex> &indics,
+                                   std::shared_ptr<Transform> transformMatrix) {
+            _triangles = std::make_shared<std::vector<Shape::Ptr>>();
+            for (auto it = indics.begin(); it != indics.end(); it++) {
+                const TriIndex &index = *it;
+                Vector3F v1, v2, v3;
+                {
+                    v1 = vertices[index.v1.vertexIndex];
+                    v2 = vertices[index.v2.vertexIndex];
+                    v3 = vertices[index.v3.vertexIndex];
+                }
+
+                Normal3F n1, n2, n3;
+                {
+                    n1 = normals[index.v1.normalIndex];
+                    n2 = normals[index.v2.normalIndex];
+                    n3 = normals[index.v3.normalIndex];
+                }
+
+                Point2F t1, t2, t3;
+                {
+                    t1 = texcoords[index.v1.texcoordIndex];
+                    t2 = texcoords[index.v2.texcoordIndex];
+                    t3 = texcoords[index.v3.texcoordIndex];
+                }
+
+                Shape::Ptr tri = std::make_shared<Triangle>(v1, v2, v3, n1, n2, n3,
+                                                            t1, t2, t3, transformMatrix);
+                _triangles->push_back(tri);
+            }
         }
 
-        bool TriangleMesh::intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const {
-            bool ret = BVH::intersect(ray, si, minStep, maxStep);
-            if (ret) {
-                si.setGeometry(this);
-            }
-            return ret;
+        const std::shared_ptr<std::vector<Shape::Ptr>> TriangleMesh::triangles() const {
+            return _triangles;
         }
 
-        void TriangleMesh::buildMeshes() {
-            assert(_vertices.size() != 0 && _vertices.size() % 3 == 0);
-            for (int i = 0; i < _vertices.size(); i += 3) {
-                Vertex vertex1 = _vertices[i];
-                Vertex vertex2 = _vertices[i + 1];
-                Vertex vertex3 = _vertices[i + 2];
-                std::shared_ptr<meta::Shape> triangle = std::make_shared<meta::Triangle>(vertex1, vertex2, vertex3,
-                                                                                         _transformMatrix);
-                std::shared_ptr<Geometry> trig = std::make_shared<Geometry>(triangle, _material, _inside, _outside,
-                                                                            _areaLight);
-                _triangles.push_back(trig);
-            }
-            BVH::build(_triangles, 0, _triangles.size());
-        }
     }
 }

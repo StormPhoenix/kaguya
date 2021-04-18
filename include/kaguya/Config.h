@@ -23,6 +23,8 @@ namespace kaguya {
     class Config {
     public:
 
+
+
         class Tracer {
         public:
             static std::string type;
@@ -58,6 +60,7 @@ namespace kaguya {
             static int kernelCount;
         };
 
+        static std::string sceneDir;
         // TODO delete
         // 输出图像名称前缀
         static std::string filenamePrefix;

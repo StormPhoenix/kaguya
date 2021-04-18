@@ -21,6 +21,8 @@ namespace kaguya {
     std::string Config::Sampler::type = "independent";
     int Config::Sampler::sampleCount = 100;
 
+    std::string Config::sceneDir = "";
+
     // 初始化场景
     int Config::sceneId = -1;
     bool Config::isScenePrepared = false;
@@ -45,12 +47,14 @@ namespace kaguya {
     std::string Config::renderType = "pt";
 
     std::shared_ptr<Scene> Config::nextScene() {
-        std::vector<std::string> sceneList = {{"./resource/scenes/cornel-box/scene.xml"},};
+        std::vector<std::string> sceneList = {{"resource/scenes/water-caustic/"},};
         using namespace kaguya::scene::importer;
         XmlSceneImporter importer = XmlSceneImporter();
         sceneId++;
         if (sceneId < sceneList.size()) {
-            return importer.importScene(sceneList[sceneId]);
+            std::string scene_dir = fs::current_path() / sceneList[sceneId];
+            Config::sceneDir = scene_dir;
+            return importer.importScene(scene_dir);
         } else {
             return nullptr;
         }

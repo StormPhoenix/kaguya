@@ -53,6 +53,7 @@ namespace kaguya {
         Spectrum area_light_spectrum(0.);
         Spectrum total_white_spectrum(1.0);
 
+        /*
         std::shared_ptr<Geometry>
         buildSphere(const Vector3F &center, const Float &radius, std::shared_ptr<Material> material) {
             // Transform
@@ -497,26 +498,6 @@ namespace kaguya {
         }
 
 
-        std::shared_ptr<Aggregation> Scene::testBunny(const std::shared_ptr<Material> material,
-                                                      const std::shared_ptr<Medium> inside,
-                                                      const std::shared_ptr<Medium> outside,
-                                                      const std::shared_ptr<AreaLight> areaLight,
-                                                      const std::shared_ptr<transform::Transform> transform) {
-            std::vector<Vertex> bunnyVertexes = kaguya::utils::ObjLoader::loadModel("./resource/objects/bunny.obj");
-
-            std::shared_ptr<Transform> transformMatrix = transform;
-            if (transformMatrix == nullptr) {
-                Float scale = 0.4 * MODEL_SCALE;
-                Matrix4F mat(1.0f);
-                mat = TRANSLATE(mat, Vector3F(0, -scale / 1.2, 0));
-                mat = SCALE(mat, Vector3F(scale, scale, scale));
-                transformMatrix = std::make_shared<Transform>(mat);
-            }
-            std::shared_ptr<Aggregation> bunny = std::make_shared<TriangleMesh>(bunnyVertexes, material, inside,
-                                                                                outside,
-                                                                                areaLight, transformMatrix);
-            return bunny;
-        }
 
         std::shared_ptr<Aggregation> Scene::testSubsurfaceBunny(const std::shared_ptr<Material> material,
                                                       const std::shared_ptr<Medium> inside,
@@ -882,6 +863,9 @@ namespace kaguya {
 
             return scene;
         }
+         */
+
+        /*
 
         std::shared_ptr<Scene> Scene::sceneDeskAndBunny() {
             // white
@@ -962,8 +946,10 @@ namespace kaguya {
 
             return scene;
         }
+         */
 
 #endif
+        /*
 
         std::shared_ptr<Scene> Scene::sceneBunnyWithPointLight() {
             // For testing
@@ -1724,6 +1710,7 @@ namespace kaguya {
 
             return scene;
         }
+         */
 
         void Scene::setCamera(std::shared_ptr<Camera> camera) {
             _camera = camera;

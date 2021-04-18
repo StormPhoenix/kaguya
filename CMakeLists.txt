@@ -10,17 +10,6 @@ message(${CMAKE_SYSTEM_NAME})
 message(${CMAKE_CXX_COMPILER_ID})
 message(${CMAKE_C_COMPILER_ID})
 
-if (CMAKE_SYSTEM_NAME MATCHES "Linux")
-    set(ASSIMP_INCLUDE /usr/include)
-    set(ASSIMP_LINK /usr/lib/x86_64-linux-gnu/libassimp.so)
-elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    set(ASSIMP_INCLUDE /usr/local/include)
-    set(ASSIMP_LINK /usr/local/Cellar/assimp/5.0.1/lib/libassimp.5.0.0.dylib)
-endif (CMAKE_SYSTEM_NAME MATCHES "Linux")
-
-include_directories(${ASSIMP_INCLUDE})
-link_libraries(${ASSIMP_LINK})
-
 INCLUDE(CheckCXXSourceCompiles)
 INCLUDE(CheckCXXSourceRuns)
 

@@ -5,27 +5,20 @@
 #ifndef KAGUYA_OBJLOADER_H
 #define KAGUYA_OBJLOADER_H
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
-#include <kaguya/scene/meta/Vertex.h>
 #include <vector>
+#include <kaguya/scene/aggregation/TriangleMesh.h>
 
 namespace kaguya {
     namespace utils {
-
-        using kaguya::scene::Vertex;
+        using kaguya::scene::TriMesh;
 
         class ObjLoader {
         public:
-            static std::vector<Vertex> loadModel(const std::string &path);
-
-        private:
-
-            static void loadNode(const aiNode *node, const aiScene *scene, std::vector<Vertex> &vertices);
-
-            static void loadMesh(const aiMesh *mesh, const aiScene *scene, std::vector<Vertex> &vertices);
+            static bool loadObj(const std::string path,
+                                std::vector<Vector3F> &vertices,
+                                std::vector<Normal3F> &normals,
+                                std::vector<Point2F> &texcoords,
+                                std::vector<TriMesh::TriIndex> &indics);
         };
 
     }

@@ -22,6 +22,7 @@ namespace kaguya {
         bool Geometry::intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const {
             // proxy
             bool ret = _shape->intersect(ray, si, minStep, maxStep);
+
             if (ret) {
                 // medium
                 si.setMediumBoundary(MediumBoundary(_inside.get(), _outside.get()));

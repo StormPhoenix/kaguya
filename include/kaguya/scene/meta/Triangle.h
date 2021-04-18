@@ -8,7 +8,6 @@
 #include <kaguya/material/Material.h>
 #include <kaguya/math/Math.h>
 #include <kaguya/scene/meta/Shape.h>
-#include <kaguya/scene/meta/Vertex.h>
 #include <kaguya/scene/accumulation/AABB.h>
 
 #include <memory>
@@ -24,9 +23,6 @@ namespace kaguya {
             class Triangle : public Shape {
             public:
                 typedef std::shared_ptr<Triangle> Ptr;
-
-                Triangle(const Vertex &a, const Vertex &b, const Vertex &c,
-                         std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
 
                 Triangle(const Vector3F &a, const Vector3F &b, const Vector3F &c,
                          const Normal3F &normal1, const Normal3F &normal2, const Normal3F &normal3,

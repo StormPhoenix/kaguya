@@ -10,6 +10,7 @@
 namespace kaguya {
     namespace scene {
 
+        // TODO delete
         struct Vertex {
             // 定点坐标
             Vector3F position;

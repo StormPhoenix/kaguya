@@ -1,11 +1,5 @@
 #include <kaguya/Config.h>
-#include <kaguya/math/Math.h>
-#include <kaguya/scene/Scene.h>
-#include <kaguya/scene/meta/Vertex.h>
 #include <kaguya/tracer/TracerFactory.h>
-#include <kaguya/tracer/pt/PathTracer.h>
-#include <kaguya/tracer/bdpt/BDPathTracer.h>
-#include <kaguya/tracer/pm/SPPMTracer.h>
 
 #include <iostream>
 #include <clipp.h>

@@ -11,15 +11,20 @@
 #include <kaguya/material/Lambertian.h>
 #include <kaguya/material/Dielectric.h>
 #include <kaguya/scene/importer/xml/XmlSceneImporter.h>
+#include <kaguya/utils/ObjLoader.h>
+
+#include <filesystem>
 
 namespace kaguya {
     namespace scene {
         namespace importer {
 
+            using namespace utils;
+            using namespace scene;
             using namespace material;
             using namespace material::texture;
-            using namespace scene::meta;
             using namespace scene::acc;
+            using namespace scene::meta;
             using namespace core::transform;
 
             std::string getOffset(long pos, std::string xml_file) {
@@ -195,7 +200,7 @@ namespace kaguya {
                 _scene->setCamera(std::make_shared<Camera>(toWorld, fov));
             }
 
-            void XmlSceneImporter::handleTagBSDF(pugi::xml_node &node, ParseInfo &parseInfo) {
+            void XmlSceneImporter::handleTagBSDF(pugi::xml_node &node, ParseInfo &parseInfo, ParseInfo &parentInfo) {
                 std::string type = node.attribute("type").value();
                 std::string id = node.attribute("id").value();
 
@@ -208,7 +213,12 @@ namespace kaguya {
                     // TODO
                     ASSERT(false, "Only support diffuse material for now");
                 }
-                _materialMap[id] = material;
+
+                if (id == "") {
+                    parentInfo.currentMaterial = material;
+                } else {
+                    _materialMap[id] = material;
+                }
             }
 
             Material::Ptr XmlSceneImporter::createDielectricMaterial(ParseInfo &info) {
@@ -321,6 +331,23 @@ namespace kaguya {
                 return ret;
             }
 
+            std::shared_ptr<std::vector<Shape::Ptr>> XmlSceneImporter::createObjMeshes(ParseInfo &info) {
+                auto transformMat = info.container["toWorld"].value.transformValue;
+                Transform::Ptr toWorld = std::make_shared<Transform>(transformMat.mat());
+
+                std::string filename = info.container["filename"].value.stringValue;
+
+                std::vector<Vector3F> vertices;
+                std::vector<Normal3F> normals;
+                std::vector<Point2F> texcoords;
+                std::vector<TriMesh::TriIndex> indics;
+                bool good = ObjLoader::loadObj(Config::sceneDir + filename, vertices, normals, texcoords, indics);
+                ASSERT(good, "Load *.obj model failed: " + filename);
+
+                TriMesh::Ptr tris = std::make_shared<TriangleMesh>(vertices, normals, texcoords, indics, toWorld);
+                return tris->triangles();
+            }
+
             void XmlSceneImporter::handleTagShape(pugi::xml_node &node, ParseInfo &parseInfo) {
                 std::string type = node.attribute("type").value();
                 std::shared_ptr<std::vector<Shape::Ptr>> shapes = nullptr;
@@ -329,15 +356,13 @@ namespace kaguya {
                     shapes = createRectangleShape(parseInfo);
                 } else if (type == "cube") {
                     shapes = createCubeShape(parseInfo);
+                } else if (type == "obj") {
+                    shapes = createObjMeshes(parseInfo);
                 } else {
                     ASSERT(false, "Only support rectangle shape for now");
                 }
 
-                Material::Ptr material = nullptr;
-                if (_materialMap.count(parseInfo.materialId) > 0) {
-                    material = _materialMap[parseInfo.materialId];
-                }
-
+                Material::Ptr material = parseInfo.currentMaterial;
                 AreaLight::Ptr light = nullptr;
                 if (parseInfo.hasAreaLight) {
                     auto radianceType = parseInfo.container["radiance"].type;
@@ -364,7 +389,7 @@ namespace kaguya {
             void XmlSceneImporter::handleTagRef(pugi::xml_node &node, ParseInfo &info) {
                 std::string id = node.attribute("id").value();
                 ASSERT(_materialMap.count(id) > 0, "Material " + id + " Not Exists.!");
-                info.materialId = id;
+                info.currentMaterial = _materialMap[id];
             }
 
             void XmlSceneImporter::handleTagRGB(pugi::xml_node &node, ParseInfo &parentParseInfo) {
@@ -443,7 +468,7 @@ namespace kaguya {
                         handleTagSensor(node, parseInfo);
                         break;
                     case Tag_BSDF:
-                        handleTagBSDF(node, parseInfo);
+                        handleTagBSDF(node, parseInfo, parentParseInfo);
                         break;
                     case Tag_Shape:
                         handleTagShape(node, parseInfo);
@@ -472,7 +497,9 @@ namespace kaguya {
                 handleXmlNode(node, parseInfo, parentParseInfo);
             }
 
-            std::shared_ptr<Scene> XmlSceneImporter::importScene(std::string xml_file) {
+            std::shared_ptr<Scene> XmlSceneImporter::importScene(std::string sceneDir) {
+                std::string xml_file = sceneDir + "scene.xml";
+
                 pugi::xml_document xml_doc;
                 pugi::xml_parse_result ret = xml_doc.load_file(xml_file.c_str());
 

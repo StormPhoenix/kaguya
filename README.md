@@ -8,6 +8,12 @@ A simple physically based render.
     - [ ] clean *.h files
     - [ ] Camera 内部变换修改成矩阵形式
     - [ ] XmlImporter 创建 Scene 的代码分离开
+    - [ ] 删除 struct Vertex
+    - [x] 删除 Assimp
+    - [x] 重构 TriangleMesh
+    - [ ] Intersectable 和 Shape 重构
+    
+- [ ] 第三方库 ext
 
 - [ ] AreaLight 使用 shape 而不是 geometry 
 
@@ -195,7 +201,7 @@ A simple physically based render.
     
 - Compile PBRT，and debug SamplerIntegrator::Render()
 
-## Result
+## Example
 
 <img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/scene_bunny-with-point-light2_ssp=300_max-depth=15_render-type=bdpt_1500x1500.jpg" alt="bunny-glass-point-light" width="50%">
 <img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/scene_light_through-air_ssp=200_max-depth=12_render-type=bdpt_1200x1200.jpg" alt="light-through-air" width="50%">

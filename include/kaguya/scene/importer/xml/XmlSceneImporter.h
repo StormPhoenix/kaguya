@@ -66,7 +66,7 @@ namespace kaguya {
             typedef struct ParseInfo {
                 transform::Transform transformMat;
                 std::map<std::string, AttrVal> container;
-                std::string materialId;
+                Material::Ptr currentMaterial;
                 bool hasAreaLight = false;
             } ParseInfo;
 
@@ -74,7 +74,7 @@ namespace kaguya {
             public:
                 XmlSceneImporter();
 
-                std::shared_ptr<Scene> importScene(std::string sceneFile) override;
+                std::shared_ptr<Scene> importScene(std::string sceneDir) override;
 
             private:
                 void handleXmlNode(pugi::xml_node &node,
@@ -85,7 +85,7 @@ namespace kaguya {
 
                 void handleTagSensor(pugi::xml_node &node, ParseInfo &parseInfo);
 
-                void handleTagBSDF(pugi::xml_node &node, ParseInfo &parseInfo);
+                void handleTagBSDF(pugi::xml_node &node, ParseInfo &parseInfo, ParseInfo &parentInfo);
 
                 void handleTagShape(pugi::xml_node &node, ParseInfo &parseInfo);
 
@@ -98,6 +98,8 @@ namespace kaguya {
                 std::shared_ptr<std::vector<Shape::Ptr>> createRectangleShape(ParseInfo &info);
 
                 std::shared_ptr<std::vector<Shape::Ptr>> createCubeShape(ParseInfo &info);
+
+                std::shared_ptr<std::vector<Shape::Ptr>> createObjMeshes(ParseInfo &info);
 
                 Material::Ptr createDiffuseMaterial(ParseInfo &info);
 
