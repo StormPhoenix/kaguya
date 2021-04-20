@@ -95,7 +95,8 @@ namespace kaguya {
             Vector3F _tanY;
             Vector3F _tanX;
             Vector3F _tanZ;
-            Vector3F _geoNormal;
+            // geometry normal
+            Vector3F _ng;
         };
 
     }

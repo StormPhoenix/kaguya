@@ -12,13 +12,14 @@ namespace kaguya {
             /* 此处的实现和 pbrt 中的实现不同，pbrt 用的是 dudp 和纹理相关，但目前没有实现纹理部分
              * 暂时用入射光线和法线来构造切线空间*/
             _tanY = NORMALIZE(interaction.rendering.normal);
+//            _tanY = NORMALIZE(interaction.normal);
             _tanZ = NORMALIZE(CROSS(interaction.direction, _tanY));
             if (!math::isValid(_tanZ)) {
                 math::tangentSpace(_tanY, &_tanX, &_tanZ);
             } else {
                 _tanX = NORMALIZE(CROSS(_tanY, _tanZ));
             }
-            _geoNormal = interaction.normal;
+            _ng = interaction.normal;
         }
 
         Vector3F BSDF::toObjectSpace(const Vector3F &v) const {
@@ -43,7 +44,8 @@ namespace kaguya {
             Vector3F wo = toObjectSpace(worldWo);
             Vector3F wi = toObjectSpace(worldWi);
 
-            bool reflect = DOT(worldWo, _geoNormal) * DOT(worldWi, _geoNormal) > 0;
+            // 局部空间法向可以用 rendering.normal，检查反射 / 折射方向用 _ng
+            bool reflect = DOT(worldWo, _ng) * DOT(worldWi, _ng) > 0;
             Spectrum f = 0;
             for (int i = 0; i < _bxdfCount; i++) {
                 if (_bxdfs[i]->allIncludeOf(type)) {
@@ -128,7 +130,7 @@ namespace kaguya {
                  * 参考 pbrt 中 MixMaterial 中的方法，当多个 BXDF 加在一起是会进行加权的，其加权和为 1 */
                 if (!bxdf->hasAllOf(BSDF_SPECULAR)) {
                     for (int i = 0; i < _bxdfCount; i++) {
-                        bool reflect = DOT(worldWo, _geoNormal) * DOT(*worldWi, _geoNormal) > 0;
+                        bool reflect = DOT(worldWo, _ng) * DOT(*worldWi, _ng) > 0;
                         if (_bxdfs[i] != nullptr && _bxdfs[i] != bxdf) {
                             if ((reflect && _bxdfs[i]->hasAllOf(BSDF_REFLECTION)) ||
                                 (!reflect && _bxdfs[i]->hasAllOf(BSDF_TRANSMISSION))) {

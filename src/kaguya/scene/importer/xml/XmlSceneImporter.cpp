@@ -13,8 +13,6 @@
 #include <kaguya/scene/importer/xml/XmlSceneImporter.h>
 #include <kaguya/utils/ObjLoader.h>
 
-#include <filesystem>
-
 namespace kaguya {
     namespace scene {
         namespace importer {
@@ -335,16 +333,23 @@ namespace kaguya {
                 auto transformMat = info.container["toWorld"].value.transformValue;
                 Transform::Ptr toWorld = std::make_shared<Transform>(transformMat.mat());
 
+                // face normal
+                bool faceNormal = false;
+                if (info.container.count("faceNormals") == 1) {
+                    faceNormal = info.container["faceNormals"].value.boolValue;
+                }
+
                 std::string filename = info.container["filename"].value.stringValue;
 
                 std::vector<Vector3F> vertices;
                 std::vector<Normal3F> normals;
                 std::vector<Point2F> texcoords;
                 std::vector<TriMesh::TriIndex> indics;
-                bool good = ObjLoader::loadObj(Config::sceneDir + filename, vertices, normals, texcoords, indics);
+                bool good = io::ObjLoader::loadObj(Config::sceneDir + filename, vertices, normals, texcoords, indics);
                 ASSERT(good, "Load *.obj model failed: " + filename);
 
-                TriMesh::Ptr tris = std::make_shared<TriangleMesh>(vertices, normals, texcoords, indics, toWorld);
+                TriMesh::Ptr tris = std::make_shared<TriangleMesh>(vertices, normals, texcoords, indics, toWorld,
+                                                                   faceNormal);
                 return tris->triangles();
             }
 
@@ -430,6 +435,13 @@ namespace kaguya {
                     } else {
                         ASSERT(false, "Only support spectrum type radiance.");
                     }
+                } else if (type == "point") {
+                    transform::Transform toWorldMat = info.container["toWorld"].value.transformValue;
+                    std::shared_ptr<transform::Transform> toWorld = std::make_shared<transform::Transform>(toWorldMat);
+                    Spectrum intensity = info.container["intensity"].value.spectrumValue;
+                    Light::Ptr pointLight = std::make_shared<PointLight>(intensity, toWorld, MediumBoundary(nullptr,
+                                                                                                            nullptr));
+                    _scene->addLight(pointLight);
                 } else {
                     ASSERT(false, "Only support area type for now");
                 }

@@ -7,9 +7,12 @@
 namespace kaguya {
     namespace core {
 
-        PointLight::PointLight(const Vector3F &center, const Spectrum &intensity, const MediumBoundary &mediumBoundary) :
-                Light(DELTA_POSITION, mediumBoundary), _center(center), _intensity(intensity) {
-            assert(mediumBoundary.inside() == mediumBoundary.outside());
+        PointLight::PointLight(const Spectrum &intensity, Transform::Ptr lightToWorld,
+                               const MediumBoundary &mediumBoundary) :
+                Light(DELTA_POSITION, mediumBoundary), _intensity(intensity) {
+            ASSERT(mediumBoundary.inside() == mediumBoundary.outside(), "Outside medium must equal to inside medium");
+            _lightToWorld = lightToWorld != nullptr ? lightToWorld : std::make_shared<Transform>();
+            _center = lightToWorld->transformPoint(Point3F(0));
         }
 
         Spectrum PointLight::sampleLi(const Interaction &eye,
@@ -49,13 +52,5 @@ namespace kaguya {
             (*pdfPos) = 0.0;
             (*pdfDir) = math::INV_4PI;
         }
-
-        std::shared_ptr<PointLight> PointLight::buildPointLight(const Vector3F &center, const Spectrum &intensity,
-                                                                const MediumBoundary mediumBoundary) {
-            std::shared_ptr<PointLight> light =
-                    std::make_shared<PointLight>(center, intensity, mediumBoundary);
-            return light;
-        }
-
     }
 }

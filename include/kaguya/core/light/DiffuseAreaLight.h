@@ -27,13 +27,6 @@ namespace kaguya {
             virtual void pdfLe(const Ray &ray, const Vector3F &normal,
                                Float *pdfPos, Float *pdfDir) const override;
 
-        public:
-            // 构造漫反射区域灯光
-            static std::shared_ptr<AreaLight> buildDiffuseAreaLight(const Spectrum &intensity,
-                                                                    std::shared_ptr<Shape> geometry,
-                                                                    const MediumBoundary &mediumBoundary,
-                                                                    bool singleSide = true);
-
         private:
             bool _singleSide = true;
         };

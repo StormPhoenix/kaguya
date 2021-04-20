@@ -15,10 +15,10 @@ namespace kaguya {
             SPPMTracer();
 
         private:
-            virtual std::function<void(const int, const int, const int, const int, Sampler *)> render() override;
+            virtual void render() override;
 
         private:
-            int _writeFrequence = 20;
+            int _writeFrequence = 50;
 
             Float _gamma = 2.0 / 3.0;
 

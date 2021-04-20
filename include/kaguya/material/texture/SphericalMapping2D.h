@@ -32,12 +32,8 @@ namespace kaguya {
                         dir = NORMALIZE(si.point);
                     }
 
-                    Float theta = std::acos(math::clamp(dir.y, -1, 1));
-                    Float phi = std::atan2(dir.x, dir.z);
-                    if (phi < 0) {
-                        phi += 2 * math::PI;
-                    }
-
+                    Float theta = math::dirToTheta(dir);
+                    Float phi = math::dirToPhi(dir);
                     Point2F ret(theta * math::INV_PI, phi * math::INV_2PI);
                     return ret;
                 }

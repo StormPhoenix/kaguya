@@ -42,9 +42,7 @@ namespace kaguya {
             BDPathTracer();
 
         private:
-//            virtual std::function<void(const int, const int, Sampler *)> render() override;
-
-            virtual std::function<void(const int, const int, const int, const int, Sampler *)> render() override;
+            virtual void render() override;
 
 
             virtual void init();
@@ -59,8 +57,6 @@ namespace kaguya {
              */
             Spectrum shader(const Ray &ray, std::shared_ptr<Scene> scene, int maxDepth,
                             Sampler *sampler, MemoryArena &memoryArena);
-
-            Spectrum shaderOfMyImplemention();
 
             /**
              * 计算从相机位置出发的路径，统计每一条路径的概率密度

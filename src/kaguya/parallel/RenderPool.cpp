@@ -5,13 +5,31 @@
 #include <kaguya/Config.h>
 #include <kaguya/parallel/RenderPool.h>
 
-#include <kaguya/sampler/SamplerFactory.hpp>
-
 #include <cassert>
 #include <cstdlib>
 
 namespace kaguya {
     namespace parallel {
+
+        thread_local int threadIdx;
+
+        int maxKernelCores() {
+            return std::max(1u, std::thread::hardware_concurrency());
+        }
+
+        int renderCores() {
+            return Config::Parallel::kernelCount <= 0 ? maxKernelCores() : Config::Parallel::kernelCount;
+        }
+
+        void parallelFor1D(const std::function<void(const int)> func, int count, int chunkSize) {
+            RenderPool *pool = RenderPool::getInstance();
+            pool->addRenderTask1D(func, count, chunkSize);
+        }
+
+        void parallelFor2D(const std::function<void(const int, const int)> func, Point2I size) {
+            RenderPool *pool = RenderPool::getInstance();
+            pool->addRenderTask2D(func, size[0], size[1]);
+        }
 
         bool RenderPool::_shutdown = false;
 
@@ -23,15 +41,14 @@ namespace kaguya {
 
         std::condition_variable RenderPool::_taskCondition;
 
-        RenderTask *RenderPool::_taskQueue = nullptr;
+        RenderTaskNode *RenderPool::_taskQueue = nullptr;
 
         RenderPool *RenderPool::getInstance() {
-            const int threadsCount = Config::Parallel::kernelCount;
             if (_pool == nullptr) {
                 {
                     std::lock_guard<std::mutex> poolLock(_poolMutex);
                     if (_pool == nullptr) {
-                        _pool = new RenderPool(threadsCount);
+                        _pool = new RenderPool(renderCores());
                     }
                 }
             }
@@ -43,48 +60,141 @@ namespace kaguya {
             _taskCondition.notify_all();
         }
 
+        void RenderPool::addRenderTask1D(const std::function<void(const int)> func1D, int taskCount, int chunkSize) {
+            ASSERT(_threadCount > 0, "Thread count > 0.");
+
+            RenderTask *task = new RenderTask(func1D, taskCount, chunkSize);
+            RenderTaskNode *node = new RenderTaskNode(task);
+            {
+                // lock on task queue when add task
+                std::lock_guard<std::mutex> lock(_taskMutex);
+                node->next = _taskQueue;
+                _taskQueue = node;
+            }
+            _taskCondition.notify_all();
+            task->waitUntilFinished();
+        }
+
+        void RenderPool::addRenderTask2D(const std::function<void(const int, const int)> func2D, int nX, int nY) {
+            ASSERT(_threadCount > 0, "Thread count > 0.");
+
+            RenderTask *task = new RenderTask(func2D, nX, nY);
+            RenderTaskNode *node = new RenderTaskNode(task);
+            {
+                // lock on task queue when add task
+                std::lock_guard<std::mutex> lock(_taskMutex);
+                node->next = _taskQueue;
+                _taskQueue = node;
+            }
+            _taskCondition.notify_all();
+            task->waitUntilFinished();
+        }
+
         void RenderPool::renderFunc(const int threadId,
                                     std::shared_ptr<Barrier> barrier) {
-            srand(threadId);
+            threadIdx = threadId;
             // wait until all thread reachs to the barrier
             barrier->wait();
 
             // when notified, release the barrier
             barrier.reset();
 
-            // create sampler
-            Sampler *sampler = sampler::SamplerFactory::newSampler();
-
             std::unique_lock<std::mutex> lock(_taskMutex);
             // running rendering function
             while (!_shutdown) {
                 if (_taskQueue == nullptr) {
-                    // sleepC
+                    // sleep for empty task queue
                     _taskCondition.wait(lock);
                 } else {
                     // acquire task
-                    RenderTask *task = _taskQueue;
+                    RenderTaskNode *taskNode = _taskQueue;
+                    ASSERT(taskNode->task != nullptr, "Task is nullptr.");
 
-                    // get rendering task from task
-                    int rowStart, rowEnd, colStart, colEnd;
-                    if (task->renderRange(rowStart, rowEnd, colStart, colEnd)) {
+                    RenderTask *task = taskNode->task;
+
+                    int idx1, idx2;
+                    auto mode = task->mode();
+                    bool assigned = false;
+
+                    // Assigned task
+                    if (mode == RenderTask::One_Dim) {
+                        assigned = task->assignTask1D(idx1, idx2);
+                    } else if (mode == RenderTask::Two_Dim) {
+                        assigned = task->assignTask2D(idx1, idx2);
+                    } else {
+                        ASSERT(false, "Task mode not support.");
+                    }
+
+                    if (assigned) {
                         task->renderEnter();
-                        // release lock
                         lock.unlock();
-                        task->func2D(rowStart, rowEnd, colStart, colEnd, sampler);
+
+                        // Execute task
+                        if (mode == RenderTask::One_Dim) {
+                            for (int idx = idx1; idx <= idx2; idx++) {
+                                task->func1D(idx);
+                            }
+                        } else if (mode == RenderTask::Two_Dim) {
+                            task->func2D(idx1, idx2);
+                        }
+
                         lock.lock();
                         task->renderLeave();
                         if (task->isFinished()) {
                             task->notifyMaster();
+                            if (_taskQueue == taskNode) {
+                                _taskQueue = _taskQueue->next;
+                            }
+
                             delete task;
+                            delete taskNode;
                             _taskCondition.notify_all();
                         }
                     } else {
-                        _taskQueue = task->next;
+                        _taskQueue = taskNode->next;
                     }
+
+                    /* TODO delete
+                    if (task->mode() == RenderTask::One_Dim) {
+                        int idxStart, idxEnd;
+                        if (task->assignTask1D(idxStart, idxEnd)) {
+                            task->renderEnter();
+                            lock.unlock();
+                            for (int idx = idxStart; idx <= idxEnd; idx++) {
+                                task->func1D(idx);
+                            }
+                            lock.lock();
+                            task->renderLeave();
+                            if (task->isFinished()) {
+                                task->notifyMaster();
+                                delete task;
+                                _taskCondition.notify_all();
+                            }
+                        } else {
+                            _taskQueue = taskNode->next;
+                        }
+                    } else if (task->mode() == RenderTask::Two_Dim) {
+                        int idxX, idxY;
+                        if (task->assignTask2D(idxX, idxY)) {
+                            task->renderEnter();
+                            lock.unlock();
+                            task->func2D(idxX, idxY);
+                            lock.lock();
+                            task->renderLeave();
+                            if (task->isFinished()) {
+                                task->notifyMaster();
+                                delete task;
+                                _taskCondition.notify_all();
+                            }
+                        } else {
+                            _taskQueue = taskNode->next;
+                        }
+                    } else {
+                        ASSERT(false, "Task mode not support.");
+                    }
+                     */
                 }
             }
-            delete sampler;
         }
 
         RenderPool::RenderPool(int threadCount) : _threadCount(threadCount) {
@@ -100,29 +210,15 @@ namespace kaguya {
             barrier->wait();
         }
 
-        void RenderPool::addRenderTask(std::function<void(const int, const int, const int, const int, Sampler *)> func2D,
-                                       int renderWidth, int renderHeight) {
-            assert(_threadCount > 0);
-
-            RenderTask *task = new RenderTask(std::move(func2D), renderWidth, renderHeight);
-            {
-                // lock on task queue when add task
-                std::lock_guard<std::mutex> lock(_taskMutex);
-                task->next = _taskQueue;
-                _taskQueue = task;
-            }
-
-            _taskCondition.notify_all();
-            task->waitUntilFinished();
-        }
-
         RenderPool::~RenderPool() {
-            RenderTask *task = nullptr;
+            RenderTaskNode *node = nullptr;
             while (_taskQueue != nullptr) {
-                task = _taskQueue->next;
+                node = _taskQueue->next;
+                delete _taskQueue->task;
                 delete _taskQueue;
-                _taskQueue = task;
+                _taskQueue = node;
             }
+            _pool = nullptr;
         }
     }
 }

@@ -34,7 +34,7 @@ namespace kaguya {
                     int scale = 1;
                     int digits = 0;
                     int base = (i == 0) ? 2 : 3;
-                    while (scale < std::min(MAX_TILE_RESOLUTION, Config::tileSize)) {
+                    while (scale < std::min(MAX_TILE_RESOLUTION, Config::Parallel::tileSize)) {
                         scale *= base;
                         digits++;
                     }
@@ -51,6 +51,11 @@ namespace kaguya {
                 // new seed
                 seedForPixel = seedForCurrentPixel(0);
                 dimension = START_DIMENSION;
+            }
+
+            void HaltonSampler::setCurrentSeed(int seed) {
+                Sampler::setCurrentSeed(seed);
+                seedForPixel = seedForCurrentPixel(randomSeed);
             }
 
             bool HaltonSampler::nextSampleRound() {

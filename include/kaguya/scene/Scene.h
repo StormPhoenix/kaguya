@@ -66,6 +66,7 @@ namespace kaguya {
          */
         class Scene {
         public:
+            typedef std::shared_ptr<Scene> Ptr;
 
 #ifdef TEST_SCENE
 
@@ -213,8 +214,16 @@ namespace kaguya {
                 return _lights;
             }
 
+            const std::vector<std::shared_ptr<Light>> &getEnvironmentLights() const {
+                return _environmentLights;
+            }
+
             void addLight(Light::Ptr light) {
                 _lights.push_back(light);
+            }
+
+            void addEnvironmentLight(Light::Ptr light) {
+                _environmentLights.push_back(light);
             }
 
             const std::string getName() const {
@@ -237,7 +246,8 @@ namespace kaguya {
             std::shared_ptr<Intersectable> _world = nullptr;
             // camera
             std::shared_ptr<Camera> _camera = nullptr;
-            std::vector<std::shared_ptr<Light>> _lights;
+            std::vector<Light::Ptr> _lights;
+            std::vector<Light::Ptr> _environmentLights;
         };
 
     }

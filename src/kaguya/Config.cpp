@@ -37,7 +37,7 @@ namespace kaguya {
     int Config::Tracer::maxDepth = 15;
     int Config::Tracer::sampleNum = 10;
 
-    int Config::tileSize = 50;
+    int Config::Parallel::tileSize = 50;
 
     Float Config::initialSearchRadius = 1.0f;
     Float Config::searchRadiusDecay = 2.0 / 3.0;

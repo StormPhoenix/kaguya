@@ -14,6 +14,8 @@ namespace kaguya {
         public:
             virtual bool nextSampleRound() override;
 
+            virtual void setCurrentSeed(int seed) override;
+
             virtual Float sample1D() override;
 
             virtual Vector2F sample2D() override;

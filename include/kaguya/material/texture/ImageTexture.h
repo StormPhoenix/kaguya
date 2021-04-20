@@ -7,24 +7,17 @@
 
 #include <kaguya/core/Core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
+#include <kaguya/utils/IOReader.h>
 #include <kaguya/material/texture/Texture.h>
 #include <kaguya/material/texture/TextureMapping2D.h>
 #include <kaguya/material/texture/UVMapping2D.h>
-
-#define STB_IMAGE_IMPLEMENTATION
-
-#include <stb/stb_image.h>
-
-#include <string>
-#include <iostream>
-#include <fstream>
 
 namespace kaguya {
     namespace material {
         namespace texture {
 
 #define MAX_CHANNEL 10
-
+            using namespace utils;
             template<typename T>
             class ImageTexture : public Texture<T> {
             public:
@@ -48,7 +41,7 @@ namespace kaguya {
                         }
                     }
 
-                    _texture = stbi_load(imagePath.c_str(), &_width, &_height, &_channel, 0);
+                    _texture = io::readImage(imagePath.c_str(), &_width, &_height, &_channel, 0);
                     if (_channel > MAX_CHANNEL) {
                         std::cout << "Image channel count NOT Support !" << std::endl;
                     }
@@ -82,7 +75,7 @@ namespace kaguya {
 
                 ~ImageTexture() {
                     if (_texture != nullptr) {
-                        stbi_image_free(_texture);
+                        io::freeImage(_texture);
                     }
                 }
 

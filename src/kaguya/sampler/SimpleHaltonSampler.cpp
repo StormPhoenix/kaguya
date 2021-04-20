@@ -33,6 +33,12 @@ namespace kaguya {
             if (_haltonIndex >= nSamples) {
                 _haltonIndex = 0;
             }
+            return true;
+        }
+
+        void SimpleHaltonSampler::setCurrentSeed(int seed) {
+            _haltonIndex = seed;
+            _haltonDimension = 0;
         }
 
         Sampler *SimpleHaltonSampler::newInstance(int nSamples) {

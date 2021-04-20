@@ -43,7 +43,8 @@ namespace kaguya {
 
             TriangleMesh(std::vector<Vector3F> &vertices, std::vector<Normal3F> &normals,
                          std::vector<Point2F> &texcoords, std::vector<TriIndex> &indics,
-                         std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>());
+                         std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(),
+                         bool faceNormal = false);
 
             const std::shared_ptr<std::vector<Shape::Ptr>> triangles() const;
 

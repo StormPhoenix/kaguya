@@ -18,7 +18,6 @@ namespace kaguya {
         void Tracer::run() {
             _scene = Config::nextScene();
 
-            parallel::RenderPool *pool = parallel::RenderPool::getInstance();
             while (_scene != nullptr) {
                 _camera = _scene->getCamera();
 
@@ -26,12 +25,7 @@ namespace kaguya {
                 _filmPlane = _camera->buildFilmPlane(SPECTRUM_CHANNEL);
 
                 // rendering
-                auto renderFunc = render();
-
-                // execute rendering task
-                int cameraWidth = _camera->getResolutionWidth();
-                int cameraHeight = _camera->getResolutionHeight();
-                pool->addRenderTask(renderFunc, cameraWidth, cameraHeight);
+                render();
 
                 // write to image
                 std::cout << std::endl << "scene " << _scene->getName() << " completed." << std::endl;
@@ -44,9 +38,6 @@ namespace kaguya {
                 _camera = nullptr;
                 _scene = Config::nextScene();
             }
-
-            pool->shutdown();
-//            delete pool;
         }
 
         std::shared_ptr<Light> Tracer::uniformSampleLight(std::shared_ptr<Scene> scene, Float *lightPdf, Sampler *sampler) {

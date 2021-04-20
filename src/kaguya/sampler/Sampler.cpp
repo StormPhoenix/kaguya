@@ -16,6 +16,10 @@ namespace kaguya {
             randomSeed = 0;
         }
 
+        void Sampler::setCurrentSeed(int seed) {
+            randomSeed = seed;
+        }
+
         bool Sampler::nextSampleRound() {
             randomSeed++;
             return randomSeed < nSamples;

@@ -6,6 +6,8 @@
 #include <kaguya/core/bssrdf/BSSRDF.h>
 #include <kaguya/core/Interaction.h>
 #include <kaguya/tracer/pt/PathTracer.h>
+#include <kaguya/sampler/SamplerFactory.hpp>
+#include <kaguya/parallel/RenderPool.h>
 
 namespace kaguya {
     namespace tracer {
@@ -77,6 +79,7 @@ namespace kaguya {
                                         si, -si.direction) * beta);
                             }
                         } else {
+                            // 环境光
                             shaderColor += (beta * background(scatterRay));
                             break;
                         }
@@ -157,15 +160,29 @@ namespace kaguya {
             return shaderColor;
         }
 
-        std::function<void(const int, const int, const int, const int, Sampler *)> PathTracer::render() {
-            auto renderFunc = [this](const int startRow, const int endRow,
-                                     const int startCol, const int endCol,
-                                     Sampler *sampler) -> void {
+        void PathTracer::render() {
+            int width = _camera->getResolutionWidth();
+            int height = _camera->getResolutionHeight();
 
+            int nTileX = (width + Config::Parallel::tileSize - 1) / Config::Parallel::tileSize;
+            int nTileY = (height + Config::Parallel::tileSize - 1) / Config::Parallel::tileSize;
+
+            std::atomic<int> nFinished(0);
+
+            auto renderFunc = [&](const int idxTileX, const int idxTileY) -> void {
+
+                int startRow = idxTileY * Config::Parallel::tileSize;
+                int endRow = std::min(startRow + Config::Parallel::tileSize - 1, height - 1);
+
+                int startCol = idxTileX * Config::Parallel::tileSize;
+                int endCol = std::min(startCol + Config::Parallel::tileSize - 1, width - 1);
+
+                Sampler *sampler = sampler::SamplerFactory::newSampler(_samplePerPixel);
                 for (int row = startRow; row <= endRow; row++) {
                     for (int col = startCol; col <= endCol; col++) {
                         // set current sampling pixel
                         sampler->forPixel(Point2F(row, col));
+//                        sampler->setCurrentSeed(idxTileY * nTileX + idxTileX);
 
                         Spectrum ans = {0};
                         const Float sampleWeight = 1.0 / _samplePerPixel;
@@ -186,15 +203,25 @@ namespace kaguya {
                         _filmPlane->addSpectrum(ans, row, col);
                     }
                 }
+                delete sampler;
+
+                nFinished++;
+                std::cout << "\r" << float(nFinished) * 100 / (nTileX * nTileY) << " %"
+                          << std::flush;
             };
 
-            return renderFunc;
+            parallel::parallelFor2D(renderFunc, Point2I(nTileX, nTileY));
         }
 
         Spectrum PathTracer::background(const Ray &ray) {
-            // TODO 临时设计背景色
-            return Spectrum(0.0f);
+            auto lights = _scene->getEnvironmentLights();
+            Spectrum ret(0);
+            for (Light::Ptr light : lights) {
+                ret += light->Le(ray);
+            }
+            return ret;
         }
 
+        PathTracer::~PathTracer() {}
     }
 }

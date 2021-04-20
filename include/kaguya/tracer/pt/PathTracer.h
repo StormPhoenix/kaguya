@@ -17,13 +17,16 @@ namespace kaguya {
     namespace tracer {
 
         using namespace kaguya::core;
+        using namespace kaguya::sampler;
         using kaguya::memory::MemoryArena;
 
         class PathTracer : public Tracer {
         public:
             PathTracer();
 
-            virtual std::function<void(const int, const int, const int, const int, Sampler *)> render() override;
+            virtual void render() override;
+
+            ~PathTracer();
 
         private:
             virtual void init();

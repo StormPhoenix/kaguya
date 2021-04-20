@@ -6,7 +6,6 @@
 #define KAGUYA_RENDERTASK_H
 
 #include <kaguya/Config.h>
-#include <kaguya/sampler/Sampler.h>
 
 #include <condition_variable>
 #include <functional>
@@ -18,20 +17,25 @@ namespace kaguya {
 
         class RenderTask {
         public:
-            RenderTask(const std::function<void(const int, const int, const int, const int, Sampler *)> &func2D,
-                       int renderWidth, int renderHeight);
 
-            /**
-             * rendering task assignment
-             *
-             * @param rowStart
-             * @param rowEnd
-             * @param colStart
-             * @param colEnd
-             * @return return false if all render task is allocated
-             */
-            bool renderRange(int &rowStart, int &rowEnd,
-                             int &colStart, int &colEnd);
+            // Task mode
+            typedef enum TaskMode {
+                One_Dim,
+                Two_Dim
+            } TaskMode;
+
+            // For 1D task
+            RenderTask(const std::function<void(const int)> func1D, int taskCount, int chunkSize = 1);
+
+            // For 2D task
+            RenderTask(const std::function<void(const int, const int)> func2D, int nX, int nY);
+
+            // Assign rendering task index
+            bool assignTask1D(int &idxStart, int &idxEnd);
+
+            bool assignTask2D(int &idxX, int &idxY);
+
+            TaskMode mode();
 
             void renderEnter();
 
@@ -45,37 +49,26 @@ namespace kaguya {
 
             ~RenderTask();
 
-        public:
             // render function
-            const std::function<void(const int, const int, const int, const int, Sampler *)> func2D;
-
-            // next render task
-            RenderTask *next = nullptr;
-
+            const std::function<void(const int)> func1D;
+            const std::function<void(const int, const int)> func2D;
 
         private:
-            // progress flag
-            bool progressFlag = false;
+            TaskMode _mode;
 
-            // active render
+            int _maxTaskCount;
+            int _nextTaskIndex;
+            int _chunkSize;
+
+            // For 2D render task
+            int _nX = -1, _nY = -1;
+
+            // Active render
             int _activeRender = 0;
-            const int _renderWidth;
-            const int _renderHeight;
             // task mutex
-            std::mutex _finishMutex;
+            std::mutex _taskFinishedMutex;
             // task condition
             std::condition_variable _finishCondition;
-            // next render range
-            int _nextTileXCount;
-            int _nextTileYCount;
-            const int _tileSize = Config::tileSize;
-
-
-            // total tile count
-            int _totalTileXCount;
-            int _totalTileYCount;
-
-            int tileRecord = 0;
         };
 
     }

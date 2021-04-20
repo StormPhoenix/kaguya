@@ -27,6 +27,7 @@
 #include <kaguya/material/texture/SphericalMapping2D.h>
 #include <kaguya/utils/ObjLoader.h>
 #include <kaguya/core/medium/GridDensityMedium.h>
+#include <kaguya/core/light/EnvironmentLight.h>
 
 #ifdef TEST_SCENE
 
@@ -1031,16 +1032,16 @@ namespace kaguya {
             std::vector<Normal3F> normals;
             std::vector<Point2F> texcoords;
             std::vector<TriMesh::TriIndex> indics;
-            bool good = kaguya::utils::ObjLoader::loadObj("./resource/objects/bunny.obj", vertices, normals, texcoords,
+            bool good = utils::io::ObjLoader::loadObj("./resource/objects/bunny2.obj", vertices, normals, texcoords,
                                                           indics);
-            ASSERT(good, "Load *.obj model failed: /resource/objects/bunny.obj ");
+            ASSERT(good, "Load *.obj model failed: /resource/objects/bunny2.obj ");
 
             Transform::Ptr toWorld = nullptr;
-            Float scale = 0.4 * MODEL_SCALE;
-            Matrix4F mat(1.0f);
-            mat = TRANSLATE(mat, Vector3F(0, -scale / 1.2, 0));
-            mat = SCALE(mat, Vector3F(scale, scale, scale));
-            toWorld = std::make_shared<Transform>(mat);
+            Float scale = 0.2 * MODEL_SCALE;
+            Matrix4F bunnyMat(1.0f);
+            bunnyMat = TRANSLATE(bunnyMat, Vector3F(scale / 4.5, -scale / 1.0, scale / 6.0));
+            bunnyMat = SCALE(bunnyMat, Vector3F(scale, scale, scale));
+            toWorld = std::make_shared<Transform>(bunnyMat);
             TriMesh::Ptr tris = std::make_shared<TriangleMesh>(vertices, normals, texcoords, indics, toWorld);
 
             for (auto it = tris->triangles()->begin(); it != tris->triangles()->end(); it++) {
@@ -1052,11 +1053,21 @@ namespace kaguya {
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 
             // build point light
-            std::shared_ptr<PointLight> light = PointLight::buildPointLight(
-                    Vector3F(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE), lightSpectrum,
-                    MediumBoundary(airMedium.get(), airMedium.get()));
+            Matrix4F lightToWorldMat(1.0);
+            lightToWorldMat = TRANSLATE(lightToWorldMat,
+                                        Vector3F(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE));
+            Transform::Ptr lightToWorld = std::make_shared<Transform>(lightToWorldMat);
+            std::shared_ptr<PointLight> light = std::make_shared<PointLight>(lightSpectrum,
+                                                                             lightToWorld,
+                                                                             MediumBoundary(nullptr, nullptr));
             scene->_lights.push_back(light);
 
+            // build environment lights
+            /*
+            Light::Ptr enLight = std::make_shared<EnvironmentLight>(1, "./resource/texture/en2.png",
+                                                                    MediumBoundary(nullptr, nullptr));
+            scene->addEnvironmentLight(enLight);
+             */
 
             // scene
             std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);

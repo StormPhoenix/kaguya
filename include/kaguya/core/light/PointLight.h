@@ -7,26 +7,21 @@
 
 #include <kaguya/core/light/Light.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
+#include <kaguya/core/Transform.h>
 
 namespace kaguya {
     namespace core {
 
+        using namespace transform;
+
         class PointLight : public Light {
         public:
-            /**
-             * 构建点光源
-             * @param center
-             * @param intensity
-             * @return
-             */
-            static std::shared_ptr<PointLight> buildPointLight(const Vector3F &center, const Spectrum &intensity, const MediumBoundary mediumBoundary);
-
             /**
              * 点光源
              * @param center 光源位置
              * @param intensity 光源处，单位立体角的光通量
              */
-            PointLight(const Vector3F &center, const Spectrum &intensity, const MediumBoundary &mediumBoundary);
+            PointLight(const Spectrum &intensity, Transform::Ptr lightToWorld, const MediumBoundary &mediumBoundary);
 
             virtual Spectrum sampleLi(const Interaction &eye,
                                       Vector3F *wi, Float *pdf,
@@ -43,8 +38,9 @@ namespace kaguya {
 
         private:
             // 单位立体角的光强
-            const Spectrum _intensity;
-            const Vector3F _center;
+            Spectrum _intensity;
+            Vector3F _center;
+            Transform::Ptr _lightToWorld;
         };
 
     }

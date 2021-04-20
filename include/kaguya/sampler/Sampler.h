@@ -14,6 +14,8 @@ namespace kaguya {
 
         class Sampler {
         public:
+            typedef std::shared_ptr<Sampler> Ptr;
+
             Sampler(int nSamples);
 
             /**
@@ -21,6 +23,8 @@ namespace kaguya {
              * @param pixel
              */
             virtual void forPixel(const Point2F pixel);
+
+            virtual void setCurrentSeed(int seed);
 
             /**
              * Begin next sample round

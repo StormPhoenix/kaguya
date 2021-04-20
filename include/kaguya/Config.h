@@ -23,8 +23,6 @@ namespace kaguya {
     class Config {
     public:
 
-
-
         class Tracer {
         public:
             static std::string type;
@@ -58,10 +56,11 @@ namespace kaguya {
         public:
             // rendering kernel count
             static int kernelCount;
+            // parallel tile size
+            static int tileSize;
         };
 
         static std::string sceneDir;
-        // TODO delete
         // 输出图像名称前缀
         static std::string filenamePrefix;
         // russian roulette 从什么 depth 开始
@@ -71,8 +70,6 @@ namespace kaguya {
         static Float russianRoulette;
         // 对光源采样概率
         static Float sampleLightProb;
-        // Image tile size
-        static int tileSize;
         // Sampler type
         static std::string samplerType;
         // Render type

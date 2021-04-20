@@ -14,11 +14,11 @@ namespace kaguya {
 
         TriangleMesh::TriangleMesh(std::vector<Vector3F> &vertices, std::vector<Normal3F> &normals,
                                    std::vector<Point2F> &texcoords, std::vector<TriIndex> &indics,
-                                   std::shared_ptr<Transform> transformMatrix) {
+                                   std::shared_ptr<Transform> transformMatrix, bool faceNormal) {
             _triangles = std::make_shared<std::vector<Shape::Ptr>>();
 
             bool texFlag = texcoords.size() > 0;
-            bool normalFlag = normals.size() > 0;
+            bool useNormals = (!faceNormal && normals.size() > 0);
 
             for (auto it = indics.begin(); it != indics.end(); it++) {
                 const TriIndex &index = *it;
@@ -31,7 +31,7 @@ namespace kaguya {
 
                 Normal3F n1(0), n2(0), n3(0);
                 {
-                    if (normalFlag) {
+                    if (useNormals) {
                         n1 = normals[index.v1.normalIndex];
                         n2 = normals[index.v2.normalIndex];
                         n3 = normals[index.v3.normalIndex];

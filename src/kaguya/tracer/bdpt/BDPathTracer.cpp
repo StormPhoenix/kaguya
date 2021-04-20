@@ -8,6 +8,8 @@
 #include <kaguya/tracer/bdpt/PathVertex.h>
 #include <kaguya/utils/VisibilityTester.h>
 #include <kaguya/utils/ScopeSwapper.hpp>
+#include <kaguya/sampler/SamplerFactory.hpp>
+#include <kaguya/parallel/RenderPool.h>
 
 
 namespace kaguya {
@@ -23,11 +25,24 @@ namespace kaguya {
             init();
         }
 
-        std::function<void(const int, const int, const int, const int, Sampler *)> BDPathTracer::render() {
-            auto renderFunc = [this](const int startRow, const int endRow,
-                                     const int startCol, const int endCol,
-                                     Sampler *sampler) -> void {
+        void BDPathTracer::render() {
+            int width = _camera->getResolutionWidth();
+            int height = _camera->getResolutionHeight();
 
+            int nTileX = (width + Config::Parallel::tileSize - 1) / Config::Parallel::tileSize;
+            int nTileY = (height + Config::Parallel::tileSize - 1) / Config::Parallel::tileSize;
+
+            std::atomic<int> nFinished(0);
+
+            auto renderFunc = [&](const int idxTileX, const int idxTileY) -> void {
+
+                int startRow = idxTileY * Config::Parallel::tileSize;
+                int endRow = std::min(startRow + Config::Parallel::tileSize - 1, height - 1);
+
+                int startCol = idxTileX * Config::Parallel::tileSize;
+                int endCol = std::min(startCol + Config::Parallel::tileSize - 1, width - 1);
+
+                Sampler *sampler = sampler::SamplerFactory::newSampler(_samplePerPixel);
                 for (int row = startRow; row <= endRow; row++) {
                     for (int col = startCol; col <= endCol; col++) {
                         // set current sampling pixel
@@ -52,8 +67,13 @@ namespace kaguya {
                         }
                     }
                 }
-                };
-            return renderFunc;
+                delete sampler;
+                nFinished++;
+                std::cout << "\r" << float(nFinished) * 100 / (nTileX * nTileY) << " %"
+                          << std::flush;
+            };
+
+            parallel::parallelFor2D(renderFunc, Point2I(nTileX, nTileY));
         }
 
         void BDPathTracer::init() {

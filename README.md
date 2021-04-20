@@ -8,15 +8,29 @@ A simple physically based render.
     - [ ] clean *.h files
     - [ ] Camera 内部变换修改成矩阵形式
     - [ ] XmlImporter 创建 Scene 的代码分离开
-    - [ ] 删除 struct Vertex
+    - [x] 删除 struct Vertex
     - [x] 删除 Assimp
     - [x] 重构 TriangleMesh
-    - [ ] Intersectable 和 Shape 重构
+    - [ ] Intersectable 和 Shape 重构 (删除 Aggagrete)
     - [ ] 测试 bunny 焦散，以及为什么 water-caustic 无法成像。
+
+- [ ] water-caustic 错误
+    - [x] 只考虑墙，材质 diffuse 透光了，很奇怪 PT_water-caustic5，并且材质出现分界线，猜测是采样 Light 没有考虑误差 error (obj 文件的法线是错的)
+    - [x] 只考虑墙，材质 dielectric，两个方体形状变了，发射了折射？PT_water-caustic4(obj 文件的法线是错的)
+    - [ ] 只考虑波纹，水内物体变模糊了 BDPT_water-caustic2 (对相机圆盘区域采样)
+    - [x] 墙、波纹都考虑，物体变黑了 PT_water-caustic6 (PT 采样不到光线)
+    - [ ] 只考虑波纹，采用 SPPM，不模糊了，但是小正方体阴影出现问题 SPPM_water-caustic7
+    - [ ] SPPMTracer 如果采用 500w 的光子数量，simpleHalton 可能数量不够
     
+- [ ] bunny-caustic 错误
+    - [ ] 检查下是不是 SPPM 参数设置不对
+
+- [x] SPPM 渲染耗费时间太长太长了，改进 SPPM 的写法   
+    - [x] Camera pass 在每个 iteration 需要并行生成 rays (按照块并行，采用 HaltonSampler，利用 seed 和 pixel 不同确定种子序列)
+    - [x] Photon pass 也要并行，单枪的 photon pass 每个线程都要全部处理一次，太慢了
 - [ ] 第三方库 ext
 
-- [ ] AreaLight 使用 shape 而不是 geometry 
+- [x] AreaLight 使用 shape 而不是 geometry 
 
 - [ ] 添加环境光贴图
     - [ ] PathVertex::emit() 修改成 Le()
@@ -25,8 +39,8 @@ A simple physically based render.
             - [ ] connectible() cameraPath 最后一个 Vertex 是 EL
             - [ ] connectPath() cameraPath 最后一个 Vertex 是 EL，则调过 connect 步骤
             - [ ] randomWalk() for cameraPath
-        - [ ] PT
-            - [ ] Path tracing 未击中
+        - [x] PT
+            - [x] Path tracing 未击中
         - [ ] SPPM
             - [ ] Visible point 未击中
     - [ ] Light::Le() 
@@ -39,10 +53,7 @@ A simple physically based render.
 - [ ] HaltonSampler 代码写的可能有问题
 - [ ] Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法，写成文档记录下来
 - [ ] Triangle sampling strategy 计算方法记录。
-- [ ] Medium sampling method.
-- [ ] Regular tracing, ray marching, delta tracking, ratio tracking article
-    - [ ] Delta tracing - reject sampling, Delta tracing's sampling strategy is a little different 
-            from reject sampling.
+
             
 - [ ] HaltonSampler 代码写的可能有问题
 
@@ -195,6 +206,15 @@ A simple physically based render.
 - [x] 条带
     图像中心出现十字条带(修改切线空间后消失，不清楚是不是这个原因)
     Debug：不知道修改了什么，这个现象消失了
+
+## Taking Notes
+- [ ] Triangle Intersection 的计算方法，两种：1 对矩阵求逆 2 PBRT 中的方法，写成文档记录下来
+- [ ] Medium sampling method.
+- [ ] Regular tracing, ray marching, delta tracking, ratio tracking article
+    - [ ] Delta tracing - reject sampling, Delta tracing's sampling strategy is a little different 
+            from reject sampling.
+- [ ] AABB intersection.
+- [ ] Jacobi matrix
 
 ## 一些想法
 - 新的光线追踪想法：不需要像 Path Tracing 一次性把 shaderOfRecursion color 求解出来，而是多次迭代。每次迭代只让光线反射一次，迭代 N 轮让

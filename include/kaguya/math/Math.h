@@ -459,6 +459,18 @@ namespace kaguya {
             return r;
         }
 
+        inline Float dirToTheta(Vector3F dir) {
+            return std::acos(clamp(dir.y, -1, 1));
+        }
+
+        inline Float dirToPhi(Vector3F dir) {
+            Float phi = std::atan2(dir.z, dir.x);
+            if (phi < 0) {
+                phi += 2 * PI;
+            }
+            return phi;
+        }
+
         namespace sampling {
 
             /**

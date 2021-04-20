@@ -17,6 +17,23 @@
 namespace kaguya {
     namespace parallel {
 
+        extern thread_local int threadIdx;
+
+        int maxKernelCores();
+
+        int renderCores();
+
+        void parallelFor1D(const std::function<void(const int)> func, int count, int chunkSize = 1);
+
+        void parallelFor2D(const std::function<void(const int, const int)> func2D, Point2I size);
+
+        typedef struct RenderTaskNode {
+            RenderTask *task = nullptr;
+            RenderTaskNode *next = nullptr;
+
+            RenderTaskNode(RenderTask *task) : task(task), next(nullptr) {}
+        } RenderTaskNode;
+
         class RenderPool {
         public:
             /**
@@ -26,8 +43,9 @@ namespace kaguya {
             static RenderPool *getInstance();
 
         public:
-            void addRenderTask(std::function<void(const int, const int, const int, const int, Sampler *)> func2D,
-                               int renderWidth, int renderHeight);
+            void addRenderTask1D(const std::function<void(const int)> func1D, int taskCount, int chunkSize = 1);
+
+            void addRenderTask2D(const std::function<void(const int, const int)> func2D, int nX, int nY);
 
             void shutdown();
 
@@ -59,7 +77,7 @@ namespace kaguya {
             static std::mutex _taskMutex;
 
             // rendering task queue
-            static RenderTask *_taskQueue;
+            static RenderTaskNode *_taskQueue;
 
             // notify condition for task queue
             static std::condition_variable _taskCondition;
