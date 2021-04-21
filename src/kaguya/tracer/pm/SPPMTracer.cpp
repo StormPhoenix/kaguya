@@ -107,6 +107,9 @@ namespace kaguya {
             int nTileX = (width + Config::Parallel::tileSize - 1) / Config::Parallel::tileSize;
             int nTileY = (height + Config::Parallel::tileSize - 1) / Config::Parallel::tileSize;
 
+            // Display
+            Float minSearchRadius = Config::initialSearchRadius;
+
             std::vector<MemoryArena> memoryArenaPerThread(renderCores());
 
             // Loop iterations
@@ -251,7 +254,7 @@ namespace kaguya {
                 }
 
                 int gridRes[3];
-                Float gridSize;
+                Float gridSize = 0;
                 Bound3 vpsBound;
 
                 int hashSize = nPixels;
@@ -275,6 +278,7 @@ namespace kaguya {
 
                         // Search max radius
                         gridSize = std::max(gridSize, pixel.searchRadius);
+                        minSearchRadius = std::min(minSearchRadius, pixel.searchRadius);
                     }
 
                     /* Resolution computation */
@@ -477,11 +481,11 @@ namespace kaguya {
                     }
                 }
 
-                for (int i = 0; i < memoryArenaPerThread.size(); i ++) {
+                for (int i = 0; i < memoryArenaPerThread.size(); i++) {
                     memoryArenaPerThread[i].clean();
                 }
-                std::cout << "\r" << float(iter + 1) * 100 / nIterations << " %"
-                          << std::flush;
+                std::cout << "\r" << (iter + 1) << "/" << nIterations << "(" << float(iter + 1) * 100 / nIterations
+                          << "%) max/min radius: " << gridSize << "/" << minSearchRadius << std::flush;
             }
         }
     }
