@@ -6,31 +6,18 @@ A simple physically based render.
 - [ ] 场景导入
     - [ ] XML
     - [ ] clean *.h files
+    - [ ] GLM 的矩阵变换好像和 kaguya 坐标系有些不匹配，需要自己改矩阵
+        - [ ] LookAt 用 macro 实现
     - [ ] Camera 内部变换修改成矩阵形式
     - [ ] XmlImporter 创建 Scene 的代码分离开
     - [x] 删除 struct Vertex
     - [x] 删除 Assimp
     - [x] 重构 TriangleMesh
-    - [ ] Intersectable 和 Shape 重构 (删除 Aggagrete)
-    - [ ] 测试 bunny 焦散，以及为什么 water-caustic 无法成像。
-
-- [ ] water-caustic 错误
-    - [x] 只考虑墙，材质 diffuse 透光了，很奇怪 PT_water-caustic5，并且材质出现分界线，猜测是采样 Light 没有考虑误差 error (obj 文件的法线是错的)
-    - [x] 只考虑墙，材质 dielectric，两个方体形状变了，发射了折射？PT_water-caustic4(obj 文件的法线是错的)
-    - [ ] 只考虑波纹，水内物体变模糊了 BDPT_water-caustic2 (对相机圆盘区域采样)
-    - [x] 墙、波纹都考虑，物体变黑了 PT_water-caustic6 (PT 采样不到光线)
-    - [ ] 只考虑波纹，采用 SPPM，不模糊了，但是小正方体阴影出现问题 SPPM_water-caustic7
-    - [ ] SPPMTracer 如果采用 500w 的光子数量，simpleHalton 可能数量不够
+    - [x] Intersectable 和 Shape 重构 (删除 Aggagrete)
+    - [x] 测试 bunny 焦散，以及为什么 water-caustic 无法成像。
+        - [x] photon 数太少，radius 初始太大，收敛太慢。这个配置下 CPU 跑的太慢了，是时候升级到 GPU 版本了 
     
-- [ ] bunny-caustic 错误
-    - [ ] 检查下是不是 SPPM 参数设置不对
-
-- [x] SPPM 渲染耗费时间太长太长了，改进 SPPM 的写法   
-    - [x] Camera pass 在每个 iteration 需要并行生成 rays (按照块并行，采用 HaltonSampler，利用 seed 和 pixel 不同确定种子序列)
-    - [x] Photon pass 也要并行，单枪的 photon pass 每个线程都要全部处理一次，太慢了
 - [ ] 第三方库 ext
-
-- [x] AreaLight 使用 shape 而不是 geometry 
 
 - [ ] 添加环境光贴图
     - [ ] PathVertex::emit() 修改成 Le()
@@ -141,6 +128,10 @@ A simple physically based render.
     - 光斑是 t = 1，s = 2 情况下出现的。推测是 light path 连接 camera vertex 时，beta 计算错误。
     - 经过检查，发现 Camera 计算成像平面面积时少算了 3/4 的面积，修改过后，结果正确。
 
+- [x] SPPM 渲染耗费时间太长太长了，改进 SPPM 的写法   
+    - [x] Camera pass 在每个 iteration 需要并行生成 rays (按照块并行，采用 HaltonSampler，利用 seed 和 pixel 不同确定种子序列)
+    - [x] Photon pass 也要并行，单枪的 photon pass 每个线程都要全部处理一次，太慢了
+    
 - [x] front 墙壁渲染结果会有一圈曲线（BDPT）
     - [x] 去掉 openMP，结果正常
     - [x] 加上 openMP，对访问数据上锁，不正常
