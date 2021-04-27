@@ -7,9 +7,12 @@
 
 #include <kaguya/core/light/Light.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
+#include <kaguya/core/Transform.h>
 
 namespace kaguya {
     namespace core {
+
+        using namespace transform;
 
         class SpotLight : public Light {
         public:
@@ -27,6 +30,9 @@ namespace kaguya {
                                       VisibilityTester *visibilityTester) override;
 
             virtual Float pdfLi(const Interaction &eye, const Vector3F &dir) override;
+
+            SpotLight(const Spectrum &intensity, Transform::Ptr lightToWorld, const MediumBoundary &mediumBoundary,
+                      Float fallOffRange = 30, Float totalRange = 45);
 
             /**
              * 聚光灯
@@ -49,10 +55,11 @@ namespace kaguya {
             Spectrum fallOffWeight(const Vector3F &wo);
 
         private:
-            const Vector3F _center;
-            const Vector3F _dir;
+            Vector3F _center;
+            Vector3F _dir;
             Float _cosFallOffRange;
             Float _cosTotalRange;
+            Transform::Ptr _lightToWorld;
             const Spectrum _intensity;
         };
 

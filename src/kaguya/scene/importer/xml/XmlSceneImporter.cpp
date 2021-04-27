@@ -50,6 +50,25 @@ namespace kaguya {
                 return "byte offset " + std::to_string(pos);
             }
 
+            inline Vector3F toVector(const std::string &val) {
+                Vector3F ret;
+                char *tmp;
+#if defined(KAGUYA_DATA_DOUBLE)
+                ret[0] = strtod(val.c_str(), &tmp);
+                for (int i = 1; i < 3; i++) {
+                    tmp++;
+                    ret[i] = strtod(tmp, &tmp);
+                }
+#else
+                ret[0] = strtof(val.c_str(), &tmp);
+                for (int i = 1; i < 3; i++) {
+                    tmp++;
+                    ret[i] = strtof(tmp, &tmp);
+                }
+#endif
+                return ret;
+            }
+
             XmlSceneImporter::XmlSceneImporter() {
                 _nodeTypeMap["mode"] = Tag_Mode;
                 _nodeTypeMap["scene"] = Tag_Scene;
@@ -73,6 +92,7 @@ namespace kaguya {
                 _nodeTypeMap["rgb"] = Tag_RGB;
                 _nodeTypeMap["transform"] = Tag_Transform;
                 _nodeTypeMap["matrix"] = Tag_Matrix;
+                _nodeTypeMap["lookat"] = Tag_LookAt;
             }
 
             void handleTagBoolean(pugi::xml_node &node, ParseInfo &parentParseInfo) {
@@ -307,6 +327,7 @@ namespace kaguya {
                 std::vector<TriMesh::TriIndex> indics;
                 bool good = io::ObjLoader::loadObj(Config::sceneDir + filename, vertices, normals, texcoords, indics);
                 ASSERT(good, "Load *.obj model failed: " + filename);
+                std::cout << "Loading mesh: " << filename << std::endl;
 
                 TriMesh::Ptr tris = std::make_shared<TriangleMesh>(vertices, normals, texcoords, indics, toWorld,
                                                                    faceNormal);
@@ -395,6 +416,7 @@ namespace kaguya {
                     } else {
                         ASSERT(false, "Only support spectrum type radiance.");
                     }
+                    std::cout << "Create light: area light" << std::endl;
                 } else if (type == "point") {
                     transform::Transform toWorldMat = info.container["toWorld"].value.transformValue;
                     std::shared_ptr<transform::Transform> toWorld = std::make_shared<transform::Transform>(toWorldMat);
@@ -402,9 +424,54 @@ namespace kaguya {
                     Light::Ptr pointLight = std::make_shared<PointLight>(intensity, toWorld, MediumBoundary(nullptr,
                                                                                                             nullptr));
                     _scene->addLight(pointLight);
+                    std::cout << "Create light: point light" << std::endl;
+                } else if (type == "spot") {
+                    transform::Transform toWorldMat = info.container["toWorld"].value.transformValue;
+                    std::shared_ptr<transform::Transform> toWorld = std::make_shared<transform::Transform>(toWorldMat);
+                    Spectrum intensity = info.container["intensity"].value.spectrumValue;
+                    Float totalAngle = info.container["totalAngle"].value.floatValue;
+                    Float falloffAngle = info.container["falloffAngle"].value.floatValue;
+                    Light::Ptr spotLight = std::make_shared<SpotLight>(
+                            intensity, toWorld,
+                            MediumBoundary(nullptr, nullptr),
+                            falloffAngle, totalAngle);
+                    _scene->addLight(spotLight);
+                    std::cout << "Create light: spot light" << std::endl;
                 } else {
                     ASSERT(false, "Only support area type for now");
                 }
+            }
+
+            void XmlSceneImporter::handleTagLookAt(pugi::xml_node &node, ParseInfo &parent) {
+                const Vector3F origin = toVector(node.attribute("origin").value());
+                const Vector3F target = toVector(node.attribute("target").value());
+                const Vector3F up = toVector(node.attribute("up").value());
+
+                Matrix4F mat;
+                mat[3][0] = origin[0];
+                mat[3][1] = origin[1];
+                mat[3][2] = origin[2];
+                mat[3][3] = 1;
+
+                Vector3F forward = NORMALIZE(target - origin);
+                Vector3F left = CROSS(up, forward);
+                Vector3F realUp = CROSS(forward, left);
+                mat[0][0] = left[0];
+                mat[0][1] = left[1];
+                mat[0][2] = left[2];
+                mat[0][3] = 0;
+
+                mat[1][0] = realUp[0];
+                mat[1][1] = realUp[1];
+                mat[1][2] = realUp[2];
+                mat[1][3] = 0;
+
+                mat[2][0] = forward[0];
+                mat[2][1] = forward[1];
+                mat[2][2] = forward[2];
+                mat[2][3] = 0;
+
+                parent.transformMat = transform::Transform(mat);
             }
 
             void XmlSceneImporter::handleXmlNode(pugi::xml_node &node,
@@ -453,6 +520,9 @@ namespace kaguya {
                         break;
                     case Tag_Emitter:
                         handleTagEmitter(node, parseInfo, parentParseInfo);
+                        break;
+                    case Tag_LookAt:
+                        handleTagLookAt(node, parentParseInfo);
                         break;
                     default:
                         std::cout << "Unsupport tag type: " << node.name() << std::endl;

@@ -70,6 +70,7 @@ using Point3I = Vector3i;
 #define NORMALIZE(x) glm::normalize(x)
 #define LENGTH(x) glm::length(x)
 #define CROSS(x, y) glm::cross(x, y)
+#define LOOK_AT(eye, center, up) glm::lookAt(eye, center, up)
 
 namespace kaguya {
     namespace sampler {

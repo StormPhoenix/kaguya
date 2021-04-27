@@ -6,6 +6,18 @@
 
 namespace kaguya {
     namespace core {
+        SpotLight::SpotLight(const Spectrum &intensity, Transform::Ptr lightToWorld,
+                             const MediumBoundary &mediumBoundary, Float fallOffRange, Float totalRange) :
+                Light(DELTA_POSITION, mediumBoundary),
+                _intensity(intensity) {
+            ASSERT(_mediumBoundary.inside() == _mediumBoundary.outside(), "SpotLight medium must be equal.");
+            _lightToWorld = lightToWorld != nullptr ? lightToWorld : std::make_shared<Transform>();
+            _center = _lightToWorld->transformPoint(Point3F(0));
+            _dir = NORMALIZE(_lightToWorld->transformVector(Vector3F(0, 1, 0)));
+
+            _cosFallOffRange = std::cos(math::DEGREES_TO_RADIANS(fallOffRange));
+            _cosTotalRange = std::cos(math::DEGREES_TO_RADIANS(totalRange));
+        }
 
         SpotLight::SpotLight(const Vector3F center, const Vector3F dir, Spectrum intensity,
                              const MediumBoundary &mediumBoundary, Float fallOffRange, Float totalRange) :

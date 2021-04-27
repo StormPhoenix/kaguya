@@ -37,6 +37,7 @@ namespace kaguya {
                 Tag_String,
                 Tag_Transform,
                 Tag_Matrix,
+                Tag_LookAt,
                 Tag_RGB,
             } TagType;
 
@@ -94,6 +95,8 @@ namespace kaguya {
                 void handleTagRGB(pugi::xml_node &node, ParseInfo &parentParseInfo);
 
                 void handleTagEmitter(pugi::xml_node &node, ParseInfo &info, ParseInfo &parent);
+
+                void handleTagLookAt(pugi::xml_node &node, ParseInfo &parent);
 
                 std::shared_ptr<std::vector<Shape::Ptr>> createRectangleShape(ParseInfo &info);
 
