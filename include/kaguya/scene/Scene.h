@@ -7,7 +7,6 @@
 
 #include <kaguya/core/Interaction.h>
 #include <kaguya/scene/meta/Shape.h>
-#include <kaguya/scene/Aggregation.h>
 #include <kaguya/tracer/Camera.h>
 #include <memory>
 

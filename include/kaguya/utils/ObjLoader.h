@@ -6,7 +6,7 @@
 #define KAGUYA_OBJLOADER_H
 
 #include <vector>
-#include <kaguya/scene/aggregation/TriangleMesh.h>
+#include <kaguya/scene/TriangleMesh.h>
 
 namespace kaguya {
     namespace utils {

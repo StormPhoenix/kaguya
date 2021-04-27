@@ -32,6 +32,16 @@ namespace kaguya {
                 return compareBox(a, b, 2);
             }
 
+            AABB BVH::mergeAABB(const AABB &a, const AABB &b) const {
+                Vector3F small(std::min(a.min().x, b.min().x),
+                               std::min(a.min().y, b.min().y),
+                               std::min(a.min().z, b.min().z));
+                Vector3F big(std::max(a.max().x, b.max().x),
+                             std::max(a.max().y, b.max().y),
+                             std::max(a.max().z, b.max().z));
+                return AABB(small, big);
+            }
+
             BVH::BVH(std::shared_ptr<Intersectable> object) {
                 std::vector<std::shared_ptr<Intersectable>> objects;
                 objects.push_back(object);
@@ -98,10 +108,6 @@ namespace kaguya {
 
             const AABB &BVH::boundingBox() const {
                 return _aabb;
-            }
-
-            const std::vector<std::shared_ptr<Intersectable>> BVH::aggregation() const {
-                return _objects;
             }
         }
     }

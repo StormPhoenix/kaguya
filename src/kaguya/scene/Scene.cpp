@@ -11,12 +11,12 @@
 #include <kaguya/scene/meta/Triangle.h>
 #include <kaguya/scene/Geometry.h>
 #include <kaguya/Config.h>
-#include <kaguya/scene/aggregation/Box.h>
+#include <kaguya/scene/Cube.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/accumulation/BVH.h>
 #include <kaguya/scene/meta/Sphere.h>
 #include <kaguya/scene/meta/Triangle.h>
-#include <kaguya/scene/aggregation/TriangleMesh.h>
+#include <kaguya/scene/TriangleMesh.h>
 #include <kaguya/material/Dielectric.h>
 #include <kaguya/material/Lambertian.h>
 #include <kaguya/material/Metal.h>

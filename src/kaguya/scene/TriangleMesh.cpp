@@ -4,13 +4,17 @@
 
 #include <kaguya/math/Math.h>
 #include <kaguya/scene/meta/Triangle.h>
-#include <kaguya/scene/aggregation/TriangleMesh.h>
+#include <kaguya/scene/TriangleMesh.h>
 
 namespace kaguya {
     namespace scene {
 
         // TODO delete
         using namespace meta;
+
+        TriangleMesh::TriangleMesh() {
+            _triangles = std::make_shared<std::vector<Shape::Ptr>>();
+        }
 
         TriangleMesh::TriangleMesh(std::vector<Vector3F> &vertices, std::vector<Normal3F> &normals,
                                    std::vector<Point2F> &texcoords, std::vector<TriIndex> &indics,

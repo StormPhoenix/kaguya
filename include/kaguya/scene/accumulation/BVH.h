@@ -5,7 +5,7 @@
 #ifndef KAGUYA_BVH_H
 #define KAGUYA_BVH_H
 
-#include <kaguya/scene/Aggregation.h>
+#include <kaguya/scene/Intersectable.h>
 #include <kaguya/scene/Geometry.h>
 #include <kaguya/scene/accumulation/AABB.h>
 
@@ -15,7 +15,7 @@ namespace kaguya {
     namespace scene {
         namespace acc {
 
-            class BVH : public Aggregation {
+            class BVH : public Intersectable {
             public:
                 BVH() {}
 
@@ -25,11 +25,11 @@ namespace kaguya {
 
                 BVH(std::vector<std::shared_ptr<Intersectable>> &objects, size_t start, size_t end);
 
+                AABB mergeAABB(const AABB &a, const AABB &b) const;
+
                 const AABB &boundingBox() const override;
 
                 bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const override;
-
-                virtual const std::vector<std::shared_ptr<Intersectable>> aggregation() const override;
 
             protected:
                 /**

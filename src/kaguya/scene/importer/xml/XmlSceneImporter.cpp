@@ -6,6 +6,7 @@
 #include <kaguya/core/Transform.h>
 #include <kaguya/scene/meta/Triangle.h>
 #include <kaguya/scene/accumulation/BVH.h>
+#include <kaguya/scene/Cube.h>
 #include <kaguya/material/texture/Texture.h>
 #include <kaguya/material/texture/ConstantTexture.h>
 #include <kaguya/material/Lambertian.h>
@@ -283,50 +284,9 @@ namespace kaguya {
             }
 
             std::shared_ptr<std::vector<Shape::Ptr>> XmlSceneImporter::createCubeShape(ParseInfo &info) {
-                Vector3F vertices[] = {
-                        {1,  -1, -1},
-                        {1,  -1, 1},
-                        {-1, -1, 1},
-                        {-1, -1, -1},
-                        {1,  1,  -1},
-                        {-1, 1,  -1},
-                        {-1, 1,  1},
-                        {1,  1,  1}
-                };
-
-                Vector3i indices[] = {
-                        {7, 2, 1},
-                        {7, 6, 2},
-                        {4, 1, 0},
-                        {4, 7, 1},
-                        {5, 0, 3},
-                        {5, 4, 0},
-                        {6, 3, 2},
-                        {6, 5, 3},
-                        {4, 6, 7},
-                        {4, 5, 6},
-                        {1, 2, 3},
-                        {1, 3, 0}
-                };
-
-                auto transformMat = info.container["toWorld"].value.transformValue;
-                Transform::Ptr toWorld = std::make_shared<Transform>(transformMat.mat());
-
-                std::shared_ptr<std::vector<Shape::Ptr>> ret = std::make_shared<std::vector<Shape::Ptr>>();
-                for (int i = 0; i < 12; i++) {
-                    Vector3i index = indices[i];
-                    Vector3F v1 = vertices[index[0]];
-                    Vector3F v2 = vertices[index[1]];
-                    Vector3F v3 = vertices[index[2]];
-                    Normal3F normal = NORMALIZE(CROSS(v2 - v1, v3 - v1));
-                    Vector2F textureCoord = Vector2F(0, 0);
-                    Shape::Ptr shape = std::make_shared<Triangle>(
-                            v1, v2, v3, normal, normal, normal,
-                            textureCoord, textureCoord, textureCoord,
-                            toWorld);
-                    ret->push_back(shape);
-                }
-                return ret;
+                auto transform = info.container["toWorld"].value.transformValue;
+                Cube::Ptr cubePtr = std::make_shared<Cube>(transform.mat());
+                return cubePtr->triangles();
             }
 
             std::shared_ptr<std::vector<Shape::Ptr>> XmlSceneImporter::createObjMeshes(ParseInfo &info) {

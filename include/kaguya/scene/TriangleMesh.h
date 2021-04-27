@@ -19,7 +19,7 @@ namespace kaguya {
         using kaguya::scene::acc::BVH;
         using kaguya::core::transform::Transform;
 
-        class TriangleMesh final : public BVH {
+        class TriangleMesh {
         public:
 
             typedef struct Index {
@@ -41,6 +41,8 @@ namespace kaguya {
 
             typedef std::shared_ptr<TriangleMesh> Ptr;
 
+            TriangleMesh();
+
             TriangleMesh(std::vector<Vector3F> &vertices, std::vector<Normal3F> &normals,
                          std::vector<Point2F> &texcoords, std::vector<TriIndex> &indics,
                          std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(),
@@ -50,7 +52,7 @@ namespace kaguya {
 
             virtual ~TriangleMesh() {}
 
-        private:
+        protected:
             std::shared_ptr<std::vector<Shape::Ptr>> _triangles;
         };
 

@@ -47,7 +47,7 @@ namespace kaguya {
     std::string Config::renderType = "pt";
 
     std::shared_ptr<Scene> Config::nextScene() {
-        /*
+//        /*
         std::vector<std::string> sceneList = {{"resource/scenes/water-caustic/"},};
         using namespace kaguya::scene::importer;
         XmlSceneImporter importer = XmlSceneImporter();
@@ -59,9 +59,9 @@ namespace kaguya {
         } else {
             return nullptr;
         }
-         */
+//         */
 
-//        /* TODO delete
+        /* TODO delete
         // 若场景未构建，则线构建场景
         if (!isScenePrepared) {
 //            Scene::initSceneComponents();
@@ -90,6 +90,6 @@ namespace kaguya {
         } else {
             return nullptr;
         }
-//         */
+         */
     }
 }

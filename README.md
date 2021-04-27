@@ -61,8 +61,6 @@ A simple physically based render.
 
 - [ ] 添加 Stratified Sampler、Sobel Sampler
 
-- [ ] Geometry Aggregation 结构调整
-
 - [ ] 自己实现 Transformation，加上 Error 管理
 
 ## Unsolved
@@ -132,11 +130,6 @@ A simple physically based render.
     - [x] modify the method which applied for triangle intersection, and calculate the error bound. 
     
 - [x] randomInt 会出现随机到 randomValue = 1.0 的地方，得出的 int 值会让调用者越界
-
-- [x] 重新调整 Shape, Geometry, Aggregation 结构
-    - [x] 重新定义 Shape, Geometry, Aggregation
-    - [x] Shape 子类命名空间调整
-    - [x] TriangleMesh 在新架构下重构
 
 - [x] Smoke 的渲染改进
     - [x] Smoke 会在地板下面透射一个方形的影子，这个很不正常
