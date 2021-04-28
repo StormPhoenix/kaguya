@@ -96,10 +96,6 @@ namespace kaguya {
             testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
                              std::vector<std::shared_ptr<Light>> &lights, const std::shared_ptr<Material> material);
 
-            static std::vector<std::shared_ptr<Geometry>>
-            testTopAreaLightByTime(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
-                                   std::vector<std::shared_ptr<Light>> &lights,
-                                   const std::shared_ptr<Material> material, Float t);
             */
             static std::vector<std::shared_ptr<Geometry>> testBottomWall(const std::shared_ptr<Material> material,
                                                                          const std::shared_ptr<Medium> insideMedium,
@@ -130,26 +126,14 @@ namespace kaguya {
                                                                    const std::shared_ptr<Medium> inside,
                                                                    const std::shared_ptr<Medium> outside,
                                                                    bool singleSide);
-            */
 
             static std::shared_ptr<Scene> sceneSmoke();
 
-            /*
-            static std::shared_ptr<Scene> cornelBoxWater();
-
-            static std::shared_ptr<Scene> sceneTwoBox();
-
             static std::shared_ptr<Scene> sceneDeskAndBunny();
 
-            static std::shared_ptr<Scene> sceneLightThroughAir();
              */
 
 #endif
-
-            /**
-             * 构建 Cornel box，加载 bunny 模型
-             */
-            static std::shared_ptr<Scene> sceneBunnyWithAreaLight();
 
             /**
              * 构建 Cornel box，加载 bunny 模型，次表面散射材质
@@ -161,25 +145,7 @@ namespace kaguya {
              */
             static std::shared_ptr<Scene> sceneBunnyWithPointLight();
 
-            /**
-             * 构建 two spheres，用区域光源
-             */
             static std::shared_ptr<Scene> sceneTwoSpheresWithAreaLight();
-
-            /**
-             * 测试 PointLight
-             */
-            static std::shared_ptr<Scene> sceneTwoSpheresWithPointLight();
-
-            /**
-             * 测试 SpotLight
-             */
-            static std::shared_ptr<Scene> sceneTwoSpheresWithSpotLight();
-
-            /**
-             * 构建 Cornel-box 场景测试
-             */
-             static std::shared_ptr<Scene> sceneCornelBoxXml();
 
             /**
              * Intersect with scene，record the interaction

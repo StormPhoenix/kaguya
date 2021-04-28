@@ -1,8 +1,10 @@
 //
 // Created by Storm Phoenix on 2020/10/2.
 //
-#include <iostream>
+#include <kaguya/Config.h>
 #include <kaguya/scene/meta/Triangle.h>
+
+#include <iostream>
 
 namespace kaguya {
     namespace scene {
@@ -16,7 +18,7 @@ namespace kaguya {
                       _uv1(uv1), _uv2(uv2), _uv3(uv3),
                       _transformMatrix(transformMatrix) {
                 assert(transformMatrix != nullptr);
-                usingNg = (LENGTH(_n1) == 0 || LENGTH(_n2) == 0 || LENGTH(_n3) == 0);
+                usingNg = (Config::Tracer::strictNormals || LENGTH(_n1) == 0 || LENGTH(_n2) == 0 || LENGTH(_n3) == 0);
                 init();
             }
 

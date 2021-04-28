@@ -37,6 +37,7 @@ namespace kaguya {
                 Tag_String,
                 Tag_Transform,
                 Tag_Matrix,
+                Tag_Vector,
                 Tag_LookAt,
                 Tag_RGB,
             } TagType;
@@ -50,6 +51,7 @@ namespace kaguya {
                     Attr_Float,
                     Attr_Transform,
                     Attr_String,
+                    Attr_Vector,
                 } type;
 
                 struct Val {
@@ -59,6 +61,7 @@ namespace kaguya {
                     Float floatValue;
                     transform::Transform transformValue;
                     std::string stringValue;
+                    Vector3F vectorValue;
                 } value;
 
                 AttrVal() {}
@@ -97,6 +100,10 @@ namespace kaguya {
                 void handleTagEmitter(pugi::xml_node &node, ParseInfo &info, ParseInfo &parent);
 
                 void handleTagLookAt(pugi::xml_node &node, ParseInfo &parent);
+
+                void handleTagVector(pugi::xml_node &node, ParseInfo &parent);
+
+                void handleTagIntegrator(pugi::xml_node &node, ParseInfo &info);
 
                 std::shared_ptr<std::vector<Shape::Ptr>> createRectangleShape(ParseInfo &info);
 

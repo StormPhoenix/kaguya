@@ -19,6 +19,10 @@ namespace kaguya {
             _scene = Config::nextScene();
 
             while (_scene != nullptr) {
+                // Print config info
+                std::cout << std::endl << "Max depth: " << Config::Tracer::maxDepth << std::endl;
+                std::cout << "Sample number: " << Config::Tracer::sampleNum << std::endl;
+
                 _camera = _scene->getCamera();
 
                 assert(_camera != nullptr);
