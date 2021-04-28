@@ -48,12 +48,12 @@ namespace kaguya {
 
     std::shared_ptr<Scene> Config::nextScene() {
 //        /*
-        std::vector<std::string> sceneList = {{"resource/scenes/dragon/"},};
+        std::vector<std::string> sceneList = {{"/resource/scenes/dragon/"},};
         using namespace kaguya::scene::importer;
         XmlSceneImporter importer = XmlSceneImporter();
         sceneId++;
         if (sceneId < sceneList.size()) {
-            std::string scene_dir = fs::current_path() / sceneList[sceneId];
+            std::string scene_dir = fs::current_path().generic_u8string() + sceneList[sceneId];
             Config::sceneDir = scene_dir;
             return importer.importScene(scene_dir);
         } else {

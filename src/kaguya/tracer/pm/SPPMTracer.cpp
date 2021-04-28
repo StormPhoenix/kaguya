@@ -119,10 +119,10 @@ namespace kaguya {
                 {
                     auto cameraPassFunc = [&](const int idxTileX, const int idxTileY) -> void {
                         int startRow = idxTileY * Config::Parallel::tileSize;
-                        int endRow = std::min(startRow + Config::Parallel::tileSize - 1, height - 1);
+                        int endRow = (std::min)(startRow + Config::Parallel::tileSize - 1, height - 1);
 
                         int startCol = idxTileX * Config::Parallel::tileSize;
-                        int endCol = std::min(startCol + Config::Parallel::tileSize - 1, width - 1);
+                        int endCol = (std::min)(startCol + Config::Parallel::tileSize - 1, width - 1);
 
                         MemoryArena &arena = memoryArenaPerThread[threadIdx];
                         Sampler *sampler = sampler::SamplerFactory::newSampler(nIterations);
@@ -236,7 +236,7 @@ namespace kaguya {
 
                                             // Russian Roultte
                                             if (beta.g() < 0.25) {
-                                                Float terminateProb = 1 - std::min(Float(1.), beta.g());
+                                                Float terminateProb = 1 - (std::min)(Float(1.), beta.g());
                                                 if (sampler->sample1D() < terminateProb) {
                                                     break;
                                                 }
@@ -277,8 +277,8 @@ namespace kaguya {
                         }
 
                         // Search max radius
-                        gridSize = std::max(gridSize, pixel.searchRadius);
-                        minSearchRadius = std::min(minSearchRadius, pixel.searchRadius);
+                        gridSize = (std::max)(gridSize, pixel.searchRadius);
+                        minSearchRadius = (std::min)(minSearchRadius, pixel.searchRadius);
                     }
 
                     /* Resolution computation */
@@ -412,7 +412,7 @@ namespace kaguya {
                             Spectrum newBeta = beta * f * ABS_DOT(wi, si.rendering.normal) / samplePdf;
 
                             // Russian Roulette
-                            Float terminateProb = std::max(1. - newBeta.r() / beta.r(), 0.);
+                            Float terminateProb = (std::max)(1. - newBeta.r() / beta.r(), 0.);
                             if (haltonSampler->sample1D() < terminateProb) {
                                 break;
                             }

@@ -11,6 +11,14 @@
 #include <string>
 #include <map>
 
+#if defined(_WINDOWS)
+	#ifndef WINDOWS
+		#define WINDOWS
+		#define NOMINMAX
+	#endif
+#endif
+
+
 #if defined(__cplusplus) && __cplusplus >= 201703L && defined(__has_include)
 #if __has_include(<filesystem>)
 #define GHC_USE_STD_FS
@@ -19,9 +27,12 @@ namespace fs = std::filesystem;
 #endif
 #endif
 #ifndef GHC_USE_STD_FS
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <ext/ghc/filesystem.hpp>
 namespace fs = ghc::filesystem;
 #endif
+
+#include <cstdlib>
 
 namespace kaguya {
 

@@ -11,7 +11,7 @@ namespace kaguya {
 
         using kaguya::core::medium::MediumBoundary;
 
-        Camera::Camera(std::shared_ptr<Transform> transformMat, Float fov, Float near, Float far) {
+        Camera::Camera(std::shared_ptr<Transform> transformMat, Float fov, Float nearSection, Float farSection) {
             if (transformMat == nullptr) {
                 transformMat = std::make_shared<Transform>();
             }
@@ -19,7 +19,7 @@ namespace kaguya {
             _front = transformMat->transformVector(Vector3F(0, 0, 1));
             _right = transformMat->transformVector(Vector3F(-1, 0, 0));
             _up = NORMALIZE(CROSS(_right, _front));
-            _focal = near;
+            _focal = nearSection;
 
             _resolutionHeight = Config::Camera::height;
             _resolutionWidth = Config::Camera::width;

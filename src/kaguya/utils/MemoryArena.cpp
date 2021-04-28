@@ -3,6 +3,7 @@
 //
 
 #include <kaguya/utils/MemoryArena.h>
+#include <kaguya/Common.h>
 
 #if defined(KAGUYA_WINDOWS_MALLOC_ALIGNED)
 #include <malloc.h>

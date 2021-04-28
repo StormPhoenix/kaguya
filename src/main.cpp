@@ -1,3 +1,4 @@
+#include <kaguya/Common.h>
 #include <kaguya/Config.h>
 #include <kaguya/tracer/TracerFactory.h>
 

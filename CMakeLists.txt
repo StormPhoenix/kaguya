@@ -70,4 +70,3 @@ file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pugixml/*.cpp)
 
 add_executable(kaguya ${sources})
-target_link_libraries(kaguya pthread)

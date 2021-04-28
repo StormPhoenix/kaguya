@@ -17,7 +17,7 @@ namespace kaguya {
                 AABB boxA = a->boundingBox();
                 AABB boxB = b->boundingBox();
 
-                return boxA.min()[axis] < boxB.min()[axis];
+                return boxA.minPos()[axis] < boxB.minPos()[axis];
             }
 
             bool compareX(const std::shared_ptr<Intersectable> a, const std::shared_ptr<Intersectable> b) {
@@ -33,13 +33,13 @@ namespace kaguya {
             }
 
             AABB BVH::mergeAABB(const AABB &a, const AABB &b) const {
-                Vector3F small(std::min(a.min().x, b.min().x),
-                               std::min(a.min().y, b.min().y),
-                               std::min(a.min().z, b.min().z));
-                Vector3F big(std::max(a.max().x, b.max().x),
-                             std::max(a.max().y, b.max().y),
-                             std::max(a.max().z, b.max().z));
-                return AABB(small, big);
+                Vector3F minimum((std::min)(a.minPos().x, b.minPos().x),
+                               (std::min)(a.minPos().y, b.minPos().y),
+                               (std::min)(a.minPos().z, b.minPos().z));
+                Vector3F maxmum((std::max)(a.maxPos().x, b.maxPos().x),
+                             (std::max)(a.maxPos().y, b.maxPos().y),
+                             (std::max)(a.maxPos().z, b.maxPos().z));
+                return AABB(minimum, maxmum);
             }
 
             BVH::BVH(std::shared_ptr<Intersectable> object) {

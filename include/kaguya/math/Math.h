@@ -79,8 +79,13 @@ namespace kaguya {
 
     namespace math {
 
-        const double doubleOneMinusEpsilon = 0x1.fffffffffffffp-1;
-        const float floatOneMinusEpsilon = 0x1.fffffep-1;
+#ifdef WINDOWS
+        const double doubleOneMinusEpsilon = 0.99999999999999989;
+        const float floatOneMinusEpsilon = 0.99999994;
+#else
+		const double doubleOneMinusEpsilon = 0x1.fffffffffffffp-1;
+		const float floatOneMinusEpsilon = 0x1.fffffep-1;
+#endif
 
 #if defined(KAGUYA_DATA_DOUBLE)
         const Float ONE_MINUS_EPSILON = doubleOneMinusEpsilon;
@@ -88,7 +93,12 @@ namespace kaguya {
         const Float ONE_MINUS_EPSILON = floatOneMinusEpsilon;
 #endif
 
-        constexpr Float MAX_FLOAT = std::numeric_limits<Float>::max();
+#ifdef WINDOWS
+#define MAX_FLOAT std::numeric_limits<Float>::max()
+#else
+		constexpr Float MAX_FLOAT = std::numeric_limits<Float>::max();
+#endif
+        
         constexpr Float infinity = std::numeric_limits<Float>::infinity();
         constexpr Float epsilon = std::numeric_limits<Float>::epsilon() * 0.5;
         constexpr Float shadowEpsilon = 0.0001;
@@ -106,7 +116,7 @@ namespace kaguya {
         public:
             Bound3() {
                 Float minNum = std::numeric_limits<Float>::lowest();
-                Float maxNum = std::numeric_limits<Float>::max();
+                Float maxNum = (std::numeric_limits<Float>::max)();
                 _min = Point3F(maxNum, maxNum, maxNum);
                 _max = Point3F(minNum, minNum, minNum);
             }
@@ -125,13 +135,13 @@ namespace kaguya {
             }
 
             void merge(const Bound3 &b) {
-                _min = {std::min(_min.x, b._min.x),
-                        std::min(_min.y, b._min.y),
-                        std::min(_min.z, b._min.z)};
+                _min = {(std::min)(_min.x, b._min.x),
+						(std::min)(_min.y, b._min.y),
+						(std::min)(_min.z, b._min.z)};
 
-                _max = {std::max(_max.x, b._max.x),
-                        std::max(_max.y, b._max.y),
-                        std::max(_max.z, b._max.z)};
+                _max = {(std::max)(_max.x, b._max.x),
+						(std::max)(_max.y, b._max.y),
+						(std::max)(_max.z, b._max.z)};
             }
 
             Vector3F offset(const Point3F &p) const {
@@ -184,7 +194,7 @@ namespace kaguya {
                 std::swap(thetaI, thetaT);
             }
 
-            Float sineI = std::sqrt(std::max(Float(0.), Float(1 - std::pow(cosineI, 2))));
+            Float sineI = std::sqrt((std::max)(Float(0.), Float(1 - std::pow(cosineI, 2))));
             Float sineT = sineI * (thetaI / thetaT);
 
             if (sineT >= 1) {
@@ -192,7 +202,7 @@ namespace kaguya {
                 return 1.0f;
             }
 
-            Float cosineT = std::sqrt(std::max(Float(0.), Float(1 - std::pow(sineT, 2))));
+            Float cosineT = std::sqrt((std::max)(Float(0.), Float(1 - std::pow(sineT, 2))));
             // 计算 R_parallel
             Float parallelR = ((thetaT * cosineI) - (thetaI * cosineT)) /
                               ((thetaT * cosineI) + (thetaI * cosineT));
@@ -217,15 +227,15 @@ namespace kaguya {
             Float t0 = *stepMin, t1 = *stepMax;
             for (int axis = 0; axis < 3; ++axis) {
                 Float invStep = 1 / direction[axis];
-                Float near = (boundMin[axis] - origin[axis]) * invStep;
-                Float far = (boundMax[axis] - origin[axis]) * invStep;
+                Float nearT = (boundMin[axis] - origin[axis]) * invStep;
+                Float farT = (boundMax[axis] - origin[axis]) * invStep;
 
-                if (near > far) {
-                    std::swap(near, far);
+                if (nearT > farT) {
+                    std::swap(nearT, farT);
                 }
 
-                t0 = near > t0 ? near : t0;
-                t1 = far < t1 ? far : t1;
+                t0 = nearT > t0 ? nearT : t0;
+                t1 = farT < t1 ? farT : t1;
                 if (t0 > t1) {
                     return false;
                 }
@@ -242,7 +252,7 @@ namespace kaguya {
                 cosine = -cosine;
             }
 
-            Float sine = std::sqrt(std::max(Float(0.), Float(1 - std::pow(cosine, 2))));
+            Float sine = std::sqrt((std::max)(Float(0.), Float(1 - std::pow(cosine, 2))));
             if (sine * ref_idx >= 1) {
                 return 1.0;
             }
@@ -298,14 +308,14 @@ namespace kaguya {
          */
         inline bool refract(const Vector3F &wo, const Vector3F &normal, Float refraction, Vector3F *wi) {
             Float cosineThetaI = DOT(wo, normal);
-            Float sineThetaI = std::sqrt(std::max(Float(0.), 1 - cosineThetaI * cosineThetaI));
+            Float sineThetaI = std::sqrt((std::max)(Float(0.), 1 - cosineThetaI * cosineThetaI));
             Float sineThetaT = refraction * sineThetaI;
             if (sineThetaT > 1) {
                 // 全反射，无法折射
                 return false;
             }
 
-            Float cosineThetaT = std::sqrt(std::max(Float(0.), 1 - sineThetaT * sineThetaT));
+            Float cosineThetaT = std::sqrt((std::max)(Float(0.), 1 - sineThetaT * sineThetaT));
             *wi = refraction * (-wo) + (refraction * cosineThetaI - cosineThetaT) * normal;
             return true;
         }

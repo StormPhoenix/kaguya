@@ -27,11 +27,11 @@ namespace kaguya {
 
                 bool insectPoint(const Ray &ray, Float *minStep, Float *maxStep) const;
 
-                const Vector3F &min() const {
+                const Vector3F &minPos() const {
                     return _min;
                 }
 
-                const Vector3F &max() const {
+                const Vector3F &maxPos() const {
                     return _max;
                 }
 

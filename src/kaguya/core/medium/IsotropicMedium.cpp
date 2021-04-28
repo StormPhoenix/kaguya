@@ -2,15 +2,20 @@
 // Created by Storm Phoenix on 2020/12/17.
 //
 
+#include <kaguya/Common.h>
 #include <kaguya/core/medium/IsotropicMedium.h>
+
+#include <algorithm>
 
 namespace kaguya {
     namespace core {
         namespace medium {
 
+			using namespace math;
+
             core::Spectrum IsotropicMedium::transmittance(const tracer::Ray &ray, Sampler *sampler) const {
                 // e^{-\sigma_t * dist}
-                return exp(-_sigma_t * std::min(ray.getStep() * LENGTH(ray.getDirection()), math::MAX_FLOAT));
+                return exp(-_sigma_t * std::min(ray.getStep() * LENGTH(ray.getDirection()), MAX_FLOAT));
             }
 
             core::Spectrum
@@ -33,7 +38,7 @@ namespace kaguya {
                 }
 
                 // calculate transmittance
-                Spectrum T = exp(-_sigma_t * std::min(step, math::MAX_FLOAT) * LENGTH(ray.getDirection()));
+                Spectrum T = exp(-_sigma_t * std::min(step, MAX_FLOAT) * LENGTH(ray.getDirection()));
 
                 // calculate pdf
                 Spectrum p = sampleMedium ? _sigma_t * T : T;

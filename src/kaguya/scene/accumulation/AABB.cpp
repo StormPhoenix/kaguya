@@ -14,15 +14,15 @@ namespace kaguya {
                 Float t0 = 0, t1 = ray.getStep();
                 for (int axis = 0; axis < 3; ++axis) {
                     Float invStep = 1 / ray.getDirection()[axis];
-                    Float near = (_min[axis] - ray.getOrigin()[axis]) * invStep;
-                    Float far = (_max[axis] - ray.getOrigin()[axis]) * invStep;
+                    Float nearT = (_min[axis] - ray.getOrigin()[axis]) * invStep;
+                    Float farT = (_max[axis] - ray.getOrigin()[axis]) * invStep;
 
-                    if (near > far) {
-                        std::swap(near, far);
+                    if (nearT > farT) {
+                        std::swap(nearT, farT);
                     }
 
-                    t0 = near > t0 ? near : t0;
-                    t1 = far < t1 ? far : t1;
+                    t0 = nearT > t0 ? nearT : t0;
+                    t1 = farT < t1 ? farT : t1;
                     if (t0 > t1) {
                         return false;
                     }

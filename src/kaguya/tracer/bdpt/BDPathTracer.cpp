@@ -11,6 +11,7 @@
 #include <kaguya/sampler/SamplerFactory.hpp>
 #include <kaguya/parallel/RenderPool.h>
 
+#include <atomic>
 
 namespace kaguya {
     namespace tracer {

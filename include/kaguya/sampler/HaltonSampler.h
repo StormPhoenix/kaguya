@@ -37,8 +37,8 @@ namespace kaguya {
             int seedForCurrentPixel(int seed);
 
         private:
-            Point2I pixelForOffset = Point2I(std::numeric_limits<int>::max(),
-                                             std::numeric_limits<int>::max());
+            Point2I pixelForOffset = Point2I((std::numeric_limits<int>::max)(),
+                                             (std::numeric_limits<int>::max)());
             // Sampling seed
             int seedForPixel;
             // Dimension of sampling serial

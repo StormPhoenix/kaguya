@@ -13,7 +13,7 @@ namespace kaguya {
         EnvironmentLight::EnvironmentLight(Float intensity, std::string texturePath,
                                            const MediumBoundary &mediumBoundary,
                                            Transform::Ptr lightToWorld)
-                : Light(INFINITE, mediumBoundary), _intensity(intensity), _lightToWorld(lightToWorld) {
+                : Light(ENVIRONMENT, mediumBoundary), _intensity(intensity), _lightToWorld(lightToWorld) {
             // Check file exists
             {
                 std::ifstream in(texturePath);
@@ -127,8 +127,8 @@ namespace kaguya {
 
         void EnvironmentLight::worldBound(const Scene::Ptr scene) {
             const AABB &bound = scene->getWorld()->boundingBox();
-            _worldRadius = 0.5 * LENGTH(bound.max() - bound.min());
-            _worldCenter = (bound.max() + bound.min()) / Float(2.0);
+            _worldRadius = 0.5 * LENGTH(bound.maxPos() - bound.minPos());
+            _worldCenter = (bound.maxPos() + bound.minPos()) / Float(2.0);
         }
 
         EnvironmentLight::~EnvironmentLight() {

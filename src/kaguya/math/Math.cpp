@@ -2,6 +2,7 @@
 // Created by Storm Phoenix on 2020/12/28.
 //
 
+#include <kaguya/Common.h>
 #include <kaguya/math/Math.h>
 #include <kaguya/sampler/Sampler.h>
 
@@ -23,9 +24,17 @@ namespace kaguya {
         namespace sampling {
 
             typedef struct DRand48 {
+				const long long m = 0x100000000LL;
+				const long long c = 0xb16;
+				const long long a = 0x5deece66dLL;
+				unsigned long long seed = 1;
+
                 template<typename Integer>
-                Integer operator()(const Integer n) const {
-                    return static_cast<Integer>(drand48() * n);
+                Integer operator()(const Integer n) {
+					seed = (a * seed + c) & 0xffffffffffffLL;
+					unsigned int x = seed >> 16;
+					double randSeed = (double(x) / double(m));
+                    return static_cast<Integer>(randSeed * n);
                 }
             } DRand48;
 
@@ -3055,7 +3064,11 @@ namespace kaguya {
 
                 Float radicalReverse(uint64_t n) {
                     uint64_t rev64 = reverseBit64(n);
-                    return rev64 * 0x1p-64;
+#ifdef WINDOWS
+					return rev64 * 5.4210108624275222e-20;
+#else
+					return rev64 * 0x1p-64;
+#endif
                 }
             }
         }
