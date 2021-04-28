@@ -5,7 +5,7 @@
 #ifndef KAGUYA_XMLSCENEIMPORTER_H
 #define KAGUYA_XMLSCENEIMPORTER_H
 
-#include <pugixml/pugixml.hpp>
+#include <ext/pugixml/pugixml.hpp>
 #include <kaguya/core/Transform.h>
 #include <kaguya/scene/importer/SceneImporter.h>
 

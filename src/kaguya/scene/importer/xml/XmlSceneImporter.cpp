@@ -529,9 +529,11 @@ namespace kaguya {
                     case Tag_String:
                         handleTagString(node, parentParseInfo);
                         break;
+                        /*
                     case Tag_Sampler:
                         handleTagSampler(node, parseInfo);
                         break;
+                         */
                     case Tag_Film:
                         handleTagFilm(node, parseInfo);
                         break;
@@ -560,7 +562,7 @@ namespace kaguya {
                         handleTagIntegrator(node, parseInfo);
                         break;
                     default:
-                        std::cout << "\tUnsupport tag type: " << node.name() << std::endl;
+                        std::cout << "\tUnsupported tag: <" << node.name() << ">" << std::endl;
                 }
             }
 

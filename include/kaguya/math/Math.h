@@ -5,10 +5,10 @@
 #ifndef KAGUYA_MATH_H
 #define KAGUYA_MATH_H
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/matrix_inverse.hpp>
-#include <glm/gtx/compatibility.hpp>
+#include <ext/glm/glm.hpp>
+#include <ext/glm/gtc/matrix_transform.hpp>
+#include <ext/glm/gtc/matrix_inverse.hpp>
+#include <ext/glm/gtx/compatibility.hpp>
 
 #include <cstring>
 #include <cmath>

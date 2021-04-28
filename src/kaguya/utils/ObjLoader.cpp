@@ -5,7 +5,7 @@
 #include <kaguya/utils/ObjLoader.h>
 
 #define TINYOBJLOADER_IMPLEMENTATION
-#include <tinyobjloader/tiny_obj_loader.h>
+#include <ext/tinyobjloader/tiny_obj_loader.h>
 
 namespace kaguya {
     namespace utils {

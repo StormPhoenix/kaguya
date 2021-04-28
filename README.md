@@ -5,11 +5,9 @@ A simple physically based render.
 ## Processing
 - [ ] 场景导入
     - [ ] XML
-    - [ ] clean *.h files
     - [ ] GLM 的矩阵变换好像和 kaguya 坐标系有些不匹配，需要自己改矩阵
         - [ ] LookAt 用 macro 实现
     - [ ] Camera 内部变换修改成矩阵形式
-    - [ ] XmlImporter 创建 Scene 的代码分离开
     - [x] 删除 struct Vertex
     - [x] 删除 Assimp
     - [x] 重构 TriangleMesh
@@ -17,8 +15,6 @@ A simple physically based render.
     - [x] 测试 bunny 焦散，以及为什么 water-caustic 无法成像。
         - [x] photon 数太少，radius 初始太大，收敛太慢。这个配置下 CPU 跑的太慢了，是时候升级到 GPU 版本了 
     
-- [ ] 第三方库 ext
-
 - [ ] 添加环境光贴图
     - [ ] PathVertex::emit() 修改成 Le()
     - [ ] 考虑 EnvironmentLight(EL) 在 PT \ BDPT \ SPPM 三种情况下如何处理
@@ -44,8 +40,6 @@ A simple physically based render.
             
 - [ ] HaltonSampler 代码写的可能有问题
 
-- [ ] 编写实时展现渲染进度的功能。
-
 - [ ] 添加 Stratified Sampler、Sobel Sampler
 
 - [ ] 自己实现 Transformation，加上 Error 管理
@@ -56,17 +50,13 @@ A simple physically based render.
     - [x] sampleS()，检查 BSSRDFTable 数据、插值结果、采样的 pi (经过检查，catmull-rom、TabulatedBSSRDF、Table 赋值都没有错误)
     - [x] 采样得到的 pi.bsdf->sampleF() 经常返回 0.3 左右的值。检查是因为场景的 MODEL_SCALE 参数和 sigma_t 参数不匹配，导致射线击不中场景
     - [x] 修改 sigma_t 参数，射线依然无法击中（实际上是能击中的，但是 PT 里面的 uniformSampleLight 用的不是 rendering.normal，导致采样的光线为 0）
-    - [ ] Subsurface Bunny 下面会透光，这是不允许的
-        - [ ] 降低兔子靠近下平面，光线越来越明显
+    - [x] Subsurface Bunny 下面会透光，这是不允许的
+        - [x] 降低兔子靠近下平面，光线越来越明显(模型下面破了一个洞)
     - [x] Bunny 表面呈现血管纹路，猜测是 found、额外的 pdf 造成的 (已解决：去掉额外的 x \ z 轴的采样)
     
     - [ ] Bunny 耳朵边缘部分存在噪点，应该在采样 Sr 半径时考虑射线与 Surface 的夹角，判断使用哪一条轴做采样
 
-- [ ] Ray direction 和 step 的关系，direction 长度可以不为 1。    
-
-- [ ] Move *struct Vertex* to new package
-
-- [ ] Bunny 透明材质出现黑块，且整体偏暗；光源面积缩小一倍，提高光源亮度，整个场景变成暗色，出现大量白色燥点；
+- [x] Bunny 透明材质出现黑块，且整体偏暗；光源面积缩小一倍，提高光源亮度，整个场景变成暗色，出现大量白色燥点；
     参考 [知乎-文刀秋二](https://www.zhihu.com/question/48961286/answer/113580178)
 
 - [ ] 电解质折射率问题

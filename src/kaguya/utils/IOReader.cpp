@@ -4,7 +4,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 
-#include <stb/stb_image.h>
+#include <ext/stb/stb_image.h>
 
 namespace kaguya {
     namespace utils {

@@ -101,7 +101,7 @@ namespace kaguya {
             return buildSphere(center, radius, lamb);
         }
 
-        void Scene::initSceneComponents() {
+        void Scene::s() {
 
             imageTexture1 = std::make_shared<ImageTexture<Spectrum>>(
                     "./resource/texture/texture1.jpg");
