@@ -69,7 +69,7 @@ namespace kaguya {
         }
 
         void Camera::rayImportance(const Ray &ray, Float &pdfPos, Float &pdfDir) const {
-            Float cosine = DOT(ray.getDirection(), _cameraToWorld->transformNormal(Normal3F(0, 0, 1)));
+            Float cosine = DOT(ray.getDirection(), _front);
             if (cosine <= 0) {
                 pdfPos = 0.;
                 pdfDir = 0.;
@@ -94,7 +94,7 @@ namespace kaguya {
         }
 
         Spectrum Camera::rayImportance(const Ray &ray, Point2F *const filmPosition) const {
-            Float cosine = DOT(ray.getDirection(), _cameraToWorld->transformNormal(Normal3F(0, 0, 1)));
+            Float cosine = DOT(ray.getDirection(), _front);
             if (cosine <= 0) {
                 return Spectrum(0.);
             }
