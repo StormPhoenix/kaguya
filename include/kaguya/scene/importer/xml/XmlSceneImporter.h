@@ -93,7 +93,7 @@ namespace kaguya {
 
                 void handleTagShape(pugi::xml_node &node, ParseInfo &parseInfo);
 
-                void handleTagRef(pugi::xml_node &node, ParseInfo &info);
+                void handleTagRef(pugi::xml_node &node, ParseInfo &parent);
 
                 void handleTagRGB(pugi::xml_node &node, ParseInfo &parentParseInfo);
 
@@ -112,6 +112,10 @@ namespace kaguya {
                 std::shared_ptr<std::vector<Shape::Ptr>> createObjMeshes(ParseInfo &info);
 
                 Material::Ptr createDiffuseMaterial(ParseInfo &info);
+
+                Material::Ptr createMirrorMaterial(ParseInfo &info);
+
+                Material::Ptr createGlassMaterial(ParseInfo &info);
 
                 Material::Ptr createDielectricMaterial(ParseInfo &info);
 

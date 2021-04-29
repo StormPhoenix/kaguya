@@ -11,6 +11,7 @@
 #include <kaguya/material/texture/ConstantTexture.h>
 #include <kaguya/material/Lambertian.h>
 #include <kaguya/material/Dielectric.h>
+#include <kaguya/material/Metal.h>
 #include <kaguya/scene/importer/xml/XmlSceneImporter.h>
 #include <kaguya/utils/ObjLoader.h>
 
@@ -232,9 +233,13 @@ namespace kaguya {
                     material = createDiffuseMaterial(parseInfo);
                 } else if (type == "dielectric") {
                     material = createDielectricMaterial(parseInfo);
+                } else if (type == "mirror") {
+                    material = createMirrorMaterial(parseInfo);
+                } else if (type == "glass") {
+                    material = createGlassMaterial(parseInfo);
                 } else {
                     // TODO
-                    ASSERT(false, "Only support diffuse material for now");
+                    ASSERT(false, "Material " + type + " not supported for now");
                 }
 
                 if (id == "") {
@@ -242,6 +247,13 @@ namespace kaguya {
                 } else {
                     _materialMap[id] = material;
                 }
+            }
+
+            Material::Ptr XmlSceneImporter::createGlassMaterial(ParseInfo &info) {
+                Float extIOR = 1.;
+                Float intIOR = 1.5;
+                Texture<Spectrum>::Ptr texture = std::make_shared<ConstantTexture<Spectrum>>(1.0);
+                return std::make_shared<Dielectric>(texture, extIOR, intIOR);
             }
 
             Material::Ptr XmlSceneImporter::createDielectricMaterial(ParseInfo &info) {
@@ -274,6 +286,10 @@ namespace kaguya {
                     ASSERT(type == AttrVal::Attr_Spectrum, "Only support spectrum reflectance for now.");
                 }
                 return material;
+            }
+
+            Material::Ptr XmlSceneImporter::createMirrorMaterial(ParseInfo &info) {
+                return std::make_shared<Metal>();
             }
 
             std::shared_ptr<std::vector<Shape::Ptr>> XmlSceneImporter::createRectangleShape(ParseInfo &info) {
@@ -376,10 +392,10 @@ namespace kaguya {
                 }
             }
 
-            void XmlSceneImporter::handleTagRef(pugi::xml_node &node, ParseInfo &info) {
+            void XmlSceneImporter::handleTagRef(pugi::xml_node &node, ParseInfo &parent) {
                 std::string id = node.attribute("id").value();
                 ASSERT(_materialMap.count(id) > 0, "Material " + id + " Not Exists.!");
-                info.currentMaterial = _materialMap[id];
+                parent.currentMaterial = _materialMap[id];
             }
 
             void XmlSceneImporter::handleTagRGB(pugi::xml_node &node, ParseInfo &parentParseInfo) {

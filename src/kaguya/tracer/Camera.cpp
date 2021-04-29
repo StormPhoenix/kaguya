@@ -20,21 +20,22 @@ namespace kaguya {
                                Transform::perspective(hFov, nearClip, farClip)).inverse().ptr();
 
             _cameraToRaster = _rasterToCamera->inverse().ptr();
+            _origin = _cameraToWorld->transformPoint(Point3F(0., 0., 0.));
 
             Point3F filmMin = _rasterToCamera->transformPoint(Point3F(0, 0, 0));
             Point3F filmMax = _rasterToCamera->transformPoint(
                     Point3F(Config::Camera::width, Config::Camera::height, 0));
             _area = (filmMax.x - filmMin.x) * (filmMax.y - filmMin.y);
+            _front = NORMALIZE(_cameraToWorld->transformPoint(Vector3F(0, 0, 1)));
         }
 
         Ray Camera::sendRay(Float u, Float v) const {
-            int x = Config::Camera::width * u;
-            int y = Config::Camera::height * v;
+            Float x = Config::Camera::width * u;
+            Float y = Config::Camera::height * v;
             Vector3F dir = NORMALIZE(_rasterToCamera->transformPoint(Point3F(x, y, 0)));
 
             dir = NORMALIZE(_cameraToWorld->transformVector(dir));
-            Point3F origin = _cameraToWorld->transformPoint(Point3F(0.0, 0.0, 0.0));
-            return Ray(origin, dir, _medium.get());
+            return Ray(_origin, dir, _medium.get());
         }
 
         FilmPlane *Camera::buildFilmPlane(int channel) const {

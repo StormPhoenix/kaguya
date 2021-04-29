@@ -29,12 +29,6 @@ namespace kaguya {
             Camera(Transform::Ptr cameraToWorld, Float hFov, Float nearClip = 1.0, Float farClip = 10000,
                    Medium::Ptr medium = nullptr);
 
-            /**
-             * 获取射线
-             * @param u
-             * @param v
-             * @return
-             */
             Ray sendRay(Float u, Float v) const;
 
             const Vector3F &getFront() const {
@@ -79,15 +73,10 @@ namespace kaguya {
              */
             Spectrum rayImportance(const Ray &ray, Point2F *const filmPosition) const;
         private:
-            // 相机位置
+            Vector3F _origin;
             Vector3F _front;
-            Vector3F _right;
-            // 相机成像平面面积
             Float _area;
-            // 相机光圈大小
-            Float _lensRadius = 0.025;
-            // 默认焦距为 10
-            Float _focal = 10;
+            Float _lensRadius = 0.00025;
 
             Float _nearClip;
             Float _farClip;
