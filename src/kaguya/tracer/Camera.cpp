@@ -15,6 +15,7 @@ namespace kaguya {
             if (transformMat == nullptr) {
                 transformMat = std::make_shared<Transform>();
             }
+            _lensRadius = 0.000025;
             _eye = transformMat->transformPoint(Vector3F(0, 0, 0));
             _front = transformMat->transformVector(Vector3F(0, 0, 1));
             _right = transformMat->transformVector(Vector3F(-1, 0, 0));
