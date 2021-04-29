@@ -217,7 +217,7 @@ namespace kaguya {
 
                 Float fov = parseInfo.container["fov"].value.floatValue;
                 transform::Transform toWorldMat = parseInfo.container["toWorld"].value.transformValue;
-                std::shared_ptr<transform::Transform> toWorld = std::make_shared<transform::Transform>(toWorldMat);
+                std::shared_ptr<transform::Transform> toWorld = std::make_shared<transform::Transform>(toWorldMat.mat());
 
                 // TODO check near far 属性
                 _scene->setCamera(std::make_shared<Camera>(toWorld, fov));

@@ -51,7 +51,7 @@ namespace kaguya {
 
     std::shared_ptr<Scene> Config::nextScene() {
 //        /*
-        std::vector<std::string> sceneList = {{"/resource/scenes/dragon/"},};
+        std::vector<std::string> sceneList = {{"/resource/scenes/cornel-box/"},};
         using namespace kaguya::scene::importer;
         XmlSceneImporter importer = XmlSceneImporter();
         sceneId++;

@@ -20,6 +20,7 @@ namespace kaguya {
 
             class Medium {
             public:
+                typedef std::shared_ptr<Medium> Ptr;
                 // 计算 ray 的透射率
                 virtual core::Spectrum transmittance(const Ray &ray, Sampler *sampler) const = 0;
 

@@ -9,6 +9,7 @@ namespace kaguya {
 
         Ray::Ray() : _medium(nullptr), _minStep(0.0), _step(math::infinity) {}
 
+        // TODO Medium 换成 shared 指针
         Ray::Ray(const Vector3F &origin, const Vector3F &direction,
                  const Medium *medium) :
                 _origin(origin), _direction(direction),

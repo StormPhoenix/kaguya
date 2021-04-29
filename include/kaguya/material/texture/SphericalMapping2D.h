@@ -18,7 +18,7 @@ namespace kaguya {
                 SphericalMapping2D(std::shared_ptr<transform::Transform> modelViewMatrix)
                         : _modelViewMatrix(modelViewMatrix) {
                     if (_modelViewMatrix != nullptr) {
-                        _worldToLocalMatrix = _modelViewMatrix->inverse();
+                        _worldToLocalMatrix = _modelViewMatrix->inverse().ptr();
                     } else {
                         _identity = true;
                     }

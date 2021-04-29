@@ -58,10 +58,6 @@ namespace kaguya {
             void writeBuffer(const Vector3F &color, int row, int col);
 
         private:
-            // 最大采样深度
-            int _maxDepth = 100;
-            // 每个像素采样次数
-            int _samplePerPixel = 300;
             // 开始 Russian Roulette 时机
             int _russianRouletteBounce;
             // Russian Roulette 概率

@@ -9,8 +9,7 @@
 namespace kaguya {
     namespace scene {
 
-        // TODO delete
-        using namespace meta;
+        using meta::Shape;
 
         TriangleMesh::TriangleMesh() {
             _triangles = std::make_shared<std::vector<Shape::Ptr>>();

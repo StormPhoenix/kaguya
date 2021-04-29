@@ -29,7 +29,19 @@ namespace kaguya {
 
                 Matrix4F mat() const;
 
-                std::shared_ptr<Transform> inverse() const;
+                Transform inverse() const;
+
+                Transform operator*(const Transform &t) const;
+
+                Ptr ptr() const;
+
+                static Transform perspective(Float fov, Float nearClip, Float farClip);
+
+                static Transform translate(Float x, Float y, Float z);
+
+                static Transform scale(Float sx, Float sy, Float sz);
+
+                static Transform lookAt(Point3F origin, Point3F target, Vector3F up);
 
             private:
                 bool _identity = false;

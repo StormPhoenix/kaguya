@@ -24,7 +24,7 @@ namespace kaguya {
             if (_lightToWorld == nullptr) {
                 _lightToWorld = std::make_shared<Transform>();
             }
-            _worldToLight = _lightToWorld->inverse();
+            _worldToLight = _lightToWorld->inverse().ptr();
             _texture = io::readImage(texturePath.c_str(), &_width, &_height, &_channel, 0);
         }
 

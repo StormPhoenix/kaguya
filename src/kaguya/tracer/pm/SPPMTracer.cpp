@@ -84,15 +84,14 @@ namespace kaguya {
 
         SPPMTracer::SPPMTracer() {
             _gamma = Config::searchRadiusDecay;
-            _samplePerPixels = Config::Tracer::sampleNum;
             _shootPhotonsPerIter = Config::photonPerIteration;
             _maxDepth = Config::Tracer::maxDepth;
             _initialRadius = Config::initialSearchRadius;
         }
 
         void SPPMTracer::render() {
-            int width = _camera->getResolutionWidth();
-            int height = _camera->getResolutionHeight();
+            int width = Config::Camera::width;
+            int height = Config::Camera::height;
 
             // Build pixels buffer
             int nPixels = width * height;
@@ -113,7 +112,7 @@ namespace kaguya {
             std::vector<MemoryArena> memoryArenaPerThread(renderCores());
 
             // Loop iterations
-            int nIterations = _samplePerPixels;
+            int nIterations = Config::Tracer::sampleNum;
             for (int iter = 0; iter < nIterations; iter++) {
                 // Generate camera ray for each pixels
                 {
@@ -136,8 +135,8 @@ namespace kaguya {
                                 SPPMPixel &pixel = pixels[pixelOffset];
 
                                 // Sample camera ray
-                                auto u = (col + sampler->sample1D()) / Float(_camera->getResolutionWidth());
-                                auto v = (row + sampler->sample1D()) / Float(_camera->getResolutionHeight());
+                                auto u = (col + sampler->sample1D()) / Float(Config::Camera::width);
+                                auto v = (row + sampler->sample1D()) / Float(Config::Camera::height);
                                 Ray cameraRay = _camera->sendRay(u, v);
                                 Spectrum beta(1.0f);
                                 bool isSpecularBounce = false;

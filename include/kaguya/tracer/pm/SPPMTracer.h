@@ -22,8 +22,6 @@ namespace kaguya {
 
             Float _gamma = 2.0 / 3.0;
 
-            int _samplePerPixels = 300;
-
             int _shootPhotonsPerIter = 8192;
 
             int _maxDepth = 100;

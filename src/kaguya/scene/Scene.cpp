@@ -3,16 +3,11 @@
 //
 
 #include <kaguya/core/light/Light.h>
-#include <kaguya/core/light/AreaLight.h>
-#include <kaguya/core/light/DiffuseAreaLight.h>
 #include <kaguya/core/light/PointLight.h>
-#include <kaguya/core/light/SpotLight.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/meta/Triangle.h>
 #include <kaguya/scene/Geometry.h>
 #include <kaguya/Config.h>
-#include <kaguya/scene/Cube.h>
-#include <kaguya/scene/Scene.h>
 #include <kaguya/scene/accumulation/BVH.h>
 #include <kaguya/scene/meta/Sphere.h>
 #include <kaguya/scene/meta/Triangle.h>
@@ -756,9 +751,10 @@ namespace kaguya {
             // build camera
             auto eye = Vector3F(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
             auto dir = Vector3F(0.0f, 0.0f, -1.0f);
-            std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
-            camera->setResolutionWidth(Config::Camera::width);
-            camera->setResolutionHeight(Config::Camera::height);
+            auto up = Vector3F(0.0f, 1.0f, 0.0f);
+
+            Transform cameraToWorld = Transform::lookAt(eye, dir, up);
+            std::shared_ptr<Camera> camera = std::make_shared<Camera>(cameraToWorld.ptr(), 60);
             scene->_camera = camera;
 
             scene->_sceneName = "bunny-with-point-light.png";

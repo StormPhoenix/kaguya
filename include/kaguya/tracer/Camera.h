@@ -11,15 +11,9 @@
 #include <kaguya/tracer/FilmPlane.h>
 #include <kaguya/utils/VisibilityTester.h>
 #include <kaguya/core/Transform.h>
+#include <kaguya/core/medium/Medium.h>
 
 namespace kaguya {
-
-    namespace core {
-        namespace medium {
-            class Medium;
-        }
-    }
-
     namespace tracer {
 
         using kaguya::core::Interaction;
@@ -31,32 +25,9 @@ namespace kaguya {
         class Camera {
         public:
             typedef std::shared_ptr<Camera> Ptr;
-            Camera(std::shared_ptr<Transform> transformMat, Float fov, Float nearSection = 1.0, Float farSection = 10000);
 
-            /**
-             * 初始化相机
-             * @param eye 相机位置
-             * @param direction 相机朝向
-             * @param fov 相机张角，角度单位
-             * @param focal 相机焦距
-             * @param aspect 相机成像平面的宽/高比例
-             */
-            Camera(const Vector3F &eye = {0.0f, 0.0f, 0.0f}, const Vector3F &direction = {0.0f, 0.0f, -1.0f},
-                   const std::shared_ptr<Medium> medium = nullptr, float fov = 60.0, float aspect = 1.0);
-
-            /**
-             * 初始化相机，设计到欧拉角的计算，这和欧拉角具体的转换方式有关。
-             * 此处以 x 轴指向为默认指向，先绕世界坐标 y 轴做 yaw 角度旋转（顺时针为正），
-             * 再绕物体坐标系的 z 轴线做 pitch 角度旋转（逆时针为正）
-             * @param eye 相机位置
-             * @param fov 张角
-             * @param focal 焦距
-             * @param aspect 宽高比例
-             * @param yaw 欧拉角，偏航角
-             * @param pitch 欧拉角，俯仰角
-             */
-            Camera(const Vector3F &eye, float yaw = -90.0f, float pitch = 0.0f,
-                   const std::shared_ptr<Medium> medium = nullptr, float fov = 60.0, float aspect = 1.0);
+            Camera(Transform::Ptr cameraToWorld, Float hFov, Float nearClip = 1.0, Float farClip = 10000,
+                   Medium::Ptr medium = nullptr);
 
             /**
              * 获取射线
@@ -65,24 +36,6 @@ namespace kaguya {
              * @return
              */
             Ray sendRay(Float u, Float v) const;
-
-            Vector3F getEye() const;
-
-            /**
-             * 获得相机成像宽度
-             * @return
-             */
-            int getResolutionWidth() const;
-
-            void setResolutionWidth(int resolutionWidth);
-
-            /**
-            * 获得相机成像高度
-            * @return
-            */
-            int getResolutionHeight() const;
-
-            void setResolutionHeight(int resolutionHeight);
 
             const Vector3F &getFront() const {
                 return _front;
@@ -125,38 +78,26 @@ namespace kaguya {
              * @return
              */
             Spectrum rayImportance(const Ray &ray, Point2F *const filmPosition) const;
-
-            /**
-             * 构建相机坐标系
-             * @param fov
-             * @param aspect
-             */
-            void buildCameraCoordinate(float fov, float aspect);
-
         private:
-            // 相机宽度分辨率
-            int _resolutionWidth = 700;
-            // 相机高度分辨率
-            int _resolutionHeight = 700;
             // 相机位置
-            Vector3F _eye;
             Vector3F _front;
             Vector3F _right;
-            Vector3F _up;
-            Vector3F _leftBottomCorner;
-            Vector3F _rightTopCorner;
-            Vector3F _diagonalVector;
-            // 相机成像平面大小
-            Float _halfWindowHeight;
-            Float _halfWindowWidth;
             // 相机成像平面面积
             Float _area;
             // 相机光圈大小
             Float _lensRadius = 0.025;
             // 默认焦距为 10
             Float _focal = 10;
+
+            Float _nearClip;
+            Float _farClip;
             // medium
-            std::shared_ptr<Medium> _medium;
+            Medium::Ptr _medium;
+
+            Transform::Ptr _cameraToWorld;
+            Transform::Ptr _worldToCamera;
+            Transform::Ptr _rasterToCamera;
+            Transform::Ptr _cameraToRaster;
         };
 
     }

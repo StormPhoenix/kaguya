@@ -15,7 +15,7 @@ namespace kaguya {
                 transformMat = TRANSLATE(transformMat, Vector3F(center[0], center[1], center[2]));
                 transformMat = SCALE(transformMat, Vector3F(radius, radius, radius));
                 _transformMatrix = std::make_shared<Transform>(transformMat);
-                _inverseTransformMatrix = _transformMatrix->inverse();
+                _inverseTransformMatrix = _transformMatrix->inverse().ptr();
 
                 _center = Vector3F(0.);
                 _transformedCenter = center;
@@ -32,7 +32,7 @@ namespace kaguya {
                 if (_transformMatrix == nullptr) {
                     _transformMatrix = std::make_shared<Transform>();
                 }
-                _inverseTransformMatrix = _transformMatrix->inverse();
+                _inverseTransformMatrix = _transformMatrix->inverse().ptr();
                 _center = Vector3F(0.);
                 _transformedCenter = _transformMatrix->transformPoint(_center);
                 _radius = LENGTH(

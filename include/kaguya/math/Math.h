@@ -57,6 +57,7 @@ using Normal3F = Vector3F;
 using Point2I = Vector2i;
 using Point3I = Vector3i;
 
+#define RADIANS(radius) glm::radians(radius)
 #define ROTATE(matrix, radius, axis) glm::rotate(matrix, glm::radians(radius), axis)
 #define TRANSLATE(matrix, offset) glm::translate(matrix, offset)
 #define SCALE(matrix, factor) glm::scale(matrix, factor)

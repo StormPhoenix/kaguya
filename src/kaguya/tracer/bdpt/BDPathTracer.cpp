@@ -27,8 +27,8 @@ namespace kaguya {
         }
 
         void BDPathTracer::render() {
-            int width = _camera->getResolutionWidth();
-            int height = _camera->getResolutionHeight();
+            int width = Config::Camera::width;
+            int height = Config::Camera::height;
 
             int nTileX = (width + Config::Parallel::tileSize - 1) / Config::Parallel::tileSize;
             int nTileY = (height + Config::Parallel::tileSize - 1) / Config::Parallel::tileSize;
@@ -43,19 +43,19 @@ namespace kaguya {
                 int startCol = idxTileX * Config::Parallel::tileSize;
                 int endCol = std::min(startCol + Config::Parallel::tileSize - 1, width - 1);
 
-                Sampler *sampler = sampler::SamplerFactory::newSampler(_samplePerPixel);
+                Sampler *sampler = sampler::SamplerFactory::newSampler(Config::Tracer::sampleNum);
                 for (int row = startRow; row <= endRow; row++) {
                     for (int col = startCol; col <= endCol; col++) {
                         // set current sampling pixel
                         sampler->forPixel(Point2F(row, col));
 
                         Spectrum ans = {0};
-                        const Float sampleWeight = 1.0 / _samplePerPixel;
+                        const Float sampleWeight = 1.0 / Config::Tracer::sampleNum;
                         // 做 _samplePerPixel 次采样
-                        for (int sampleCount = 0; sampleCount < _samplePerPixel; sampleCount++) {
+                        for (int sampleCount = 0; sampleCount < Config::Tracer::sampleNum; sampleCount++) {
                             MemoryArena arena;
-                            auto u = (col + sampler->sample1D()) / Float(_camera->getResolutionWidth());
-                            auto v = (row + sampler->sample1D()) / Float(_camera->getResolutionHeight());
+                            auto u = (col + sampler->sample1D()) / Float(Config::Camera::width);
+                            auto v = (row + sampler->sample1D()) / Float(Config::Camera::height);
 
                             Ray sampleRay = _camera->sendRay(u, v);
                             Spectrum shaderColor = shader(sampleRay, _scene, _maxDepth, sampler, arena);
@@ -78,7 +78,6 @@ namespace kaguya {
         }
 
         void BDPathTracer::init() {
-            _samplePerPixel = Config::Tracer::sampleNum;
             _sampleLightProb = Config::sampleLightProb;
             _maxDepth = Config::Tracer::maxDepth;
             _russianRouletteBounce = Config::russianRouletteDepth;
@@ -502,7 +501,7 @@ namespace kaguya {
                                                      lightSubPath, lightPathLength, s,
                                                      &samplePosition, sampler);
 
-                        const Float INV_WEIGHT = 1.0 / _samplePerPixel;
+                        const Float INV_WEIGHT = 1.0 / Config::Tracer::sampleNum;
 
                         if (t == 1) {
                             // 在成像平面的 samplePosition 位置加上 value

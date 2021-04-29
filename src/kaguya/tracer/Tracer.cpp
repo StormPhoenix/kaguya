@@ -22,6 +22,7 @@ namespace kaguya {
                 // Print config info
                 std::cout << std::endl << "Max depth: " << Config::Tracer::maxDepth << std::endl;
                 std::cout << "Sample number: " << Config::Tracer::sampleNum << std::endl;
+                std::cout << "Size: (" << Config::Camera::width << ", " << Config::Camera::height << ")" << std::endl;
 
                 _camera = _scene->getCamera();
 

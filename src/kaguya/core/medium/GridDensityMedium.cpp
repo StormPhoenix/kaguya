@@ -19,7 +19,7 @@ namespace kaguya {
                     _sigma_a(sigma_a), _sigma_s(sigma_s),
                     _g(g), _gridX(axisXGrid), _gridY(axisYGrid), _gridZ(axisZGrid),
                     _densities(densities), _transformMatrix(transformMatrix),
-                    _invTransformMatrix(transformMatrix->inverse()) {
+                    _invTransformMatrix(transformMatrix->inverse().ptr()) {
                 _sigma_t = (_sigma_a + _sigma_s)[0];
 
                 assert(Spectrum(_sigma_t) == (_sigma_a + _sigma_s));
