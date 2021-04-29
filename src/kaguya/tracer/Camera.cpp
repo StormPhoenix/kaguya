@@ -14,6 +14,7 @@ namespace kaguya {
             _cameraToWorld = cameraToWorld;
             _worldToCamera = _cameraToWorld->inverse().ptr();
 
+            _lensRadius = 0.000025;
             _rasterToCamera = (Transform::scale(Config::Camera::width, Config::Camera::height, 1.) *
                                Transform::scale(-0.5, 0.5 * aspect, 1.) *
                                Transform::translate(-1, 1.0 / aspect, 0) *

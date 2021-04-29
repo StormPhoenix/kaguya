@@ -121,12 +121,14 @@ namespace kaguya {
                                                           const std::shared_ptr<Medium> outside = nullptr,
                                                           const std::shared_ptr<AreaLight> areaLight = nullptr);
 
+             */
             static std::shared_ptr<AreaLight> testDiffuseAreaLight(const Spectrum &spectrum,
                                                                    const std::shared_ptr<Geometry> geometry,
                                                                    const std::shared_ptr<Medium> inside,
                                                                    const std::shared_ptr<Medium> outside,
                                                                    bool singleSide);
 
+            /*
             static std::shared_ptr<Scene> sceneSmoke();
 
             static std::shared_ptr<Scene> sceneDeskAndBunny();
@@ -134,6 +136,10 @@ namespace kaguya {
              */
 
 #endif
+
+            static std::vector<std::shared_ptr<Geometry>>
+            testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
+                             std::vector<std::shared_ptr<Light>> &lights, const std::shared_ptr<Material> material);
 
             /**
              * 构建 Cornel box，加载 bunny 模型，次表面散射材质

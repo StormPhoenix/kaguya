@@ -18,7 +18,7 @@ namespace kaguya {
                       _uv1(uv1), _uv2(uv2), _uv3(uv3),
                       _transformMatrix(transformMatrix) {
                 assert(transformMatrix != nullptr);
-                usingNg = (Config::Tracer::strictNormals || LENGTH(_n1) == 0 || LENGTH(_n2) == 0 || LENGTH(_n3) == 0);
+                usingNg = (LENGTH(_n1) == 0 || LENGTH(_n2) == 0 || LENGTH(_n3) == 0);
                 init();
             }
 
@@ -176,12 +176,22 @@ namespace kaguya {
                 Vector3F error = Vector3F(xError, yError, zError);
 
                 si.point = b1 * _p1World + b2 * _p2World + b0 * _p3World;
-                si.normal = NORMALIZE(CROSS(_p2World - _p1World, _p3World - _p1World));
+
+                Vector3F ng, ns;
+                ng = NORMALIZE(CROSS(_p2World - _p1World, _p3World - _p1World));
                 if (usingNg) {
-                    si.rendering.normal = si.normal;
+                    ns = ng;
                 } else {
-                    si.rendering.normal = b1 * _n1World + b2 * _n2World + b0 * _n3World;
+                    ns = b1 * _n1World + b2 * _n2World + b0 * _n3World;
+                    if (DOT(ns, ng) < 0) {
+                        ng *= -1;
+                    }
+                    if (Config::Tracer::strictNormals) {
+                        ns = ng;
+                    }
                 }
+                si.normal = ng;
+                si.rendering.normal = ns;
 
                 si.direction = ray.getDirection();
                 si.wo = -NORMALIZE(si.direction);
@@ -226,12 +236,13 @@ namespace kaguya {
                     ns = _n1World * barycentric[0] +
                          _n2World * barycentric[1] +
                          _n3World * (1 - barycentric[0] - barycentric[1]);
+
+                    if (DOT(ns, ng) < 0) {
+                        // correct geometry normal
+                        ng *= -1;
+                    }
                 }
 
-                // correct geometry normal
-                if (DOT(ng, ns) < 0) {
-                    ng *= -1;
-                }
                 si.normal = ng;
                 si.rendering.normal = ns;
                 return si;

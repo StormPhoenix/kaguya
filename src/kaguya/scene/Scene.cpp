@@ -306,7 +306,7 @@ namespace kaguya {
             lights.push_back(light2);
             return v;
         }
-
+        */
 
         std::vector<std::shared_ptr<Geometry>>
         Scene::testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
@@ -342,7 +342,6 @@ namespace kaguya {
             return v;
         }
 
- */
         std::vector<std::shared_ptr<Geometry>> Scene::testTopWall(const std::shared_ptr<Material> material,
                                                                   const std::shared_ptr<Medium> insideMedium,
                                                                   const std::shared_ptr<Medium> outsideMedium) {
@@ -420,17 +419,18 @@ namespace kaguya {
                                                                                 areaLight, transformMatrix);
             return bunny;
         }
-
+        */
         std::shared_ptr<AreaLight> Scene::testDiffuseAreaLight(const Spectrum &spectrum,
                                                                const std::shared_ptr<Geometry> geometry,
                                                                const std::shared_ptr<Medium> inside,
                                                                const std::shared_ptr<Medium> outside,
                                                                bool singleSide) {
-            std::shared_ptr<AreaLight> light = DiffuseAreaLight::buildDiffuseAreaLight(
+            std::shared_ptr<AreaLight> light = std::make_shared<DiffuseAreaLight>(
                     spectrum, geometry->getShape(), MediumBoundary(inside.get(), outside.get()), singleSide);
             geometry->setAreaLight(light);
             return light;
         }
+        /*
 
         std::shared_ptr<Scene> Scene::sceneSmoke() {
             // For testing
@@ -703,6 +703,7 @@ namespace kaguya {
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
             // load model
+            /*
             std::vector<Vector3F> vertices;
             std::vector<Normal3F> normals;
             std::vector<Point2F> texcoords;
@@ -723,6 +724,7 @@ namespace kaguya {
                 Geometry::Ptr geometry = std::make_shared<Geometry>(*it, glass);
                 objects.push_back(geometry);
             }
+             */
 
             // build scene object
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
@@ -732,10 +734,10 @@ namespace kaguya {
             lightToWorldMat = TRANSLATE(lightToWorldMat,
                                         Vector3F(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE));
             Transform::Ptr lightToWorld = std::make_shared<Transform>(lightToWorldMat);
-            std::shared_ptr<PointLight> light = std::make_shared<PointLight>(lightSpectrum,
-                                                                             lightToWorld,
-                                                                             MediumBoundary(nullptr, nullptr));
-            scene->_lights.push_back(light);
+
+
+            auto lightWall = testTopAreaLight(lightSpectrum, airMedium, scene->_lights, lambertTop);
+            objects.insert(objects.end(), lightWall.begin(), lightWall.end());
 
             // build environment lights
             /*
