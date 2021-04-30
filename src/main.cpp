@@ -41,7 +41,6 @@ int main(int argc, char *argv[]) {
 
     Tracer *tracer = TracerFactory::newTracer();
     if (tracer != nullptr) {
-        cout << "Using render type: " << Config::renderType << endl;
         tracer->run();
         delete tracer;
     }

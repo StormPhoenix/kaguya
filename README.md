@@ -30,6 +30,8 @@ A simple physically based render.
     
 - [ ] 断言 assert 替换 -> ASSERT
 
+- [ ] Camera _area 重命名
+
 ## TODO
 - [ ] 修正 C++ template 特化语法
     

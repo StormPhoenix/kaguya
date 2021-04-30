@@ -28,10 +28,12 @@ using Vector3d = glm::dvec3;
 using Vector3f = glm::vec3;
 
 using Vector4d = glm::dvec4;
+using Vector4i = glm::int4;
+using Vector4f = glm::vec4;
+
 using Matrix4d = glm::dmat4x4;
 using Matrix3d = glm::dmat3x3;
 
-using Vector4f = glm::vec4;
 using Matrix4f = glm::mat4x4;
 using Matrix3f = glm::mat3x3;
 
@@ -39,12 +41,14 @@ using Matrix3f = glm::mat3x3;
 
 #if defined(KAGUYA_DATA_DOUBLE)
 using Float = double;
+using Vector4F = Vector4d;
 using Vector3F = Vector3d;
 using Vector2F = Vector2d;
 using Matrix4F = Matrix4d;
 using Matrix3F = Matrix3d;
 #else
 using Float = float;
+using Vector4F = Vector4f;
 using Vector3F = Vector3f;
 using Vector2F = Vector2f;
 using Matrix4F = Matrix4f;
@@ -53,9 +57,11 @@ using Matrix3F = Matrix3f;
 
 using Point2F = Vector2F;
 using Point3F = Vector3F;
+using Point4F = Vector4F;
 using Normal3F = Vector3F;
 using Point2I = Vector2i;
 using Point3I = Vector3i;
+using Point4I= Vector4i;
 
 #define RADIANS(radius) glm::radians(radius)
 #define ROTATE(matrix, radius, axis) glm::rotate(matrix, glm::radians(radius), axis)

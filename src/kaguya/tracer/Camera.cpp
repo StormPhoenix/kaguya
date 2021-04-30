@@ -26,8 +26,11 @@ namespace kaguya {
             Point3F filmMin = _rasterToCamera->transformPoint(Point3F(0, 0, 0));
             Point3F filmMax = _rasterToCamera->transformPoint(
                     Point3F(Config::Camera::width, Config::Camera::height, 0));
-            _area = (filmMax.x - filmMin.x) * (filmMax.y - filmMin.y);
-            _front = NORMALIZE(_cameraToWorld->transformPoint(Vector3F(0, 0, 1)));
+            filmMin /= filmMin.z;
+            filmMax /= filmMax.z;
+            _area = std::abs((filmMax.x - filmMin.x) * (filmMax.y - filmMin.y));
+            _front = NORMALIZE(_cameraToWorld->transformPoint(Vector3F(0, 0, 1))
+                               - _cameraToWorld->transformPoint(Vector3F(0, 0, 0)));
         }
 
         Ray Camera::sendRay(Float u, Float v) const {
@@ -58,7 +61,7 @@ namespace kaguya {
             Float dist = LENGTH(*wi);
             (*wi) = NORMALIZE(*wi);
             // Normal
-            Vector3F normal = _cameraToWorld->transformNormal(Normal3F(0, 0, 1));
+            Vector3F normal = _front;
 
             Interaction lensInter = Interaction(lensSample, *wi, normal, _medium.get());
             (*visibilityTester) = VisibilityTester(eye, lensInter);
@@ -70,7 +73,8 @@ namespace kaguya {
         }
 
         void Camera::rayImportance(const Ray &ray, Float &pdfPos, Float &pdfDir) const {
-            Float cosine = DOT(ray.getDirection(), _front);
+            Vector3F rayDir = NORMALIZE(ray.getDirection());
+            Float cosine = DOT(rayDir, _front);
             if (cosine <= 0) {
                 pdfPos = 0.;
                 pdfDir = 0.;
@@ -78,7 +82,7 @@ namespace kaguya {
             }
 
             // Compute raster position
-            Point3F pFocus = (_nearClip / cosine) * ray.getDirection() + ray.getOrigin();
+            Point3F pFocus = (1 / cosine) * rayDir + ray.getOrigin();
             Point3F pRaster = _cameraToRaster->transformPoint(_worldToCamera->transformPoint(pFocus));
             // Check range
             if (pRaster.x < 0 || pRaster.x >= Config::Camera::width ||
@@ -89,19 +93,20 @@ namespace kaguya {
             }
 
             // 计算 pdfPos pdfDir
-            pdfPos = 1 / (math::PI * _lensRadius * _lensRadius);
-            pdfDir = (_nearClip * _nearClip) / (_area * cosine * cosine * cosine);
+            pdfPos = 1. / (math::PI * _lensRadius * _lensRadius);
+            pdfDir = 1. / (_area * cosine * cosine * cosine);
             return;
         }
 
         Spectrum Camera::rayImportance(const Ray &ray, Point2F *const filmPosition) const {
-            Float cosine = DOT(ray.getDirection(), _front);
+            Vector3F rayDir = NORMALIZE(ray.getDirection());
+            Float cosine = DOT(rayDir, _front);
             if (cosine <= 0) {
                 return Spectrum(0.);
             }
 
             // Compute raster position
-            Point3F pFocus = (_nearClip / cosine) * ray.getDirection() + ray.getOrigin();
+            Point3F pFocus = (1 / cosine) * rayDir + ray.getOrigin();
             Point3F pRaster = _cameraToRaster->transformPoint(_worldToCamera->transformPoint(pFocus));
 
             // Check range
@@ -109,6 +114,7 @@ namespace kaguya {
                 pRaster.y < 0 || pRaster.y >= Config::Camera::height) {
                 return Spectrum(0.);
             }
+
             if (filmPosition != nullptr) {
                 (*filmPosition) = Point2F(pRaster.x, pRaster.y);
             }
@@ -124,8 +130,7 @@ namespace kaguya {
              * Float weight = pW / (PI * _lensRadius * _lensRadius * cosine);
             */
             Float areaLens = math::PI * _lensRadius * _lensRadius;
-            Float weight = (_nearClip * _nearClip) /
-                           (_area * areaLens * std::pow(cosine, 4));
+            Float weight = 1. / (_area * areaLens * std::pow(cosine, 4));
             return Spectrum(weight);
         }
 

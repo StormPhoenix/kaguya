@@ -21,7 +21,7 @@ namespace kaguya {
 
                 Transform(Matrix4F transformMatrix);
 
-                Vector3F transformPoint(const Vector3F &p) const;
+                Vector3F transformPoint(const Point3F &p) const;
 
                 Vector3F transformVector(const Vector3F &v) const;
 

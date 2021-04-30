@@ -13,12 +13,18 @@ namespace kaguya {
                     _transformMatrix(transformMatrix),
                     _identity(false) {}
 
-            Vector3F Transform::transformPoint(const Vector3F &p) const {
+            Vector3F Transform::transformPoint(const Point3F &p) const {
                 if (_identity) {
                     return p;
                 }
 
-                return _transformMatrix * Vector4d(p, 1.);
+                Point4F ret = _transformMatrix * Vector4d(p, 1.);
+                ASSERT(ret[3] != 0, "Coordinate w can't be zero.")
+                if (ret[3] == 1) {
+                    return Vector3F(ret[0], ret[1], ret[2]);
+                } else {
+                    return Vector3F(ret[0], ret[1], ret[2]) / ret[3];
+                }
             }
 
             Vector3F Transform::transformVector(const Vector3F &v) const {
