@@ -92,6 +92,10 @@ namespace kaguya {
             assert(t >= 1 && t <= cameraPathLength);
             assert(s >= 0 && s <= lightPathLength);
 
+            if (t > 1 && s != 0 && cameraSubPath[t - 1].type == PathVertexType::LIGHT) {
+                return Spectrum(0.);
+            }
+
             /* 处理策略
              * Case s = 0 && t = 0:
              *
@@ -453,7 +457,7 @@ namespace kaguya {
                     sumRi += ri;
                 }
             }
-            return 1 / (sumRi + 1);
+            return 1. / (sumRi + 1);
         }
 
         Spectrum BDPathTracer::g(const PathVertex &pre, const PathVertex &next, Sampler *sampler) {
@@ -479,7 +483,7 @@ namespace kaguya {
         Spectrum BDPathTracer::shader(const Ray &ray, std::shared_ptr<Scene> scene, int maxDepth,
                                       Sampler *sampler, MemoryArena &memoryArena) {
             // 创建临时变量用于存储 camera、light 路径
-            PathVertex *cameraSubPath = memoryArena.alloc<PathVertex>(maxDepth + 1, false);
+            PathVertex *cameraSubPath = memoryArena.alloc<PathVertex>(maxDepth + 2, false);
             PathVertex *lightSubPath = memoryArena.alloc<PathVertex>(maxDepth, false);
 
             // 生成相机路径
@@ -494,22 +498,24 @@ namespace kaguya {
             // 路径连接
             for (int t = 1; t <= cameraPathLength; t++) {
                 for (int s = 0; s <= lightPathLength; s++) {
-                    int depth = t + s - 1;
-                    if (depth <= maxDepth && depth > 0 && t <= cameraPathLength && s <= lightPathLength) {
-                        Point2F samplePosition;
-                        Spectrum value = connectPath(scene, cameraSubPath, cameraPathLength, t,
-                                                     lightSubPath, lightPathLength, s,
-                                                     &samplePosition, sampler);
+                    int depth = t + s - 2;
+                    if ((s == 1 && t == 1) || depth < 0 || depth > maxDepth) {
+                        continue;
+                    }
 
-                        const Float INV_WEIGHT = 1.0 / Config::Tracer::sampleNum;
+                    Point2F samplePosition;
+                    Spectrum value = connectPath(scene, cameraSubPath, cameraPathLength, t,
+                                                 lightSubPath, lightPathLength, s,
+                                                 &samplePosition, sampler);
 
-                        if (t == 1) {
-                            // 在成像平面的 samplePosition 位置加上 value
-                            _filmPlane->addSpectrum(value * INV_WEIGHT, std::floor(samplePosition.y),
-                                                    std::floor(samplePosition.x));
-                        } else {
-                            shaderColor += value;
-                        }
+                    const Float INV_WEIGHT = 1.0 / Config::Tracer::sampleNum;
+
+                    if (t == 1) {
+                        // 在成像平面的 samplePosition 位置加上 value
+                        _filmPlane->addSpectrum(value * INV_WEIGHT, std::floor(samplePosition.y),
+                                                std::floor(samplePosition.x));
+                    } else {
+                        shaderColor += value;
                     }
                 }
             }

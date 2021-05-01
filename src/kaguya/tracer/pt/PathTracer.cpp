@@ -200,7 +200,7 @@ namespace kaguya {
                             sampler->nextSampleRound();
                         }
                         ans *= sampleWeight;
-                        _filmPlane->addSpectrum(ans, row, col);
+                        _filmPlane->setSpectrum(ans, row, col);
                     }
                 }
                 delete sampler;
