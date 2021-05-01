@@ -75,7 +75,8 @@ namespace kaguya {
         private:
             Vector3F _origin;
             Vector3F _front;
-            Float _area;
+            Float _filmPlaneArea;
+            Float _lensArea;
             Float _lensRadius = 0.00025;
 
             Float _nearClip;

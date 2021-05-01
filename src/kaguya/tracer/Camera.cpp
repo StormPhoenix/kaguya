@@ -28,7 +28,8 @@ namespace kaguya {
                     Point3F(Config::Camera::width, Config::Camera::height, 0));
             filmMin /= filmMin.z;
             filmMax /= filmMax.z;
-            _area = std::abs((filmMax.x - filmMin.x) * (filmMax.y - filmMin.y));
+            _filmPlaneArea = std::abs((filmMax.x - filmMin.x) * (filmMax.y - filmMin.y));
+            _lensArea = math::PI * _lensRadius * _lensRadius;
             _front = NORMALIZE(_cameraToWorld->transformPoint(Vector3F(0, 0, 1))
                                - _cameraToWorld->transformPoint(Vector3F(0, 0, 0)));
         }
@@ -67,8 +68,7 @@ namespace kaguya {
             (*visibilityTester) = VisibilityTester(eye, lensInter);
 
             // Compute importance value
-            Float lensArea = math::PI * _lensRadius * _lensRadius;
-            (*pdf) = (dist * dist) / (lensArea * ABS_DOT(lensInter.normal, *wi));
+            (*pdf) = (dist * dist) / (_lensArea * ABS_DOT(lensInter.normal, *wi));
             return rayImportance(Ray(lensSample, -(*wi)), filmPosition);
         }
 
@@ -93,8 +93,8 @@ namespace kaguya {
             }
 
             // 计算 pdfPos pdfDir
-            pdfPos = 1. / (math::PI * _lensRadius * _lensRadius);
-            pdfDir = 1. / (_area * cosine * cosine * cosine);
+            pdfPos = 1. / (_lensArea);
+            pdfDir = 1. / (_filmPlaneArea * cosine * cosine * cosine);
             return;
         }
 
@@ -129,8 +129,7 @@ namespace kaguya {
              * Float pW = dist * dist / (_area * cosine);
              * Float weight = pW / (PI * _lensRadius * _lensRadius * cosine);
             */
-            Float areaLens = math::PI * _lensRadius * _lensRadius;
-            Float weight = 1. / (_area * areaLens * std::pow(cosine, 4));
+            Float weight = 1. / (_filmPlaneArea * _lensArea * std::pow(cosine, 4));
             return Spectrum(weight);
         }
 

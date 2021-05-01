@@ -495,6 +495,7 @@ namespace kaguya {
                                                     sampler, memoryArena);
 
             Spectrum shaderColor = Spectrum(0.0);
+            const Float INV_WEIGHT = 1.0 / Config::Tracer::sampleNum;
             // 路径连接
             for (int t = 1; t <= cameraPathLength; t++) {
                 for (int s = 0; s <= lightPathLength; s++) {
@@ -507,8 +508,6 @@ namespace kaguya {
                     Spectrum value = connectPath(scene, cameraSubPath, cameraPathLength, t,
                                                  lightSubPath, lightPathLength, s,
                                                  &samplePosition, sampler);
-
-                    const Float INV_WEIGHT = 1.0 / Config::Tracer::sampleNum;
 
                     if (t == 1) {
                         // 在成像平面的 samplePosition 位置加上 value
