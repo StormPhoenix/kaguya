@@ -218,7 +218,10 @@ namespace kaguya {
             // 初始射线
             Ray scatterRay = ray;
 
-            return randomWalk(scene, scatterRay, cameraSubPath, maxDepth, 1.0,
+            Float pdfPos, pdfDir;
+            camera->rayImportance(scatterRay, pdfPos, pdfDir);
+
+            return randomWalk(scene, scatterRay, cameraSubPath, maxDepth, pdfDir,
                               sampler, memoryArena, beta, TransportMode::RADIANCE);
         }
 
@@ -430,7 +433,6 @@ namespace kaguya {
             Float ri;
             // 计算 cameraSubPath 的 Ri
             ri = 1;
-
             for (int i = t - 1; i > 0; i--) {
                 Float pdfBackward = cameraSubPath[i].pdfBackward == 0 ? 1 : cameraSubPath[i].pdfBackward;
                 Float pdfForward = cameraSubPath[i].pdfForward == 0 ? 1 : cameraSubPath[i].pdfForward;
@@ -457,7 +459,9 @@ namespace kaguya {
                     sumRi += ri;
                 }
             }
-            return 1. / (sumRi + 1);
+
+            Float ret = 1. / (sumRi + 1);
+            return ret;
         }
 
         Spectrum BDPathTracer::g(const PathVertex &pre, const PathVertex &next, Sampler *sampler) {

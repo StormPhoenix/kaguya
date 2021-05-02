@@ -76,16 +76,17 @@ namespace kaguya {
         }
 
         Float PathVertex::convertDensity(Float pdfWi, const PathVertex &next) const {
-            Float distSquare = std::pow(LENGTH(point - next.point), 2);
+            Vector3F wi = next.point - point;
+            Float distSquare = std::pow(LENGTH(wi), 2);
             if (distSquare == 0) {
                 return 0;
             }
+            wi = NORMALIZE(wi);
 
             Float pdfFwd = pdfWi / distSquare;
             if (next.type == PathVertexType::SURFACE) {
                 Vector3F surfaceNormal = next.si.normal;
-                Vector3F dirToPre = -next.si.direction;
-                pdfFwd *= ABS_DOT(surfaceNormal, dirToPre);
+                pdfFwd *= ABS_DOT(surfaceNormal, wi);
             }
             return pdfFwd;
         }

@@ -32,6 +32,12 @@ A simple physically based render.
 
 - [ ] BDPT connectPath() 调用处的 INV_WEIGHT 优化；connectPath() 外部包围代码选择 if 简化
 
+- [ ] PathVertex.cpp assert 断言替换
+
+- [ ] Camera rayImportance 重命名
+
+- [ ] BDPathTracer::misWeight() 解释一下注释
+
 ## TODO
 - [ ] 修正 C++ template 特化语法
     
