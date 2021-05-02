@@ -119,7 +119,7 @@ namespace kaguya {
                 // lightSubPath 上没有任何路径点
                 const PathVertex &pt = cameraSubPath[t - 1];
                 if (pt.isLight()) {
-                    ret = pt.emit(cameraSubPath[t - 2].point) * pt.beta;
+                    ret = pt.Le(cameraSubPath[t - 2].point) * pt.beta;
                 }
             } else if (t == 1) {
                 // 去 lightSubPath 连接点
@@ -354,7 +354,7 @@ namespace kaguya {
                     }
                 }
                 // update pre-vertex's backward density
-                preVertex.pdfBackward = vertex.convertDensity(pdfWo, preVertex);
+                preVertex.pdfBackward = vertex.convertToDensity(pdfWo, preVertex);
             }
             return vertexCount;
         }
@@ -392,7 +392,7 @@ namespace kaguya {
             // 当 t > 0， 更新 cameraSubPath[t - 1].pdfBackward
             ScopeSwapper<Float> swapper2;
             if (pt != nullptr) {
-                swapper2 = {&(pt->pdfBackward), s > 0 ? ps->density(psMinus, *pt)
+                swapper2 = {&(pt->pdfBackward), s > 0 ? ps->computeDensity(psMinus, *pt)
                                                       : pt->densityLightOrigin(*ptMinus)};
             }
 
@@ -400,20 +400,20 @@ namespace kaguya {
             ScopeSwapper<Float> swapper3;
             if (ps != nullptr) {
                 // 这里不考虑 t 的大小，因为 t < 2 的情况是不可能进入的
-                swapper3 = {&(ps->pdfBackward), pt->density(ptMinus, *ps)};
+                swapper3 = {&(ps->pdfBackward), pt->computeDensity(ptMinus, *ps)};
             }
 
             // 当 t > 2，则更新 cameraSubPath[t - 2].pdfBackward
             ScopeSwapper<Float> swapper4;
             if (ptMinus != nullptr) {
-                swapper4 = {&(ptMinus->pdfBackward), s > 0 ? pt->density(ps, *ptMinus) :
-                                                     pt->densityByLight(*ptMinus)};
+                swapper4 = {&(ptMinus->pdfBackward), s > 0 ? pt->computeDensity(ps, *ptMinus) :
+                                                     pt->densityFromLight(*ptMinus)};
             }
 
             // 当 s > 2，则更新 lightSubPath[s - 2].pdfBackward
             ScopeSwapper<Float> swapper5;
             if (psMinus != nullptr) {
-                swapper5 = {&(psMinus->pdfBackward), ps->density(pt, *psMinus)};
+                swapper5 = {&(psMinus->pdfBackward), ps->computeDensity(pt, *psMinus)};
             }
 
             // 临时替换 isDelta 项目

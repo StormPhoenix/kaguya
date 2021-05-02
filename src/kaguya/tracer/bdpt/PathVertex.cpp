@@ -40,7 +40,7 @@ namespace kaguya {
                     (type == PathVertexType::SURFACE && si.getAreaLight() != nullptr));
         }
 
-        Spectrum PathVertex::emit(const Vector3F &eye) const {
+        Spectrum PathVertex::Le(const Vector3F &eye) const {
             if (!isLight()) {
                 return Spectrum(0.0);
             }
@@ -75,7 +75,7 @@ namespace kaguya {
             }
         }
 
-        Float PathVertex::convertDensity(Float pdfWi, const PathVertex &next) const {
+        Float PathVertex::convertToDensity(Float pdfWi, const PathVertex &next) const {
             Vector3F wi = next.point - point;
             Float distSquare = std::pow(LENGTH(wi), 2);
             if (distSquare == 0) {
@@ -110,9 +110,9 @@ namespace kaguya {
             }
         }
 
-        Float PathVertex::density(const PathVertex *pre, const PathVertex &next) const {
+        Float PathVertex::computeDensity(const PathVertex *pre, const PathVertex &next) const {
             if (type == LIGHT) {
-                return densityByLight(next);
+                return densityFromLight(next);
             }
 
             // 计算 wi
@@ -152,10 +152,10 @@ namespace kaguya {
             }
 
             // pdf 转化为基于 area 的 density
-            return convertDensity(pdf, next);
+            return convertToDensity(pdf, next);
         }
 
-        Float PathVertex::densityByLight(const PathVertex &next) const {
+        Float PathVertex::densityFromLight(const PathVertex &next) const {
             // 获取当前 PathVertex 保存的 light 和 areaLight
             const Light *light = (type == LIGHT) ? ei.light : si.getAreaLight();
             ASSERT(light != nullptr, "Light entity can't be null. ");

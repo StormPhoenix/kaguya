@@ -16,7 +16,6 @@ A simple physically based render.
         - [x] photon 数太少，radius 初始太大，收敛太慢。这个配置下 CPU 跑的太慢了，是时候升级到 GPU 版本了 
     
 - [ ] 添加环境光贴图
-    - [ ] PathVertex::emit() 修改成 Le()
     - [ ] 考虑 EnvironmentLight(EL) 在 PT \ BDPT \ SPPM 三种情况下如何处理
         - [ ] BDPT
             - [ ] connectible() cameraPath 最后一个 Vertex 是 EL

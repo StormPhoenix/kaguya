@@ -87,18 +87,18 @@ namespace kaguya {
              * @param next 下一个点
              * @return
              */
-            Float convertDensity(Float pdfWi, const PathVertex &next) const;
+            Float convertToDensity(Float pdfWi, const PathVertex &next) const;
 
             /**
-             * 计算 pre -> p -> next 的 density pdf，这个 ，density pdf 是 next 的。
-             * 计算方法和 computePdfForward 一致，
-             * 不同之处在于 computePdfForward 是在已知 pdfWi 的情况下计算的，
-             * computePdf 需要自己计算 pdfWi
+             * 计算 pre -> p -> next 的 density ，这个 ，density 是 next 的。
+             * 计算方法和 convertToDensity 一致，
+             * 不同之处在于 convertToDensity 是在已知 pdfWi 的情况下计算的，
+             * computeDensity 需要自己计算 pdfWi
              * @param pre
              * @param next
              * @return
              */
-            Float density(const PathVertex *pre, const PathVertex &next) const;
+            Float computeDensity(const PathVertex *pre, const PathVertex &next) const;
 
             /**
              * 计算 p -> next 的 density pdf（密度 pdf），这个 density pdf 是 next 的 density pdf，
@@ -107,7 +107,7 @@ namespace kaguya {
              * @param next
              * @return
              */
-            Float densityByLight(const PathVertex &next) const;
+            Float densityFromLight(const PathVertex &next) const;
 
             /**
              * 当前 PathVertex 作为发光体的时候，计算这个发光体上的发光点的 density pdf
@@ -136,7 +136,7 @@ namespace kaguya {
              * @param eye
              * @return
              */
-            Spectrum emit(const Vector3F &eye) const;
+            Spectrum Le(const Vector3F &eye) const;
 
             static inline PathVertex createCameraVertex(const Camera *camera, const Ray &ray, Spectrum beta) {
                 StartEndInteraction ei = StartEndInteraction(camera, ray);
@@ -148,7 +148,7 @@ namespace kaguya {
             static inline PathVertex createMediumVertex(const MediumInteraction &mi, Float forwardDensity,
                                                         const PathVertex &preVertex, const Spectrum &beta) {
                 PathVertex vertex = PathVertex(mi, beta);
-                vertex.pdfForward = preVertex.convertDensity(forwardDensity, vertex);
+                vertex.pdfForward = preVertex.convertToDensity(forwardDensity, vertex);
                 return vertex;
             }
 
@@ -172,7 +172,7 @@ namespace kaguya {
                 // 创建路径点
                 PathVertex v = PathVertex(si, beta);
                 // 计算上个点发射线击中当前点时，当前点对应的概率
-                v.pdfForward = pre.convertDensity(pdfPreWi, v);
+                v.pdfForward = pre.convertToDensity(pdfPreWi, v);
                 return v;
             }
 
