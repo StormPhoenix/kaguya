@@ -276,14 +276,20 @@ namespace kaguya {
             Material::Ptr XmlSceneImporter::createDiffuseMaterial(ParseInfo &info) {
                 Material::Ptr material = nullptr;
 
-                auto type = info.container["reflectance"].type;
-                if (type == AttrVal::Attr_Spectrum) {
-                    Spectrum albedo = info.container["reflectance"].value.spectrumValue;
-                    Texture<Spectrum>::Ptr texture = std::make_shared<ConstantTexture<Spectrum>>(albedo);
+                if (info.container.count("reflectance") <= 0) {
+                    // Create default diffuse material
+                    Texture<Spectrum>::Ptr texture = std::make_shared<ConstantTexture<Spectrum>>(0.);
                     material = std::make_shared<Lambertian>(texture);
                 } else {
-                    // TODO
-                    ASSERT(type == AttrVal::Attr_Spectrum, "Only support spectrum reflectance for now.");
+                    auto type = info.container["reflectance"].type;
+                    if (type == AttrVal::Attr_Spectrum) {
+                        Spectrum albedo = info.container["reflectance"].value.spectrumValue;
+                        Texture<Spectrum>::Ptr texture = std::make_shared<ConstantTexture<Spectrum>>(albedo);
+                        material = std::make_shared<Lambertian>(texture);
+                    } else {
+                        // TODO
+                        ASSERT(type == AttrVal::Attr_Spectrum, "Only support spectrum reflectance for now.");
+                    }
                 }
                 return material;
             }
