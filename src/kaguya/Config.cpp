@@ -67,9 +67,8 @@ namespace kaguya {
 //        /* TODO delete
         // 若场景未构建，则线构建场景
         if (!isScenePrepared) {
-//            Scene::initSceneComponents();
 //            scenes.push_back(Scene::sceneDeskAndBunny);
-            scenes.push_back(Scene::sceneBunnyWithPointLight);
+            scenes.push_back(Scene::innerSceneBunnyWithPointLight);
 //            scenes.push_back(Scene::sceneBunnySubsurfaceWithAreaLight);
 //            scenes.push_back(Scene::sceneSmoke);
             isScenePrepared = true;

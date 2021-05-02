@@ -7,31 +7,20 @@
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/meta/Triangle.h>
 #include <kaguya/scene/Geometry.h>
-#include <kaguya/Config.h>
 #include <kaguya/scene/accumulation/BVH.h>
 #include <kaguya/scene/meta/Sphere.h>
-#include <kaguya/scene/meta/Triangle.h>
 #include <kaguya/scene/TriangleMesh.h>
 #include <kaguya/material/Dielectric.h>
 #include <kaguya/material/Lambertian.h>
 #include <kaguya/material/Metal.h>
 #include <kaguya/material/SubsurfaceMaterial.h>
 #include <kaguya/material/texture/ConstantTexture.h>
-#include <kaguya/material/texture/ImageTexture.h>
-#include <kaguya/material/texture/UVMapping2D.h>
 #include <kaguya/material/texture/SphericalMapping2D.h>
 #include <kaguya/utils/ObjLoader.h>
 #include <kaguya/core/medium/GridDensityMedium.h>
-#include <kaguya/core/light/EnvironmentLight.h>
 
-#ifdef TEST_SCENE
-
-#include <cstring>
-#include <experimental/filesystem>
-#include <fstream>
 #include <iostream>
 
-#endif
 
 namespace kaguya {
     namespace scene {
@@ -41,80 +30,10 @@ namespace kaguya {
         using namespace kaguya::scene::meta;
         using namespace kaguya::core;
 
-#ifdef TEST_SCENE
-
-        // Image texture UVMapping
-        std::shared_ptr<Texture<Spectrum>> imageTexture1 = nullptr;
         Spectrum blue_spectrum(0.);
-        Spectrum area_light_spectrum(0.);
         Spectrum total_white_spectrum(1.0);
 
         /*
-        std::shared_ptr<Geometry>
-        buildSphere(const Vector3F &center, const Float &radius, std::shared_ptr<Material> material) {
-            // Transform
-            Matrix4F sphereMat(1.0f);
-            sphereMat = TRANSLATE(sphereMat, center);
-            sphereMat = SCALE(sphereMat, Vector3F(radius, radius, radius));
-            std::shared_ptr<Transform> metalSphereTransform = std::make_shared<Transform>(sphereMat);
-
-            std::shared_ptr<Shape> metalSphereShape = std::make_shared<meta::Sphere>(metalSphereTransform);
-            std::shared_ptr<Geometry> metalSphere = std::make_shared<Geometry>(metalSphereShape, material,
-                                                                               nullptr, nullptr);
-            return metalSphere;
-        }
-
-        std::shared_ptr<Geometry> buildMetalSphere(const Vector3F &center, const Float &radius) {
-            std::shared_ptr<Material> metal = std::make_shared<Metal>();
-            return buildSphere(center, radius, metal);
-        }
-
-        std::shared_ptr<Geometry> buildGlassSphere(const Vector3F &center, const Float &radius) {
-            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
-                    total_white_spectrum);
-            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
-            return buildSphere(center, radius, glass);
-        }
-
-        std::shared_ptr<Geometry> buildLambSphere(const Vector3F &center, const Float &radius) {
-            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
-                    total_white_spectrum);
-            std::shared_ptr<Material> lamb = std::make_shared<Lambertian>(totalWhite);
-            return buildSphere(center, radius, lamb);
-        }
-
-        std::shared_ptr<Geometry> buildLambSphereImageTexture(const Vector3F &center, const Float &radius) {
-            // Transform
-            Matrix4F sphereMat(1.0f);
-            sphereMat = TRANSLATE(sphereMat, center);
-            sphereMat = SCALE(sphereMat, Vector3F(radius, radius, radius));
-            std::shared_ptr<Transform> transform = std::make_shared<Transform>(sphereMat);
-            std::shared_ptr<TextureMapping2D> textureMapping2D = std::make_shared<SphericalMapping2D>(transform);
-
-            std::shared_ptr<Texture<Spectrum>> imageTextureLocal = std::make_shared<ImageTexture<Spectrum>>("./resource/texture/texture1.jpg", textureMapping2D);
-            std::shared_ptr<Material> lamb = std::make_shared<Lambertian>(imageTextureLocal);
-            return buildSphere(center, radius, lamb);
-        }
-
-        void Scene::s() {
-
-            imageTexture1 = std::make_shared<ImageTexture<Spectrum>>(
-                    "./resource/texture/texture1.jpg");
-
-            // blue
-            blue_spectrum = Spectrum(0.0);
-            blue_spectrum.r(0);
-            blue_spectrum.g(0);
-            blue_spectrum.b(1.0);
-
-            // light spectrum
-            Float areaLightIntensity = 125;
-            area_light_spectrum.r(Float(249.0) / 255.0 * areaLightIntensity);
-            area_light_spectrum.g(Float(222.0) / 255.0 * areaLightIntensity);
-            area_light_spectrum.b(Float(180.0) / 255.0 * areaLightIntensity);
-
-        }
-
         Float *Scene::testSmokeData() {
             std::cout << "load smoke data ... " << std::endl;
             float density;
@@ -147,7 +66,6 @@ namespace kaguya {
             std::shared_ptr<Medium> airMedium = std::make_shared<IsotropicMedium>(sigmaA, 0.1, 0);
             return airMedium;
         }
-
          */
 
         std::vector<std::shared_ptr<Geometry>>
@@ -179,7 +97,6 @@ namespace kaguya {
             v.push_back(gt2);
             return v;
         }
-
 
         std::vector<std::shared_ptr<Geometry>>
         Scene::testRightWall(const std::shared_ptr<Material> material,
@@ -269,43 +186,7 @@ namespace kaguya {
             return v;
         }
 
-        std::vector<std::shared_ptr<Geometry>>
-        Scene::testTopAreaLightByTime(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
-                                      std::vector<std::shared_ptr<Light>> &lights,
-                                      const std::shared_ptr<Material> material,
-                                      Float t) {
 
-            const Float baseLeft = -2.0;
-
-            const Vector3F a1((baseLeft + 0.4 + 0.02 * t) * MODEL_SCALE, 0.55 * MODEL_SCALE, -0.2 * MODEL_SCALE);
-            const Vector3F a2((baseLeft + 0.02 * t) * MODEL_SCALE, 0.55 * MODEL_SCALE, -0.2 * MODEL_SCALE);
-            const Vector3F a3((baseLeft + 0.02 * t) * MODEL_SCALE, 0.55 * MODEL_SCALE, 0.2 * MODEL_SCALE);
-            const Vector3F a4((baseLeft + 0.4 + 0.02 * t) * MODEL_SCALE, 0.55 * MODEL_SCALE, 0.2 * MODEL_SCALE);
-
-            const Normal3F n(0, -1, 0);
-            const Vector2f default_uv(0);
-
-            std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
-                                                                                 n, n, n,
-                                                                                 default_uv, default_uv, default_uv);
-            std::shared_ptr<Geometry> gt1 = std::make_shared<Geometry>(tri1, material, medium, medium,
-                                                                       nullptr);
-
-            std::shared_ptr<meta::Shape> tri2 = std::make_shared<meta::Triangle>(a1, a2, a3,
-                                                                                 n, n, n,
-                                                                                 default_uv, default_uv, default_uv);
-            std::shared_ptr<Geometry> gt2 = std::make_shared<Geometry>(tri2, material, medium, medium,
-                                                                       nullptr);
-            std::vector<std::shared_ptr<Geometry>> v;
-            v.push_back(gt1);
-            v.push_back(gt2);
-            // build area light
-            std::shared_ptr<AreaLight> light1 = testDiffuseAreaLight(spectrum, gt1, medium, medium, true);
-            std::shared_ptr<AreaLight> light2 = testDiffuseAreaLight(spectrum, gt2, medium, medium, true);
-            lights.push_back(light1);
-            lights.push_back(light2);
-            return v;
-        }
         */
 
         std::vector<std::shared_ptr<Geometry>>
@@ -402,7 +283,6 @@ namespace kaguya {
         }
 
 /*
-
         std::shared_ptr<Aggregation> Scene::testSubsurfaceBunny(const std::shared_ptr<Material> material,
                                                       const std::shared_ptr<Medium> inside,
                                                       const std::shared_ptr<Medium> outside,
@@ -430,9 +310,8 @@ namespace kaguya {
             geometry->setAreaLight(light);
             return light;
         }
-        /*
 
-        std::shared_ptr<Scene> Scene::sceneSmoke() {
+        std::shared_ptr<Scene> Scene::innerSceneWithAreaLight() {
             // For testing
             // albedos
             // total white
@@ -462,10 +341,15 @@ namespace kaguya {
             greenSpectrum.b(0.15);
             std::shared_ptr<Texture<Spectrum>> green = std::make_shared<ConstantTexture<Spectrum>>(greenSpectrum);
 
+            // blue
             std::shared_ptr<Texture<Spectrum>> blue = std::make_shared<ConstantTexture<Spectrum>>(blue_spectrum);
 
-
-
+            // light spectrum
+            Spectrum lightSpectrum = Spectrum(0.0);
+            Float lightIntensity = 12;
+            lightSpectrum.r(Float(249.0) / 255.0 * lightIntensity);
+            lightSpectrum.g(Float(222.0) / 255.0 * lightIntensity);
+            lightSpectrum.b(Float(180.0) / 255.0 * lightIntensity);
 
             // lambertian materials
             std::shared_ptr<Material> lambertLeft = std::make_shared<Lambertian>(red);
@@ -476,28 +360,10 @@ namespace kaguya {
             std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
             std::shared_ptr<Material> metal = std::make_shared<Metal>();
 
-//            std::shared_ptr<Medium> airMedium = testAirMedium();
             std::shared_ptr<Medium> airMedium = nullptr;
-
-            // smoke data
-            Float scale = 0.6 * MODEL_SCALE;
-            Matrix4F mat(1.0f);
-            mat = TRANSLATE(mat, Vector3F(-scale * 0.6, -MODEL_SCALE * 0.5 + 0.0001, -scale * 0.5));
-            mat = SCALE(mat, Vector3F(scale * 1.2, MODEL_SCALE * 0.90, scale * 1.2));
-            std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(mat);
-
-            Float *smoke = testSmokeData();
-            std::shared_ptr<Medium> smokeMedium = std::make_shared<GridDensityMedium>(0.002, 2.3, 0, gridx, gridy,
-                                                                                      gridz,
-                                                                                      smoke, transformMatrix);
 
             // objects
             std::vector<std::shared_ptr<Intersectable>> objects;
-
-            // tiny box wrap smoke
-            Box smokeWrapper = Box(nullptr, smokeMedium, airMedium, transformMatrix);
-            std::vector<std::shared_ptr<Intersectable>> boxes = smokeWrapper.aggregation();
-            objects.insert(objects.end(), boxes.begin(), boxes.end());
 
             // walls
             std::vector<std::shared_ptr<Geometry>> leftWall =
@@ -511,18 +377,24 @@ namespace kaguya {
             std::vector<std::shared_ptr<Geometry>> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
             objects.insert(objects.end(), bottomWall.begin(), bottomWall.end());
 
-
             std::vector<std::shared_ptr<Geometry>> topWall = testTopWall(lambertTop, airMedium, airMedium);
             objects.insert(objects.end(), topWall.begin(), topWall.end());
 
             std::vector<std::shared_ptr<Geometry>> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
+
             // build scene object
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 
-            // build area light
-            auto lightWall = testTopAreaLight(area_light_spectrum, airMedium, scene->_lights, lambertTop);
+            // build point light
+            Matrix4F lightToWorldMat(1.0);
+            lightToWorldMat = TRANSLATE(lightToWorldMat,
+                                        Vector3F(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE));
+            Transform::Ptr lightToWorld = std::make_shared<Transform>(lightToWorldMat);
+
+
+            auto lightWall = testTopAreaLight(lightSpectrum, airMedium, scene->_lights, lambertTop);
             objects.insert(objects.end(), lightWall.begin(), lightWall.end());
 
             // scene
@@ -532,103 +404,19 @@ namespace kaguya {
             // build camera
             auto eye = Vector3F(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
             auto dir = Vector3F(0.0f, 0.0f, -1.0f);
-            std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
-            camera->setResolutionWidth(Config::Camera::width);
-            camera->setResolutionHeight(Config::Camera::height);
+            auto up = Vector3F(0.0f, 1.0f, 0.0f);
+
+            Transform cameraToWorld = Transform::lookAt(eye, dir, up);
+            std::shared_ptr<Camera> camera = std::make_shared<Camera>(cameraToWorld.ptr(), 60);
             scene->_camera = camera;
-            scene->_sceneName = "smoke-with-area-light";
+
+            scene->_sceneName = "inner-scene-with-area-light.png";
 
             return scene;
         }
 
-         */
 
-        /*
-
-        std::shared_ptr<Scene> Scene::sceneDeskAndBunny() {
-            // white
-            Spectrum whiteSpectrum = Spectrum(0.0);
-            whiteSpectrum.r(0.73);
-            whiteSpectrum.g(0.73);
-            whiteSpectrum.b(0.73);
-            std::shared_ptr<Texture<Spectrum>> white = std::make_shared<ConstantTexture<Spectrum>>(whiteSpectrum);
-            std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
-
-            std::shared_ptr<TextureMapping2D> textureMapping = std::make_shared<UVMapping2D>();
-            std::shared_ptr<Texture<Spectrum>> imageTextureLocal = std::make_shared<ImageTexture<Spectrum>>(
-                    "./resource/texture/texture4.jpg", textureMapping);
-
-            std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(imageTextureLocal);
-
-            const float planeWidthHeightRatio = 780.0 / 1040.0;
-
-            const Vector3F a1(2 * MODEL_SCALE, -0.5 * MODEL_SCALE, -2 * planeWidthHeightRatio * MODEL_SCALE);
-            const Vector3F a2(-2 * MODEL_SCALE, -0.5 * MODEL_SCALE, -2 * planeWidthHeightRatio * MODEL_SCALE);
-            const Vector3F a3(-2 * MODEL_SCALE, -0.5 * MODEL_SCALE, 2 * planeWidthHeightRatio * MODEL_SCALE);
-            const Vector3F a4(2 * MODEL_SCALE, -0.5 * MODEL_SCALE, 2 * planeWidthHeightRatio * MODEL_SCALE);
-
-            const Normal3F n(0, 1, 0);
-
-            std::shared_ptr<meta::Shape> tri1 = std::make_shared<meta::Triangle>(a1, a3, a4,
-                                                                                 n, n, n,
-                                                                                 Point2F(1, 0), Point2F(0, 1),
-                                                                                 Point2F(0, 0));
-            std::shared_ptr<Geometry> gt1 = std::make_shared<Geometry>(tri1, lambertBottom, nullptr, nullptr,
-                                                                       nullptr);
-
-            std::shared_ptr<meta::Shape> tri2 = std::make_shared<meta::Triangle>(a1, a2, a3,
-                                                                                 n, n, n,
-                                                                                 Point2F(1, 0), Point2F(1, 1),
-                                                                                 Point2F(0, 1));
-            std::shared_ptr<Geometry> gt2 = std::make_shared<Geometry>(tri2, lambertBottom, nullptr, nullptr,
-                                                                       nullptr);
-            std::vector<std::shared_ptr<Geometry>> desk;
-            desk.push_back(gt1);
-            desk.push_back(gt2);
-
-            // objects
-            std::vector<std::shared_ptr<Intersectable>> objects;
-            objects.insert(objects.end(), desk.begin(), desk.end());
-
-            // load model
-            std::shared_ptr<Material> metal = std::make_shared<Metal>();
-
-            Float scale = 0.4 * MODEL_SCALE;
-            Matrix4F mat(1.0f);
-            mat = TRANSLATE(mat, Vector3F(scale * 1.2, -scale / 0.8, 0));
-            mat = SCALE(mat, Vector3F(scale, scale, scale));
-            mat = ROTATE(mat, Float(45.0), Vector3F(0, 1, 0));
-            std::shared_ptr<Transform> transformMatrix = std::make_shared<Transform>(mat);
-            std::shared_ptr<Intersectable> bunny = testBunny(metal, nullptr, nullptr, nullptr, transformMatrix);
-            objects.push_back(bunny);
-
-            // build scene object
-            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-
-            // build area light
-            auto lightWall = testTopAreaLight(area_light_spectrum, nullptr, scene->_lights, lambertTop);
-            objects.insert(objects.end(), lightWall.begin(), lightWall.end());
-
-            // scene
-            std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);
-            scene->_world = bvh;
-
-            // build camera
-            auto eye = Vector3F(2.2 * MODEL_SCALE, 0.5 * MODEL_SCALE, 1.2);
-            auto dir = Vector3F(-0.95f, -0.6f, -0.3f);
-            std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, nullptr);
-            camera->setResolutionWidth(Config::Camera::width);
-            camera->setResolutionHeight(Config::Camera::height);
-            scene->_camera = camera;
-            scene->_sceneName = "girl-friend";
-
-            return scene;
-        }
-         */
-
-#endif
-
-        std::shared_ptr<Scene> Scene::sceneBunnyWithPointLight() {
+        std::shared_ptr<Scene> Scene::innerSceneWithPointLight() {
             // For testing
             // albedos
             // total white
@@ -684,7 +472,6 @@ namespace kaguya {
             std::vector<std::shared_ptr<Intersectable>> objects;
 
             // walls
-//            /*
             std::vector<std::shared_ptr<Geometry>> leftWall =
                     testLeftWall(lambertLeft, airMedium, airMedium);
             objects.insert(objects.end(), leftWall.begin(), leftWall.end());
@@ -692,22 +479,123 @@ namespace kaguya {
             std::vector<std::shared_ptr<Geometry>> rightWall =
                     testRightWall(lambertRight, airMedium, airMedium);
             objects.insert(objects.end(), rightWall.begin(), rightWall.end());
-//             */
 
             std::vector<std::shared_ptr<Geometry>> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
             objects.insert(objects.end(), bottomWall.begin(), bottomWall.end());
 
 
-//            /*
             std::vector<std::shared_ptr<Geometry>> topWall = testTopWall(lambertTop, airMedium, airMedium);
             objects.insert(objects.end(), topWall.begin(), topWall.end());
 
             std::vector<std::shared_ptr<Geometry>> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
-//             */
+
+
+            // build scene object
+            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+
+            // build point light
+            Matrix4F lightToWorldMat(1.0);
+            lightToWorldMat = TRANSLATE(lightToWorldMat,
+                                        Vector3F(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE));
+            Transform::Ptr lightToWorld = std::make_shared<Transform>(lightToWorldMat);
+            std::shared_ptr<PointLight> light = std::make_shared<PointLight>(lightSpectrum,
+                                                                             lightToWorld,
+                                                                             MediumBoundary(nullptr, nullptr));
+            scene->_lights.push_back(light);
+
+            // scene
+            std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);
+            scene->_world = bvh;
+
+            // build camera
+            auto eye = Vector3F(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
+            auto dir = Vector3F(0.0f, 0.0f, -1.0f);
+            auto up = Vector3F(0.0f, 1.0f, 0.0f);
+
+            Transform cameraToWorld = Transform::lookAt(eye, dir, up);
+            std::shared_ptr<Camera> camera = std::make_shared<Camera>(cameraToWorld.ptr(), 60);
+            scene->_camera = camera;
+
+            scene->_sceneName = "inner-scene-with-point-light.png";
+
+            return scene;
+        }
+
+        std::shared_ptr<Scene> Scene::innerSceneBunnyWithPointLight() {
+            // For testing
+            // albedos
+            // total white
+            Spectrum totalWhiteSpectrum = Spectrum(1.0);
+            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
+                    totalWhiteSpectrum);
+
+            // white
+            Spectrum whiteSpectrum = Spectrum(0.0);
+            whiteSpectrum.r(0.73);
+            whiteSpectrum.g(0.73);
+            whiteSpectrum.b(0.73);
+            std::shared_ptr<Texture<Spectrum>> white = std::make_shared<ConstantTexture<Spectrum>>(whiteSpectrum);
+
+            // red
+            Spectrum redSpectrum = Spectrum(0.0);
+            redSpectrum.r(0.65);
+            redSpectrum.g(0.05);
+            redSpectrum.b(0.05);
+            std::shared_ptr<Texture<Spectrum>> red = std::make_shared<ConstantTexture<Spectrum>>(redSpectrum);
+
+
+            // green
+            Spectrum greenSpectrum = Spectrum(0.0);
+            greenSpectrum.r(0.12);
+            greenSpectrum.g(0.45);
+            greenSpectrum.b(0.15);
+            std::shared_ptr<Texture<Spectrum>> green = std::make_shared<ConstantTexture<Spectrum>>(greenSpectrum);
+
+            // blue
+            std::shared_ptr<Texture<Spectrum>> blue = std::make_shared<ConstantTexture<Spectrum>>(blue_spectrum);
+
+            // light spectrum
+            Spectrum lightSpectrum = Spectrum(0.0);
+            Float lightIntensity = 12;
+            lightSpectrum.r(Float(249.0) / 255.0 * lightIntensity);
+            lightSpectrum.g(Float(222.0) / 255.0 * lightIntensity);
+            lightSpectrum.b(Float(180.0) / 255.0 * lightIntensity);
+
+            // lambertian materials
+            std::shared_ptr<Material> lambertLeft = std::make_shared<Lambertian>(red);
+            std::shared_ptr<Material> lambertRight = std::make_shared<Lambertian>(green);
+            std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
+            std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
+            std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
+            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
+            std::shared_ptr<Material> metal = std::make_shared<Metal>();
+
+//            std::shared_ptr<Medium> airMedium = testAirMedium();
+            std::shared_ptr<Medium> airMedium = nullptr;
+
+            // objects
+            std::vector<std::shared_ptr<Intersectable>> objects;
+
+            // walls
+            std::vector<std::shared_ptr<Geometry>> leftWall =
+                    testLeftWall(lambertLeft, airMedium, airMedium);
+            objects.insert(objects.end(), leftWall.begin(), leftWall.end());
+
+            std::vector<std::shared_ptr<Geometry>> rightWall =
+                    testRightWall(lambertRight, airMedium, airMedium);
+            objects.insert(objects.end(), rightWall.begin(), rightWall.end());
+
+            std::vector<std::shared_ptr<Geometry>> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
+            objects.insert(objects.end(), bottomWall.begin(), bottomWall.end());
+
+            std::vector<std::shared_ptr<Geometry>> topWall = testTopWall(lambertTop, airMedium, airMedium);
+            objects.insert(objects.end(), topWall.begin(), topWall.end());
+
+            std::vector<std::shared_ptr<Geometry>> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
+            objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
             // load model
-            /*
             std::vector<Vector3F> vertices;
             std::vector<Normal3F> normals;
             std::vector<Point2F> texcoords;
@@ -728,24 +616,11 @@ namespace kaguya {
                 Geometry::Ptr geometry = std::make_shared<Geometry>(*it, glass);
                 objects.push_back(geometry);
             }
-             */
 
             // build scene object
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 
             // build point light
-//            /*
-            Matrix4F lightToWorldMat(1.0);
-            lightToWorldMat = TRANSLATE(lightToWorldMat,
-                                        Vector3F(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE));
-            Transform::Ptr lightToWorld = std::make_shared<Transform>(lightToWorldMat);
-
-
-            auto lightWall = testTopAreaLight(lightSpectrum, airMedium, scene->_lights, lambertTop);
-            objects.insert(objects.end(), lightWall.begin(), lightWall.end());
-//             */
-
-            /*
             Matrix4F lightToWorldMat(1.0);
             lightToWorldMat = TRANSLATE(lightToWorldMat,
                                         Vector3F(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE));
@@ -754,14 +629,6 @@ namespace kaguya {
                                                                              lightToWorld,
                                                                              MediumBoundary(nullptr, nullptr));
             scene->_lights.push_back(light);
-             */
-
-            // build environment lights
-            /*
-            Light::Ptr enLight = std::make_shared<EnvironmentLight>(1, "./resource/texture/en2.png",
-                                                                    MediumBoundary(nullptr, nullptr));
-            scene->addEnvironmentLight(enLight);
-             */
 
             // scene
             std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);
@@ -776,7 +643,7 @@ namespace kaguya {
             std::shared_ptr<Camera> camera = std::make_shared<Camera>(cameraToWorld.ptr(), 60);
             scene->_camera = camera;
 
-            scene->_sceneName = "bunny-with-point-light.png";
+            scene->_sceneName = "inner-scene-bunny-with-point-light.png";
 
             return scene;
         }
@@ -885,106 +752,6 @@ namespace kaguya {
             camera->setResolutionHeight(Config::Camera::height);
             scene->_camera = camera;
             scene->_sceneName = "bunny-subsurface-material-with-area-light";
-
-            return scene;
-        }
-
-        std::shared_ptr<Scene> Scene::sceneTwoSpheresWithAreaLight() {
-            // For testing
-            // albedos
-            // total white
-            Spectrum totalWhiteSpectrum = Spectrum(1.0);
-            std::shared_ptr<Texture<Spectrum>> totalWhite = std::make_shared<ConstantTexture<Spectrum>>(
-                    totalWhiteSpectrum);
-
-            // white
-            Spectrum whiteSpectrum = Spectrum(0.0);
-            whiteSpectrum.r(0.73);
-            whiteSpectrum.g(0.73);
-            whiteSpectrum.b(0.73);
-            std::shared_ptr<Texture<Spectrum>> white = std::make_shared<ConstantTexture<Spectrum>>(whiteSpectrum);
-
-            // red
-            Spectrum redSpectrum = Spectrum(0.0);
-            redSpectrum.r(0.65);
-            redSpectrum.g(0.05);
-            redSpectrum.b(0.05);
-            std::shared_ptr<Texture<Spectrum>> red = std::make_shared<ConstantTexture<Spectrum>>(redSpectrum);
-
-
-            // green
-            Spectrum greenSpectrum = Spectrum(0.0);
-            greenSpectrum.r(0.12);
-            greenSpectrum.g(0.45);
-            greenSpectrum.b(0.15);
-            std::shared_ptr<Texture<Spectrum>> green = std::make_shared<ConstantTexture<Spectrum>>(greenSpectrum);
-
-            // blue
-            std::shared_ptr<Texture<Spectrum>> blue = std::make_shared<ConstantTexture<Spectrum>>(blue_spectrum);
-
-            // objects
-            std::vector<std::shared_ptr<Intersectable>> objects;
-
-            // lambertian materials
-            std::shared_ptr<Material> lambertLeft = std::make_shared<Lambertian>(red);
-            std::shared_ptr<Material> lambertRight = std::make_shared<Lambertian>(green);
-            std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
-
-//            std::shared_ptr<Medium> airMedium = testAirMedium();
-            std::shared_ptr<Medium> airMedium = nullptr;
-
-            // walls
-            std::vector<std::shared_ptr<Geometry>> leftWall =
-                    testLeftWall(lambertLeft, airMedium, airMedium);
-            objects.insert(objects.end(), leftWall.begin(), leftWall.end());
-
-            std::vector<std::shared_ptr<Geometry>> rightWall =
-                    testRightWall(lambertRight, airMedium, airMedium);
-            objects.insert(objects.end(), rightWall.begin(), rightWall.end());
-
-            std::vector<std::shared_ptr<Geometry>> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
-            objects.insert(objects.end(), bottomWall.begin(), bottomWall.end());
-
-
-            std::vector<std::shared_ptr<Geometry>> topWall = testTopWall(lambertTop, airMedium, airMedium);
-            objects.insert(objects.end(), topWall.begin(), topWall.end());
-
-            std::vector<std::shared_ptr<Geometry>> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
-            objects.insert(objects.end(), frontWall.begin(), frontWall.end());
-
-            std::shared_ptr<Geometry> glassSphere = buildGlassSphere(
-                    Vector3F(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE), 0.16 * MODEL_SCALE);
-
-            std::shared_ptr<Geometry> metalSphere = buildLambSphereImageTexture(
-                    Vector3F(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE),
-                    0.2 * MODEL_SCALE);
-
-            // build scene object
-            std::shared_ptr<Scene> scene = std::make_shared<Scene>();
-
-            // build area light
-            auto lightWall = testTopAreaLight(area_light_spectrum, airMedium, scene->_lights, lambertTop);
-            objects.insert(objects.end(), lightWall.begin(), lightWall.end());
-
-            objects.push_back(glassSphere);
-            objects.push_back(metalSphere);
-//            objects.push_back(mediumSphere);
-
-            // scene
-            std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(objects);
-            scene->_world = bvh;
-
-            // build camera
-            auto eye = Vector3F(0.0 * MODEL_SCALE, 0.0 * MODEL_SCALE, 1.4 * MODEL_SCALE);
-            auto dir = Vector3F(0.0f, 0.0f, -1.0f);
-            std::shared_ptr<Camera> camera = std::make_shared<Camera>(eye, dir, airMedium);
-            camera->setResolutionWidth(Config::Camera::width);
-            camera->setResolutionHeight(Config::Camera::height);
-            scene->_camera = camera;
-            scene->_sceneName = "two-spheres-with-area-light";
 
             return scene;
         }

@@ -67,11 +67,7 @@ namespace kaguya {
         public:
             typedef std::shared_ptr<Scene> Ptr;
 
-#ifdef TEST_SCENE
-
             /*
-            static void initSceneComponents();
-
             static Float *testSmokeData();
 
             static std::shared_ptr<Medium> testAirMedium();
@@ -91,12 +87,6 @@ namespace kaguya {
                           const std::shared_ptr<Medium> insideMedium,
                           const std::shared_ptr<Medium> outsideMedium);
 
-            /*
-            static std::vector<std::shared_ptr<Geometry>>
-            testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
-                             std::vector<std::shared_ptr<Light>> &lights, const std::shared_ptr<Material> material);
-
-            */
             static std::vector<std::shared_ptr<Geometry>> testBottomWall(const std::shared_ptr<Material> material,
                                                                          const std::shared_ptr<Medium> insideMedium,
                                                                          const std::shared_ptr<Medium> outsideMedium);
@@ -128,30 +118,17 @@ namespace kaguya {
                                                                    const std::shared_ptr<Medium> outside,
                                                                    bool singleSide);
 
-            /*
-            static std::shared_ptr<Scene> sceneSmoke();
-
-            static std::shared_ptr<Scene> sceneDeskAndBunny();
-
-             */
-
-#endif
-
             static std::vector<std::shared_ptr<Geometry>>
             testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
                              std::vector<std::shared_ptr<Light>> &lights, const std::shared_ptr<Material> material);
 
-            /**
-             * 构建 Cornel box，加载 bunny 模型，次表面散射材质
-             */
-            static std::shared_ptr<Scene> sceneBunnySubsurfaceWithAreaLight();
+//            static std::shared_ptr<Scene> sceneBunnySubsurfaceWithAreaLight();
 
-            /**
-             * 构建 bunny，采用点光源
-             */
-            static std::shared_ptr<Scene> sceneBunnyWithPointLight();
+            static std::shared_ptr<Scene> innerSceneBunnyWithPointLight();
 
-            static std::shared_ptr<Scene> sceneTwoSpheresWithAreaLight();
+            static std::shared_ptr<Scene> innerSceneWithAreaLight();
+
+            static std::shared_ptr<Scene> innerSceneWithPointLight();
 
             /**
              * Intersect with scene，record the interaction
