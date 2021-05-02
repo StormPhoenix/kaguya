@@ -61,7 +61,7 @@ namespace kaguya {
              * @param pdfDir
              * @return
              */
-            void rayImportance(const Ray &ray, Float &pdfPos, Float &pdfDir) const;
+            void pdfWe(const Ray &ray, Float &pdfPos, Float &pdfDir) const;
 
         private:
             /**
@@ -71,7 +71,7 @@ namespace kaguya {
              * @param filmPosition
              * @return
              */
-            Spectrum rayImportance(const Ray &ray, Point2F *const filmPosition) const;
+            Spectrum We(const Ray &ray, Point2F *const filmPosition) const;
         private:
             Vector3F _origin;
             Vector3F _front;

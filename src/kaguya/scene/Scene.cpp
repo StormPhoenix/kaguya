@@ -684,6 +684,7 @@ namespace kaguya {
             std::vector<std::shared_ptr<Intersectable>> objects;
 
             // walls
+//            /*
             std::vector<std::shared_ptr<Geometry>> leftWall =
                     testLeftWall(lambertLeft, airMedium, airMedium);
             objects.insert(objects.end(), leftWall.begin(), leftWall.end());
@@ -691,16 +692,19 @@ namespace kaguya {
             std::vector<std::shared_ptr<Geometry>> rightWall =
                     testRightWall(lambertRight, airMedium, airMedium);
             objects.insert(objects.end(), rightWall.begin(), rightWall.end());
+//             */
 
             std::vector<std::shared_ptr<Geometry>> bottomWall = testBottomWall(lambertBottom, airMedium, airMedium);
             objects.insert(objects.end(), bottomWall.begin(), bottomWall.end());
 
 
+//            /*
             std::vector<std::shared_ptr<Geometry>> topWall = testTopWall(lambertTop, airMedium, airMedium);
             objects.insert(objects.end(), topWall.begin(), topWall.end());
 
             std::vector<std::shared_ptr<Geometry>> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
+//             */
 
             // load model
             /*
@@ -730,6 +734,7 @@ namespace kaguya {
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 
             // build point light
+//            /*
             Matrix4F lightToWorldMat(1.0);
             lightToWorldMat = TRANSLATE(lightToWorldMat,
                                         Vector3F(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE));
@@ -738,6 +743,18 @@ namespace kaguya {
 
             auto lightWall = testTopAreaLight(lightSpectrum, airMedium, scene->_lights, lambertTop);
             objects.insert(objects.end(), lightWall.begin(), lightWall.end());
+//             */
+
+            /*
+            Matrix4F lightToWorldMat(1.0);
+            lightToWorldMat = TRANSLATE(lightToWorldMat,
+                                        Vector3F(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE));
+            Transform::Ptr lightToWorld = std::make_shared<Transform>(lightToWorldMat);
+            std::shared_ptr<PointLight> light = std::make_shared<PointLight>(lightSpectrum,
+                                                                             lightToWorld,
+                                                                             MediumBoundary(nullptr, nullptr));
+            scene->_lights.push_back(light);
+             */
 
             // build environment lights
             /*

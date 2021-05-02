@@ -69,10 +69,10 @@ namespace kaguya {
 
             // Compute importance value
             (*pdf) = (dist * dist) / (_lensArea * ABS_DOT(lensInter.normal, *wi));
-            return rayImportance(Ray(lensSample, -(*wi)), filmPosition);
+            return We(Ray(lensSample, -(*wi)), filmPosition);
         }
 
-        void Camera::rayImportance(const Ray &ray, Float &pdfPos, Float &pdfDir) const {
+        void Camera::pdfWe(const Ray &ray, Float &pdfPos, Float &pdfDir) const {
             Vector3F rayDir = NORMALIZE(ray.getDirection());
             Float cosine = DOT(rayDir, _front);
             if (cosine <= 0) {
@@ -98,7 +98,7 @@ namespace kaguya {
             return;
         }
 
-        Spectrum Camera::rayImportance(const Ray &ray, Point2F *const filmPosition) const {
+        Spectrum Camera::We(const Ray &ray, Point2F *const filmPosition) const {
             Vector3F rayDir = NORMALIZE(ray.getDirection());
             Float cosine = DOT(rayDir, _front);
             if (cosine <= 0) {

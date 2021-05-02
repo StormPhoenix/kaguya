@@ -219,7 +219,7 @@ namespace kaguya {
             Ray scatterRay = ray;
 
             Float pdfPos, pdfDir;
-            camera->rayImportance(scatterRay, pdfPos, pdfDir);
+            camera->pdfWe(scatterRay, pdfPos, pdfDir);
 
             return randomWalk(scene, scatterRay, cameraSubPath, maxDepth, pdfDir,
                               sampler, memoryArena, beta, TransportMode::RADIANCE);
@@ -363,7 +363,7 @@ namespace kaguya {
                                        PathVertex *lightSubPath, int s,
                                        PathVertex &extraVertex) {
             if (s + t == 2) {
-                // t = 1 s = 1
+                // Skip t = 1 s = 1
                 return 1;
             }
 

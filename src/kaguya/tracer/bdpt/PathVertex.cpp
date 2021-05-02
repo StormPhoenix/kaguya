@@ -18,10 +18,10 @@ namespace kaguya {
             Vector3F worldWi = NORMALIZE(next.point - point);
             switch (type) {
                 case SURFACE:
-                    assert(si.bsdf != nullptr);
+                    ASSERT(si.bsdf != nullptr, "BSDF entity can't be null.");
                     return si.bsdf->f(-si.direction, worldWi);
                 case MEDIUM:
-                    assert(mi.getPhaseFunction() != nullptr);
+                    ASSERT(mi.getPhaseFunction() != nullptr, "Phase function can't be null.");
                     return mi.getPhaseFunction()->scatterPdf(-mi.direction, worldWi);
                 case CAMERA:
                 case LIGHT:
@@ -69,7 +69,7 @@ namespace kaguya {
                 case LIGHT:
                     return ei;
                 default:
-                    assert(1 == 0);
+                    ASSERT(false, "Interaction type not supported.");
                     // TODO not support for now
                     return ei;
             }
@@ -100,13 +100,13 @@ namespace kaguya {
                     return !isDeltaLight();
                 case SURFACE:
                     // 判断 specular 类型
-                    assert(si.bsdf != nullptr);
+                    ASSERT(si.bsdf != nullptr, "BSDF can't be null.");
                     return si.bsdf->hasAnyOf(BXDFType(BXDFType::BSDF_DIFFUSE | BXDFType::BSDF_GLOSSY)) > 0;
                 case MEDIUM:
                     return true;
                 default:
                     // TODO 暂时不支持
-                    assert(1 == 0);
+                    ASSERT(false, "Type is not connectible.");
                     return false;
             }
         }
@@ -133,7 +133,7 @@ namespace kaguya {
                 wo = NORMALIZE(wo);
             } else {
                 // vertex type should be CAMERA
-                assert(type == CAMERA);
+                ASSERT(type == CAMERA, "Type must be CAMERA type.");
             }
 
             // 计算从当前点射向 next 点的 pdf
@@ -141,15 +141,15 @@ namespace kaguya {
             if (type == CAMERA) {
                 Float pdfPos = 0;
                 Ray cameraRay = Ray(ei.point, ei.direction);
-                ei.camera->rayImportance(cameraRay, pdfPos, pdf);
+                ei.camera->pdfWe(cameraRay, pdfPos, pdf);
             } else if (type == SURFACE) {
                 pdf = si.bsdf->samplePdf(wo, wi);
             } else if (type == MEDIUM) {
-                assert(mi.getPhaseFunction() != nullptr);
+                ASSERT(mi.getPhaseFunction() != nullptr, "Phase function can't be null.");
                 pdf = mi.getPhaseFunction()->scatterPdf(wo, wi);
             } else {
                 // TODO 暂时不支持
-                assert(1 == 0);
+                ASSERT(false, "Density calculation not supported.");
             }
 
             // pdf 转化为基于 area 的 density
@@ -159,7 +159,7 @@ namespace kaguya {
         Float PathVertex::densityByLight(const PathVertex &next) const {
             // 获取当前 PathVertex 保存的 light 和 areaLight
             const Light *light = (type == LIGHT) ? ei.light : si.getAreaLight();
-            assert(light != nullptr);
+            ASSERT(light != nullptr, "Light entity can't be null. ");
 
             Vector3F dirToNext = next.point - point;
             Float distSquare = std::pow(LENGTH(dirToNext), 2);
@@ -185,7 +185,7 @@ namespace kaguya {
             dirToNext = NORMALIZE(dirToNext);
 
             const Light *light = (type == LIGHT) ? ei.light : si.getAreaLight();
-            assert(light != nullptr);
+            ASSERT(light != nullptr, "Light entity can't be null.");
 
             // TODO 只考虑一个光源的情况，如果有多光源，则计算 pdf 时候要考虑到对不同光源采样的概率
 
