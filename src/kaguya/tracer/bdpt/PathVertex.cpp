@@ -85,8 +85,7 @@ namespace kaguya {
 
             Float pdfFwd = pdfWi / distSquare;
             if (next.type == PathVertexType::SURFACE) {
-                Vector3F surfaceNormal = next.si.normal;
-                pdfFwd *= ABS_DOT(surfaceNormal, wi);
+                pdfFwd *= ABS_DOT(next.geometryNormal(), wi);
             }
             return pdfFwd;
         }
@@ -169,12 +168,12 @@ namespace kaguya {
             Float pdfPos = 0;
             Float pdfDir = 0;
             // 计算光源采样的 pdf
-            light->pdfLe(ray, normal, &pdfPos, &pdfDir);
+            light->pdfLe(ray, geometryNormal(), &pdfPos, &pdfDir);
 
             // 计算 next 的 density pdf
             pdfDir /= distSquare;
             if (next.type == SURFACE) {
-                pdfDir *= ABS_DOT(next.normal, dirToNext);
+                pdfDir *= ABS_DOT(next.geometryNormal(), dirToNext);
             }
 
             return pdfDir;
@@ -192,7 +191,7 @@ namespace kaguya {
             Ray ray = Ray(point, dirToNext);
             Float pdfPos = 0;
             Float pdfDir = 0;
-            light->pdfLe(ray, normal, &pdfPos, &pdfDir);
+            light->pdfLe(ray, geometryNormal(), &pdfPos, &pdfDir);
             return pdfPos;
         }
     }

@@ -136,7 +136,7 @@ namespace kaguya {
                         extraVertex = PathVertex::createCameraVertex(_camera.get(), newRay, we / pdf);
                         ret = ps.beta * ps.f(extraVertex) * extraVertex.beta;
                         if (ps.type == PathVertexType::SURFACE) {
-                            ret *= ABS_DOT(ps.normal, worldWi);
+                            ret *= ABS_DOT(ps.shadingNormal(), worldWi);
                         }
 
                         // transmittance
@@ -178,7 +178,7 @@ namespace kaguya {
 
                         ret = pt.beta * pt.f(extraVertex) * extraVertex.beta;
                         if (pt.type == PathVertexType::SURFACE) {
-                            ret *= std::abs(DOT(pt.normal, worldWi));
+                            ret *= std::abs(DOT(pt.shadingNormal(), worldWi));
                         }
 
                         // transmittance
@@ -471,12 +471,12 @@ namespace kaguya {
 
             Float cosPre = 1.0;
             if (pre.type == PathVertexType::SURFACE) {
-                cosPre = std::abs(DOT(pre.normal, dirToNext));
+                cosPre = std::abs(DOT(pre.shadingNormal(), dirToNext));
             }
 
             Float cosNext = 1.0;
             if (next.type == PathVertexType::SURFACE) {
-                cosNext = std::abs(DOT(next.normal, dirToNext));
+                cosNext = std::abs(DOT(next.shadingNormal(), dirToNext));
             }
 
             VisibilityTester visibilityTester = VisibilityTester(pre.getInteraction(), next.getInteraction());

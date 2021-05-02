@@ -31,8 +31,6 @@ namespace kaguya {
             PathVertexType type;
             // 路径点位置
             Vector3F point;
-            // 路径点法向位置，只针对 Surface 类型有效
-            Vector3F normal;
             // 当前点的概率密度，从上一个点发射射线选取
             Float pdfForward = 0;
             // 当前点的概率密度，从下一个点发射射线选取
@@ -47,13 +45,25 @@ namespace kaguya {
             PathVertex() {}
 
             PathVertex(const SurfaceInteraction &si, const Spectrum &beta) :
-                    si(si), beta(beta), point(si.point), normal(si.normal), type(PathVertexType::SURFACE) {}
+                    si(si), beta(beta), point(si.point), type(PathVertexType::SURFACE) {}
 
             PathVertex(const MediumInteraction &mi, const Spectrum &beta) :
                     mi(mi), beta(beta), point(mi.point), type(PathVertexType::MEDIUM) {}
 
             PathVertex(PathVertexType type, const StartEndInteraction &ei, const Spectrum &beta) :
-                    type(type), ei(ei), point(ei.point), normal(ei.normal), beta(beta) {
+                    type(type), ei(ei), point(ei.point), beta(beta) {
+            }
+
+            Normal3F geometryNormal() const {
+                return getInteraction().normal;
+            }
+
+            Normal3F shadingNormal() const {
+                if (type == PathVertexType::SURFACE) {
+                    return getInteraction().rendering.normal;
+                } else {
+                    return getInteraction().normal;
+                }
             }
 
             /**
