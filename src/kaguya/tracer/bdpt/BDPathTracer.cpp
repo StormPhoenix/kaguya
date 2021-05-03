@@ -49,7 +49,6 @@ namespace kaguya {
                         // set current sampling pixel
                         sampler->forPixel(Point2F(row, col));
 
-                        Spectrum ans = {0};
                         const Float sampleWeight = 1.0 / Config::Tracer::sampleNum;
                         // 做 _samplePerPixel 次采样
                         for (int sampleCount = 0; sampleCount < Config::Tracer::sampleNum; sampleCount++) {
@@ -60,10 +59,9 @@ namespace kaguya {
                             Ray sampleRay = _camera->generateRay(pixelX, pixelY, sampler);
 
                             Spectrum shaderColor = shader(sampleRay, _scene, _maxDepth, sampler, arena);
-                            ans += shaderColor;
+                            shaderColor *= sampleWeight;
                             arena.clean();
-                            ans *= sampleWeight;
-                            _filmPlane->addSpectrum(ans, row, col);
+                            _filmPlane->addSpectrum(shaderColor, row, col);
                             sampler->nextSampleRound();
                         }
                     }
@@ -507,6 +505,11 @@ namespace kaguya {
                     if ((s == 1 && t == 1) || depth < 0 || depth > maxDepth) {
                         continue;
                     }
+
+                    // TODO delete
+//                    if (t == 1) {
+//                        continue;
+//                    }
 
                     Point2F samplePosition;
                     Spectrum value = connectPath(scene, cameraSubPath, cameraPathLength, t,
