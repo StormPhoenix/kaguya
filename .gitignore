@@ -8,6 +8,9 @@
 *.png
 temp.txt
 
+# VS Code
+.history
+
 # IDE
 /.idea
 

@@ -123,7 +123,6 @@ namespace kaguya {
                 std::map<std::string, TagType> _nodeTypeMap;
                 std::shared_ptr<Scene> _scene;
                 std::map<std::string, Material::Ptr> _materialMap;
-                // TODO 修改成 Intersectable
                 std::vector<Intersectable::Ptr> _shapes;
             };
 

@@ -27,6 +27,10 @@ A simple physically based render.
             - [ ] Visible point 未击中
     - [ ] Light::Le() 
     
+- [ ] 添加 Arguments 参数，在 inner scene 和 xml scene 之间切换.    
+    
+- [ ] BDPT 渲染 cbox 场景，当 ssp 设置成 1000 的时候会出现黑色躁点。有时间复现这个 bug    
+    
 ## TODO
 - [ ] 修正 C++ template 特化语法
     

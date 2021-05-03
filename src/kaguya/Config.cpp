@@ -7,6 +7,7 @@
 
 namespace kaguya {
 
+    // Camera settings
     std::string Config::Camera::type = "perspective";
     std::string Config::Camera::filename = "kaguya";
     std::string Config::Camera::filmType = "ldrfilm";
@@ -18,40 +19,46 @@ namespace kaguya {
     bool Config::Camera::banner = false;
     std::string Config::Camera::rfilter = "tent";
 
+    // Sampler settings
     std::string Config::Sampler::type = "independent";
     int Config::Sampler::sampleCount = 100;
+    std::string Config::samplerType = "default";
 
+    // Scene inputs
     std::string Config::sceneDir = "";
 
     // 初始化场景
+    // TODO delete
     int Config::sceneId = -1;
     bool Config::isScenePrepared = false;
     std::vector<std::function<std::shared_ptr<Scene>()>> Config::scenes;
 
+    // Outputs settings
     std::string Config::filenamePrefix = "render";
 
+    // Tracer settings
     int Config::russianRouletteDepth = 3;
     Float Config::russianRoulette = 0.135;
     Float Config::sampleLightProb = 0.3f;
-    int Config::Parallel::kernelCount = 1;
     std::string Config::Tracer::type = "path";
     int Config::Tracer::delta = 10;
     int Config::Tracer::maxDepth = 15;
     int Config::Tracer::sampleNum = 10;
     bool Config::Tracer::strictNormals = false;
-
-    int Config::Parallel::tileSize = 50;
-
     Float Config::initialSearchRadius = 1.0f;
     Float Config::searchRadiusDecay = 2.0 / 3.0;
     int Config::photonPerIteration = 4096;
-
-    std::string Config::samplerType = "default";
     std::string Config::renderType = "pt";
 
+    // Parallel settings
+    int Config::Parallel::tileSize = 50;
+    int Config::Parallel::kernelCount = 1;
+
+
+
     std::shared_ptr<Scene> Config::nextScene() {
-        /*`
-        std::vector<std::string> sceneList = {{"/resource/scenes/cornel-box/"},};
+//        /*`
+        std::vector<std::string> sceneList = {{"/resource/scenes/cbox/"},};
         using namespace kaguya::scene::importer;
         XmlSceneImporter importer = XmlSceneImporter();
         sceneId++;
@@ -62,9 +69,9 @@ namespace kaguya {
         } else {
             return nullptr;
         }
-         */
+//         */
 
-//        /* TODO delete
+        /* TODO delete
         // 若场景未构建，则线构建场景
         if (!isScenePrepared) {
 //            scenes.push_back(Scene::sceneDeskAndBunny);
@@ -82,6 +89,6 @@ namespace kaguya {
         } else {
             return nullptr;
         }
-//         */
+         */
     }
 }
