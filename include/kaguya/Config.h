@@ -60,8 +60,6 @@ namespace kaguya {
             static int tileSize;
         };
 
-        static std::string sceneDir;
-        // 输出图像名称前缀
         static std::string filenamePrefix;
         // russian roulette 从什么 depth 开始
         static int russianRouletteDepth;
@@ -86,15 +84,11 @@ namespace kaguya {
         // TODO 临时代码，用于测试构建场景
         static std::shared_ptr<Scene> nextScene();
 
+        static std::vector<std::string> inputSceneDirs;
+
+        static std::vector<std::function<std::shared_ptr<Scene>()>> innerScenes;
     private:
-        // TODO delete
-        // 保存场景构建函数
-        static std::vector<std::function<std::shared_ptr<Scene>()>> scenes;
-
-        // 场景数据是否准备好
-        static bool isScenePrepared;
-
-        // 场景需要
+        // Scene id
         static int sceneId;
     };
 

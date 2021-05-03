@@ -30,8 +30,6 @@ namespace kaguya {
                 _material != nullptr ? si.setMaterial(_material.get()) : si.setMaterial(nullptr);
                 // area light
                 _areaLight != nullptr ? si.setAreaLight(_areaLight.get()) : si.setAreaLight(nullptr);
-                // geometry
-                si.setGeometry(this);
             }
             return ret;
         }

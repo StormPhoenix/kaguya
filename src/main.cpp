@@ -12,8 +12,12 @@ using namespace clipp;
 using namespace std;
 
 int main(int argc, char *argv[]) {
+    std::string sceneDir = "";
     auto cli = (
             value("output name", Config::filenamePrefix),
+
+                    /* For input scene */
+                    option("-scene", "--scene-directory") & value("input scene directory", sceneDir),
 
                     /* For general settings */
                     option("-rt", "--render-type") & value("render type", Config::renderType),
@@ -37,6 +41,12 @@ int main(int argc, char *argv[]) {
     if (!parse(argc, argv, cli)) {
         cout << make_man_page(cli, argv[0]);
         return 0;
+    }
+
+    if (sceneDir != "") {
+        Config::inputSceneDirs.push_back(sceneDir);
+    } else {
+        Config::innerScenes.push_back(Scene::innerSceneBunnyWithPointLight);
     }
 
     Tracer *tracer = TracerFactory::newTracer();

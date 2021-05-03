@@ -24,14 +24,10 @@ namespace kaguya {
     int Config::Sampler::sampleCount = 100;
     std::string Config::samplerType = "default";
 
-    // Scene inputs
-    std::string Config::sceneDir = "";
-
-    // 初始化场景
-    // TODO delete
+    // Scene config
     int Config::sceneId = -1;
-    bool Config::isScenePrepared = false;
-    std::vector<std::function<std::shared_ptr<Scene>()>> Config::scenes;
+    std::vector<std::function<std::shared_ptr<Scene>()>> Config::innerScenes;
+    std::vector<std::string> Config::inputSceneDirs;
 
     // Outputs settings
     std::string Config::filenamePrefix = "render";
@@ -54,41 +50,25 @@ namespace kaguya {
     int Config::Parallel::tileSize = 50;
     int Config::Parallel::kernelCount = 1;
 
-
-
     std::shared_ptr<Scene> Config::nextScene() {
-//        /*`
-        std::vector<std::string> sceneList = {{"/resource/scenes/cbox/"},};
-        using namespace kaguya::scene::importer;
-        XmlSceneImporter importer = XmlSceneImporter();
         sceneId++;
-        if (sceneId < sceneList.size()) {
-            std::string scene_dir = fs::current_path().generic_u8string() + sceneList[sceneId];
-            Config::sceneDir = scene_dir;
-            return importer.importScene(scene_dir);
+        if (inputSceneDirs.size() > 0) {
+            using namespace kaguya::scene::importer;
+            XmlSceneImporter importer = XmlSceneImporter();
+            if (sceneId < inputSceneDirs.size()) {
+                std::string scene_dir = fs::current_path().generic_u8string() + inputSceneDirs[sceneId];
+                return importer.importScene(scene_dir);
+            } else {
+                return nullptr;
+            }
         } else {
-            return nullptr;
+            // Rendering inner scene
+            if (sceneId < innerScenes.size()) {
+                std::shared_ptr<Scene> scene = innerScenes[sceneId]();
+                return scene;
+            } else {
+                return nullptr;
+            }
         }
-//         */
-
-        /* TODO delete
-        // 若场景未构建，则线构建场景
-        if (!isScenePrepared) {
-//            scenes.push_back(Scene::sceneDeskAndBunny);
-            scenes.push_back(Scene::innerSceneBunnyWithPointLight);
-//            scenes.push_back(Scene::sceneBunnySubsurfaceWithAreaLight);
-//            scenes.push_back(Scene::sceneSmoke);
-            isScenePrepared = true;
-        }
-
-        sceneId++;
-        // 选取下一个场景
-        if (sceneId < scenes.size()) {
-            std::shared_ptr<Scene> scene = scenes[sceneId]();
-            return scene;
-        } else {
-            return nullptr;
-        }
-         */
     }
 }

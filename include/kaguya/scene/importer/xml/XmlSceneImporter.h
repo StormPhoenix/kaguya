@@ -124,6 +124,7 @@ namespace kaguya {
                 std::shared_ptr<Scene> _scene;
                 std::map<std::string, Material::Ptr> _materialMap;
                 std::vector<Intersectable::Ptr> _shapes;
+                std::string _inputSceneDir;
             };
 
         }

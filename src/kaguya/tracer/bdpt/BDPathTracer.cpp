@@ -506,11 +506,6 @@ namespace kaguya {
                         continue;
                     }
 
-                    // TODO delete
-//                    if (t == 1) {
-//                        continue;
-//                    }
-
                     Point2F samplePosition;
                     Spectrum value = connectPath(scene, cameraSubPath, cameraPathLength, t,
                                                  lightSubPath, lightPathLength, s,

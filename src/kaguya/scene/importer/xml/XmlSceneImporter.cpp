@@ -351,7 +351,7 @@ namespace kaguya {
                 std::vector<Normal3F> normals;
                 std::vector<Point2F> texcoords;
                 std::vector<TriMesh::TriIndex> indics;
-                bool good = io::ObjLoader::loadObj(Config::sceneDir + filename, vertices, normals, texcoords, indics);
+                bool good = io::ObjLoader::loadObj(_inputSceneDir + filename, vertices, normals, texcoords, indics);
                 ASSERT(good, "Load *.obj model failed: " + filename);
                 std::cout << "\tLoading mesh: " << filename << std::endl;
 
@@ -599,6 +599,7 @@ namespace kaguya {
             }
 
             std::shared_ptr<Scene> XmlSceneImporter::importScene(std::string sceneDir) {
+                _inputSceneDir = sceneDir;
                 std::string xml_file = sceneDir + "scene.xml";
                 std::cout << "Loading scene file: " << xml_file << std::endl;
 

@@ -150,19 +150,8 @@ namespace kaguya {
         protected:
             // 如果被击中物体是 AreaLight，则这一项应该被赋值
             AreaLight *_areaLight = nullptr;
-            // TODO modify to geometry
-            const Intersectable *_geometry;
 
         public:
-            // TODO delete
-            void setGeometry(const Intersectable *geometry) {
-                _geometry = geometry;
-            }
-
-            const Intersectable *getGeometry() const {
-                return _geometry;
-            }
-
             const AreaLight *getAreaLight() const {
                 return _areaLight;
             }
