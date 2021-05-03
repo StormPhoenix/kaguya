@@ -135,9 +135,10 @@ namespace kaguya {
                                 SPPMPixel &pixel = pixels[pixelOffset];
 
                                 // Sample camera ray
-                                auto u = (col + sampler->sample1D()) / Float(Config::Camera::width);
-                                auto v = (row + sampler->sample1D()) / Float(Config::Camera::height);
-                                Ray cameraRay = _camera->sendRay(u, v);
+                                Float pixelX = col + sampler->sample1D();
+                                Float pixelY = row + sampler->sample1D();
+                                Ray cameraRay = _camera->generateRay(pixelX, pixelY, sampler);
+
                                 Spectrum beta(1.0f);
                                 bool isSpecularBounce = false;
 

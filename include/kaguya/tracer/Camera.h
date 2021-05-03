@@ -29,7 +29,7 @@ namespace kaguya {
             Camera(Transform::Ptr cameraToWorld, Float hFov, Float nearClip = 1.0, Float farClip = 10000,
                    Medium::Ptr medium = nullptr);
 
-            Ray sendRay(Float u, Float v) const;
+            Ray generateRay(Float pixelX, Float pixelY, Sampler * sampler) const;
 
             const Vector3F &getFront() const {
                 return _front;

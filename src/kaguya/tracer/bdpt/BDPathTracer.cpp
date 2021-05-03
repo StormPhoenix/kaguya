@@ -54,12 +54,12 @@ namespace kaguya {
                         // 做 _samplePerPixel 次采样
                         for (int sampleCount = 0; sampleCount < Config::Tracer::sampleNum; sampleCount++) {
                             MemoryArena arena;
-                            auto u = (col + sampler->sample1D()) / Float(Config::Camera::width);
-                            auto v = (row + sampler->sample1D()) / Float(Config::Camera::height);
 
-                            Ray sampleRay = _camera->sendRay(u, v);
+                            Float pixelX = col + sampler->sample1D();
+                            Float pixelY = row + sampler->sample1D();
+                            Ray sampleRay = _camera->generateRay(pixelX, pixelY, sampler);
+
                             Spectrum shaderColor = shader(sampleRay, _scene, _maxDepth, sampler, arena);
-
                             ans += shaderColor;
                             arena.clean();
                             ans *= sampleWeight;

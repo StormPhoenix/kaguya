@@ -189,10 +189,9 @@ namespace kaguya {
                         // 做 _samplePerPixel 次采样
                         for (int sampleCount = 0; sampleCount < Config::Tracer::sampleNum; sampleCount++) {
                             MemoryArena arena;
-                            auto u = (col + sampler->sample1D()) / Float(Config::Camera::width);
-                            auto v = (row + sampler->sample1D()) / Float(Config::Camera::height);
-
-                            Ray sampleRay = _camera->sendRay(u, v);
+                            Float pixelX = col + sampler->sample1D();
+                            Float pixelY = row + sampler->sample1D();
+                            Ray sampleRay = _camera->generateRay(pixelX, pixelY, sampler);
                             Spectrum shaderColor = shaderOfProgression(sampleRay, _scene, sampler, arena);
 
                             ans += shaderColor;

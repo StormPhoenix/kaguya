@@ -34,13 +34,25 @@ namespace kaguya {
                                - _cameraToWorld->transformPoint(Vector3F(0, 0, 0)));
         }
 
-        Ray Camera::sendRay(Float u, Float v) const {
-            Float x = Config::Camera::width * u;
-            Float y = Config::Camera::height * v;
-            Vector3F dir = NORMALIZE(_rasterToCamera->transformPoint(Point3F(x, y, 0)));
+        Ray Camera::generateRay(Float pixelX, Float pixelY, Sampler *sampler) const {
+            Float x = pixelX;
+            Float y = pixelY;
 
-            dir = NORMALIZE(_cameraToWorld->transformVector(dir));
-            return Ray(_origin, dir, _medium.get());
+            // Camera space
+            Point3F pOrigin = Point3F(0, 0, 0);
+            if (_lensRadius > 0) {
+                Vector2F diskSample = math::sampling::diskUniformSampling(sampler, _lensRadius);
+                pOrigin = Point3F(diskSample.x, diskSample.y, 0);
+            }
+
+            Point3F pTarget = _rasterToCamera->transformPoint(Point3F(x, y, 0));
+            Vector3F rayDir = NORMALIZE(pTarget - pOrigin);
+
+            // Convert to world space
+            Point3F pOriginWorld = _cameraToWorld->transformPoint(pOrigin);
+            Vector3F pDirWorld = NORMALIZE(_cameraToWorld->transformVector(rayDir));
+
+            return Ray(pOriginWorld, pDirWorld, _medium.get());
         }
 
         FilmPlane *Camera::buildFilmPlane(int channel) const {
