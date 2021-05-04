@@ -6,22 +6,12 @@
 #define KAGUYA_SCENE_H
 
 #include <kaguya/core/Interaction.h>
-#include <kaguya/scene/meta/Shape.h>
-#include <kaguya/tracer/Camera.h>
-#include <memory>
-
-#define TEST_SCENE
-#ifdef TEST_SCENE
-
+#include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/core/medium/Medium.h>
 #include <kaguya/core/medium/IsotropicMedium.h>
-
-using namespace kaguya::core::medium;
-
 #include <kaguya/material/Material.h>
-
-using namespace kaguya::material;
-
+#include <kaguya/scene/meta/Shape.h>
+#include <kaguya/tracer/Camera.h>
 #include <kaguya/core/light/Light.h>
 #include <kaguya/core/light/AreaLight.h>
 #include <kaguya/core/light/DiffuseAreaLight.h>
@@ -29,23 +19,16 @@ using namespace kaguya::material;
 #include <kaguya/core/light/SpotLight.h>
 #include <kaguya/core/Transform.h>
 
-using namespace kaguya::core;
+#include <vector>
+#include <memory>
 
-#include <kaguya/core/spectrum/Spectrum.hpp>
+using namespace kaguya::core;
+using namespace kaguya::core::medium;
+using namespace kaguya::material;
 
 using kaguya::core::Spectrum;
+
 const int MODEL_SCALE = 5;
-
-// smoke data
-const int gridz = 192;
-const int gridy = 256;
-const int gridx = 192;
-
-const std::string path = "./resource/volume/density_big_0084.pbrt";
-
-#endif
-
-#include <vector>
 
 namespace kaguya {
     namespace core {

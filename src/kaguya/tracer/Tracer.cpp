@@ -17,7 +17,6 @@ namespace kaguya {
 
         void Tracer::run() {
             _scene = Config::nextScene();
-
             while (_scene != nullptr) {
                 // Print config info
                 std::cout << std::endl << "Using render type: " << Config::renderType << std::endl;
