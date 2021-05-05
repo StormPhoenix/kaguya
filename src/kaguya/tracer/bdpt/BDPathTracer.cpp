@@ -43,6 +43,10 @@ namespace kaguya {
                 int startCol = idxTileX * Config::Parallel::tileSize;
                 int endCol = std::min(startCol + Config::Parallel::tileSize - 1, width - 1);
 
+                int tileWidth = endCol - startCol + 1;
+                int tileHeight = endRow - startRow + 1;
+                FilmTile::Ptr filmTile = std::make_shared<FilmTile>(Point2I(startCol, startRow), tileWidth, tileHeight);
+
                 MemoryArena arena;
                 const Float sampleWeight = 1.0 / Config::Tracer::sampleNum;
                 Sampler *sampler = sampler::SamplerFactory::newSampler(Config::Tracer::sampleNum);
@@ -63,9 +67,11 @@ namespace kaguya {
                             sampler->nextSampleRound();
                             arena.clean();
                         }
-                        _filmPlane->addSpectrum(shaderColor * sampleWeight, row, col);
+                        filmTile->addSpectrum(shaderColor * sampleWeight, row - startRow, col - startCol);
+                        // _filmPlane->addSpectrum(shaderColor * sampleWeight, row, col);
                     }
                 }
+                _filmPlane->mergeTile(filmTile);
                 delete sampler;
                 nFinished++;
                 std::cout << "\r" << float(nFinished) * 100 / (nTileX * nTileY) << " %"

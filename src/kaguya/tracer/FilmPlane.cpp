@@ -13,6 +13,35 @@
 namespace kaguya {
     namespace tracer {
 
+        FilmTile::FilmTile(Point2I offset, int width, int height) :
+            _width(width), _height(height), _offsetInFilm(offset) {
+            int tileSize = width * height;
+            ASSERT(tileSize > 0, "FilmTile size should be greater than zero. ");
+            _filmTile = std::unique_ptr<Pixel[]>(new Pixel[tileSize]);
+        }
+
+        void FilmTile::addSpectrum(const Spectrum &spectrum, int row, int col) {
+            if (row < 0 || row >= _height ||
+                col < 0 || col >= _width) {
+                return;
+            }
+
+            int offset = (row * _width + col);
+            Pixel &pixel = _filmTile[offset];
+            pixel.spectrum += spectrum;
+        }
+
+        void FilmTile::setSpectrum(const Spectrum &spectrum, int row, int col) {
+            if (row < 0 || row >= _height ||
+                col < 0 || col >= _width) {
+                return;
+            }
+
+            int offset = (row * _width + col);
+            Pixel &pixel = _filmTile[offset];
+            pixel.spectrum = spectrum;
+        }
+
         FilmPlane::FilmPlane(int resolutionWidth, int resolutionHeight, int channel) :
                 _resolutionWidth(resolutionWidth), _resolutionHeight(resolutionHeight),
                 _channel(channel) {
@@ -57,11 +86,50 @@ namespace kaguya {
             pixel.spectrum = spectrum;
         }
 
+        void FilmPlane::mergeTile(FilmTile::Ptr tile) {
+            // Check offset
+            Point2I tileOffset = tile->_offsetInFilm;
+            if (tileOffset.x < 0 || tileOffset.x >= _resolutionWidth ||
+                tileOffset.y < 0 || tileOffset.y >= _resolutionHeight) {
+                std::cout << "Merge tile failed (tile offset out of range). " << std::endl;
+                return;
+            }
+
+            int tileWidth = tile->_width;
+            int tileHeight = tile->_height;
+            if (tileOffset.x + tileWidth > _resolutionWidth ||
+                tileOffset.y + tileHeight > _resolutionHeight) {
+                std::cout << "Merge tile failed (tile size out of range). " << std::endl;
+                return;
+            }
+
+            {
+                std::lock_guard<std::mutex> lock(_writeLock);
+                for (int row = 0; row < tileHeight; row++) {
+                    for (int col = 0; col < tileWidth; col++) {
+                        int offsetInTile = row * tileWidth + col;
+                        Pixel &tilePixel = tile->_filmTile[offsetInTile];
+
+                        int offsetInFilm = (tileOffset.y + row) * _resolutionWidth + (tileOffset.x + col);
+                        Pixel &filmPixel = _film[offsetInFilm];
+
+                        // Add spectrum
+                        filmPixel.spectrum += tilePixel.spectrum;
+
+                        // Add extra spectrum
+                        for (int ch = 0; ch < _channel; ch++) {
+                            filmPixel.extra[ch].add(tilePixel.extra[ch].get());
+                        }
+                    }
+                }
+            }
+        }
+
         void FilmPlane::writeImage(char const *filename) {
             // Create image buffer
             unsigned char *image = new unsigned char[_resolutionWidth * _resolutionHeight * _channel];
             {
-                std::lock_guard<std::mutex> lock(writeLock);
+                std::lock_guard<std::mutex> lock(_writeLock);
                 // 将光谱转化到 image buffer
                 for (int row = _resolutionHeight - 1; row >= 0; row--) {
                     for (int col = 0; col < _resolutionWidth; col++) {

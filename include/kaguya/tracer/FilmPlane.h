@@ -5,6 +5,7 @@
 #ifndef KAGUYA_FILMPLANE_H
 #define KAGUYA_FILMPLANE_H
 
+#include <kaguya/math/Math.h>
 #include <kaguya/core/Core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/parallel/AtomicFloat.h>
@@ -18,6 +19,8 @@ namespace kaguya {
         using kaguya::core::SPECTRUM_CHANNEL;
         using kaguya::parallel::AtomicFloat;
 
+        using namespace math;
+
         struct Pixel {
             Spectrum spectrum;
             AtomicFloat extra[SPECTRUM_CHANNEL];
@@ -30,6 +33,24 @@ namespace kaguya {
             }
         };
 
+        class FilmTile {
+        public:
+            typedef std::shared_ptr<FilmTile> Ptr;
+
+            friend class FilmPlane;
+
+            FilmTile(Point2I offset, int width, int height);
+
+            void addSpectrum(const Spectrum &spectrum, int row, int col);
+
+            void setSpectrum(const Spectrum &spectrum, int row, int col);
+
+        private:
+            int _width, _height;
+            Point2I _offsetInFilm;
+            std::unique_ptr<Pixel[]> _filmTile;
+        };
+
         class FilmPlane {
         public:
             FilmPlane(int resolutionWidth, int resolutionHeight, int channel);
@@ -40,6 +61,8 @@ namespace kaguya {
 
             void setSpectrum(const Spectrum &spectrum, int row, int col);
 
+            void mergeTile(FilmTile::Ptr tile);
+
             void writeImage(char const *filename);
 
         private:
@@ -47,7 +70,7 @@ namespace kaguya {
             int _resolutionHeight = 0;
             int _channel = 0;
             std::unique_ptr<Pixel[]> _film;
-            std::mutex writeLock;
+            std::mutex _writeLock;
         };
 
     }
