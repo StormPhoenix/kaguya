@@ -12,8 +12,22 @@ namespace kaguya {
             }
 
             SurfaceInteraction
-            Shape::sampleSurfaceInteraction(const Interaction &eye, Sampler *sampler) const {
-                return sampleSurfacePoint(sampler);
+            Shape::sampleSurfaceInteraction(const Interaction &eye, Float *pdf, Sampler *sampler) const {
+                Float density = 0.;
+                SurfaceInteraction si = sampleSurfacePoint(&density, sampler);
+                Vector3F wi = si.point - eye.point;
+                Float distance = LENGTH(wi);
+                if (distance == 0.) {
+                    (*pdf) = 0.;
+                } else {
+                    wi = NORMALIZE(wi);
+                    Float cosTheta = ABS_DOT(-wi, si.normal);
+                    (*pdf) = density * (distance * distance) / cosTheta;
+                    if (std::isinf(*pdf)) {
+                        (*pdf) = 0.;
+                    }
+                }
+                return si;
             }
 
             Float Shape::surfaceInteractionPdf(const Interaction &eye, const Vector3F &dir) const {

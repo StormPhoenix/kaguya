@@ -36,12 +36,12 @@ namespace kaguya {
 
                 virtual Float area() const = 0;
 
-                virtual SurfaceInteraction sampleSurfacePoint(Sampler *sampler) const = 0;
+                virtual SurfaceInteraction sampleSurfacePoint(Float *pdf, Sampler *sampler) const = 0;
 
                 virtual Float surfacePointPdf(const SurfaceInteraction &si) const;
 
                 virtual SurfaceInteraction sampleSurfaceInteraction(
-                        const Interaction &eye, Sampler *sampler) const;
+                        const Interaction &eye, Float *pdf, Sampler *sampler) const;
 
                 virtual Float surfaceInteractionPdf(const Interaction &eye, const Vector3F &dir) const;
             };

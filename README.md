@@ -26,8 +26,8 @@ A simple physically based render.
         - [ ] SPPM
             - [ ] Visible point 未击中
     - [ ] Light::Le() 
-    
-- [ ] 添加 Arguments 参数，在 inner scene 和 xml scene 之间切换.    
+
+- [ ] 构建不依赖 C++ std 的随机数生成器    
     
 ## TODO
 - [ ] 修正 C++ template 特化语法

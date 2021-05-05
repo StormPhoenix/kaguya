@@ -19,13 +19,12 @@ namespace kaguya {
             assert(_shape != nullptr);
 
             // 采样位置
-            SurfaceInteraction si = _shape->sampleSurfacePoint(sampler);
+            SurfaceInteraction si = _shape->sampleSurfacePoint(pdfPos, sampler);
+            si.setMediumBoundary(_mediumBoundary);
+
             if (normal != nullptr) {
                 *normal = si.normal;
             }
-
-            // 采样位置 pdf
-            *pdfPos = _shape->surfacePointPdf(si);
 
             Vector3F dirLocal;
             // 判断区域光是否是双面发光

@@ -204,11 +204,12 @@ namespace kaguya {
             }
 
             Float Triangle::area() const {
+                // TODO 预先计算
                 return 0.5 * LENGTH(CROSS((_p2World - _p1World),
                                           (_p3World - _p1World)));
             }
 
-            SurfaceInteraction Triangle::sampleSurfacePoint(Sampler *sampler) const {
+            SurfaceInteraction Triangle::sampleSurfacePoint(Float *pdf, Sampler *sampler) const {
                 // Uniform sampling triangle
                 Vector2F barycentric = math::sampling::triangleUniformSampling(sampler);
 
@@ -241,6 +242,10 @@ namespace kaguya {
                         // correct geometry normal
                         ng *= -1;
                     }
+                }
+
+                if (pdf != nullptr) {
+                    (*pdf) = 1. / area();
                 }
 
                 si.normal = ng;

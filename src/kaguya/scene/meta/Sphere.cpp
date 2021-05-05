@@ -108,8 +108,7 @@ namespace kaguya {
                 }
             }
 
-            SurfaceInteraction Sphere::sampleSurfacePoint(Sampler *sampler) const {
-                SurfaceInteraction si;
+            SurfaceInteraction Sphere::sampleSurfacePoint(Float *pdf, Sampler *sampler) const {
                 // Sample outward normal
                 Vector3F nLocal = math::sampling::sphereUniformSampling(sampler);
 
@@ -119,6 +118,8 @@ namespace kaguya {
                 // Project pLocal to sphere surface to compute error bound
                 Vector3F p = nWorld * _radius + _transformedCenter;
                 p = (p - _transformedCenter) * (_radius / LENGTH(p - _transformedCenter)) + _transformedCenter;
+
+                SurfaceInteraction si;
                 si.point = p;
 
                 Vector3F pError = math::gamma(5) * ABS(p);
@@ -129,21 +130,36 @@ namespace kaguya {
                     nWorld = -nWorld;
                 }
                 si.normal = si.rendering.normal = nWorld;
+                (*pdf) = 1. / area();
                 return si;
             }
 
             SurfaceInteraction
-            Sphere::sampleSurfaceInteraction(const Interaction &eye, Sampler *sampler) const {
+            Sphere::sampleSurfaceInteraction(const Interaction &eye, Float *pdf, Sampler *sampler) const {
                 // If eye is inside sphere, then uniform sampling surface
-                const Float dist = LENGTH(_transformedCenter - eye.point);
-                if (_radius >= dist) {
+                const Float eyeSphereDist = LENGTH(_transformedCenter - eye.point);
+                if (_radius >= eyeSphereDist) {
                     // inside
-                    return sampleSurfacePoint(sampler);
+                    Float density = 0;
+                    SurfaceInteraction si = sampleSurfacePoint(&density, sampler);
+                    Vector3F wi = si.point - eye.point;
+                    Float dist = LENGTH(wi);
+                    if (dist == 0.) {
+                        (*pdf) = 0;
+                    } else {
+                        wi = NORMALIZE(wi);
+                        Float cosTheta = ABS_DOT(-wi, si.normal);
+                        (*pdf) = density * (dist * dist) / cosTheta;
+                        if (std::isinf(*pdf)) {
+                            (*pdf) = 0;
+                        }
+                    }
+                    return si;
                 } else {
                     // outside sphere, then use uniform cone sampling strategy
 
                     // cosThetaMax
-                    Float sinThetaMax2 = (_radius * _radius) / (dist * dist);
+                    Float sinThetaMax2 = (_radius * _radius) / (eyeSphereDist * eyeSphereDist);
                     Float cosThetaMax = std::sqrt(std::max(Float(0.), 1 - sinThetaMax2));
 
                     // cone sampling
@@ -157,10 +173,15 @@ namespace kaguya {
                     // 计算世界坐标系中射线方向
                     Vector3F dirWorld = dir.x * tanX + dir.y * tanY + dir.z * tanZ;
 
+                    // TODO Stupid code ...
                     SurfaceInteraction si;
                     Ray sampleRay = Ray(eye.point, NORMALIZE(dirWorld));
                     bool isInsect = intersect(sampleRay, si, sampleRay.getMinStep(), sampleRay.getStep());
                     assert(isInsect);
+
+                    if (pdf != nullptr) {
+                        (*pdf) = 1 / (2 * math::PI * (1 - cosThetaMax));
+                    }
 
                     return si;
                 }
