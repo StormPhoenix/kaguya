@@ -43,27 +43,27 @@ namespace kaguya {
                 int startCol = idxTileX * Config::Parallel::tileSize;
                 int endCol = std::min(startCol + Config::Parallel::tileSize - 1, width - 1);
 
+                MemoryArena arena;
+                const Float sampleWeight = 1.0 / Config::Tracer::sampleNum;
                 Sampler *sampler = sampler::SamplerFactory::newSampler(Config::Tracer::sampleNum);
                 for (int row = startRow; row <= endRow; row++) {
                     for (int col = startCol; col <= endCol; col++) {
                         // set current sampling pixel
                         sampler->forPixel(Point2F(row, col));
 
-                        const Float sampleWeight = 1.0 / Config::Tracer::sampleNum;
                         // 做 _samplePerPixel 次采样
+                        Spectrum shaderColor(0);
                         for (int sampleCount = 0; sampleCount < Config::Tracer::sampleNum; sampleCount++) {
-                            MemoryArena arena;
 
                             Float pixelX = col + sampler->sample1D();
                             Float pixelY = row + sampler->sample1D();
                             Ray sampleRay = _camera->generateRay(pixelX, pixelY, sampler);
 
-                            Spectrum shaderColor = shader(sampleRay, _scene, _maxDepth, sampler, arena);
-                            shaderColor *= sampleWeight;
-                            arena.clean();
-                            _filmPlane->addSpectrum(shaderColor, row, col);
+                            shaderColor += shader(sampleRay, _scene, _maxDepth, sampler, arena);
                             sampler->nextSampleRound();
+                            arena.clean();
                         }
+                        _filmPlane->addSpectrum(shaderColor * sampleWeight, row, col);
                     }
                 }
                 delete sampler;
@@ -513,8 +513,8 @@ namespace kaguya {
 
                     if (t == 1) {
                         // 在成像平面的 samplePosition 位置加上 value
-                        _filmPlane->addSpectrum(value * INV_WEIGHT, std::floor(samplePosition.y),
-                                                std::floor(samplePosition.x));
+                        _filmPlane->addExtra(value * INV_WEIGHT, std::floor(samplePosition.y),
+                                             std::floor(samplePosition.x));
                     } else {
                         shaderColor += value;
                     }

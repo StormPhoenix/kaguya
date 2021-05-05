@@ -16,79 +16,68 @@ namespace kaguya {
         FilmPlane::FilmPlane(int resolutionWidth, int resolutionHeight, int channel) :
                 _resolutionWidth(resolutionWidth), _resolutionHeight(resolutionHeight),
                 _channel(channel) {
-            _bitmap = (Float *) malloc(resolutionHeight * resolutionWidth * channel * sizeof(Float));
-            memset(_bitmap, 0, resolutionHeight * resolutionWidth * channel * sizeof(Float));
+            int filmSize = _resolutionWidth * _resolutionHeight;
+            _film = std::unique_ptr<Pixel[]>(new Pixel[filmSize]);
+        }
+
+        void FilmPlane::addExtra(const Spectrum &spectrum, int row, int col) {
+            if (row < 0 || row >= _resolutionHeight ||
+                col < 0 || col >= _resolutionWidth) {
+                return;
+            }
+
+            int offset = (row * _resolutionWidth + col);
+            Pixel &pixel = _film[offset];
+            for (int ch = 0; ch < _channel; ch++) {
+                pixel.extra[ch].add(spectrum[ch]);
+            }
         }
 
         void FilmPlane::addSpectrum(const Spectrum &spectrum, int row, int col) {
-            assert(_bitmap != nullptr);
+            assert(_film != nullptr);
             if (row < 0 || row >= _resolutionHeight ||
                 col < 0 || col >= _resolutionWidth) {
                 return;
             }
 
-            int offset = (row * _resolutionWidth + col) * _channel;
-            // lock_guard will release the lock when exits stack
-            {
-                std::lock_guard<std::mutex> lock(writeLock);
-                for (int channel = 0; channel < _channel; channel++) {
-                    *(_bitmap + offset + channel) += spectrum[channel];
-                }
-            }
-            // writeLock is automatically released when lock goes out of scope
+            int offset = (row * _resolutionWidth + col);
+            Pixel &pixel = _film[offset];
+            pixel.spectrum += spectrum;
         }
 
         void FilmPlane::setSpectrum(const Spectrum &spectrum, int row, int col) {
-            assert(_bitmap != nullptr);
+            assert(_film != nullptr);
             if (row < 0 || row >= _resolutionHeight ||
                 col < 0 || col >= _resolutionWidth) {
                 return;
             }
 
-            int offset = (row * _resolutionWidth + col) * _channel;
-            // lock_guard will release the lock when exits stack
+            int offset = (row * _resolutionWidth + col);
+            Pixel &pixel = _film[offset];
+            pixel.spectrum = spectrum;
+        }
+
+        void FilmPlane::writeImage(char const *filename) {
+            // Create image buffer
+            unsigned char *image = new unsigned char[_resolutionWidth * _resolutionHeight * _channel];
             {
                 std::lock_guard<std::mutex> lock(writeLock);
-                for (int channel = 0; channel < _channel; channel++) {
-                    *(_bitmap + offset + channel) = spectrum[channel];
-                }
-            }
-            // writeLock is automatically released when lock goes out of scope
-        }
-
-
-        Float FilmPlane::getSpectrum(int row, int col, int channel) const {
-            int offset = (row * _resolutionWidth + col) * _channel;
-            return (_bitmap + offset)[channel];
-        }
-
-        void FilmPlane::writeImage(char const *filename) const {
-            // 创建 image buffer
-            unsigned char *image = (unsigned char *) malloc(
-                    sizeof(unsigned char) * _resolutionWidth * _resolutionHeight * _channel);
-
-            // 将光谱转化到 image buffer
-            for (int row = _resolutionHeight - 1; row >= 0; row--) {
-                for (int col = 0; col < _resolutionWidth; col++) {
-                    int offset = ((_resolutionHeight - 1 - row) * _resolutionWidth + col) * _channel;
-                    (image + offset)[0] = static_cast<unsigned char>(256 *
-                            math::clamp(std::sqrt(getSpectrum(row, col, 0)), 0.0,
-                                                                           0.999));
-                    (image + offset)[1] = static_cast<unsigned char>(256 *
-                            math::clamp(std::sqrt(getSpectrum(row, col, 1)), 0.0,
-                                                                           0.999));
-                    (image + offset)[2] = static_cast<unsigned char>(256 *
-                            math::clamp(std::sqrt(getSpectrum(row, col, 2)), 0.0,
-                                                                           0.999));
+                // 将光谱转化到 image buffer
+                for (int row = _resolutionHeight - 1; row >= 0; row--) {
+                    for (int col = 0; col < _resolutionWidth; col++) {
+                        int imageOffset = ((_resolutionHeight - 1 - row) * _resolutionWidth + col) * _channel;
+                        int pixelOffset = row * _resolutionWidth + col;
+                        Pixel &pixel = _film[pixelOffset];
+                        for (int ch = 0; ch < _channel; ch++) {
+                            (image + imageOffset)[ch] = static_cast<unsigned char>(
+                                    256 * math::clamp(std::sqrt(pixel.spectrum[ch] + pixel.extra[ch].get()), 0.0, 0.999));
+                        }
+                    }
                 }
             }
             // 写入 image file
             stbi_write_png(filename, _resolutionWidth, _resolutionHeight, 3, image, 0);
             free(image);
-        }
-
-        FilmPlane::~FilmPlane() {
-            free(_bitmap);
         }
     }
 }
