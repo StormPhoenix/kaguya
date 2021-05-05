@@ -383,11 +383,35 @@ namespace kaguya {
             std::vector<std::shared_ptr<Geometry>> frontWall = testFrontWall(lambertFront, airMedium, airMedium);
             objects.insert(objects.end(), frontWall.begin(), frontWall.end());
 
+            // Build metal sphere
+            Vector3F metalSphereCenter = Vector3F(-0.25 * MODEL_SCALE, -0.298 * MODEL_SCALE, 0.2 * MODEL_SCALE);
+            Float metalSphereRadius =   0.2 * MODEL_SCALE;
+            Matrix4F metalSphereMat(1.0f);
+            metalSphereMat = TRANSLATE(metalSphereMat, metalSphereCenter);
+            metalSphereMat = SCALE(metalSphereMat, Vector3F(metalSphereRadius, metalSphereRadius, metalSphereRadius));
+            std::shared_ptr<Transform> metalSphereTransform = std::make_shared<Transform>(metalSphereMat);
+            std::shared_ptr<Shape> metalSphereShape = std::make_shared<meta::Sphere>(metalSphereTransform);
+            std::shared_ptr<Geometry> metalSphere = std::make_shared<Geometry>(metalSphereShape, metal,
+                                                                               nullptr, nullptr);
+
+            // Build glass sphere
+            Vector3F glassSphereCenter = Vector3F(0.25 * MODEL_SCALE, -0.338 * MODEL_SCALE, 0 * MODEL_SCALE);
+            Float glassSphereRadius =   0.16 * MODEL_SCALE;
+            Matrix4F glassSphereMat(1.0f);
+            glassSphereMat = TRANSLATE(glassSphereMat, glassSphereCenter);
+            glassSphereMat = SCALE(glassSphereMat, Vector3F(glassSphereRadius, glassSphereRadius, glassSphereRadius));
+            std::shared_ptr<Transform> glassSphereTransform = std::make_shared<Transform>(glassSphereMat);
+            std::shared_ptr<Shape> glassSphereShape = std::make_shared<meta::Sphere>(glassSphereTransform);
+            std::shared_ptr<Geometry> glassSphere = std::make_shared<Geometry>(glassSphereShape, glass,
+                                                                               nullptr, nullptr);
+
+            objects.push_back(glassSphere);
+            objects.push_back(metalSphere);
 
             // build scene object
             std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 
-            // build point light
+            // build area light
             Matrix4F lightToWorldMat(1.0);
             lightToWorldMat = TRANSLATE(lightToWorldMat,
                                         Vector3F(0 * MODEL_SCALE, 0.46 * MODEL_SCALE, 0 * MODEL_SCALE));

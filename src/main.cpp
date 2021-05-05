@@ -46,7 +46,8 @@ int main(int argc, char *argv[]) {
     if (sceneDir != "") {
         Config::inputSceneDirs.push_back(sceneDir);
     } else {
-        Config::innerScenes.push_back(Scene::innerSceneBunnyWithPointLight);
+        Config::innerScenes.push_back(Scene::innerSceneWithAreaLight);
+//        Config::innerScenes.push_back(Scene::innerSceneBunnyWithPointLight);
     }
 
     Tracer *tracer = TracerFactory::newTracer();
