@@ -27,9 +27,11 @@ int main(int argc, char *argv[]) {
                     option("-rb", "--russian-prob") & value("russian roulette probability", Config::russianRoulette),
                     option("-rd", "--russian-depth") & value("russian roulette depth", Config::russianRouletteDepth),
                     option("-kn", "--kernel") & value("rendering kernel count", Config::Parallel::kernelCount),
+                    option("-wf", "--write-frequency") & value("write frequency", Config::writeFrequency),
 
                     /* For stochastic progressive photon mapping settings */
-                    option("-sr", "--initial-search-radius") & value("initial search radius", Config::initialSearchRadius),
+                    option("-sr", "--initial-search-radius") &
+                    value("initial search radius", Config::initialSearchRadius),
                     option("-srd", "--search-radius-decay") & value("search radius decay", Config::searchRadiusDecay),
                     option("-pc", "--photon-count") & value("photon count", Config::photonPerIteration),
 

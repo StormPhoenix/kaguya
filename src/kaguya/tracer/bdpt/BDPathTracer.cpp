@@ -2,6 +2,7 @@
 // Created by Storm Phoenix on 2020/10/28.
 //
 
+#include <kaguya/Common.h>
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/core/medium/Medium.h>
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
@@ -33,52 +34,63 @@ namespace kaguya {
             int nTileX = (width + Config::Parallel::tileSize - 1) / Config::Parallel::tileSize;
             int nTileY = (height + Config::Parallel::tileSize - 1) / Config::Parallel::tileSize;
 
+            const int nIterations = Config::Tracer::sampleNum;
+
             std::atomic<int> nFinished(0);
+            std::cout << "\r" << float(nFinished) * 100 / (nIterations) << " %" << std::flush;
+            for (int iter = 0; iter < nIterations; iter++) {
+                auto renderFunc = [&](const int idxTileX, const int idxTileY) -> void {
+                    int startRow = idxTileY * Config::Parallel::tileSize;
+                    int endRow = std::min(startRow + Config::Parallel::tileSize - 1, height - 1);
 
-            auto renderFunc = [&](const int idxTileX, const int idxTileY) -> void {
+                    int startCol = idxTileX * Config::Parallel::tileSize;
+                    int endCol = std::min(startCol + Config::Parallel::tileSize - 1, width - 1);
 
-                int startRow = idxTileY * Config::Parallel::tileSize;
-                int endRow = std::min(startRow + Config::Parallel::tileSize - 1, height - 1);
+                    int tileWidth = endCol - startCol + 1;
+                    int tileHeight = endRow - startRow + 1;
+                    FilmTile::Ptr filmTile = std::make_shared<FilmTile>(Point2I(startCol, startRow),
+                                                                        tileWidth, tileHeight);
 
-                int startCol = idxTileX * Config::Parallel::tileSize;
-                int endCol = std::min(startCol + Config::Parallel::tileSize - 1, width - 1);
-
-                int tileWidth = endCol - startCol + 1;
-                int tileHeight = endRow - startRow + 1;
-                FilmTile::Ptr filmTile = std::make_shared<FilmTile>(Point2I(startCol, startRow), tileWidth, tileHeight);
-
-                MemoryArena arena;
-                const Float sampleWeight = 1.0 / Config::Tracer::sampleNum;
-                Sampler *sampler = sampler::SamplerFactory::newSampler(Config::Tracer::sampleNum);
-                for (int row = startRow; row <= endRow; row++) {
-                    for (int col = startCol; col <= endCol; col++) {
-                        // set current sampling pixel
-                        sampler->forPixel(Point2F(row, col));
-
-                        // 做 _samplePerPixel 次采样
-                        Spectrum shaderColor(0);
-                        for (int sampleCount = 0; sampleCount < Config::Tracer::sampleNum; sampleCount++) {
+                    MemoryArena arena;
+                    Sampler *sampler = sampler::SamplerFactory::newSampler(Config::Tracer::sampleNum);
+                    for (int row = startRow; row <= endRow; row++) {
+                        for (int col = startCol; col <= endCol; col++) {
+                            // Set current sampling pixel
+                            sampler->forPixel(Point2F(row, col));
+                            sampler->setCurrentSeed(iter);
 
                             Float pixelX = col + sampler->sample1D();
                             Float pixelY = row + sampler->sample1D();
                             Ray sampleRay = _camera->generateRay(pixelX, pixelY, sampler);
 
-                            shaderColor += shader(sampleRay, _scene, _maxDepth, sampler, arena);
-                            sampler->nextSampleRound();
+                            Spectrum shaderColor = shader(sampleRay, _scene, _maxDepth, sampler, arena);
                             arena.clean();
-                        }
-                        filmTile->addSpectrum(shaderColor * sampleWeight, row - startRow, col - startCol);
-                        // _filmPlane->addSpectrum(shaderColor * sampleWeight, row, col);
-                    }
-                }
-                _filmPlane->mergeTile(filmTile);
-                delete sampler;
-                nFinished++;
-                std::cout << "\r" << float(nFinished) * 100 / (nTileX * nTileY) << " %"
-                          << std::flush;
-            };
 
-            parallel::parallelFor2D(renderFunc, Point2I(nTileX, nTileY));
+                            filmTile->addSpectrum(shaderColor, row - startRow, col - startCol);
+                        }
+                    }
+                    _filmPlane->mergeTile(filmTile);
+                    delete sampler;
+                };
+                parallel::parallelFor2D(renderFunc, Point2I(nTileX, nTileY));
+                nFinished++;
+                std::cout << "\r" << float(nFinished) * 100 / (nIterations) << " %" << std::flush;
+
+                // Write image
+                if ((Config::writeFrequency > 0 && (iter + 1) % Config::writeFrequency == 0) ||
+                    iter == nIterations - 1) {
+                    Float sampleWeight = 1.0 / (iter + 1);
+                    bool lastIteration = (iter == nIterations - 1);
+                    std::string suffixSSP;
+                    std::stringstream ss;
+                    ss << "_SSP" << iter + 1 << "_";
+                    ss >> suffixSSP;
+
+                    _filmPlane->writeImage((Config::filenamePrefix + (lastIteration ? "" : suffixSSP) +
+                                            _scene->getName()).c_str(),
+                                           sampleWeight);
+                }
+            }
         }
 
         void BDPathTracer::init() {
@@ -490,21 +502,18 @@ namespace kaguya {
 
         Spectrum BDPathTracer::shader(const Ray &ray, std::shared_ptr<Scene> scene, int maxDepth,
                                       Sampler *sampler, MemoryArena &memoryArena) {
-            // 创建临时变量用于存储 camera、light 路径
             PathVertex *cameraSubPath = memoryArena.alloc<PathVertex>(maxDepth + 2, false);
             PathVertex *lightSubPath = memoryArena.alloc<PathVertex>(maxDepth, false);
 
-            // 生成相机路径
+            // Generate camera path
             int cameraPathLength = generateCameraPath(_scene, ray, _camera, cameraSubPath, maxDepth + 1,
                                                       sampler, memoryArena);
 
-            // 生成光源路径
-            int lightPathLength = generateLightPath(_scene, lightSubPath, maxDepth,
-                                                    sampler, memoryArena);
+            // Generate light path
+            int lightPathLength = generateLightPath(_scene, lightSubPath, maxDepth, sampler, memoryArena);
 
             Spectrum shaderColor = Spectrum(0.0);
-            const Float INV_WEIGHT = 1.0 / Config::Tracer::sampleNum;
-            // 路径连接
+            // Connect path
             for (int t = 1; t <= cameraPathLength; t++) {
                 for (int s = 0; s <= lightPathLength; s++) {
                     int depth = t + s - 2;
@@ -519,8 +528,7 @@ namespace kaguya {
 
                     if (t == 1) {
                         // 在成像平面的 samplePosition 位置加上 value
-                        _filmPlane->addExtra(value * INV_WEIGHT, std::floor(samplePosition.y),
-                                             std::floor(samplePosition.x));
+                        _filmPlane->addExtra(value, std::floor(samplePosition.y), std::floor(samplePosition.x));
                     } else {
                         shaderColor += value;
                     }

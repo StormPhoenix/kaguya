@@ -125,7 +125,7 @@ namespace kaguya {
             }
         }
 
-        void FilmPlane::writeImage(char const *filename) {
+        void FilmPlane::writeImage(char const *filename, Float weight) {
             // Create image buffer
             unsigned char *image = new unsigned char[_resolutionWidth * _resolutionHeight * _channel];
             {
@@ -138,14 +138,16 @@ namespace kaguya {
                         Pixel &pixel = _film[pixelOffset];
                         for (int ch = 0; ch < _channel; ch++) {
                             (image + imageOffset)[ch] = static_cast<unsigned char>(
-                                    256 * math::clamp(std::sqrt(pixel.spectrum[ch] + pixel.extra[ch].get()), 0.0, 0.999));
+                                    256 *
+                                    math::clamp(std::sqrt((pixel.spectrum[ch] + pixel.extra[ch].get()) * weight), 0.0,
+                                                0.999));
                         }
                     }
                 }
             }
             // 写入 image file
             stbi_write_png(filename, _resolutionWidth, _resolutionHeight, 3, image, 0);
-            free(image);
+            delete[] image;
         }
     }
 }

@@ -63,7 +63,7 @@ namespace kaguya {
 
             void mergeTile(FilmTile::Ptr tile);
 
-            void writeImage(char const *filename);
+            void writeImage(char const *filename, Float weight = 1.0f);
 
         private:
             int _resolutionWidth = 0;

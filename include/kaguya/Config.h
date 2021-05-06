@@ -64,6 +64,8 @@ namespace kaguya {
         // russian roulette 从什么 depth 开始
         static int russianRouletteDepth;
 
+        static int writeFrequency;
+
         // 终止概率
         static Float russianRoulette;
         // 对光源采样概率

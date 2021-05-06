@@ -45,6 +45,7 @@ namespace kaguya {
     Float Config::searchRadiusDecay = 2.0 / 3.0;
     int Config::photonPerIteration = 4096;
     std::string Config::renderType = "pt";
+    int Config::writeFrequency = -1;
 
     // Parallel settings
     int Config::Parallel::tileSize = 50;
@@ -52,19 +53,23 @@ namespace kaguya {
 
     std::shared_ptr<Scene> Config::nextScene() {
         sceneId++;
+        std::shared_ptr<Scene> scene = nullptr;
         if (inputSceneDirs.size() > 0) {
             using namespace kaguya::scene::importer;
             XmlSceneImporter importer = XmlSceneImporter();
             if (sceneId < inputSceneDirs.size()) {
                 std::string scene_dir = fs::current_path().generic_u8string() + inputSceneDirs[sceneId];
-                return importer.importScene(scene_dir);
+                scene = importer.importScene(scene_dir);
+                std::cout << "Rendering scene: " << scene->getName() << std::endl;
+                return scene;
             } else {
                 return nullptr;
             }
         } else {
             // Rendering inner scene
             if (sceneId < innerScenes.size()) {
-                std::shared_ptr<Scene> scene = innerScenes[sceneId]();
+                scene = innerScenes[sceneId]();
+                std::cout << "Rendering inner scene: " << scene->getName() << std::endl;
                 return scene;
             } else {
                 return nullptr;
