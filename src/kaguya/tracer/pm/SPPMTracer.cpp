@@ -487,6 +487,9 @@ namespace kaguya {
                 std::cout << "\r" << (iter + 1) << "/" << nIterations << "(" << float(iter + 1) * 100 / nIterations
                           << "%) max/min radius: " << gridSize << "/" << minSearchRadius << std::flush;
             }
+
+            // write to image
+            writeImage();
         }
     }
 }

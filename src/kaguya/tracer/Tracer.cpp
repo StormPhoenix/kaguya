@@ -32,11 +32,6 @@ namespace kaguya {
                 // rendering
                 render();
 
-                // write to image
-                std::cout << std::endl << "scene " << _scene->getName() << " completed." << std::endl;
-                _filmPlane->writeImage((Config::filenamePrefix + "_" +
-                                        _scene->getName()).c_str());
-
                 delete _filmPlane;
                 _filmPlane = nullptr;
 
@@ -176,5 +171,13 @@ namespace kaguya {
             return ret;
         }
 
+        void Tracer::writeImage(Float weight) {
+            ASSERT(_filmPlane != nullptr, "Write image failed, _filmPlane is nullptr. ")
+            ASSERT(_scene != nullptr, "Write image failed, _scene is nullptr. ")
+            // write to image
+            std::cout << std::endl << "scene " << _scene->getName() << " completed." << std::endl;
+            _filmPlane->writeImage((Config::filenamePrefix + "_" +
+                                    _scene->getName()).c_str(), weight);
+        }
     }
 }

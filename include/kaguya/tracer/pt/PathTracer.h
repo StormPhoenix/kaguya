@@ -49,14 +49,6 @@ namespace kaguya {
              */
             Spectrum background(const Ray &ray);
 
-            /**
-             * 渲染结果写入 buffer
-             * @param color
-             * @param row
-             * @param col
-             */
-            void writeBuffer(const Vector3F &color, int row, int col);
-
         private:
             // 开始 Russian Roulette 时机
             int _russianRouletteBounce;

@@ -210,6 +210,7 @@ namespace kaguya {
             };
 
             parallel::parallelFor2D(renderFunc, Point2I(nTileX, nTileY));
+            writeImage();
         }
 
         Spectrum PathTracer::background(const Ray &ray) {
