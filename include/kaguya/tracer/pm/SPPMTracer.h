@@ -18,7 +18,7 @@ namespace kaguya {
             virtual void render() override;
 
         private:
-            int _writeFrequence = 50;
+            int _writeFrequency = 50;
 
             Float _gamma = 2.0 / 3.0;
 

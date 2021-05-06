@@ -463,7 +463,7 @@ namespace kaguya {
 
                 /* Write to image buffer */
                 {
-                    if (iter == nIterations - 1 || (iter + 1) % _writeFrequence == 0) {
+                    if (iter == nIterations - 1 || (iter + 1) % _writeFrequency == 0) {
                         for (int row = 0; row < height; row++) {
                             for (int col = 0; col < width; col++) {
                                 int offset = row * width + col;
