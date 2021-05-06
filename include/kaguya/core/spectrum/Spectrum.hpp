@@ -10,6 +10,7 @@
 #include <cassert>
 #include <algorithm>
 
+#include <kaguya/Common.h>
 #include <kaguya/math/Math.h>
 
 namespace kaguya {
@@ -26,7 +27,7 @@ namespace kaguya {
                 for (int i = 0; i < SpectrumSamples; ++i) {
                     value[i] = v;
                 }
-                assert(!hasNans());
+                ASSERT(!hasNans(), "Spectrum NaN.");
             }
 
             SpectrumTemplate(const SpectrumTemplate &s) {
@@ -37,39 +38,45 @@ namespace kaguya {
                 SpectrumTemplate ret;
                 for (int i = 0; i < SpectrumSamples; ++i)
                     ret.value[i] = math::clamp(value[i], low, high);
-                assert(!ret.hasNans());
+                // assert(!ret.hasNans());
+                ASSERT(!hasNans(), "Spectrum NaN.");
                 return ret;
             }
 
             SpectrumTemplate &operator=(const SpectrumTemplate &s) {
-                assert(!s.hasNans());
+                // assert(!s.hasNans());
+                ASSERT(!s.hasNans(), "Spectrum NaN.");
                 for (int i = 0; i < SpectrumSamples; ++i) value[i] = s.value[i];
                 return *this;
             }
 
 
             SpectrumTemplate &operator+=(const SpectrumTemplate &s2) {
-                assert(!s2.hasNans());
+                // assert(!s2.hasNans());
+                ASSERT(!s2.hasNans(), "Spectrum NaN.");
                 for (int i = 0; i < SpectrumSamples; ++i) value[i] += s2.value[i];
                 return *this;
             }
 
             SpectrumTemplate operator+(const SpectrumTemplate &s2) const {
-                assert(!s2.hasNans());
+                // assert(!s2.hasNans());
+                ASSERT(!s2.hasNans(), "Spectrum NaN.");
                 SpectrumTemplate ret = *this;
                 for (int i = 0; i < SpectrumSamples; ++i) ret.value[i] += s2.value[i];
                 return ret;
             }
 
             SpectrumTemplate operator-(const SpectrumTemplate &s2) const {
-                assert(!s2.hasNans());
+                // assert(!s2.hasNans());
+                ASSERT(!s2.hasNans(), "Spectrum NaN.");
                 SpectrumTemplate ret = *this;
                 for (int i = 0; i < SpectrumSamples; ++i) ret.value[i] -= s2.value[i];
                 return ret;
             }
 
             SpectrumTemplate operator/(const SpectrumTemplate &s2) const {
-                assert(!s2.hasNans());
+                // assert(!s2.hasNans());
+                ASSERT(!s2.hasNans(), "Spectrum NaN.");
                 SpectrumTemplate ret = *this;
                 for (int i = 0; i < SpectrumSamples; ++i) {
                     assert(s2.value[i] != 0);
@@ -79,14 +86,16 @@ namespace kaguya {
             }
 
             SpectrumTemplate operator*(const SpectrumTemplate &sp) const {
-                assert(!sp.hasNans());
+                // assert(!sp.hasNans());
+                ASSERT(!sp.hasNans(), "Spectrum NaN.");
                 SpectrumTemplate ret = *this;
                 for (int i = 0; i < SpectrumSamples; ++i) ret.value[i] *= sp.value[i];
                 return ret;
             }
 
             SpectrumTemplate &operator*=(const SpectrumTemplate &sp) {
-                assert(!sp.hasNans());
+                // assert(!sp.hasNans());
+                ASSERT(!sp.hasNans(), "Spectrum NaN.");
                 for (int i = 0; i < SpectrumSamples; ++i) value[i] *= sp.value[i];
                 return *this;
             }
@@ -94,24 +103,29 @@ namespace kaguya {
             SpectrumTemplate operator*(Float a) const {
                 SpectrumTemplate ret = *this;
                 for (int i = 0; i < SpectrumSamples; ++i) ret.value[i] *= a;
-                assert(!ret.hasNans());
+                // assert(!ret.hasNans());
+                ASSERT(!ret.hasNans(), "Spectrum NaN.");
                 return ret;
             }
 
             SpectrumTemplate &operator*=(Float a) {
                 for (int i = 0; i < SpectrumSamples; ++i) value[i] *= a;
-                assert(!hasNans());
+                ASSERT(!hasNans(), "Spectrum NaN.");
+                // assert(!hasNans());
                 return *this;
             }
 
             friend inline SpectrumTemplate operator*(Float a, const SpectrumTemplate &s) {
-                assert(!std::isnan(a) && !s.hasNans());
+                // assert(!std::isnan(a) && !s.hasNans());
+                ASSERT(!std::isnan(a) && !s.hasNans(), "Spectrum NaN.");
                 return s * a;
             }
 
             SpectrumTemplate operator/(Float a) const {
-                assert(a != 0);
-                assert(!std::isnan(a));
+                // assert(a != 0);
+                // assert(!std::isnan(a));
+                ASSERT(a != 0, "Divide zero. ");
+                ASSERT(!std::isnan(a), "Spectrum NaN.");
                 SpectrumTemplate ret = *this;
                 for (int i = 0; i < SpectrumSamples; ++i) ret.value[i] /= a;
                 assert(!ret.hasNans());
@@ -119,8 +133,10 @@ namespace kaguya {
             }
 
             SpectrumTemplate &operator/=(Float a) {
-                assert(a != 0);
-                assert(!std::isnan(a));
+                // assert(a != 0);
+                // assert(!std::isnan(a));
+                ASSERT(a != 0, "Divide zero. ");
+                ASSERT(!std::isnan(a), "Spectrum NaN.");
                 for (int i = 0; i < SpectrumSamples; ++i) value[i] /= a;
                 return *this;
             }
@@ -144,7 +160,8 @@ namespace kaguya {
             friend SpectrumTemplate sqrt(const SpectrumTemplate &s) {
                 SpectrumTemplate ret;
                 for (int i = 0; i < SpectrumSamples; ++i) ret.value[i] = std::sqrt(s.value[i]);
-                assert(!ret.hasNans());
+                // assert(!ret.hasNans());
+                ASSERT(!ret.hasNans(), "Spectrum NaN.");
                 return ret;
             }
 
@@ -157,7 +174,8 @@ namespace kaguya {
             friend SpectrumTemplate exp(const SpectrumTemplate &s) {
                 SpectrumTemplate ret;
                 for (int i = 0; i < SpectrumSamples; ++i) ret.value[i] = std::exp(s.value[i]);
-                assert(!ret.hasNans());
+                // assert(!ret.hasNans());
+                ASSERT(!ret.hasNans(), "Spectrum NaN.");
                 return ret;
             }
 
@@ -165,7 +183,8 @@ namespace kaguya {
                 SpectrumTemplate ret;
                 for (int i = 0; i < SpectrumSamples; ++i)
                     ret.value[i] = math::clamp(value[i], low, high);
-                assert(!ret.hasNans());
+                // assert(!ret.hasNans());
+                ASSERT(!ret.hasNans(), "Spectrum NaN.");
                 return ret;
             }
 
@@ -183,12 +202,14 @@ namespace kaguya {
             }
 
             Float &operator[](int i) {
-                assert(i >= 0 && i < SpectrumSamples);
+                // assert(i >= 0 && i < SpectrumSamples);
+                ASSERT(i >= 0 && i < SpectrumSamples, "Spectrum index out of range.");
                 return value[i];
             }
 
             Float operator[](int i) const {
-                assert(i >= 0 && i < SpectrumSamples);
+                // assert(i >= 0 && i < SpectrumSamples);
+                ASSERT(i >= 0 && i < SpectrumSamples, "Spectrum index out of range.");
                 return value[i];
             }
 

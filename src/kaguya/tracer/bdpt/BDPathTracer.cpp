@@ -179,7 +179,7 @@ namespace kaguya {
                     Spectrum sampleIntensity = light->sampleLi(pt.getInteraction(), &worldWi, &sampleLightPdf,
                                                                sampler, &visibilityTester);
 
-                    if (std::abs(sampleLightPdf - 0) < math::EPSILON || sampleIntensity.isBlack() ||
+                    if (sampleLightPdf == 0. || sampleIntensity.isBlack() ||
                         !visibilityTester.isVisible(scene)) {
                         // 没有任何光源亮度贡献的情况，直接返回 0
                         ret = Spectrum(0.0);
@@ -264,6 +264,9 @@ namespace kaguya {
             // 采样光源发射
             Spectrum intensity = light->sampleLe(&scatterRay, &lightNormal,
                                                  &pdfPos, &pdfDir, sampler);
+            if (pdfPos == 0 || pdfDir == 0 || intensity.isBlack()) {
+                return 0;
+            }
             // 创建光源点
             // TODO 没有考虑多光源情况
             lightSubPath[0] = PathVertex::createLightVertex(light.get(), scatterRay.getOrigin(),
@@ -342,7 +345,7 @@ namespace kaguya {
                                                       BXDFType::BSDF_ALL, &sampleType);
 
                         // 判断采样是否有效
-                        if (std::abs(pdfPreWi) < math::EPSILON || f.isBlack()) {
+                        if (pdfPreWi == 0. || f.isBlack()) {
                             break;
                         }
 
@@ -483,6 +486,10 @@ namespace kaguya {
         Spectrum BDPathTracer::g(const PathVertex &pre, const PathVertex &next, Sampler *sampler) {
             Vector3F dirToNext = next.point - pre.point;
             Float dist = LENGTH(dirToNext);
+            if (dist == 0) {
+                return 1.0;
+            }
+
             dirToNext = NORMALIZE(dirToNext);
 
             Float cosPre = 1.0;
