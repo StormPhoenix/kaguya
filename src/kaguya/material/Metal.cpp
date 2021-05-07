@@ -1,37 +1,47 @@
 //
-// Created by Storm Phoenix on 2020/10/8.
+// Created by Storm Phoenix on 2021/5/7.
 //
 
-#include <kaguya/core/bsdf/BXDFSpecularReflection.h>
-#include <kaguya/core/bsdf/FresnelDefault.h>
 #include <kaguya/material/Metal.h>
-#include <kaguya/material/texture/ConstantTexture.h>
+#include <kaguya/core/bsdf/microfacet/BeckmannDistribution.h>
+#include <kaguya/core/bsdf/BXDFMicrofacetReflection.h>
+#include <kaguya/core/bsdf/FresnelConductor.h>
 
 namespace kaguya {
     namespace material {
+        using core::FresnelConductor;
+        using core::BXDFMicrofacetReflection;
+        using core::microfacet::BeckmannDistribution;
 
-        using kaguya::core::BXDFSpecularReflection;
-        using kaguya::core::FresnelDefault;
-
-        Metal::Metal() {
-            _albedo = std::make_shared<ConstantTexture<Spectrum>>(Spectrum(1.0));
-            _fuzzy = 0;
+        Metal::Metal(const Texture<Float>::Ptr alpha, const Texture<Spectrum>::Ptr eta, const Texture<Spectrum>::Ptr R,
+                     const Texture<Spectrum>::Ptr K, std::string distributionType) :
+                _alpha(alpha), _eta(eta), _R(R), _K(K), _distributionType(distributionType) {
+            ASSERT(_alpha != nullptr, "Alpha is nullptr. ");
+            ASSERT(_eta != nullptr, "Eta is nullptr. ");
+            ASSERT(_R != nullptr, "R is nullptr. ");
+            ASSERT(_K != nullptr, "K is nullptr. ");
         }
 
-        Metal::Metal(std::shared_ptr<Texture<Spectrum>> albedo, Float fuzzy)
-                : _albedo(albedo), _fuzzy(fuzzy) {}
+        void Metal::computeScatteringFunctions(SurfaceInteraction &insect,
+                                               MemoryArena &memoryArena,
+                                               TransportMode mode) {
+            if (_distributionType == "backmann") {
+                // Distribution
+                Float alpha = _alpha->evaluate(insect);
+                const BeckmannDistribution *distribution = ALLOC(memoryArena, BeckmannDistribution)(alpha);
 
-        bool Metal::isSpecular() const {
-            return true;
-        }
+                const Spectrum thetaT = _eta->evaluate(insect);
+                const Spectrum k = _K->evaluate(insect);
+                const FresnelConductor *fresnel = ALLOC(memoryArena, FresnelConductor)(Spectrum(1.), thetaT, k);
 
-        void
-        Metal::computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena, TransportMode mode) {
-            FresnelDefault *fresnel = ALLOC(memoryArena, FresnelDefault)();
-            BXDFSpecularReflection *bxdf = ALLOC(memoryArena, BXDFSpecularReflection)(
-                    _albedo->evaluate(insect), fresnel);
-            insect.bsdf = ALLOC(memoryArena, BSDF)(insect);
-            insect.bsdf->addBXDF(bxdf);
+                Spectrum reflectance = _R->evaluate(insect);
+                BSDF *bsdf = ALLOC(memoryArena, BSDF)(insect);
+                BXDF *bxdf = ALLOC(memoryArena, BXDFMicrofacetReflection)(reflectance, distribution, fresnel);
+                bsdf->addBXDF(bxdf);
+                insect.bsdf = bsdf;
+            } else {
+                ASSERT(false, "Unsupported microfacet normal distribution type. ");
+            }
         }
     }
 }

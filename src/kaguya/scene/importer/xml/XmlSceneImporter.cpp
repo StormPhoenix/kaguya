@@ -11,6 +11,7 @@
 #include <kaguya/material/texture/ConstantTexture.h>
 #include <kaguya/material/Lambertian.h>
 #include <kaguya/material/Dielectric.h>
+#include <kaguya/material/Mirror.h>
 #include <kaguya/material/Metal.h>
 #include <kaguya/scene/importer/xml/XmlSceneImporter.h>
 #include <kaguya/utils/ObjLoader.h>
@@ -222,8 +223,9 @@ namespace kaguya {
                     material = createMirrorMaterial(parseInfo);
                 } else if (type == "glass") {
                     material = createGlassMaterial(parseInfo);
+                } else if (type == "roughconductor") {
+                    material = createRoughConductorMaterial(parseInfo);
                 } else {
-                    // TODO
                     ASSERT(false, "Material " + type + " not supported for now");
                 }
 
@@ -232,6 +234,25 @@ namespace kaguya {
                 } else {
                     _materialMap[id] = material;
                 }
+            }
+
+            Material::Ptr XmlSceneImporter::createRoughConductorMaterial(XmlParseInfo &info) {
+                auto alphaType = info.getType("alpha");
+                ASSERT(alphaType == XmlAttrVal::Attr_Float, "Only support float type for alpha. ")
+                Float alpha = info.getFloatValue("alpha", 0.1);
+
+                std::string distributionType = info.getStringValue("distribution", "beckmann");
+                ASSERT(distributionType == "beckmann", "Only support beckmann type. ");
+
+                Spectrum R = info.getSpectrumValue("specularReflectance", Spectrum(1.0));
+                Spectrum Eta = info.getSpectrumValue("eta", Spectrum(0.200438));
+                Spectrum K = info.getSpectrumValue("k", Spectrum(0.200438));
+
+                Texture<Float>::Ptr texAlpha = std::make_shared<ConstantTexture<Float>>(alpha);
+                Texture<Spectrum>::Ptr texR = std::make_shared<ConstantTexture<Spectrum>>(R);
+                Texture<Spectrum>::Ptr texEta = std::make_shared<ConstantTexture<Spectrum>>(Eta);
+                Texture<Spectrum>::Ptr texK = std::make_shared<ConstantTexture<Spectrum>>(K);
+                return std::make_shared<Metal>(texAlpha, texEta, texR, texK, distributionType);
             }
 
             Material::Ptr XmlSceneImporter::createGlassMaterial(XmlParseInfo &info) {
@@ -280,7 +301,7 @@ namespace kaguya {
             }
 
             Material::Ptr XmlSceneImporter::createMirrorMaterial(XmlParseInfo &info) {
-                return std::make_shared<Metal>();
+                return std::make_shared<Mirror>();
             }
 
             std::shared_ptr<std::vector<Shape::Ptr>> XmlSceneImporter::createRectangleShape(XmlParseInfo &info) {

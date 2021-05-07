@@ -1,37 +1,38 @@
 //
-// Created by Storm Phoenix on 2020/9/29.
+// Created by Storm Phoenix on 2021/5/7.
 //
 
 #ifndef KAGUYA_METAL_H
 #define KAGUYA_METAL_H
 
-#include <kaguya/math/Math.h>
 #include <kaguya/material/Material.h>
 #include <kaguya/material/texture/Texture.h>
+#include <kaguya/core/spectrum/Spectrum.hpp>
 
 namespace kaguya {
     namespace material {
-        using namespace texture;
-        using kaguya::core::Spectrum;
+
+        using core::Spectrum;
+        using texture::Texture;
 
         class Metal : public Material {
         public:
-            Metal();
-
-            Metal(std::shared_ptr<Texture<Spectrum>> albedo, Float fuzzy = 0);
-
-            virtual bool isSpecular() const override;
+            Metal(const Texture<Float>::Ptr alpha,
+                  const Texture<Spectrum>::Ptr eta,
+                  const Texture<Spectrum>::Ptr R,
+                  const Texture<Spectrum>::Ptr K,
+                  std::string distributionType = "beckmann");
 
             virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
-                                                     TransportMode mode = TransportMode::RADIANCE) override;
+                                                    TransportMode mode = TransportMode::RADIANCE) override;
 
         private:
-            // 反射率
-            std::shared_ptr<Texture<Spectrum>> _albedo;
-            // 毛玻璃效果系数
-            Float _fuzzy;
+            std::string _distributionType;
+            const Texture<Float>::Ptr _alpha;
+            const Texture<Spectrum>::Ptr _eta;
+            const Texture<Spectrum>::Ptr _R;
+            const Texture<Spectrum>::Ptr _K;
         };
-
     }
 }
 

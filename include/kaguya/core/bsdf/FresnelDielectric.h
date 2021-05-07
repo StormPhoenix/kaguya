@@ -15,7 +15,7 @@ namespace kaguya {
             FresnelDielectric(Float thetaI, Float thetaT) :
                     _thetaI(thetaI), _thetaT(thetaT) {}
 
-            virtual Spectrum fresnel(Float cosineTheta) override;
+            virtual Spectrum fresnel(Float cosineTheta) const override;
 
         private:
             Float _thetaI;

@@ -477,16 +477,68 @@ namespace kaguya {
             return r;
         }
 
-        inline Float dirToTheta(Vector3F dir) {
-            return std::acos(clamp(dir.y, -1, 1));
-        }
-
-        inline Float dirToPhi(Vector3F dir) {
-            Float phi = std::atan2(dir.z, dir.x);
-            if (phi < 0) {
-                phi += 2 * PI;
+        namespace local_coord {
+            inline Float dirToTheta(const Vector3F &dir) {
+                return std::acos(clamp(dir.y, -1, 1));
             }
-            return phi;
+
+            inline Float dirToPhi(const Vector3F &dir) {
+                Float phi = std::atan2(dir.z, dir.x);
+                if (phi < 0) {
+                    phi += 2 * PI;
+                }
+                return phi;
+            }
+
+            inline Float cosTheta(const Vector3F &v) {
+                return v.y;
+            }
+
+            inline Float cosTheta2(const Vector3F &v) {
+                return v.y * v.y;
+            }
+
+            inline Float sinTheta2(const Vector3F &v) {
+                return std::max(Float(0.), 1 - cosTheta2(v));
+            }
+
+            inline Float sinTheta(const Vector3F &v) {
+                return std::sqrt(sinTheta2(v));
+            }
+
+            inline Float tanTheta(const Vector3F &v) {
+                return sinTheta(v) / cosTheta(v);
+            }
+
+            inline Float tanTheta2(const Vector3F &v) {
+                return sinTheta2(v) / cosTheta2(v);
+            }
+
+            inline Float cosPhi(const Vector3F &v) {
+                Float sin = sinTheta(v);
+                if (sin == 0) {
+                    return 0.;
+                }
+                return clamp<Float, Float, Float>(v.x / sin, -1, 1);
+            }
+
+            inline Float sinPhi(const Vector3F &v) {
+                Float sin = sinTheta(v);
+                if (sin == 0) {
+                    return 0.;
+                }
+                return clamp<Float, Float, Float>(v.z / sin, -1, 1);
+            }
+
+            inline Float sinPhi2(const Vector3F &v) {
+                Float sin = sinPhi(v);
+                return sin * sin;
+            }
+
+            inline Float cosPhi2(const Vector3F &v) {
+                Float cos = cosPhi(v);
+                return cos * cos;
+            }
         }
 
         namespace sampling {

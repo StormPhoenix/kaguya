@@ -31,11 +31,11 @@ namespace kaguya {
         Spectrum EnvironmentLight::Le(const Ray &ray) const {
             Vector3F wi = NORMALIZE(_worldToLight->transformVector(ray.getDirection()));
             // wi.y = cosTheta
-            Float theta = math::dirToTheta(wi);
+            Float theta = math::local_coord::dirToTheta(wi);
             // wi.x = sinTheta * cosPhi
             // wi.z = sinTheta * sinPhi
             // wi.z / wi.x = tanPhi
-            Float phi = math::dirToPhi(wi);
+            Float phi = math::local_coord::dirToPhi(wi);
             Point2F uv = {phi * math::INV_2PI, theta * math::INV_PI};
             return sampleTexture(uv);
         }
@@ -69,8 +69,8 @@ namespace kaguya {
 
         Float EnvironmentLight::pdfLi(const Interaction &eye, const Vector3F &dir) {
             Vector3F wi = NORMALIZE(_worldToLight->transformVector(dir));
-            Float theta = math::dirToTheta(wi);
-            Float phi = math::dirToPhi(wi);
+            Float theta = math::local_coord::dirToTheta(wi);
+            Float phi = math::local_coord::dirToPhi(wi);
 
             Float u = phi * math::INV_2PI;
             Float v = theta * math::INV_PI;
@@ -117,8 +117,8 @@ namespace kaguya {
 
         void EnvironmentLight::pdfLe(const Ray &ray, const Vector3F &normal, Float *pdfPos, Float *pdfDir) const {
             Vector3F dir = -_worldToLight->transformVector(ray.getDirection());
-            Float theta = math::dirToTheta(dir);
-            Float phi = math::dirToPhi(dir);
+            Float theta = math::local_coord::dirToTheta(dir);
+            Float phi = math::local_coord::dirToPhi(dir);
             Float sinTheta = std::sin(theta);
             // TODO 暂时不考虑对纹理做重要性采样
             (*pdfDir) = 1.0 / (2 * math::PI * math::PI * sinTheta);

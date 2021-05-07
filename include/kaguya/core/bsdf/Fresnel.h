@@ -18,7 +18,7 @@ namespace kaguya {
              * @param cosineTheta 入射角余弦值
              * @return
              */
-            virtual Spectrum fresnel(Float cosineTheta) = 0;
+            virtual Spectrum fresnel(Float cosineTheta) const = 0;
 
             virtual ~Fresnel() {};
         };

@@ -12,7 +12,7 @@
 #include <kaguya/scene/TriangleMesh.h>
 #include <kaguya/material/Dielectric.h>
 #include <kaguya/material/Lambertian.h>
-#include <kaguya/material/Metal.h>
+#include <kaguya/material/Mirror.h>
 #include <kaguya/material/SubsurfaceMaterial.h>
 #include <kaguya/material/texture/ConstantTexture.h>
 #include <kaguya/material/texture/SphericalMapping2D.h>
@@ -358,7 +358,7 @@ namespace kaguya {
             std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
-            std::shared_ptr<Material> metal = std::make_shared<Metal>();
+            std::shared_ptr<Material> metal = std::make_shared<Mirror>();
 
             std::shared_ptr<Medium> airMedium = nullptr;
 
@@ -487,7 +487,7 @@ namespace kaguya {
             std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
-            std::shared_ptr<Material> metal = std::make_shared<Metal>();
+            std::shared_ptr<Material> metal = std::make_shared<Mirror>();
 
 //            std::shared_ptr<Medium> airMedium = testAirMedium();
             std::shared_ptr<Medium> airMedium = nullptr;
@@ -593,7 +593,7 @@ namespace kaguya {
             std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
-            std::shared_ptr<Material> metal = std::make_shared<Metal>();
+            std::shared_ptr<Material> metal = std::make_shared<Mirror>();
 
 //            std::shared_ptr<Medium> airMedium = testAirMedium();
             std::shared_ptr<Medium> airMedium = nullptr;

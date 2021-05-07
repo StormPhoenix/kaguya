@@ -10,6 +10,7 @@
 namespace kaguya {
     namespace core {
 
+        // TODO albedo -> Reflectance and Transmittance
         BXDFSpecular::BXDFSpecular(const Spectrum &albedo, Float thetaI, Float thetaT, TransportMode mode) :
                 BXDF(BXDFType(BSDF_SPECULAR | BSDF_REFLECTION | BSDF_TRANSMISSION)),
                 _albedo(albedo), _thetaI(thetaI), _thetaT(thetaT), _mode(mode) {}
@@ -22,6 +23,7 @@ namespace kaguya {
                                        Sampler *const sampler, BXDFType *sampleType) {
             Float cosine = wo.y;
             // 计算反射概率
+            // TODO move reflect probabilty computation to fresnel
             Float reflectProb = math::fresnelDielectric(cosine, _thetaI, _thetaT);
             // Fresnel 的近似计算
 //            Float reflectProb = math::schlick(cosine, _thetaI / _thetaT);

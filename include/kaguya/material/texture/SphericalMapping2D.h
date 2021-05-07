@@ -32,8 +32,8 @@ namespace kaguya {
                         dir = NORMALIZE(si.point);
                     }
 
-                    Float theta = math::dirToTheta(dir);
-                    Float phi = math::dirToPhi(dir);
+                    Float theta = math::local_coord::dirToTheta(dir);
+                    Float phi = math::local_coord::dirToPhi(dir);
                     Point2F ret(theta * math::INV_PI, phi * math::INV_2PI);
                     return ret;
                 }

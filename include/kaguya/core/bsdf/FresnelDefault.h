@@ -14,7 +14,7 @@ namespace kaguya {
         public:
             FresnelDefault() {}
 
-            Spectrum fresnel(Float cosineTheta = 0) {
+            Spectrum fresnel(Float cosineTheta = 0) const override {
                 // 默认返回 1.0 表示反射概率为 1
                 return Spectrum(1.0);
             }

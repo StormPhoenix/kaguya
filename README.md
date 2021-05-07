@@ -27,9 +27,29 @@ A simple physically based render.
             - [ ] Visible point 未击中
     - [ ] Light::Le() 
 
-- [ ] Rough Conductor 编辑
+- [ ] Microfacet Material
+    - [ ] 进一步理解 Mask and Shadowing 里面的 AlphaX and AlphaY (和粗糙度有关)
+    - [ ] 进一步理解 Normal Distribution 里面的 sigma
+
+- [ ] FilmPlane 添加 Filter
+
+- [ ] Material 结构整理 
+    - [ ] Texture Texture Mapping package 结构整理
+    - [ ] BXDF namespace (Microfacet)
+    - [ ] Medium phase function 
 
 - [ ] 构建不依赖 C++ std 的随机数生成器    
+
+- [ ] Torrance-Sparrow Model 公式推导 - 疑惑？
+    - [ ] 课上讲解的有问题，重新阅读 PBRT radiance 章节，公主 basics
+    - [ ] 推导 Torrance-Sparrow Model formulation
+    
+- [ ] 重新利用 Fresnel
+    - [ ] FresnelConductor 中的 K
+
+- [ ] BSDF 局部坐标系代码重构，不然可能会影响各向异性材质
+
+- [ ] Import scene 输出不够详细，增加打印信息
     
 ## TODO
 - [ ] 修正 C++ template 特化语法
