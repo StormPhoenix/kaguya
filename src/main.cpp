@@ -52,6 +52,10 @@ int main(int argc, char *argv[]) {
 //        Config::innerScenes.push_back(Scene::innerSceneBunnyWithPointLight);
     }
 
+    if (Config::Parallel::tileSize <= 0) {
+        Config::Parallel::tileSize = 50;
+    }
+
     Tracer *tracer = TracerFactory::newTracer();
     if (tracer != nullptr) {
         tracer->run();

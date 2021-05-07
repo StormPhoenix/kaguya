@@ -75,14 +75,12 @@ namespace kaguya {
             // visibility tester
             VisibilityTester visibilityTester;
 
-            Spectrum ret(0);
-            // 对光源采样采样
-            Spectrum lumi = light->sampleLi(eye, &wi,
-                                            &lightPdf, sampler,
-                                            &visibilityTester);
+            // Sample from light
+            Spectrum L = light->sampleLi(eye, &wi, &lightPdf, sampler, &visibilityTester);
 
+            Spectrum ret(0);
             // 排除对光源采样贡献为 0 的情况
-            if (lightPdf > math::EPSILON && !lumi.isBlack()) {
+            if (lightPdf > 0. && !L.isBlack()) {
                 Spectrum f;
                 Float scatteringPdf = 0.0f;
                 if (eye.isMediumInteraction()) {
@@ -103,15 +101,15 @@ namespace kaguya {
                 }
 
                 if (!f.isBlack()) {
-                    lumi *= visibilityTester.transmittance(scene, sampler);
-                    if (!lumi.isBlack()) {
+                    L *= visibilityTester.transmittance(scene, sampler);
+                    if (!L.isBlack()) {
                         if (light->isDeltaType()) {
                             // shader spectrum
-                            ret += f / lightPdf * lumi;
+                            ret += f / lightPdf * L;
                         } else {
                             // multiple rayImportance sampling
                             Float weight = math::misWeight(1, lightPdf, 1, scatteringPdf);
-                            ret += f * weight / lightPdf * lumi;
+                            ret += f * weight / lightPdf * L;
                         }
                     }
                 }

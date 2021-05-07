@@ -27,6 +27,8 @@ A simple physically based render.
             - [ ] Visible point 未击中
     - [ ] Light::Le() 
 
+- [ ] Rough Conductor 编辑
+
 - [ ] 构建不依赖 C++ std 的随机数生成器    
     
 ## TODO

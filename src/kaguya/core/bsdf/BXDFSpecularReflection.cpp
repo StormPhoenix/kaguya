@@ -26,8 +26,13 @@ namespace kaguya {
             if (sampleType != nullptr) {
                 *sampleType = BXDFType(BSDF_SPECULAR | BSDF_REFLECTION);
             }
+
+            Float cosTheta = std::abs((*wi).y);
+            if (cosTheta == 0.) {
+                return Spectrum(0.);
+            }
             // 除以 cosine(w_i) 是为了不让能量损耗，这个可以利用 hemisphere-directional 积分得到
-            return _fresnel->fresnel(wo.y) * _albedo / std::abs((*wi).y);
+            return _fresnel->fresnel(wo.y) * _albedo / cosTheta;
         }
 
         Float BXDFSpecularReflection::samplePdf(const Vector3F &wo, const Vector3F &wi) const {

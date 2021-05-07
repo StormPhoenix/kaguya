@@ -162,6 +162,10 @@ namespace kaguya {
 
             Vector3F dirToNext = next.point - point;
             Float distSquare = std::pow(LENGTH(dirToNext), 2);
+            if (distSquare == 0.) {
+                return 1.0;
+            }
+
             dirToNext = NORMALIZE(dirToNext);
 
             Ray ray = Ray(point, NORMALIZE(next.point - point));

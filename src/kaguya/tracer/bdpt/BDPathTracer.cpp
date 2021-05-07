@@ -28,6 +28,9 @@ namespace kaguya {
         }
 
         void BDPathTracer::render() {
+            ASSERT(Config::Parallel::tileSize > 0, "Tile size lower than zero. ")
+            ASSERT(Config::Tracer::sampleNum > 0, "Sample number lower than zero. ")
+
             int width = Config::Camera::width;
             int height = Config::Camera::height;
 
@@ -125,12 +128,10 @@ namespace kaguya {
              *      直接对光源采样
              */
 
-            Spectrum ret = Spectrum(0.0);
-
-            // 额外采样的 光源 / 相机
+            // New sample
             PathVertex extraVertex;
 
-            // 区分不同情况
+            Spectrum ret = Spectrum(0.0);
             if (s == 0) {
                 // lightSubPath 上没有任何路径点
                 const PathVertex &pt = cameraSubPath[t - 1];
@@ -167,7 +168,7 @@ namespace kaguya {
                 if (pt.isConnectible()) {
                     Float lightPdf = 0;
                     auto light = uniformSampleLight(scene, &lightPdf, sampler);
-                    if (light == nullptr) {
+                    if (light == nullptr || lightPdf == 0.) {
                         return 0;
                     }
 
@@ -249,7 +250,7 @@ namespace kaguya {
 
             Float lightPdf = 0;
             auto light = uniformSampleLight(scene, &lightPdf, sampler);
-            if (light == nullptr) {
+            if (light == nullptr || lightPdf == 0.) {
                 return 0;
             }
 
@@ -486,7 +487,7 @@ namespace kaguya {
         Spectrum BDPathTracer::g(const PathVertex &pre, const PathVertex &next, Sampler *sampler) {
             Vector3F dirToNext = next.point - pre.point;
             Float dist = LENGTH(dirToNext);
-            if (dist == 0) {
+            if (dist == 0.) {
                 return 1.0;
             }
 

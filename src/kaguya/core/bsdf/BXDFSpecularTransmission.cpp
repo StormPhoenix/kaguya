@@ -39,8 +39,12 @@ namespace kaguya {
                 return 0;
             }
             *pdf = 1;
-            Float cosineThetaT = abs(wi->y);
-            Spectrum f = _albedo * (Spectrum(1.0) - _fresnel->fresnel(cosineThetaT)) / cosineThetaT;
+            Float cosThetaT = abs(wi->y);
+            if (cosThetaT == 0.) {
+                return 0.;
+            }
+
+            Spectrum f = _albedo * (Spectrum(1.0) - _fresnel->fresnel(cosThetaT)) / cosThetaT;
             if (_mode == TransportMode::RADIANCE) {
                 f *= std::pow(refraction, 2);
             }

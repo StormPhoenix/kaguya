@@ -37,6 +37,9 @@ namespace kaguya {
                 *wi = Vector3F(-wo.x, wo.y, -wo.z);
                 *pdf = reflectProb;
                 // f(p, w_o, w_i) / cos(theta(w_i))
+                if ((*wi).y == 0) {
+                    return 0;
+                }
                 return reflectProb * _albedo / abs(wi->y);
             } else {
                 // 折射
