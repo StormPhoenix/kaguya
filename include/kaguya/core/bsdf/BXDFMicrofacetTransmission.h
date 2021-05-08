@@ -7,7 +7,9 @@
 
 namespace kaguya {
     namespace core {
+        namespace bsdf {
 
+        }
     }
 }
 

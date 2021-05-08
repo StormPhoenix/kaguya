@@ -5,13 +5,13 @@
 #include <kaguya/material/Metal.h>
 #include <kaguya/core/bsdf/microfacet/BeckmannDistribution.h>
 #include <kaguya/core/bsdf/BXDFMicrofacetReflection.h>
-#include <kaguya/core/bsdf/FresnelConductor.h>
+#include <kaguya/core/bsdf/fresnel/FresnelConductor.h>
 
 namespace kaguya {
     namespace material {
-        using core::FresnelConductor;
-        using core::BXDFMicrofacetReflection;
-        using core::microfacet::BeckmannDistribution;
+        using core::bsdf::fresnel::FresnelConductor;
+        using core::bsdf::BXDFMicrofacetReflection;
+        using core::bsdf::microfacet::BeckmannDistribution;
 
         Metal::Metal(const Texture<Float>::Ptr alpha, const Texture<Spectrum>::Ptr eta, const Texture<Spectrum>::Ptr R,
                      const Texture<Spectrum>::Ptr K, std::string distributionType) :

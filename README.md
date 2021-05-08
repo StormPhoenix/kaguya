@@ -35,7 +35,6 @@ A simple physically based render.
 
 - [ ] Material 结构整理 
     - [ ] Texture Texture Mapping package 结构整理
-    - [ ] BXDF namespace (Microfacet)
     - [ ] Medium phase function 
 
 - [ ] 构建不依赖 C++ std 的随机数生成器    
@@ -49,7 +48,6 @@ A simple physically based render.
 
 - [ ] BSDF 局部坐标系代码重构，不然可能会影响各向异性材质
 
-- [ ] Import scene 输出不够详细，增加打印信息
     
 ## TODO
 - [ ] 修正 C++ template 特化语法

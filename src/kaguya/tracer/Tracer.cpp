@@ -3,7 +3,6 @@
 //
 
 #include <kaguya/Config.h>
-#include <kaguya/parallel/RenderPool.h>
 #include <kaguya/tracer/Tracer.h>
 
 #include <iostream>
@@ -12,6 +11,7 @@ namespace kaguya {
     namespace tracer {
 
         using kaguya::Config;
+        using core::bsdf::BXDFType;
 
         Tracer::Tracer() {}
 
@@ -134,7 +134,7 @@ namespace kaguya {
                     assert(si.bsdf != nullptr);
 
                     BXDFType sampleType;
-                    f = si.bsdf->sampleF(wo, &wi, &scatteringPdf, sampler, BSDF_ALL, &sampleType);
+                    f = si.bsdf->sampleF(wo, &wi, &scatteringPdf, sampler, BXDFType::BSDF_ALL, &sampleType);
                     f *= ABS_DOT(si.rendering.normal, wi);
                     sampleSpecular = (sampleType & BXDFType::BSDF_SPECULAR) != 0;
                 }

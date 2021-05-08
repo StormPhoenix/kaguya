@@ -8,8 +8,11 @@
 namespace kaguya {
     namespace core {
         namespace bssrdf {
+
+            using bsdf::BXDFType;
+
             SeparableBSSRDFAdapter::SeparableBSSRDFAdapter(const SeparableBSSRDF *bssrdf) :
-                    BXDF(BXDFType(BSDF_REFLECTION | BSDF_DIFFUSE)), _bssrdf(bssrdf) {
+                    BXDF(BXDFType(BXDFType::BSDF_REFLECTION | BXDFType::BSDF_DIFFUSE)), _bssrdf(bssrdf) {
                 assert(_bssrdf != nullptr);
             }
 

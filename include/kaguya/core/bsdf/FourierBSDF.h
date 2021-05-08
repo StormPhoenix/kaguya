@@ -9,9 +9,11 @@
 
 namespace kaguya {
     namespace core {
-        class FourierBSDF : public BSDF {
+        namespace bsdf {
+            class FourierBSDF : public BSDF {
 
-        };
+            };
+        }
     }
 }
 

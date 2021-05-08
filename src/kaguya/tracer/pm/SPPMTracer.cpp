@@ -12,8 +12,7 @@ namespace kaguya {
     namespace tracer {
 
         using namespace parallel;
-
-        // TODO VisiblePoint struct
+        using core::bsdf::BXDFType;
 
         // Visible Point
         typedef struct VisiblePoint {
@@ -196,18 +195,18 @@ namespace kaguya {
                                         assert(si.bsdf != nullptr);
 
                                         // Sample from direct light
-                                        if (si.bsdf->allIncludeOf(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
+                                        if (si.bsdf->allIncludeOf(BXDFType(BXDFType::BSDF_ALL & (~BXDFType::BSDF_SPECULAR)))) {
                                             pixel.Ld += beta * sampleDirectLight(_scene, si, sampler);
                                         }
 
                                         // Judge visible point
-                                        bool isDiffuse = si.bsdf->allIncludeOf(BXDFType(BSDF_DIFFUSE
-                                                                                        | BSDF_REFLECTION
-                                                                                        | BSDF_TRANSMISSION)) > 0;
+                                        bool isDiffuse = si.bsdf->allIncludeOf(BXDFType(BXDFType::BSDF_DIFFUSE
+                                                                                        | BXDFType::BSDF_REFLECTION
+                                                                                        | BXDFType::BSDF_TRANSMISSION)) > 0;
 
-                                        bool isGlossy = si.bsdf->allIncludeOf(BXDFType(BSDF_GLOSSY
-                                                                                       | BSDF_REFLECTION
-                                                                                       | BSDF_TRANSMISSION)) > 0;
+                                        bool isGlossy = si.bsdf->allIncludeOf(BXDFType(BXDFType::BSDF_GLOSSY
+                                                                                       | BXDFType::BSDF_REFLECTION
+                                                                                       | BXDFType::BSDF_TRANSMISSION)) > 0;
 
                                         Vector3F wo = -cameraRay.getDirection();
                                         if (isDiffuse || (isGlossy && (_maxDepth - 1 == bounce))) {
@@ -222,13 +221,13 @@ namespace kaguya {
                                             Float samplePdf = 0;
                                             BXDFType sampleType;
                                             Spectrum f = si.bsdf->sampleF(wo, &wi, &samplePdf, sampler,
-                                                                          BSDF_ALL, &sampleType);
+                                                                          BXDFType::BSDF_ALL, &sampleType);
 
                                             if (f.isBlack() || samplePdf == 0.) {
                                                 break;
                                             }
 
-                                            isSpecularBounce = (sampleType & BSDF_SPECULAR) > 0;
+                                            isSpecularBounce = (sampleType & BXDFType::BSDF_SPECULAR) > 0;
 
                                             // Update beta
                                             Float cos = ABS_DOT(si.rendering.normal, NORMALIZE(wi));
@@ -387,7 +386,7 @@ namespace kaguya {
 
                                         // Contribution computation
                                         Vector3F wi = -photonRay.getDirection();
-                                        Spectrum phi = beta * pixel.vp.bsdf->f(pixel.vp.wo, wi, BSDF_ALL);
+                                        Spectrum phi = beta * pixel.vp.bsdf->f(pixel.vp.wo, wi, BXDFType::BSDF_ALL);
                                         for (int i = 0; i < SPECTRUM_CHANNEL; i++) {
                                             pixel.phi[i].add(phi[i]);
                                         }
@@ -405,7 +404,7 @@ namespace kaguya {
                             Vector3F wi;
                             Float samplePdf = 0;
 
-                            Spectrum f = si.bsdf->sampleF(wo, &wi, &samplePdf, haltonSampler, BSDF_ALL, nullptr);
+                            Spectrum f = si.bsdf->sampleF(wo, &wi, &samplePdf, haltonSampler, BXDFType::BSDF_ALL, nullptr);
                             if (f.isBlack() || samplePdf == 0.) {
                                 break;
                             }

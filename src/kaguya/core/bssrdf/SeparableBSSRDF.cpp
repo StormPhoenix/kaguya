@@ -2,13 +2,12 @@
 // Created by Storm Phoenix on 2021/1/10.
 //
 
-#include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/core/bssrdf/SeparableBSSRDF.h>
-#include <iostream>
 
 namespace kaguya {
     namespace core {
         namespace bssrdf {
+            using bsdf::BSDF;
 
             Float fresnelMoment1(Float eta) {
                 Float eta2 = eta * eta, eta3 = eta2 * eta, eta4 = eta3 * eta,

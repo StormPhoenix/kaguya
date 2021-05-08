@@ -6,13 +6,14 @@
 
 namespace kaguya {
     namespace core {
+        namespace bsdf {
+            typedef struct FourierCoefficientTable {
 
-        typedef struct FourierCoefficientTable {
+            } FourierCoefficientTable;
 
-        } FourierCoefficientTable;
+            static bool read(FourierCoefficientTable *table) {
 
-        static bool read(FourierCoefficientTable *table) {
-
+            }
         }
     }
 }

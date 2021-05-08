@@ -26,8 +26,8 @@
 namespace kaguya {
     namespace tracer {
 
-        using kaguya::core::BSDF;
-        using kaguya::core::BXDFType;
+        using kaguya::core::bsdf::BSDF;
+        using kaguya::core::bsdf::BXDFType;
         using kaguya::core::Spectrum;
         using kaguya::core::TransportMode;
         using kaguya::material::Material;

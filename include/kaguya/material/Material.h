@@ -17,9 +17,9 @@ namespace kaguya {
 
         using kaguya::core::Interaction;
         using kaguya::core::SurfaceInteraction;
-        using kaguya::core::BSDF;
-        using kaguya::core::BXDF;
-        using kaguya::core::TransportMode;
+        using kaguya::core::bsdf::BSDF;
+        using kaguya::core::bsdf::BXDF;
+        using kaguya::core::bsdf::TransportMode;
         using kaguya::memory::MemoryArena;
 
         /**

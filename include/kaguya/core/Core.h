@@ -23,7 +23,14 @@ namespace kaguya {
         constexpr int SPECTRUM_CHANNEL = 3;
 #endif
 
-        class BSDF;
+        namespace bsdf {
+            class BSDF;
+            class BXDF;
+        }
+
+        namespace bssrdf {
+            class BSSRDF;
+        }
 
         constexpr static int MAX_BXDF_NUM = 5;
     }

@@ -9,7 +9,7 @@
 namespace kaguya {
     namespace material {
 
-        using kaguya::core::BXDFSpecular;
+        using kaguya::core::bsdf::BXDFSpecular;
 
         SubsurfaceMaterial::SubsurfaceMaterial(Spectrum albedoEff, Spectrum mft, Float g, Float eta)
                 : _theta(eta), _albedoEff(albedoEff), _meanFreePath(mft), _table(100, 64) {

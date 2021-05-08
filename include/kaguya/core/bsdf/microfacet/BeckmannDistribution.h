@@ -9,25 +9,27 @@
 
 namespace kaguya {
     namespace core {
-        namespace microfacet {
+        namespace bsdf {
+            namespace microfacet {
 
-            class BeckmannDistribution : public MicrofacetDistribution {
-            public:
-                BeckmannDistribution(Float alpha);
+                class BeckmannDistribution : public MicrofacetDistribution {
+                public:
+                    BeckmannDistribution(Float alpha);
 
-                BeckmannDistribution(Float alphaX, Float alphaZ);
+                    BeckmannDistribution(Float alphaX, Float alphaZ);
 
-                virtual Float D(const Normal3F &wh) const override;
+                    virtual Float D(const Normal3F &wh) const override;
 
-                virtual Vector3F sampleWh(const Vector3F &wo, Sampler *sampler) const override;
+                    virtual Vector3F sampleWh(const Vector3F &wo, Sampler *sampler) const override;
 
-            protected:
-                virtual Float lambda(const Vector3F &wo) const override;
+                protected:
+                    virtual Float lambda(const Vector3F &wo) const override;
 
-            protected:
-                Float _alphaX, _alphaZ;
-            };
+                protected:
+                    Float _alphaX, _alphaZ;
+                };
 
+            }
         }
     }
 }

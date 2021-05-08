@@ -3,15 +3,16 @@
 //
 
 #include <kaguya/core/bsdf/BXDFSpecularReflection.h>
-#include <kaguya/core/bsdf/FresnelDefault.h>
+#include <kaguya/core/bsdf/fresnel/FresnelDefault.h>
 #include <kaguya/material/Mirror.h>
 #include <kaguya/material/texture/ConstantTexture.h>
 
 namespace kaguya {
     namespace material {
 
-        using kaguya::core::BXDFSpecularReflection;
-        using kaguya::core::FresnelDefault;
+        using core::bsdf::BSDF;
+        using core::bsdf::BXDFSpecularReflection;
+        using core::bsdf::fresnel::FresnelDefault;
 
         Mirror::Mirror() {
             _albedo = std::make_shared<ConstantTexture<Spectrum>>(Spectrum(1.0));

@@ -27,10 +27,9 @@ namespace kaguya {
     }
 
     namespace core {
+        using bsdf::TransportMode;
+        using bsdf::BSDF;
 
-        namespace bssrdf {
-            class BSSRDF;
-        }
 
         class AreaLight;
 

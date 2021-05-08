@@ -9,13 +9,15 @@
 
 namespace kaguya {
     namespace core {
-        namespace microfacet {
+        namespace bsdf {
+            namespace microfacet {
 
-            class TrowbridgeReitzDistribution : public MicrofacetDistribution {
-            public:
+                class TrowbridgeReitzDistribution : public MicrofacetDistribution {
+                public:
 
-            };
+                };
 
+            }
         }
     }
 }

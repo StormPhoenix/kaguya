@@ -9,7 +9,8 @@
 
 namespace kaguya {
     namespace core {
-
+        namespace bsdf {
+        }
     }
 }
 #endif //KAGUYA_BXDFORENNAYAR_CPP

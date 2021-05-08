@@ -9,18 +9,18 @@
 
 namespace kaguya {
     namespace core {
+        namespace bsdf {
+            class BXDFOrenNayar : public BXDF {
+            public:
+                BXDFOrenNayar(const Spectrum &reflectance, Float sigma = 0.);
 
-        class BXDFOrenNayar : public BXDF {
-        public:
-            BXDFOrenNayar(const Spectrum &reflectance, Float sigma = 0.);
+                virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
 
-            virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
-
-        private:
-            const Spectrum _reflectance;
-            const Float _sigma;
-        };
-
+            private:
+                const Spectrum _reflectance;
+                const Float _sigma;
+            };
+        }
     }
 }
 

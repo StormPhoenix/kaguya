@@ -14,9 +14,10 @@
 namespace kaguya {
     namespace tracer {
 
-        using kaguya::core::Interaction;
-        using kaguya::material::Material;
+        using core::Interaction;
+        using material::Material;
         using core::bssrdf::BSSRDF;
+        using namespace bsdf;
 
         PathTracer::PathTracer() {
             init();
@@ -113,6 +114,7 @@ namespace kaguya {
                     BXDFType bxdfType;
                     // p(wi)
                     Float samplePdf = 0;
+
                     // f(p, wo, wi)
                     Spectrum f = si.bsdf->sampleF(worldWo, &worldWi, &samplePdf, sampler, BSDF_ALL, &bxdfType);
                     isSpecularBounce = (bxdfType & BSDF_SPECULAR) > 0;
@@ -123,6 +125,7 @@ namespace kaguya {
 
                     // cosine
                     Float cosine = ABS_DOT(si.rendering.normal, NORMALIZE(worldWi));
+
                     // 计算 beta
                     beta *= (f * cosine / samplePdf);
                     // 设置下一次打击光线

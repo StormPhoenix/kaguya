@@ -9,8 +9,8 @@
 namespace kaguya {
     namespace material {
 
-        using kaguya::core::BSDF;
-        using kaguya::core::BXDFLambertianReflection;
+        using kaguya::core::bsdf::BSDF;
+        using kaguya::core::bsdf::BXDFLambertianReflection;
 
         Lambertian::Lambertian(std::shared_ptr<Texture<Spectrum>> albedo) : _albedo(albedo) {}
 

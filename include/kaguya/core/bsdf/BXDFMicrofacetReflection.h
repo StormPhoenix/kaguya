@@ -7,30 +7,33 @@
 
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/core/bsdf/microfacet/MicrofacetDistribution.h>
-#include <kaguya/core/bsdf/Fresnel.h>
+#include <kaguya/core/bsdf/fresnel/Fresnel.h>
 
 namespace kaguya {
     namespace core {
-        using microfacet::MicrofacetDistribution;
+        namespace bsdf {
+            using microfacet::MicrofacetDistribution;
+            using fresnel::Fresnel;
 
-        class BXDFMicrofacetReflection : public BXDF {
-        public:
-            BXDFMicrofacetReflection(const Spectrum &reflectance,
-                                     const MicrofacetDistribution *microfacetDistribution,
-                                     const Fresnel *fresnel);
+            class BXDFMicrofacetReflection : public BXDF {
+            public:
+                BXDFMicrofacetReflection(const Spectrum &reflectance,
+                                         const MicrofacetDistribution *microfacetDistribution,
+                                         const Fresnel *fresnel);
 
-            virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
+                virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
 
-            virtual Spectrum sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
-                                     Sampler *const sampler, BXDFType *sampleType) override;
+                virtual Spectrum sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
+                                         Sampler *const sampler, BXDFType *sampleType) override;
 
-            virtual Float samplePdf(const Vector3F &wo, const Vector3F &wi) const override;
+                virtual Float samplePdf(const Vector3F &wo, const Vector3F &wi) const override;
 
-        private:
-            const Spectrum _reflectance;
-            const MicrofacetDistribution *_microfacetDistribution;
-            const Fresnel *_fresnel;
-        };
+            private:
+                const Spectrum _reflectance;
+                const MicrofacetDistribution *_microfacetDistribution;
+                const Fresnel *_fresnel;
+            };
+        }
     }
 }
 

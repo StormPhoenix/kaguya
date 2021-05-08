@@ -49,6 +49,7 @@ file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/bsdf/*.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/bsdf/fresnel/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/bsdf/microfacet/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/bssrdf/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/light/*.cpp

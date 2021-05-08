@@ -9,17 +9,17 @@
 
 namespace kaguya {
     namespace core {
+        namespace bsdf {
+            class BXDFLambertianReflection : public BXDF {
+            public:
+                BXDFLambertianReflection(const Spectrum &albedo);
 
-        class BXDFLambertianReflection : public BXDF {
-        public:
-            BXDFLambertianReflection(const Spectrum &albedo);
+                virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
 
-            virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
-
-        private:
-            const Spectrum _albedo;
-        };
-
+            private:
+                const Spectrum _albedo;
+            };
+        }
     }
 }
 

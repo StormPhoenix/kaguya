@@ -17,7 +17,7 @@
 namespace kaguya {
     namespace tracer {
 
-        using kaguya::core::BXDFType;
+        using kaguya::core::bsdf::BXDFType;
         using kaguya::core::medium::Medium;
         using kaguya::core::TransportMode;
         using kaguya::memory::ScopeSwapper;

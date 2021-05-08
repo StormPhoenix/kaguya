@@ -8,7 +8,8 @@
 namespace kaguya {
     namespace material {
 
-        using kaguya::core::BXDFSpecular;
+        using core::bsdf::BSDF;
+        using core::bsdf::BXDFSpecular;
 
         Dielectric::Dielectric(std::shared_ptr<Texture<Spectrum>> albedo) : Dielectric(albedo, 1.5) {}
 

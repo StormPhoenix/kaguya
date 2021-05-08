@@ -12,7 +12,7 @@ namespace kaguya {
     namespace tracer {
 
         using kaguya::material::Material;
-        using kaguya::core::BXDFType;
+        using kaguya::core::bsdf::BXDFType;
 
         Spectrum PathVertex::f(const PathVertex &next) const {
             Vector3F worldWi = NORMALIZE(next.point - point);
