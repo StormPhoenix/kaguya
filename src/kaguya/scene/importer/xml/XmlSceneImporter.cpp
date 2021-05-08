@@ -619,7 +619,7 @@ namespace kaguya {
                 XmlParseInfo parseInfo;
                 parseXml(*xml_doc.begin(), parseInfo);
 
-                std::cout << "Building bvh acceleration structure ... " << std::endl;
+                std::cout << "\tBuilding bvh acceleration structure ... " << std::endl;
                 std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(_shapes);
                 _scene->setWorld(bvh);
                 _scene->setSceneName(Config::Camera::filename);
