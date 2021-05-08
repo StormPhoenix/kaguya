@@ -44,7 +44,9 @@ A simple physically based render.
     - [ ] 推导 Torrance-Sparrow Model formulation
     
 - [ ] 重新利用 Fresnel
-    - [ ] FresnelConductor 中的 K
+    - [ ] FresnelConductor 中的 K 做记录
+    
+- [ ] BDPT RandomWalk 添加 Russian Roullete
 
 - [ ] BSDF 局部坐标系代码重构，不然可能会影响各向异性材质
 
