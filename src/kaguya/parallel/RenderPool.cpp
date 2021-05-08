@@ -153,46 +153,6 @@ namespace kaguya {
                     } else {
                         _taskQueue = taskNode->next;
                     }
-
-                    /* TODO delete
-                    if (task->mode() == RenderTask::One_Dim) {
-                        int idxStart, idxEnd;
-                        if (task->assignTask1D(idxStart, idxEnd)) {
-                            task->renderEnter();
-                            lock.unlock();
-                            for (int idx = idxStart; idx <= idxEnd; idx++) {
-                                task->func1D(idx);
-                            }
-                            lock.lock();
-                            task->renderLeave();
-                            if (task->isFinished()) {
-                                task->notifyMaster();
-                                delete task;
-                                _taskCondition.notify_all();
-                            }
-                        } else {
-                            _taskQueue = taskNode->next;
-                        }
-                    } else if (task->mode() == RenderTask::Two_Dim) {
-                        int idxX, idxY;
-                        if (task->assignTask2D(idxX, idxY)) {
-                            task->renderEnter();
-                            lock.unlock();
-                            task->func2D(idxX, idxY);
-                            lock.lock();
-                            task->renderLeave();
-                            if (task->isFinished()) {
-                                task->notifyMaster();
-                                delete task;
-                                _taskCondition.notify_all();
-                            }
-                        } else {
-                            _taskQueue = taskNode->next;
-                        }
-                    } else {
-                        ASSERT(false, "Task mode not support.");
-                    }
-                     */
                 }
             }
         }

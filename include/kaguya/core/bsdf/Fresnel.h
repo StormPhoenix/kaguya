@@ -30,7 +30,7 @@ namespace kaguya {
             Spectrum thetaK = k / thetaI;
 
             Float cosine2 = cosineI * cosineI;
-            Float sine2 = 1 - sine2;
+            Float sine2 = 1 - cosine2;
 
             Spectrum theta2 = theta * theta;
             Spectrum thetaK2 = thetaK * thetaK;
@@ -40,13 +40,13 @@ namespace kaguya {
             // TODO 不懂此处的 a 是如何计算得到的
             Spectrum a = sqrt(0.5 * (a2Andb2 + item0));
             Spectrum item1 = a2Andb2 + cosine2;
-            Spectrum item2 = 2 * a * cosineI;
+            Spectrum item2 = 2. * a * cosineI;
 
             Spectrum perpendicularR = (item1 - item2) /
                                       (item1 + item2);
 
             Spectrum item3 = cosine2 * a2Andb2 + sine2 * sine2;
-            Spectrum item4 = 2 * a * cosineI * sine2;
+            Spectrum item4 = item2 * sine2;
 
             Spectrum parallelR = perpendicularR * (item3 - item4) /
                                  (item3 + item4);

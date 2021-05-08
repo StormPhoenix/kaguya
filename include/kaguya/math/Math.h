@@ -301,8 +301,8 @@ namespace kaguya {
             return Vector3F(v[x], v[y], v[z]);
         }
 
-        inline Vector3F reflect(const Vector3F &v, const Vector3F &normal) {
-            return v - 2 * DOT(v, NORMALIZE(normal)) * normal;
+        inline Vector3F reflect(const Vector3F &v, const Normal3F &normal) {
+            return 2 * DOT(v, NORMALIZE(normal)) * normal - v;
         }
 
         /**

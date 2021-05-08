@@ -117,13 +117,16 @@ namespace kaguya {
                     Spectrum f = si.bsdf->sampleF(worldWo, &worldWi, &samplePdf, sampler, BSDF_ALL, &bxdfType);
                     isSpecularBounce = (bxdfType & BSDF_SPECULAR) > 0;
 
+                    if (samplePdf == 0 || f.isBlack()) {
+                        break;
+                    }
+
                     // cosine
                     Float cosine = ABS_DOT(si.rendering.normal, NORMALIZE(worldWi));
                     // 计算 beta
                     beta *= (f * cosine / samplePdf);
                     // 设置下一次打击光线
                     scatterRay = si.sendRay(NORMALIZE(worldWi));
-
                     if (si.bssrdf != nullptr && (bxdfType & BXDFType::BSDF_TRANSMISSION)) {
                         // Subsurface
                         SurfaceInteraction pi;

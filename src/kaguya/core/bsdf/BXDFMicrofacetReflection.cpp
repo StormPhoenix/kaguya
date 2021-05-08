@@ -23,7 +23,6 @@ namespace kaguya {
             if (cosThetaI == 0 || cosThetaO == 0) {
                 return 0.;
             }
-
             // Half angle
             Vector3F wh = wo + wi;
             wh = NORMALIZE(wh);
@@ -32,7 +31,8 @@ namespace kaguya {
             Float G_Wo_Wi = _microfacetDistribution->G(wo, wi);
 
             // Fresnel computation
-            Float cosThetaH = DOT(wo, wh);
+            wh = DOT(wh, Vector3F(0, 1, 0)) > 0 ? wh : -wh;
+            Float cosThetaH = DOT(wi, wh);
             Spectrum Fr = _fresnel->fresnel(cosThetaH);
 
             return (D_Wh * G_Wo_Wi * Fr * _reflectance) / (4 * cosThetaO * cosThetaI);
@@ -43,11 +43,19 @@ namespace kaguya {
             if (wo.y == 0.) {
                 return 0.;
             }
+
             Vector3F wh = _microfacetDistribution->sampleWh(wo, sampler);
+            if (DOT(wo, wh) < 0) {
+                return 0.;
+            }
 
             // Check same side
             Vector3F reflectDir = math::reflect(wo, wh);
+
             if ((wo.y * reflectDir.y) <= 0) {
+                if (pdf != nullptr) {
+                    (*pdf) = 0;
+                }
                 return 0.;
             }
 
@@ -66,8 +74,7 @@ namespace kaguya {
             if (wo.y * wi.y <= 0) {
                 return 0.;
             }
-            Vector3F wh = (wo + wi);
-            wh = NORMALIZE(wh);
+            Vector3F wh = NORMALIZE(wo + wi);
             return _microfacetDistribution->samplePdf(wo, wh) / (4 * DOT(wo, wh));
         }
     }

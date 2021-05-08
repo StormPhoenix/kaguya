@@ -25,7 +25,7 @@ namespace kaguya {
         void Metal::computeScatteringFunctions(SurfaceInteraction &insect,
                                                MemoryArena &memoryArena,
                                                TransportMode mode) {
-            if (_distributionType == "backmann") {
+            if (_distributionType == "beckmann") {
                 // Distribution
                 Float alpha = _alpha->evaluate(insect);
                 const BeckmannDistribution *distribution = ALLOC(memoryArena, BeckmannDistribution)(alpha);
