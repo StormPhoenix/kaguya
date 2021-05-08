@@ -499,6 +499,9 @@ namespace kaguya {
                 Config::Tracer::sampleNum = info.getIntValue("sampleNum", Config::Tracer::sampleNum);
                 Config::Tracer::delta = info.getIntValue("delta", Config::Tracer::delta);
                 Config::Tracer::strictNormals = info.getBoolValue("strictNormals", Config::Tracer::strictNormals);
+                Config::Tracer::photonCount = info.getIntValue("photonCount", Config::Tracer::photonCount);
+                Config::Tracer::initialRadius = info.getFloatValue("initialRadius", Config::Tracer::initialRadius);
+                Config::Tracer::radiusDecay = info.getFloatValue("alpha", Config::Tracer::radiusDecay);
             }
 
             void XmlSceneImporter::handleTagLookAt(pugi::xml_node &node, XmlParseInfo &parent) {

@@ -81,14 +81,19 @@ namespace kaguya {
                                    (p.z * 83492791)) % hashSize;
         }
 
-        SPPMTracer::SPPMTracer() {
-            _gamma = Config::searchRadiusDecay;
-            _shootPhotonsPerIter = Config::photonPerIteration;
-            _maxDepth = Config::Tracer::maxDepth;
-            _initialRadius = Config::initialSearchRadius;
-        }
+        SPPMTracer::SPPMTracer() {}
 
         void SPPMTracer::render() {
+            _gamma = Config::Tracer::radiusDecay;
+            _shootPhotonsPerIter = Config::Tracer::photonCount;
+            _maxDepth = Config::Tracer::maxDepth;
+            _initialRadius = Config::Tracer::initialRadius;
+
+            // Print config info
+            std::cout << "Initial radius: " << _initialRadius << std::endl;
+            std::cout << "Radius decay: " << _gamma << std::endl;
+            std::cout << "Photon count: " << _shootPhotonsPerIter << std::endl;
+
             int width = Config::Camera::width;
             int height = Config::Camera::height;
 
@@ -106,7 +111,7 @@ namespace kaguya {
             int nTileY = (height + Config::Parallel::tileSize - 1) / Config::Parallel::tileSize;
 
             // Display
-            Float minSearchRadius = Config::initialSearchRadius;
+            Float minSearchRadius = _initialRadius;
 
             std::vector<MemoryArena> memoryArenaPerThread(renderCores());
 
@@ -462,7 +467,7 @@ namespace kaguya {
 
                 /* Write to image buffer */
                 {
-                    if (iter == nIterations - 1 || (iter + 1) % _writeFrequency == 0) {
+                    if (iter == nIterations - 1 || (iter + 1) % Config::writeFrequency == 0) {
                         for (int row = 0; row < height; row++) {
                             for (int col = 0; col < width; col++) {
                                 int offset = row * width + col;
@@ -478,6 +483,12 @@ namespace kaguya {
                             }
                         }
                     }
+
+                    std::string suffixSSP;
+                    std::stringstream ss;
+                    ss << "_SSP" << iter + 1 << "_";
+                    ss >> suffixSSP;
+                    writeImage(Config::filenamePrefix + suffixSSP + _scene->getName());
                 }
 
                 for (int i = 0; i < memoryArenaPerThread.size(); i++) {

@@ -41,11 +41,12 @@ namespace kaguya {
     int Config::Tracer::maxDepth = 15;
     int Config::Tracer::sampleNum = 10;
     bool Config::Tracer::strictNormals = false;
-    Float Config::initialSearchRadius = 1.0f;
-    Float Config::searchRadiusDecay = 2.0 / 3.0;
-    int Config::photonPerIteration = 4096;
+    Float Config::Tracer::initialRadius = 0.5f;
+    Float Config::Tracer::radiusDecay = 2.0 / 3.0;
+    int Config::Tracer::photonCount = 4096;
+
     std::string Config::renderType = "pt";
-    int Config::writeFrequency = -1;
+    int Config::writeFrequency = 20;
 
     // Parallel settings
     int Config::Parallel::tileSize = 50;

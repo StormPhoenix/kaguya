@@ -31,9 +31,9 @@ int main(int argc, char *argv[]) {
 
                     /* For stochastic progressive photon mapping settings */
                     option("-sr", "--initial-search-radius") &
-                    value("initial search radius", Config::initialSearchRadius),
-                    option("-srd", "--search-radius-decay") & value("search radius decay", Config::searchRadiusDecay),
-                    option("-pc", "--photon-count") & value("photon count", Config::photonPerIteration),
+                    value("initial search radius", Config::Tracer::initialRadius),
+                    option("-srd", "--search-radius-decay") & value("search radius decay", Config::Tracer::radiusDecay),
+                    option("-pc", "--photon-count") & value("photon count", Config::Tracer::photonCount),
 
                     /* Outputs settings */
                     option("-h", "--height") & value("image height", Config::Camera::height),

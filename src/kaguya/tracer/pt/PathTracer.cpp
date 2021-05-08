@@ -221,6 +221,7 @@ namespace kaguya {
                 }
             }
             writeImage(Config::filenamePrefix + "_" + _scene->getName(), 1.0 / nIterations);
+            std::cout << std::endl << "scene " << _scene->getName() << " completed." << std::endl;
         }
 
         Spectrum PathTracer::background(const Ray &ray) {

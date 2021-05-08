@@ -18,8 +18,6 @@ namespace kaguya {
             virtual void render() override;
 
         private:
-            int _writeFrequency = 50;
-
             Float _gamma = 2.0 / 3.0;
 
             int _shootPhotonsPerIter = 8192;

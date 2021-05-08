@@ -30,6 +30,9 @@ namespace kaguya {
             static int sampleNum;
             static int delta;
             static bool strictNormals;
+            static int photonCount;
+            static float initialRadius;
+            static float radiusDecay;
         };
 
         class Camera {
@@ -74,14 +77,6 @@ namespace kaguya {
         static std::string samplerType;
         // Render type
         static std::string renderType;
-
-        /* SPPM config */
-        // 初始搜索半径
-        static Float initialSearchRadius;
-        // 光子收集半径衰减速率
-        static Float searchRadiusDecay;
-        // 每轮光子发射数量
-        static int photonPerIteration;
 
         // TODO 临时代码，用于测试构建场景
         static std::shared_ptr<Scene> nextScene();
