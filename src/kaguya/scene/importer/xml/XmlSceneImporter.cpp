@@ -225,6 +225,11 @@ namespace kaguya {
                     material = createGlassMaterial(parseInfo);
                 } else if (type == "roughconductor") {
                     material = createRoughConductorMaterial(parseInfo);
+                } else if (type == "twosided") {
+                    ASSERT(parseInfo.currentMaterial != nullptr,
+                           "BSDF twosided should have {currentMaterial} attribute. ");
+                    material = parseInfo.currentMaterial;
+                    material->setTwoSided(true);
                 } else {
                     ASSERT(false, "Material " + type + " not supported for now");
                 }

@@ -51,7 +51,7 @@ namespace kaguya {
 
             typedef struct XmlParseInfo {
                 Transform transformMat;
-                Material::Ptr currentMaterial;
+                Material::Ptr currentMaterial = nullptr;
                 bool hasAreaLight = false;
 
                 XmlAttrVal get(std::string name) {

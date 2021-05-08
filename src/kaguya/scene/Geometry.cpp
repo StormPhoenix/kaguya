@@ -27,7 +27,13 @@ namespace kaguya {
                 // medium
                 si.setMediumBoundary(MediumBoundary(_inside.get(), _outside.get()));
                 // material
-                _material != nullptr ? si.setMaterial(_material.get()) : si.setMaterial(nullptr);
+                if (_material != nullptr) {
+                    if (_material->isTwoSided() || (DOT(ray.getDirection(), si.normal) < 0)) {
+                        si.setMaterial(_material.get());
+                    }
+                } else {
+                    si.setMaterial(nullptr);
+                }
                 // area light
                 _areaLight != nullptr ? si.setAreaLight(_areaLight.get()) : si.setAreaLight(nullptr);
             }

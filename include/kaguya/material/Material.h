@@ -46,6 +46,17 @@ namespace kaguya {
                 return false;
             }
 
+            virtual bool isTwoSided() const {
+                return _twoSided;
+            }
+
+            virtual void setTwoSided(bool twoSided) {
+                _twoSided = twoSided;
+            }
+
+        protected:
+            bool _twoSided = true;
+
         };
 
     }
