@@ -175,48 +175,52 @@ namespace kaguya {
 
             std::atomic<int> nFinished(0);
 
-            auto renderFunc = [&](const int idxTileX, const int idxTileY) -> void {
+            int nIterations = Config::Tracer::sampleNum;
+            for (int iter = 0; iter < nIterations; iter++) {
+                auto renderFunc = [&](const int idxTileX, const int idxTileY) -> void {
+                    int startRow = idxTileY * Config::Parallel::tileSize;
+                    int endRow = std::min(startRow + Config::Parallel::tileSize - 1, height - 1);
 
-                int startRow = idxTileY * Config::Parallel::tileSize;
-                int endRow = std::min(startRow + Config::Parallel::tileSize - 1, height - 1);
+                    int startCol = idxTileX * Config::Parallel::tileSize;
+                    int endCol = std::min(startCol + Config::Parallel::tileSize - 1, width - 1);
 
-                int startCol = idxTileX * Config::Parallel::tileSize;
-                int endCol = std::min(startCol + Config::Parallel::tileSize - 1, width - 1);
+                    MemoryArena arena;
+                    Sampler *sampler = sampler::SamplerFactory::newSampler(Config::Tracer::sampleNum);
+                    for (int row = startRow; row <= endRow; row++) {
+                        for (int col = startCol; col <= endCol; col++) {
+                            // set current sampling pixel
+                            sampler->forPixel(Point2F(row, col));
+                            sampler->setCurrentSeed(iter);
 
-                Sampler *sampler = sampler::SamplerFactory::newSampler(Config::Tracer::sampleNum);
-                for (int row = startRow; row <= endRow; row++) {
-                    for (int col = startCol; col <= endCol; col++) {
-                        // set current sampling pixel
-                        sampler->forPixel(Point2F(row, col));
-//                        sampler->setCurrentSeed(idxTileY * nTileX + idxTileX);
-
-                        Spectrum ans = {0};
-                        const Float sampleWeight = 1.0 / Config::Tracer::sampleNum;
-                        // 做 _samplePerPixel 次采样
-                        for (int sampleCount = 0; sampleCount < Config::Tracer::sampleNum; sampleCount++) {
-                            MemoryArena arena;
                             Float pixelX = col + sampler->sample1D();
                             Float pixelY = row + sampler->sample1D();
                             Ray sampleRay = _camera->generateRay(pixelX, pixelY, sampler);
                             Spectrum shaderColor = shaderOfProgression(sampleRay, _scene, sampler, arena);
 
-                            ans += shaderColor;
+                            _filmPlane->addSpectrum(shaderColor, row, col);
                             arena.clean();
-                            sampler->nextSampleRound();
                         }
-                        ans *= sampleWeight;
-                        _filmPlane->setSpectrum(ans, row, col);
                     }
-                }
-                delete sampler;
-
+                    delete sampler;
+                };
+                parallel::parallelFor2D(renderFunc, Point2I(nTileX, nTileY));
                 nFinished++;
-                std::cout << "\r" << float(nFinished) * 100 / (nTileX * nTileY) << " %"
-                          << std::flush;
-            };
+                std::cout << "\r" << float(nFinished) * 100 / (nIterations) << " %" << std::flush;
 
-            parallel::parallelFor2D(renderFunc, Point2I(nTileX, nTileY));
-            writeImage();
+                // Write image frequently
+                if ((Config::writeFrequency > 0 && (iter + 1) % Config::writeFrequency == 0) ||
+                    iter == nIterations - 1) {
+                    Float sampleWeight = 1.0 / (iter + 1);
+                    std::string suffixSSP;
+                    std::stringstream ss;
+                    ss << "_SSP" << iter + 1 << "_";
+                    ss >> suffixSSP;
+
+                    _filmPlane->writeImage((Config::filenamePrefix + suffixSSP + _scene->getName()).c_str(),
+                                           sampleWeight);
+                }
+            }
+            writeImage(Config::filenamePrefix + "_" + _scene->getName(), 1.0 / nIterations);
         }
 
         Spectrum PathTracer::background(const Ray &ray) {

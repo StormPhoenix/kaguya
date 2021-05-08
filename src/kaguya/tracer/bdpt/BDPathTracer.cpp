@@ -83,17 +83,16 @@ namespace kaguya {
                 if ((Config::writeFrequency > 0 && (iter + 1) % Config::writeFrequency == 0) ||
                     iter == nIterations - 1) {
                     Float sampleWeight = 1.0 / (iter + 1);
-                    bool lastIteration = (iter == nIterations - 1);
                     std::string suffixSSP;
                     std::stringstream ss;
                     ss << "_SSP" << iter + 1 << "_";
                     ss >> suffixSSP;
 
-                    _filmPlane->writeImage((Config::filenamePrefix + (lastIteration ? "" : suffixSSP) +
-                                            _scene->getName()).c_str(),
+                    _filmPlane->writeImage((Config::filenamePrefix + suffixSSP + _scene->getName()).c_str(),
                                            sampleWeight);
                 }
             }
+            writeImage(Config::filenamePrefix + "_" + _scene->getName(), 1.0 / nIterations);
         }
 
         void BDPathTracer::init() {

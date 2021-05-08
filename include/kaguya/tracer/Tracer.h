@@ -48,7 +48,7 @@ namespace kaguya {
             virtual Spectrum evaluateDirectLight(std::shared_ptr<Scene> scene, const Interaction &eye,
                                                  const std::shared_ptr<Light> light, Sampler *sampler);
 
-            virtual void writeImage(Float weight = 1.0f);
+            virtual void writeImage(std::string filename, Float weight = 1.0f);
 
         private:
             // Rendering implementation

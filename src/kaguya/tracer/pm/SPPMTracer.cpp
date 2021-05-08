@@ -488,7 +488,7 @@ namespace kaguya {
             }
 
             // write to image
-            writeImage();
+            writeImage(Config::filenamePrefix + "_" + _scene->getName());
         }
     }
 }
