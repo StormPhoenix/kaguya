@@ -263,8 +263,9 @@ namespace kaguya {
             Material::Ptr XmlSceneImporter::createGlassMaterial(XmlParseInfo &info) {
                 Float extIOR = 1.;
                 Float intIOR = 1.5;
-                Texture<Spectrum>::Ptr texture = std::make_shared<ConstantTexture<Spectrum>>(1.0);
-                return std::make_shared<Dielectric>(texture, extIOR, intIOR);
+                Texture<Spectrum>::Ptr texR = std::make_shared<ConstantTexture<Spectrum>>(1.0);
+                Texture<Spectrum>::Ptr texT = std::make_shared<ConstantTexture<Spectrum>>(1.0);
+                return std::make_shared<Dielectric>(texR, texT, extIOR, intIOR);
             }
 
             Material::Ptr XmlSceneImporter::createDielectricMaterial(XmlParseInfo &info) {
@@ -279,8 +280,9 @@ namespace kaguya {
                 // thetaI
                 Float extIOR = info.getFloatValue("extIOR", 1.5);
                 // 临时用 1.0 spectrum 代替
-                Texture<Spectrum>::Ptr texture = std::make_shared<ConstantTexture<Spectrum>>(1.0);
-                material = std::make_shared<Dielectric>(texture, extIOR, intIOR);
+                Texture<Spectrum>::Ptr texR = std::make_shared<ConstantTexture<Spectrum>>(1.0);
+                Texture<Spectrum>::Ptr texT = std::make_shared<ConstantTexture<Spectrum>>(1.0);
+                material = std::make_shared<Dielectric>(texR, texT, extIOR, intIOR);
                 return material;
             }
 

@@ -15,11 +15,12 @@ namespace kaguya {
              */
             class BXDFSpecular : public BXDF {
             public:
-                BXDFSpecular(const Spectrum &albedo, Float thetaI, Float thetaT,
+                BXDFSpecular(const Spectrum &reflectance,
+                             const Spectrum &transmittance,
+                             Float thetaI, Float thetaT,
                              TransportMode mode = TransportMode::RADIANCE);
 
                 // TODO add constructor method for Fresnel *
-
                 virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
 
                 virtual Spectrum sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
@@ -30,7 +31,8 @@ namespace kaguya {
             private:
                 Float _thetaI;
                 Float _thetaT;
-                Spectrum _albedo;
+                Spectrum _reflectance;
+                Spectrum _transmittance;
                 const TransportMode _mode;
             };
         }

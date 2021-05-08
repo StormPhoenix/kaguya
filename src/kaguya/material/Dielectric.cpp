@@ -11,13 +11,8 @@ namespace kaguya {
         using core::bsdf::BSDF;
         using core::bsdf::BXDFSpecular;
 
-        Dielectric::Dielectric(std::shared_ptr<Texture<Spectrum>> albedo) : Dielectric(albedo, 1.5) {}
-
-        Dielectric::Dielectric(std::shared_ptr<Texture<Spectrum>> albedo, Float refractiveIndex)
-                : _thetaI(1.), _thetaT(refractiveIndex), _albedo(albedo) {}
-
-        Dielectric::Dielectric(std::shared_ptr<Texture<Spectrum>> albedo, Float thetaI, Float thetaT)
-                : _thetaI(thetaI), _thetaT(thetaT), _albedo(albedo) {}
+        Dielectric::Dielectric(const Texture<Spectrum>::Ptr R, const Texture<Spectrum>::Ptr T,
+                               Float etaI, Float etaT) : _R(R), _T(T), _etaI(etaI), _etaT(etaT) {}
 
         bool Dielectric::isSpecular() const {
             return true;
@@ -25,8 +20,9 @@ namespace kaguya {
 
         void Dielectric::computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
                                                     TransportMode mode) {
-            Spectrum albedo = _albedo->evaluate(insect);
-            BXDFSpecular *specularBXDF = ALLOC(memoryArena, BXDFSpecular)(albedo, _thetaI, _thetaT, mode);
+            Spectrum R = _R->evaluate(insect);
+            Spectrum T = _T->evaluate(insect);
+            BXDFSpecular *specularBXDF = ALLOC(memoryArena, BXDFSpecular)(R, T, _etaI, _etaT, mode);
             insect.bsdf = ALLOC(memoryArena, BSDF)(insect);
             insect.bsdf->addBXDF(specularBXDF);
         }

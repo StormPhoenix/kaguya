@@ -42,7 +42,7 @@ namespace kaguya {
         void SubsurfaceMaterial::computeScatteringFunctions(SurfaceInteraction &si, MemoryArena &memoryArena, TransportMode mode) {
 
             si.bsdf = ALLOC(memoryArena, BSDF)(si);
-            si.bsdf->addBXDF(ALLOC(memoryArena, BXDFSpecular)(1.0f, 1.0f, _theta, mode));
+            si.bsdf->addBXDF(ALLOC(memoryArena, BXDFSpecular)(1.0f, 1.0f, 1.0f, _theta, mode));
 
             Spectrum sigma_a, sigma_s;
             subsurfaceFromDiffuse(_table, _albedoEff, _meanFreePath, &sigma_a, &sigma_s);

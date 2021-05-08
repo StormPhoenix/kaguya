@@ -357,7 +357,7 @@ namespace kaguya {
             std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
+            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, totalWhite, 1, 1.5);
             std::shared_ptr<Material> metal = std::make_shared<Mirror>();
 
             std::shared_ptr<Medium> airMedium = nullptr;
@@ -486,7 +486,7 @@ namespace kaguya {
             std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
+            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, totalWhite, 1, 1.5);
             std::shared_ptr<Material> metal = std::make_shared<Mirror>();
 
 //            std::shared_ptr<Medium> airMedium = testAirMedium();
@@ -592,7 +592,7 @@ namespace kaguya {
             std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
             std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
+            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, totalWhite, 1, 1.5);
             std::shared_ptr<Material> metal = std::make_shared<Mirror>();
 
 //            std::shared_ptr<Medium> airMedium = testAirMedium();

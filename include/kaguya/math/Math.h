@@ -196,7 +196,7 @@ namespace kaguya {
         inline Float fresnelDielectric(Float cosineI, Float thetaI, Float thetaT) {
             cosineI = clamp(cosineI, -1, 1);
             if (cosineI < 0) {
-                // 内部射入
+                // Traver form inner
                 cosineI = std::abs(cosineI);
                 std::swap(thetaI, thetaT);
             }
@@ -205,7 +205,7 @@ namespace kaguya {
             Float sineT = sineI * (thetaI / thetaT);
 
             if (sineT >= 1) {
-                // 全反射
+                // Totally reflection
                 return 1.0f;
             }
 
@@ -313,12 +313,12 @@ namespace kaguya {
          * @param wi
          * @return
          */
-        inline bool refract(const Vector3F &wo, const Vector3F &normal, Float refraction, Vector3F *wi) {
+        inline bool refract(const Vector3F &wo, const Normal3F &normal, Float refraction, Vector3F *wi) {
             Float cosineThetaI = DOT(wo, normal);
             Float sineThetaI = std::sqrt((std::max)(Float(0.), 1 - cosineThetaI * cosineThetaI));
             Float sineThetaT = refraction * sineThetaI;
-            if (sineThetaT > 1) {
-                // 全反射，无法折射
+            if (sineThetaT >= 1) {
+                // Can't do refraction
                 return false;
             }
 

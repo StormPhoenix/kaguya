@@ -11,9 +11,11 @@ namespace kaguya {
     namespace core {
         namespace bsdf {
             // TODO albedo -> Reflectance and Transmittance
-            BXDFSpecular::BXDFSpecular(const Spectrum &albedo, Float thetaI, Float thetaT, TransportMode mode) :
+            BXDFSpecular::BXDFSpecular(const Spectrum &reflectance, const Spectrum &transmittance,
+                                       Float thetaI, Float thetaT, TransportMode mode) :
                     BXDF(BXDFType(BSDF_SPECULAR | BSDF_REFLECTION | BSDF_TRANSMISSION)),
-                    _albedo(albedo), _thetaI(thetaI), _thetaT(thetaT), _mode(mode) {}
+                    _reflectance(reflectance), _transmittance(transmittance),
+                    _thetaI(thetaI), _thetaT(thetaT), _mode(mode) {}
 
             Spectrum BXDFSpecular::f(const Vector3F &wo, const Vector3F &wi) const {
                 return Spectrum(0.0);
@@ -28,10 +30,9 @@ namespace kaguya {
                 // Fresnel 的近似计算
 //            Float reflectProb = math::schlick(cosine, _thetaI / _thetaT);
 
-                // 随机采样是否反射
                 Float random = sampler->sample1D();
                 if (random < reflectProb) {
-                    // 设置散射类型
+                    // Reflection
                     if (sampleType != nullptr) {
                         *sampleType = BXDFType(BSDF_SPECULAR | BSDF_REFLECTION);
                     }
@@ -42,29 +43,27 @@ namespace kaguya {
                     if ((*wi).y == 0) {
                         return 0;
                     }
-                    return reflectProb * _albedo / abs(wi->y);
+                    return reflectProb * _reflectance / abs(wi->y);
                 } else {
-                    // 折射
-                    Float refraction;
-                    // 法向
+                    // Refraction
                     Vector3F normal = Vector3F(0.0, 1.0, 0.0);
-                    // 判断射入方向
+                    Float refraction;
                     if (wo.y > 0) {
-                        // 外部射入
+                        // Travel from outer
                         refraction = _thetaI / _thetaT;
                     } else {
-                        // 内部射入
+                        // Travel from inner
                         refraction = _thetaT / _thetaI;
                         normal.y *= -1;
                     }
 
                     if (!math::refract(wo, normal, refraction, wi)) {
-                        // 全反射
+                        // Totally reflection
                         return 0;
                     }
 
                     *pdf = 1 - reflectProb;
-                    Spectrum f = _albedo * (Spectrum(1.0) - reflectProb) / std::abs(wi->y);
+                    Spectrum f = _transmittance * (1.0 - reflectProb) / std::abs(wi->y);
                     if (_mode == RADIANCE) {
                         f *= std::pow(refraction, 2);
                     }

@@ -224,7 +224,6 @@ namespace kaguya {
         int BDPathTracer::generateCameraPath(std::shared_ptr<Scene> scene, const Ray &ray,
                                              std::shared_ptr<Camera> camera, PathVertex *cameraSubPath,
                                              int maxDepth, Sampler *sampler, MemoryArena &memoryArena) {
-            TransportMode mode = TransportMode::RADIANCE;
             assert(cameraSubPath != nullptr);
             // 初始 beta
             Spectrum beta = Spectrum(1.0);
