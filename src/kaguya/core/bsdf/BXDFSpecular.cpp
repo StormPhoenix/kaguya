@@ -26,7 +26,7 @@ namespace kaguya {
                 Float cosine = wo.y;
                 // 计算反射概率
                 // TODO move reflect probabilty computation to fresnel
-                Float reflectProb = math::fresnelDielectric(cosine, _thetaI, _thetaT);
+                Float reflectProb = math::fresnel::fresnelDielectric(cosine, _thetaI, _thetaT);
                 // Fresnel 的近似计算
 //            Float reflectProb = math::schlick(cosine, _thetaI / _thetaT);
 

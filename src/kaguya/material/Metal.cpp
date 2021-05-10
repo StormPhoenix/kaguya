@@ -13,12 +13,12 @@ namespace kaguya {
         using core::bsdf::BXDFMicrofacetReflection;
         using core::bsdf::microfacet::BeckmannDistribution;
 
-        Metal::Metal(const Texture<Float>::Ptr alpha, const Texture<Spectrum>::Ptr eta, const Texture<Spectrum>::Ptr R,
+        Metal::Metal(const Texture<Float>::Ptr alpha, const Texture<Spectrum>::Ptr eta, const Texture<Spectrum>::Ptr Ks,
                      const Texture<Spectrum>::Ptr K, std::string distributionType) :
-                _alpha(alpha), _eta(eta), _R(R), _K(K), _distributionType(distributionType) {
+                _alpha(alpha), _eta(eta), _Ks(Ks), _K(K), _distributionType(distributionType) {
             ASSERT(_alpha != nullptr, "Alpha is nullptr. ");
             ASSERT(_eta != nullptr, "Eta is nullptr. ");
-            ASSERT(_R != nullptr, "R is nullptr. ");
+            ASSERT(_Ks != nullptr, "R is nullptr. ");
             ASSERT(_K != nullptr, "K is nullptr. ");
         }
 
@@ -34,7 +34,7 @@ namespace kaguya {
                 const Spectrum k = _K->evaluate(insect);
                 const FresnelConductor *fresnel = ALLOC(memoryArena, FresnelConductor)(Spectrum(1.), thetaT, k);
 
-                Spectrum reflectance = _R->evaluate(insect);
+                Spectrum reflectance = _Ks->evaluate(insect);
                 BSDF *bsdf = ALLOC(memoryArena, BSDF)(insect);
                 BXDF *bxdf = ALLOC(memoryArena, BXDFMicrofacetReflection)(reflectance, distribution, fresnel);
                 bsdf->addBXDF(bxdf);

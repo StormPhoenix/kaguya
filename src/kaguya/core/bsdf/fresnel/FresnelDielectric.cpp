@@ -9,7 +9,7 @@ namespace kaguya {
         namespace bsdf {
             namespace fresnel {
                 Spectrum FresnelDielectric::fresnel(Float cosineTheta) const {
-                    return math::fresnelDielectric(cosineTheta, _thetaI, _thetaT);
+                    return math::fresnel::fresnelDielectric(cosineTheta, _thetaI, _thetaT);
                 }
             }
         }

@@ -186,37 +186,51 @@ namespace kaguya {
             return INV_4PI * (1 - g * g) / (denominator * std::sqrt(denominator));
         }
 
-        /**
-         * 计算非导体（玻璃、水晶等）的反射概率
-         * @param cosineI 值的正负用于表示内部、外部射入
-         * @param thetaI
-         * @param thetaT
-         * @return
-         */
-        inline Float fresnelDielectric(Float cosineI, Float thetaI, Float thetaT) {
-            cosineI = clamp(cosineI, -1, 1);
-            if (cosineI < 0) {
-                // Traver form inner
-                cosineI = std::abs(cosineI);
-                std::swap(thetaI, thetaT);
+        namespace fresnel {
+            // Compute reflection probability of dielectric material
+            inline Float fresnelDielectric(Float cosThetaI, Float etaI, Float etaT) {
+                cosThetaI = clamp(cosThetaI, -1, 1);
+                if (cosThetaI < 0) {
+                    // Traver form inner
+                    cosThetaI = std::abs(cosThetaI);
+                    std::swap(etaI, etaT);
+                }
+
+                Float sineI = std::sqrt((std::max)(Float(0.), Float(1 - std::pow(cosThetaI, 2))));
+                Float sineT = sineI * (etaI / etaT);
+
+                if (sineT >= 1) {
+                    // Totally reflection
+                    return 1.0f;
+                }
+
+                Float cosineT = std::sqrt((std::max)(Float(0.), Float(1 - std::pow(sineT, 2))));
+                // 计算 R_parallel
+                Float parallelR = ((etaT * cosThetaI) - (etaI * cosineT)) /
+                                  ((etaT * cosThetaI) + (etaI * cosineT));
+                Float perpendicularR = ((etaI * cosThetaI) - (etaT * cosineT)) /
+                                       ((etaI * cosThetaI) + (etaT * cosineT));
+                return 0.5 * (parallelR * parallelR + perpendicularR * perpendicularR);
             }
 
-            Float sineI = std::sqrt((std::max)(Float(0.), Float(1 - std::pow(cosineI, 2))));
-            Float sineT = sineI * (thetaI / thetaT);
+            // Fresnel schlick approximation
+            inline Float fresnelSchlick(Float cosine, Float ref_idx) {
+                if (cosine < 0) {
+                    ref_idx = 1 / ref_idx;
+                    cosine = -cosine;
+                }
 
-            if (sineT >= 1) {
-                // Totally reflection
-                return 1.0f;
+                Float sine = std::sqrt((std::max)(Float(0.), Float(1 - std::pow(cosine, 2))));
+                if (sine * ref_idx >= 1) {
+                    return 1.0;
+                }
+
+                auto r0 = (1 - ref_idx) / (1 + ref_idx);
+                r0 = r0 * r0;
+                return r0 + (1 - r0) * pow((1 - cosine), 5);
             }
-
-            Float cosineT = std::sqrt((std::max)(Float(0.), Float(1 - std::pow(sineT, 2))));
-            // 计算 R_parallel
-            Float parallelR = ((thetaT * cosineI) - (thetaI * cosineT)) /
-                              ((thetaT * cosineI) + (thetaI * cosineT));
-            Float perpendicularR = ((thetaI * cosineI) - (thetaT * cosineT)) /
-                                   ((thetaI * cosineI) + (thetaT * cosineT));
-            return 0.5 * (parallelR * parallelR + perpendicularR * perpendicularR);
         }
+
 
         inline bool checkRange(Float num, Float min, Float max) {
             return num >= min && num <= max;
@@ -251,22 +265,6 @@ namespace kaguya {
             *stepMin = t0;
             *stepMax = t1;
             return true;
-        }
-
-        inline Float schlick(Float cosine, Float ref_idx) {
-            if (cosine < 0) {
-                ref_idx = 1 / ref_idx;
-                cosine = -cosine;
-            }
-
-            Float sine = std::sqrt((std::max)(Float(0.), Float(1 - std::pow(cosine, 2))));
-            if (sine * ref_idx >= 1) {
-                return 1.0;
-            }
-
-            auto r0 = (1 - ref_idx) / (1 + ref_idx);
-            r0 = r0 * r0;
-            return r0 + (1 - r0) * pow((1 - cosine), 5);
         }
 
         Float randomDouble(Float min, Float max, Sampler *const sampler);
@@ -492,6 +490,10 @@ namespace kaguya {
 
             inline Float cosTheta(const Vector3F &v) {
                 return v.y;
+            }
+
+            inline Float absCosTheta(const Vector3F &v) {
+                return std::abs(v.y);
             }
 
             inline Float cosTheta2(const Vector3F &v) {

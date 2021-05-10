@@ -65,7 +65,7 @@ namespace kaguya {
 
             Spectrum SeparableBSSRDF::S(const SurfaceInteraction &si, const Vector3F &wi) {
                 Float cosTheta = ABS_DOT(po.direction, po.normal);
-                Float ft = math::fresnelDielectric(cosTheta, 1, _theta);
+                Float ft = math::fresnel::fresnelDielectric(cosTheta, 1, _theta);
                 // TODO  wi 是什么坐标系
                 return (1 - ft) * Sp(si) * subsurfaceWi(wi);
             }
@@ -214,7 +214,7 @@ namespace kaguya {
             Spectrum SeparableBSSRDF::subsurfaceWi(const Vector3F &wi) const {
                 // TODO 参考 Fresnel 积分
                 Float c = 1 - 2 * fresnelMoment1(1.0 / _theta);
-                return (1 - math::fresnelDielectric(wi.y, 1.0, _theta)) / (c * math::PI);
+                return (1 - math::fresnel::fresnelDielectric(wi.y, 1.0, _theta)) / (c * math::PI);
             }
         }
     }

@@ -7,11 +7,11 @@
 namespace kaguya {
     namespace core {
         namespace bsdf {
-            BXDFMicrofacetReflection::BXDFMicrofacetReflection(const Spectrum &reflectance,
+            BXDFMicrofacetReflection::BXDFMicrofacetReflection(const Spectrum &specularReflectance,
                                                                const MicrofacetDistribution *microfacetDistribution,
                                                                const Fresnel *fresnel) :
                     BXDF(BXDFType(BSDF_REFLECTION | BSDF_GLOSSY)),
-                    _reflectance(reflectance),
+                    _specularReflectance(specularReflectance),
                     _microfacetDistribution(microfacetDistribution),
                     _fresnel(fresnel) {
                 ASSERT(_microfacetDistribution != nullptr, "MicrofacetDistribution can't be nullptr. ");
@@ -36,7 +36,7 @@ namespace kaguya {
                 Float cosThetaH = DOT(wi, wh);
                 Spectrum Fr = _fresnel->fresnel(cosThetaH);
 
-                return (D_Wh * G_Wo_Wi * Fr * _reflectance) / (4 * cosThetaO * cosThetaI);
+                return (D_Wh * G_Wo_Wi * Fr * _specularReflectance) / (4 * cosThetaO * cosThetaI);
             }
 
             Spectrum BXDFMicrofacetReflection::sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,

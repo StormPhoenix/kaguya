@@ -24,6 +24,7 @@ namespace kaguya {
                     virtual ~Fresnel() {};
                 };
 
+                // TODO 所有 fresnel 相关计算整合在一起·
                 inline Spectrum fresnelConductor(Float cosineI, const Spectrum &thetaI,
                                                  const Spectrum &thetaT, const Spectrum &k) {
                     cosineI = math::clamp(cosineI, -1, 1);

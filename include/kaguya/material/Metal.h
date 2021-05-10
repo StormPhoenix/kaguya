@@ -19,7 +19,7 @@ namespace kaguya {
         public:
             Metal(const Texture<Float>::Ptr alpha,
                   const Texture<Spectrum>::Ptr eta,
-                  const Texture<Spectrum>::Ptr R,
+                  const Texture<Spectrum>::Ptr Ks,
                   const Texture<Spectrum>::Ptr K,
                   std::string distributionType = "beckmann");
 
@@ -30,7 +30,7 @@ namespace kaguya {
             std::string _distributionType;
             const Texture<Float>::Ptr _alpha;
             const Texture<Spectrum>::Ptr _eta;
-            const Texture<Spectrum>::Ptr _R;
+            const Texture<Spectrum>::Ptr _Ks;
             const Texture<Spectrum>::Ptr _K;
         };
     }

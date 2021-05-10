@@ -29,7 +29,7 @@ namespace kaguya {
 
                     // Add contribution of single scattering at depth $t$
                     Ess += rho * std::exp(-sigma_t * (d + tCrit)) / (d * d) *
-                           math::phaseFuncHG(cosThetaO, g) * (1 - math::fresnelDielectric(-cosThetaO, 1, theta)) *
+                           math::phaseFuncHG(cosThetaO, g) * (1 - math::fresnel::fresnelDielectric(-cosThetaO, 1, theta)) *
                            std::abs(cosThetaO);
                 }
                 return Ess / nSamples;

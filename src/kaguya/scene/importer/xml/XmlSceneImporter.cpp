@@ -9,6 +9,7 @@
 #include <kaguya/scene/Cube.h>
 #include <kaguya/material/texture/Texture.h>
 #include <kaguya/material/texture/ConstantTexture.h>
+#include <kaguya/material/CoatingMaterial.h>
 #include <kaguya/material/Lambertian.h>
 #include <kaguya/material/Dielectric.h>
 #include <kaguya/material/Mirror.h>
@@ -230,6 +231,8 @@ namespace kaguya {
                            "BSDF twosided should have {currentMaterial} attribute. ");
                     material = parseInfo.currentMaterial;
                     material->setTwoSided(true);
+                } else if (type == "coating") {
+                    material = createCoatingMaterial(parseInfo);
                 } else {
                     ASSERT(false, "Material " + type + " not supported for now");
                 }
@@ -266,6 +269,25 @@ namespace kaguya {
                 Texture<Spectrum>::Ptr texR = std::make_shared<ConstantTexture<Spectrum>>(1.0);
                 Texture<Spectrum>::Ptr texT = std::make_shared<ConstantTexture<Spectrum>>(1.0);
                 return std::make_shared<Dielectric>(texR, texT, extIOR, intIOR);
+            }
+
+            Material::Ptr XmlSceneImporter::createCoatingMaterial(XmlParseInfo &info) {
+                Material::Ptr material = nullptr;
+
+                ASSERT(info.getType("diffuseReflectance") == XmlAttrVal::Attr_Spectrum &&
+                       info.getType("specularReflectance") == XmlAttrVal::Attr_Spectrum &&
+                       info.getType("alpha") == XmlAttrVal::Attr_Float,
+                       "CoatingMaterial parameter error: type not supported");
+
+                auto diffuseReflectance = info.getSpectrumValue("diffuseReflectance", Spectrum(1.0));
+                auto specularReflectance = info.getSpectrumValue("specularReflectance", Spectrum(1.0));
+                auto alpha = info.getFloatValue("alpha", 0.1);
+
+                Texture<Spectrum>::Ptr Kd = std::make_shared<ConstantTexture<Spectrum>>(diffuseReflectance);
+                Texture<Spectrum>::Ptr Ks = std::make_shared<ConstantTexture<Spectrum>>(specularReflectance);
+                Texture<Float>::Ptr roughness = std::make_shared<ConstantTexture<Float>>(alpha);
+                material = std::make_shared<CoatingMaterial>(Kd, Ks, roughness);
+                return material;
             }
 
             Material::Ptr XmlSceneImporter::createDielectricMaterial(XmlParseInfo &info) {

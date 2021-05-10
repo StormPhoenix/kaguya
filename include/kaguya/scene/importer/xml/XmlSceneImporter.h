@@ -90,6 +90,8 @@ namespace kaguya {
 
                 Material::Ptr createRoughConductorMaterial(XmlParseInfo &info);
 
+                Material::Ptr createCoatingMaterial(XmlParseInfo &info);
+
             private:
                 std::map<std::string, TagType> _nodeTypeMap;
                 std::shared_ptr<Scene> _scene;
