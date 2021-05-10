@@ -482,13 +482,14 @@ namespace kaguya {
                                 _filmPlane->setSpectrum(L, row, col);
                             }
                         }
-                    }
 
-                    std::string suffixSSP;
-                    std::stringstream ss;
-                    ss << "_SSP" << iter + 1 << "_";
-                    ss >> suffixSSP;
-                    writeImage(Config::filenamePrefix + suffixSSP + _scene->getName());
+                        // Write
+                        std::string suffixSSP;
+                        std::stringstream ss;
+                        ss << "_SSP" << iter + 1 << "_";
+                        ss >> suffixSSP;
+                        writeImage(Config::filenamePrefix + suffixSSP + _scene->getName());
+                    }
                 }
 
                 for (int i = 0; i < memoryArenaPerThread.size(); i++) {

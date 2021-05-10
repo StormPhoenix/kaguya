@@ -354,7 +354,7 @@ namespace kaguya {
 
                 // face normal
                 bool faceNormal = false;
-                faceNormal = info.getBoolValue("faceNormals", faceNormal);
+                faceNormal = info.getBoolValue("faceNormals", false);
 
                 std::string filename = info.getStringValue("filename", "");
                 ASSERT(filename != "", "Obj filename can't be empty. ");

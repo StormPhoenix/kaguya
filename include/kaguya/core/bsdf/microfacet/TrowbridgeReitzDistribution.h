@@ -14,7 +14,7 @@ namespace kaguya {
 
                 class TrowbridgeReitzDistribution : public MicrofacetDistribution {
                 public:
-
+                    // TODO
                 };
 
             }
