@@ -41,6 +41,9 @@ A simple physically based render.
 
 - [ ] BSDF 局部坐标系代码重构，不然可能会影响各向异性材质
 
+- Sampling
+- [ ] Sampler 和 sampling 方法单独放在不同文件，不要挤在 math.h 里面
+
 - Scene
 - [ ] Material-testball 场景渲染错误
     - [x] 环境光照没有生效，mirror 反射全是黑色

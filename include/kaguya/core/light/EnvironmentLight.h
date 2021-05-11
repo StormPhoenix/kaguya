@@ -8,12 +8,14 @@
 #include <kaguya/core/light/Light.h>
 #include <kaguya/core/Transform.h>
 #include <kaguya/scene/Scene.h>
+#include <kaguya/math/Distribution.h>
 
 namespace kaguya {
     namespace core {
 
         using namespace transform;
         using namespace scene;
+        using math::sampling::Distribution2D;
 
         // TODO 对纹理图的重要性采样 ...
 
@@ -48,9 +50,13 @@ namespace kaguya {
             Transform::Ptr _worldToLight = nullptr;
             Float _worldRadius = 20000;
             Point3F _worldCenter;
+
             // Texture
             std::unique_ptr<RGBSpectrum[]> _texture = nullptr;
             int _width, _height;
+
+            // Texture distribution
+            std::unique_ptr<Distribution2D> _textureDistribution;
         };
     }
 }

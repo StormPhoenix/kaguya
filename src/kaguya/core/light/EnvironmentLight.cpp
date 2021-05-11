@@ -3,8 +3,8 @@
 //
 
 #include <kaguya/math/Math.h>
-#include <kaguya/core/light/EnvironmentLight.h>
 #include <kaguya/utils/ImageReader.h>
+#include <kaguya/core/light/EnvironmentLight.h>
 
 namespace kaguya {
     namespace core {
@@ -26,6 +26,18 @@ namespace kaguya {
             }
             _worldToLight = _lightToWorld->inverse().ptr();
             _texture = io::readImage(texturePath.c_str(), &_width, &_height);
+
+            std::unique_ptr<Float[]> sampleFunction(new Float[_width * _height]);
+            int sampleChannel = 1;
+            for (int row = 0; row < _height; row++) {
+                for (int col = 0; col < _width; col++) {
+                    int offset = row * _width + col;
+                    Float sinTheta = std::sin(Float(row) / _height * math::PI);
+                    sampleFunction[offset] = _texture[offset][sampleChannel] * sinTheta;
+                }
+            }
+
+            _textureDistribution.reset(new Distribution2D(sampleFunction.get(), _width, _height));
         }
 
         Spectrum EnvironmentLight::Le(const Ray &ray) const {
@@ -55,10 +67,16 @@ namespace kaguya {
 
             *wi = _lightToWorld->transformVector({sinTheta * cosPhi, sinTheta * sinPhi, cosTheta});
             *wi = NORMALIZE(*wi);
+
+            // Sample pdf
+            Float samplePdf = 0.;
+            _textureDistribution->sampleContinuous(&samplePdf, sampler);
+
             if (sinTheta == 0) {
                 *pdf = 0;
             } else {
-                *pdf = 1.0 / (2 * math::PI * math::PI * sinTheta);
+                // Jacobi correction
+                *pdf = samplePdf / (2 * math::PI * math::PI * sinTheta);
             }
 
             *visibilityTester = VisibilityTester(eye, Interaction(
@@ -81,6 +99,7 @@ namespace kaguya {
             if (sinTheta == 0) {
                 return 0;
             } else {
+                // Jacobi correction
                 return 1.0 / (2 * math::PI * math::PI * sinTheta);
             }
         }
