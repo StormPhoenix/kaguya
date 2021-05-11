@@ -134,11 +134,21 @@ namespace kaguya {
                     // create RGBs...
                     rgb = new RGBSpectrum[width * height];
                     if (nChannels == 1) {
-                        for (int i = 0; i < width * height; ++i) rgb[i] = RGBSpectrum(data[i]);
+                        for (int j = 0; j < height; j++) {
+                            for (int i = 0; i < width; i++) {
+                                int rgbOffset = ((height - j - 1) * width) + i;
+                                int imageOffset = j * width + i;
+                                rgb[imageOffset] = RGBSpectrum(data[rgbOffset]);
+                            }
+                        }
                     } else {
-                        for (int i = 0; i < width * height; ++i) {
-                            Float frgb[3] = {data[3 * i], data[3 * i + 1], data[3 * i + 2]};
-                            rgb[i] = RGBSpectrum::fromRGB(frgb);
+                        for (int j = 0; j < height; j++) {
+                            for (int i = 0; i < width; i++) {
+                                int rgbOffset = ((height - j - 1) * width) + i;
+                                Float frgb[3] = {data[3 * rgbOffset], data[3 * rgbOffset + 1], data[3 * rgbOffset + 2]};
+                                int imageOffset = j * width + i;
+                                rgb[imageOffset] = RGBSpectrum::fromRGB(frgb);
+                            }
                         }
                     }
 

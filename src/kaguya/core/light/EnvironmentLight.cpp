@@ -43,6 +43,7 @@ namespace kaguya {
         Spectrum EnvironmentLight::sampleLi(const Interaction &eye, Vector3F *wi,
                                             Float *pdf, Sampler *sampler,
                                             VisibilityTester *visibilityTester) {
+            // TODO Uniform sampling
             Point2F uv = sampler->sample2D();
             Float theta = math::PI * uv.y;
             Float phi = 2 * math::PI * uv.x;
