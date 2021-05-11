@@ -11,7 +11,8 @@
 #include <kaguya/material/texture/Texture.h>
 #include <kaguya/material/texture/ConstantTexture.h>
 #include <kaguya/material/texture/ChessboardTexture.h>
-#include <kaguya/material/CoatingMaterial.h>
+#include <kaguya/material/PatinaMaterial.h>
+#include <kaguya/material/PlasticMaterial.h>
 #include <kaguya/material/Lambertian.h>
 #include <kaguya/material/Dielectric.h>
 #include <kaguya/material/Mirror.h>
@@ -250,6 +251,8 @@ namespace kaguya {
                     material->setTwoSided(true);
                 } else if (type == "coating") {
                     material = createCoatingMaterial(parseInfo);
+                } else if (type == "plastic") {
+                    material = createPlasticMaterial(parseInfo);
                 } else {
                     ASSERT(false, "Material " + type + " not supported for now");
                 }
@@ -288,6 +291,38 @@ namespace kaguya {
                 return std::make_shared<Dielectric>(texR, texT, extIOR, intIOR);
             }
 
+            Material::Ptr XmlSceneImporter::createPlasticMaterial(XmlParseInfo &info) {
+                Material::Ptr material = nullptr;
+                auto intIORType = info.getType("intIOR");
+                auto extIORType = info.getType("extIOR");
+                ASSERT(intIORType == XmlAttrVal::Attr_Float && extIORType == XmlAttrVal::Attr_Float,
+                       "Only support float type IOR for now");
+
+                // thetaT
+                Float intIOR = info.getFloatValue("intIOR", 1.0);
+                // thetaI
+                Float extIOR = info.getFloatValue("extIOR", 1.5);
+
+                ASSERT(info.getType("diffuseReflectance") == XmlAttrVal::Attr_Spectrum &&
+                       info.getType("specularReflectance") == XmlAttrVal::Attr_Spectrum &&
+                       info.getType("alpha") == XmlAttrVal::Attr_Float,
+                       "PlasticMaterial parameter error: type not supported");
+
+                auto diffuseReflectance = info.getSpectrumValue("diffuseReflectance", Spectrum(1.0));
+                auto specularReflectance = info.getSpectrumValue("specularReflectance", Spectrum(1.0));
+                auto alpha = info.getFloatValue("alpha", 0.01);
+
+                Texture<Spectrum>::Ptr Kd = std::make_shared<ConstantTexture<Spectrum>>(diffuseReflectance);
+                Texture<Spectrum>::Ptr Ks = std::make_shared<ConstantTexture<Spectrum>>(specularReflectance);
+
+                Texture<Float>::Ptr etaI = std::make_shared<ConstantTexture<Float>>(extIOR);
+                Texture<Float>::Ptr etaT = std::make_shared<ConstantTexture<Float>>(intIOR);
+
+                material = std::make_shared<PlasticMaterial>(Kd, Ks, etaI, etaT, alpha);
+                return material;
+            }
+
+            // Rename method
             Material::Ptr XmlSceneImporter::createCoatingMaterial(XmlParseInfo &info) {
                 Material::Ptr material = nullptr;
 
@@ -303,7 +338,7 @@ namespace kaguya {
                 Texture<Spectrum>::Ptr Kd = std::make_shared<ConstantTexture<Spectrum>>(diffuseReflectance);
                 Texture<Spectrum>::Ptr Ks = std::make_shared<ConstantTexture<Spectrum>>(specularReflectance);
                 Texture<Float>::Ptr roughness = std::make_shared<ConstantTexture<Float>>(alpha);
-                material = std::make_shared<CoatingMaterial>(Kd, Ks, roughness);
+                material = std::make_shared<PatinaMaterial>(Kd, Ks, roughness);
                 return material;
             }
 

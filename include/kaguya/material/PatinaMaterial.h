@@ -2,8 +2,8 @@
 // Created by Storm Phoenix on 2021/5/10.
 //
 
-#ifndef KAGUYA_COATINGMATERIAL_H
-#define KAGUYA_COATINGMATERIAL_H
+#ifndef KAGUYA_PATINAMATERIAL_H
+#define KAGUYA_PATINAMATERIAL_H
 
 #include <kaguya/material/Material.h>
 #include <kaguya/material/texture/Texture.h>
@@ -13,11 +13,12 @@ namespace kaguya {
     namespace material {
         using namespace texture;
 
-        class CoatingMaterial : public Material {
+        class PatinaMaterial : public Material {
         public:
-            CoatingMaterial(const Texture<Spectrum>::Ptr Kd,
-                            const Texture<Spectrum>::Ptr Ks,
-                            const Texture<Float>::Ptr alpha);
+            // Layered material: Glossy + Diffuse
+            PatinaMaterial(const Texture<Spectrum>::Ptr Kd,
+                           const Texture<Spectrum>::Ptr Ks,
+                           const Texture<Float>::Ptr alpha);
 
             virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
                                                     TransportMode mode = TransportMode::RADIANCE) override;
@@ -30,4 +31,4 @@ namespace kaguya {
     }
 }
 
-#endif //KAGUYA_COATINGMATERIAL_H
+#endif //KAGUYA_PATINAMATERIAL_H

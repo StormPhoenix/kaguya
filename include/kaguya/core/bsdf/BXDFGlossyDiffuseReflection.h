@@ -2,8 +2,8 @@
 // Created by Storm Phoenix on 2021/5/10.
 //
 
-#ifndef KAGUYA_BXDFFRESNELMICROFACETREFLECTION_H
-#define KAGUYA_BXDFFRESNELMICROFACETREFLECTION_H
+#ifndef KAGUYA_BXDFGLOSSYDIFFUSEREFLECTION_H
+#define KAGUYA_BXDFGLOSSYDIFFUSEREFLECTION_H
 
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/core/bsdf/microfacet/MicrofacetDistribution.h>
@@ -14,10 +14,10 @@ namespace kaguya {
 
             using microfacet::MicrofacetDistribution;
 
-            class BXDFFresnelMicrofacetReflection : public BXDF {
+            class BXDFGlossyDiffuseReflection : public BXDF {
             public:
-                BXDFFresnelMicrofacetReflection(const Spectrum &Rd, const Spectrum &Rs,
-                                               const MicrofacetDistribution *dist);
+                BXDFGlossyDiffuseReflection(const Spectrum &Rd, const Spectrum &Rs,
+                                            const MicrofacetDistribution *dist);
 
                 virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
 
@@ -34,4 +34,4 @@ namespace kaguya {
         }
     }
 }
-#endif //KAGUYA_BXDFFRESNELMICROFACETREFLECTION_H
+#endif //KAGUYA_BXDFGLOSSYDIFFUSEREFLECTION_H

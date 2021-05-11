@@ -95,6 +95,8 @@ namespace kaguya {
 
                 Material::Ptr createCoatingMaterial(XmlParseInfo &info);
 
+                Material::Ptr createPlasticMaterial(XmlParseInfo &info);
+
             private:
                 std::map<std::string, TagType> _nodeTypeMap;
                 std::shared_ptr<Scene> _scene;

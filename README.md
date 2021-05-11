@@ -51,8 +51,10 @@ A simple physically based render.
     - [ ] 重构 Path Tracer 中环境光照的代码（不要用 background 这个东西代替
 
 - Material
-- [ ] CoatingMaterial 重构，添加 Refraction 参数
-    - [ ] mitsuba 和 pbrt 中的 CoatingMaterial 种类要区分开
+- [x] CoatingMaterial 重构，添加 Refraction 参数
+    - [x] mitsuba 和 pbrt 中的 CoatingMaterial 种类要区分开 （不需要额外修改了，PatinaMaterial 属于内部 diffuse，外部 glossy 材质）
+    
+- [ ] Mitsuba 中的 Coating 材质研究一下
 
 - [ ] Microfacet Material
     - [ ] 进一步理解 Mask and Shadowing 里面的 AlphaX and AlphaY (和粗糙度有关)
