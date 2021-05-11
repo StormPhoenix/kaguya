@@ -32,6 +32,7 @@ namespace kaguya {
             for (int row = 0; row < _height; row++) {
                 for (int col = 0; col < _width; col++) {
                     int offset = row * _width + col;
+                    // SinTheta for sampling correction
                     Float sinTheta = std::sin(Float(row) / _height * math::PI);
                     sampleFunction[offset] = _texture[offset][sampleChannel] * sinTheta;
                 }
@@ -55,8 +56,10 @@ namespace kaguya {
         Spectrum EnvironmentLight::sampleLi(const Interaction &eye, Vector3F *wi,
                                             Float *pdf, Sampler *sampler,
                                             VisibilityTester *visibilityTester) {
-            // TODO Uniform sampling
-            Point2F uv = sampler->sample2D();
+            // Sample from environment map
+            Float samplePdf = 0.;
+            Point2F uv = _textureDistribution->sampleContinuous(&samplePdf, sampler);
+
             Float theta = math::PI * uv.y;
             Float phi = 2 * math::PI * uv.x;
 
@@ -67,10 +70,6 @@ namespace kaguya {
 
             *wi = _lightToWorld->transformVector({sinTheta * cosPhi, sinTheta * sinPhi, cosTheta});
             *wi = NORMALIZE(*wi);
-
-            // Sample pdf
-            Float samplePdf = 0.;
-            _textureDistribution->sampleContinuous(&samplePdf, sampler);
 
             if (sinTheta == 0) {
                 *pdf = 0;
@@ -100,14 +99,15 @@ namespace kaguya {
                 return 0;
             } else {
                 // Jacobi correction
-                return 1.0 / (2 * math::PI * math::PI * sinTheta);
+                return (_textureDistribution->pdfContinuous(Point2F(u, v))) / (2 * math::PI * math::PI * sinTheta);
             }
         }
 
         Spectrum EnvironmentLight::sampleLe(Ray *ray, Vector3F *normal,
                                             Float *pdfPos, Float *pdfDir,
                                             Sampler *sampler) {
-            Point2F uv = sampler->sample2D();
+            Float samplePdf = 0;
+            Point2F uv = _textureDistribution->sampleContinuous(&samplePdf, sampler);
             Float theta = uv.y * math::PI;
             Float phi = uv.x * math::PI * 2.0;
 
@@ -130,7 +130,7 @@ namespace kaguya {
 
             (*pdfPos) = 1.0 / (math::PI * _worldRadius * _worldRadius);
             // TODO 暂时不考虑对纹理做重要性采样
-            (*pdfDir) = sinTheta == 0 ? 0 : 1 / (2.0 * math::PI * math::PI * sinTheta);
+            (*pdfDir) = sinTheta == 0 ? 0 : samplePdf / (2.0 * math::PI * math::PI * sinTheta);
             (*ray) = Ray(posSample, dir, _mediumBoundary.inside());
             return sampleTexture(uv);
         }
@@ -141,7 +141,10 @@ namespace kaguya {
             Float phi = math::local_coord::dirToPhi(dir);
             Float sinTheta = std::sin(theta);
             // TODO 暂时不考虑对纹理做重要性采样
-            (*pdfDir) = 1.0 / (2 * math::PI * math::PI * sinTheta);
+            Point2F uv(phi * math::INV_2PI, theta * math::INV_PI);
+            Float mapPdf = _textureDistribution->pdfContinuous(uv);
+
+            (*pdfDir) = mapPdf / (2 * math::PI * math::PI * sinTheta);
             (*pdfPos) = 1.0 / (math::PI * _worldRadius * _worldRadius);
         }
 
