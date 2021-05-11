@@ -20,6 +20,9 @@ namespace kaguya {
 
                 virtual T evaluate(const SurfaceInteraction &si) = 0;
             };
+
+            typedef Texture<Spectrum> SpectrumTexture;
+            typedef Texture<Float> FloatTexture;
         }
     }
 }

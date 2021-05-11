@@ -4,7 +4,7 @@
 
 #include <kaguya/math/Math.h>
 #include <kaguya/core/light/EnvironmentLight.h>
-#include <kaguya/utils/IOReader.h>
+#include <kaguya/utils/ImageReader.h>
 
 namespace kaguya {
     namespace core {
@@ -25,7 +25,7 @@ namespace kaguya {
                 _lightToWorld = std::make_shared<Transform>();
             }
             _worldToLight = _lightToWorld->inverse().ptr();
-            _texture = io::readImage(texturePath.c_str(), &_width, &_height, &_channel, 0);
+            _texture = io::readImage(texturePath.c_str(), &_width, &_height);
         }
 
         Spectrum EnvironmentLight::Le(const Ray &ray) const {
@@ -132,9 +132,6 @@ namespace kaguya {
         }
 
         EnvironmentLight::~EnvironmentLight() {
-            if (_texture != nullptr) {
-                free(_texture);
-            }
         }
 
         Spectrum EnvironmentLight::sampleTexture(Point2F uv) const {
@@ -149,11 +146,13 @@ namespace kaguya {
 
             // flip
             hOffset = _height - (hOffset + 1);
-            int offset = (hOffset * _width + wOffset) * _channel;
+            int offset = (hOffset * _width + wOffset);
 
             Spectrum ret(0);
-            for (int ch = 0; ch < _channel && ch < SPECTRUM_CHANNEL; ch++) {
-                ret[ch] = Float(_texture[offset + ch]) / 255.0 * _intensity;
+            // TODO Adjust rgb channels
+            for (int ch = 0; ch < 3 && ch < SPECTRUM_CHANNEL; ch++) {
+//                ret[ch] = Float(_texture[offset][ch]) / 255.0 * _intensity;
+                ret[ch] = Float(_texture[offset][ch]) * _intensity;
             }
             return ret;
         }

@@ -224,6 +224,15 @@ namespace kaguya {
         class RGBSpectrum : public SpectrumTemplate<3> {
             using SpectrumTemplate<3>::value;
         public:
+            static RGBSpectrum fromRGB(const Float rgb[3]) {
+                RGBSpectrum ret;
+                ret[0] = rgb[0];
+                ret[1] = rgb[1];
+                ret[2] = rgb[2];
+                ASSERT(!ret.hasNans(), "RGBSpectrum has NaNs ! ")
+                return ret;
+            }
+
             RGBSpectrum(Float value = 0.0f) : SpectrumTemplate<3>(value) {}
 
             RGBSpectrum(const SpectrumTemplate<3> &spectrum) : SpectrumTemplate<3>(spectrum) {}

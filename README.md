@@ -27,15 +27,9 @@ A simple physically based render.
             - [ ] Visible point 未击中
     - [ ] Light::Le() 
 
-- [ ] Microfacet Material
-    - [ ] 进一步理解 Mask and Shadowing 里面的 AlphaX and AlphaY (和粗糙度有关)
-    - [ ] 进一步理解 Normal Distribution 里面的 sigma
+
 
 - [ ] FilmPlane 添加 Filter
-
-- [ ] Material 结构整理 
-    - [ ] Texture Texture Mapping package 结构整理
-    - [ ] Medium phase function 
 
 - [ ] 构建不依赖 C++ std 的随机数生成器    
 
@@ -43,13 +37,30 @@ A simple physically based render.
     - [ ] 课上讲解的有问题，重新阅读 PBRT radiance 章节，公主 basics
     - [ ] 推导 Torrance-Sparrow Model formulation
     
-- [ ] 重新利用 Fresnel
-    - [ ] FresnelConductor 中的 K 做记录
-    
 - [ ] BDPT RandomWalk 添加 Russian Roullete
 
 - [ ] BSDF 局部坐标系代码重构，不然可能会影响各向异性材质
 
+- Scene
+- [ ] Material-testball 场景渲染错误
+    - [x] 环境光照没有生效，mirror 反射全是黑色
+    - [ ] roughconductor 材质没有生效
+    - [ ] 重构 Path Tracer 中环境光照的代码（不要用 background 这个东西代替
+
+- Material
+- [ ] CoatingMaterial 重构，添加 Refraction 参数
+    - [ ] mitsuba 和 pbrt 中的 CoatingMaterial 种类要区分开
+
+- [ ] Microfacet Material
+    - [ ] 进一步理解 Mask and Shadowing 里面的 AlphaX and AlphaY (和粗糙度有关)
+    - [ ] 进一步理解 Normal Distribution 里面的 sigma
+    
+- [ ] 重新利用 Fresnel
+    - [ ] FresnelConductor 中的 K 做记录
+    
+- [ ] Material 结构整理 
+    - [ ] Texture Texture Mapping package 结构整理
+    - [ ] Medium phase function 
     
 ## TODO
 - [ ] 修正 C++ template 特化语法

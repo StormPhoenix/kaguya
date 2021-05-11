@@ -50,7 +50,9 @@ namespace kaguya {
 
             SET_PARSE_INFO_VALUE_FUNC_DEFINE(Vector3F, Vector, vector);
 
+            GET_PARSE_INFO_VALUE_FUNC_DEFINE(SpectrumTexture::Ptr, SpectrumTexture, spectrumTexture);
 
+            SET_PARSE_INFO_VALUE_FUNC_DEFINE(SpectrumTexture::Ptr, SpectrumTexture, spectrumTexture);
         }
     }
 }

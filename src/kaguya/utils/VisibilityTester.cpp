@@ -9,6 +9,7 @@
 namespace kaguya {
     namespace utils {
 
+        // TODO Move namespace
         using kaguya::core::medium::Medium;
 
         VisibilityTester::VisibilityTester(const kaguya::core::Interaction start, const kaguya::core::Interaction end) :

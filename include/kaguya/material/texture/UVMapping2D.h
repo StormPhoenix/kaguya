@@ -14,11 +14,16 @@ namespace kaguya {
 
             class UVMapping2D : public TextureMapping2D {
             public:
-                UVMapping2D() {}
+                UVMapping2D(Float uScale = 1.0, Float vScale = 1.0) :
+                        _uScale(uScale), _vScale(vScale) {}
 
                 virtual Point2F map(const SurfaceInteraction &si) override {
-                    return Point2F(si.u, si.v);
+                    return Point2F(si.u * _uScale, si.v * _vScale);
                 }
+
+            private:
+                Float _uScale;
+                Float _vScale;
             };
 
         }

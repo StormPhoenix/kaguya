@@ -67,7 +67,6 @@ namespace kaguya {
                     return 0;
                 }
 
-
                 // Diffuse reflection pdf
                 Float pdfDiffuse  = 0.5 * math::local_coord::absCosTheta(wi) * math::INV_PI;
 

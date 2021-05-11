@@ -49,9 +49,8 @@ namespace kaguya {
             Float _worldRadius = 20000;
             Point3F _worldCenter;
             // Texture
-            unsigned char *_texture = nullptr;
+            std::unique_ptr<RGBSpectrum[]> _texture = nullptr;
             int _width, _height;
-            int _channel;
         };
     }
 }

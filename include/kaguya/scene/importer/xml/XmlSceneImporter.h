@@ -32,6 +32,7 @@ namespace kaguya {
                 Tag_BSDF,
                 Tag_Ref,
 
+                Tag_Texture,
                 Tag_Integer,
                 Tag_Float,
                 Tag_Boolean,
@@ -59,6 +60,8 @@ namespace kaguya {
                 void handleTagSensor(pugi::xml_node &node, XmlParseInfo &parseInfo);
 
                 void handleTagBSDF(pugi::xml_node &node, XmlParseInfo &parseInfo, XmlParseInfo &parentInfo);
+
+                void handleTagTexture(pugi::xml_node &node, XmlParseInfo &parseInfo, XmlParseInfo &parentInfo);
 
                 void handleTagShape(pugi::xml_node &node, XmlParseInfo &parseInfo);
 

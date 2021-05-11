@@ -13,6 +13,8 @@ namespace kaguya {
 
             class TextureMapping2D {
             public:
+                typedef std::shared_ptr<TextureMapping2D> Ptr;
+
                 virtual Point2F map(const SurfaceInteraction &si) = 0;
             };
         }

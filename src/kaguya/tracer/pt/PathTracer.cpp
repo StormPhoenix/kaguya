@@ -89,6 +89,7 @@ namespace kaguya {
                     // 终止条件判断
                     if (!isIntersected) {
                         // TODO 添加环境光
+                        shaderColor += (beta * background(scatterRay));
                         break;
                     }
 

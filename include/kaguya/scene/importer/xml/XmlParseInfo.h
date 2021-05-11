@@ -7,6 +7,7 @@
 
 #include <kaguya/Common.h>
 #include <kaguya/material/Material.h>
+#include <kaguya/material/texture/Texture.h>
 #include <kaguya/core/Transform.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
@@ -17,6 +18,7 @@ namespace kaguya {
             using namespace core;
             using namespace core::transform;
             using namespace material;
+            using namespace material::texture;
 
 #define GET_PARSE_INFO_VALUE_FUNC_DECLARE(Type, TypeUpperCase) \
     Type get##TypeUpperCase##Value(const std::string name, const Type defaultValue);                                                               \
@@ -33,11 +35,13 @@ namespace kaguya {
                     Attr_Transform,
                     Attr_String,
                     Attr_Vector,
+                    Attr_SpectrumTexture,
                     Attr_None,
                 } type;
 
                 struct Val {
                     Spectrum spectrumValue;
+                    SpectrumTexture::Ptr spectrumTextureValue;
                     bool boolValue;
                     int intValue;
                     Float floatValue;
@@ -73,6 +77,10 @@ namespace kaguya {
                 bool attrExists(std::string name) {
                     return container.count(name) > 0;
                 }
+
+                GET_PARSE_INFO_VALUE_FUNC_DECLARE(SpectrumTexture::Ptr, SpectrumTexture)
+
+                SET_PARSE_INFO_VALUE_FUNC_DECLARE(SpectrumTexture::Ptr, SpectrumTexture)
 
                 GET_PARSE_INFO_VALUE_FUNC_DECLARE(bool, Bool)
 

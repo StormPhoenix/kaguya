@@ -7,8 +7,10 @@
 #include <kaguya/scene/meta/Triangle.h>
 #include <kaguya/scene/accumulation/BVH.h>
 #include <kaguya/scene/Cube.h>
+#include <kaguya/core/light/EnvironmentLight.h>
 #include <kaguya/material/texture/Texture.h>
 #include <kaguya/material/texture/ConstantTexture.h>
+#include <kaguya/material/texture/ChessboardTexture.h>
 #include <kaguya/material/CoatingMaterial.h>
 #include <kaguya/material/Lambertian.h>
 #include <kaguya/material/Dielectric.h>
@@ -98,6 +100,7 @@ namespace kaguya {
                 _nodeTypeMap["bsdf"] = Tag_BSDF;
                 _nodeTypeMap["ref"] = Tag_Ref;
 
+                _nodeTypeMap["texture"] = Tag_Texture;
                 _nodeTypeMap["bool"] = Tag_Boolean;
                 _nodeTypeMap["boolean"] = Tag_Boolean;
                 _nodeTypeMap["integer"] = Tag_Integer;
@@ -208,6 +211,20 @@ namespace kaguya {
 
                 // TODO check near far 属性
                 _scene->setCamera(std::make_shared<Camera>(toWorld, fov));
+            }
+
+            void XmlSceneImporter::handleTagTexture(pugi::xml_node &node,
+                                                    XmlParseInfo &parseInfo,
+                                                    XmlParseInfo &parentInfo) {
+                Spectrum color0 = parseInfo.getSpectrumValue("color0", Spectrum(0.));
+                Spectrum color1 = parseInfo.getSpectrumValue("color1", Spectrum(0.));
+
+                Float uScale = parseInfo.getFloatValue("uscale", 1.0);
+                Float vScale = parseInfo.getFloatValue("vscale", 1.0);
+
+                Texture<Spectrum>::Ptr texture = std::make_shared<ChessboardTexture<Spectrum>>(color0, color1,
+                                                                                               uScale, vScale);
+                parentInfo.setSpectrumTextureValue("reflectance", texture);
             }
 
             void
@@ -321,9 +338,13 @@ namespace kaguya {
                         Spectrum albedo = info.getSpectrumValue("reflectance", 0);
                         Texture<Spectrum>::Ptr texture = std::make_shared<ConstantTexture<Spectrum>>(albedo);
                         material = std::make_shared<Lambertian>(texture);
+                    } else if (type == XmlAttrVal::Attr_SpectrumTexture) {
+                        Texture<Spectrum>::Ptr texture = info.getSpectrumTextureValue("reflectance", nullptr);
+                        ASSERT(texture, "Texture can't be nullptr. ");
+                        material = std::make_shared<Lambertian>(texture);
                     } else {
                         // TODO
-                        ASSERT(type == XmlAttrVal::Attr_Spectrum, "Only support spectrum reflectance for now.");
+                        ASSERT(type == XmlAttrVal::Attr_Spectrum, "Reflectance type not supported .");
                     }
                 }
                 return material;
@@ -509,8 +530,21 @@ namespace kaguya {
                             falloffAngle, totalAngle);
                     _scene->addLight(spotLight);
                     std::cout << "\tCreate light: spot light" << std::endl;
+                } else if (type == "envmap") {
+                    transform::Transform toWorldMat = info.getTransformValue("toWorld", Transform());
+                    std::shared_ptr<transform::Transform> toWorld = toWorldMat.ptr();
+
+                    ASSERT(info.attrExists("filename"), "Environment light type should has envmap. ");
+                    std::string envmapPath = info.getStringValue("filename", "");
+
+                    Light::Ptr envLight = std::make_shared<EnvironmentLight>(1., _inputSceneDir + envmapPath,
+                                                                             MediumBoundary(nullptr, nullptr), toWorld);
+                    // TODO delete
+//                    _scene->addLight(envLight);
+                    _scene->addEnvironmentLight(envLight);
+                    std::cout << "\tCreate environment light. " << std::endl;
                 } else {
-                    ASSERT(false, "Only support area type for now");
+                    ASSERT(false, "Emitter type not supported: <" + type + ">. ");
                 }
             }
 
@@ -594,6 +628,9 @@ namespace kaguya {
                         break;
                     case Tag_Sensor:
                         handleTagSensor(node, parseInfo);
+                        break;
+                    case Tag_Texture:
+                        handleTagTexture(node, parseInfo, parentParseInfo);
                         break;
                     case Tag_BSDF:
                         handleTagBSDF(node, parseInfo, parentParseInfo);

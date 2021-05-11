@@ -7,7 +7,7 @@
 
 #include <kaguya/core/Core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
-#include <kaguya/utils/IOReader.h>
+#include <kaguya/utils/ImageReader.h>
 #include <kaguya/material/texture/Texture.h>
 #include <kaguya/material/texture/TextureMapping2D.h>
 #include <kaguya/material/texture/UVMapping2D.h>
@@ -41,7 +41,9 @@ namespace kaguya {
                         }
                     }
 
-                    _texture = io::readImage(imagePath.c_str(), &_width, &_height, &_channel, 0);
+                    _texture = io::readImage(imagePath.c_str(), &_width, &_height);
+                    // TODO 调整到 channel
+                    _channel = 3;
                     if (_channel > MAX_CHANNEL) {
                         std::cout << "Image channel count NOT Support !" << std::endl;
                     }
@@ -63,25 +65,21 @@ namespace kaguya {
                     }
 
                     // flip
-                    hOffset = _height - (hOffset + 1);
-                    int offset = (hOffset * _width + wOffset) * _channel;
+                    int offset = (hOffset * _width + wOffset);
 
                     T ret(0);
                     for (int ch = 0; ch < _channel && ch < MAX_CHANNEL; ch++) {
-                        ret[ch] = Float(_texture[offset + ch]) / 255;
+                        ret[ch] = Float(_texture[offset][ch]) / 255;
                     }
                     return ret;
                 }
 
                 ~ImageTexture() {
-                    if (_texture != nullptr) {
-                        io::freeImage(_texture);
-                    }
                 }
 
             private:
                 std::shared_ptr<TextureMapping2D> _textureMapping = nullptr;
-                unsigned char *_texture = nullptr;
+                std::unique_ptr<RGBSpectrum[]> _texture = nullptr;
                 Float _value[MAX_CHANNEL];
                 int _width, _height;
                 int _channel;
@@ -104,11 +102,10 @@ namespace kaguya {
                 }
 
                 // flip
-                hOffset = _height - (hOffset + 1);
-                int offset = (hOffset * _width + wOffset) * _channel;
+                int offset = (hOffset * _width + wOffset);
 
                 int ch = 0;
-                return Float(_texture[offset + ch]) / 255;
+                return Float(_texture[offset][ch]) / 255;
             }
 
         }
