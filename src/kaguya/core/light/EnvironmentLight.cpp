@@ -30,10 +30,10 @@ namespace kaguya {
             std::unique_ptr<Float[]> sampleFunction(new Float[_width * _height]);
             int sampleChannel = 1;
             for (int row = 0; row < _height; row++) {
+                // SinTheta for sampling correction
+                Float sinTheta = std::sin(Float(row) / _height * math::PI);
                 for (int col = 0; col < _width; col++) {
                     int offset = row * _width + col;
-                    // SinTheta for sampling correction
-                    Float sinTheta = std::sin(Float(row) / _height * math::PI);
                     sampleFunction[offset] = _texture[offset][sampleChannel] * sinTheta;
                 }
             }
@@ -60,6 +60,10 @@ namespace kaguya {
             Float samplePdf = 0.;
             Point2F uv = _textureDistribution->sampleContinuous(&samplePdf, sampler);
 
+            if (samplePdf == 0.) {
+                return Spectrum(0.);
+            }
+
             Float theta = math::PI * uv.y;
             Float phi = 2 * math::PI * uv.x;
 
@@ -68,7 +72,7 @@ namespace kaguya {
             Float cosPhi = std::cos(phi);
             Float sinPhi = std::sin(phi);
 
-            *wi = _lightToWorld->transformVector({sinTheta * cosPhi, sinTheta * sinPhi, cosTheta});
+            *wi = _lightToWorld->transformVector({sinTheta * cosPhi, cosTheta, sinTheta * sinPhi});
             *wi = NORMALIZE(*wi);
 
             if (sinTheta == 0) {
@@ -81,7 +85,6 @@ namespace kaguya {
             *visibilityTester = VisibilityTester(eye, Interaction(
                     eye.point + (*wi) * Float(2. * _worldRadius),
                     (*wi), -(*wi), _mediumBoundary));
-            // TODO 暂时不考虑对纹理做重要性采样
             return sampleTexture(uv);
         }
 
@@ -92,7 +95,6 @@ namespace kaguya {
 
             Float u = phi * math::INV_2PI;
             Float v = theta * math::INV_PI;
-            // TODO 暂时不考虑对纹理做重要性采样
 
             Float sinTheta = std::sin(theta);
             if (sinTheta == 0) {
@@ -116,7 +118,7 @@ namespace kaguya {
             Float cosPhi = std::cos(phi);
             Float sinPhi = std::sin(phi);
 
-            Vector3F dir = -_lightToWorld->transformVector(Vector3F(sinTheta * cosPhi, sinTheta * sinPhi, cosTheta));
+            Vector3F dir = -_lightToWorld->transformVector(Vector3F(sinTheta * cosPhi, cosTheta, sinTheta * sinPhi));
             *normal = NORMALIZE(dir);
 
             // Sample light pos
@@ -129,7 +131,6 @@ namespace kaguya {
             posSample = posSample + tanY * _worldRadius;
 
             (*pdfPos) = 1.0 / (math::PI * _worldRadius * _worldRadius);
-            // TODO 暂时不考虑对纹理做重要性采样
             (*pdfDir) = sinTheta == 0 ? 0 : samplePdf / (2.0 * math::PI * math::PI * sinTheta);
             (*ray) = Ray(posSample, dir, _mediumBoundary.inside());
             return sampleTexture(uv);
@@ -140,7 +141,6 @@ namespace kaguya {
             Float theta = math::local_coord::dirToTheta(dir);
             Float phi = math::local_coord::dirToPhi(dir);
             Float sinTheta = std::sin(theta);
-            // TODO 暂时不考虑对纹理做重要性采样
             Point2F uv(phi * math::INV_2PI, theta * math::INV_PI);
             Float mapPdf = _textureDistribution->pdfContinuous(uv);
 

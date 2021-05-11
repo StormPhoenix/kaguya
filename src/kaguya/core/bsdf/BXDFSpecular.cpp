@@ -10,7 +10,6 @@
 namespace kaguya {
     namespace core {
         namespace bsdf {
-            // TODO albedo -> Reflectance and Transmittance
             BXDFSpecular::BXDFSpecular(const Spectrum &reflectance, const Spectrum &transmittance,
                                        Float thetaI, Float thetaT, TransportMode mode) :
                     BXDF(BXDFType(BSDF_SPECULAR | BSDF_REFLECTION | BSDF_TRANSMISSION)),

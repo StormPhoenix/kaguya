@@ -539,7 +539,6 @@ namespace kaguya {
 
                     Light::Ptr envLight = std::make_shared<EnvironmentLight>(1., _inputSceneDir + envmapPath,
                                                                              MediumBoundary(nullptr, nullptr), toWorld);
-                    // TODO delete
                     _scene->addLight(envLight);
                     _scene->addEnvironmentLight(envLight);
                     std::cout << "\tCreate environment light. " << std::endl;

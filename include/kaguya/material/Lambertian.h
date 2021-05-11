@@ -18,16 +18,13 @@ namespace kaguya {
 
         class Lambertian : public Material {
         public:
-
-            Lambertian(std::shared_ptr<Texture<Spectrum>> albedo);
+            Lambertian(std::shared_ptr<Texture<Spectrum>> Kd);
 
             virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
                                                      TransportMode mode = TransportMode::RADIANCE) override;
 
         private:
-
-//            template<int Channel>
-            std::shared_ptr<Texture<Spectrum>> _albedo = nullptr;
+            std::shared_ptr<Texture<Spectrum>> _Kd = nullptr;
         };
 
     }

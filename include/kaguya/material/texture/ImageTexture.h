@@ -69,7 +69,7 @@ namespace kaguya {
 
                     T ret(0);
                     for (int ch = 0; ch < _channel && ch < MAX_CHANNEL; ch++) {
-                        ret[ch] = Float(_texture[offset][ch]) / 255;
+                        ret[ch] = Float(_texture[offset][ch]);
                     }
                     return ret;
                 }
@@ -105,7 +105,7 @@ namespace kaguya {
                 int offset = (hOffset * _width + wOffset);
 
                 int ch = 0;
-                return Float(_texture[offset][ch]) / 255;
+                return Float(_texture[offset][ch]);
             }
 
         }
