@@ -11,12 +11,12 @@ namespace kaguya {
             namespace microfacet {
                 using namespace math;
 
-                Float MicrofacetDistribution::G(const Vector3F &wo) const {
-                    return 1. / (1. + lambda(wo));
+                Float MicrofacetDistribution::G(const Vector3F &wo, const Normal3F &wh) const {
+                    return 1. / (1. + lambda(wo, wh));
                 }
 
-                Float MicrofacetDistribution::G(const Vector3F &wo, const Vector3F &wi) const {
-                    return 1. / (1. + lambda(wo) + lambda(wi));
+                Float MicrofacetDistribution::G(const Vector3F &wo, const Vector3F &wi, const Normal3F &wh) const {
+                    return 1. / (1. + lambda(wo, wh) + lambda(wi, wh));
                 }
 
                 Float MicrofacetDistribution::samplePdf(const Vector3F &wo, const Vector3F &wh) const {

@@ -29,7 +29,7 @@ namespace kaguya {
                 wh = NORMALIZE(wh);
 
                 Float D_Wh = _microfacetDistribution->D(wh);
-                Float G_Wo_Wi = _microfacetDistribution->G(wo, wi);
+                Float G_Wo_Wi = _microfacetDistribution->G(wo, wi, wh);
 
                 // Fresnel computation
                 wh = DOT(wh, Vector3F(0, 1, 0)) > 0 ? wh : -wh;

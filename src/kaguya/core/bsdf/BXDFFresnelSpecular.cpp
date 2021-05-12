@@ -3,29 +3,29 @@
 //
 
 #include <kaguya/sampler/Sampler.h>
-#include <kaguya/core/bsdf/BXDFSpecular.h>
+#include <kaguya/core/bsdf/BXDFFresnelSpecular.h>
 #include <kaguya/core/bsdf/fresnel/Fresnel.h>
 #include <kaguya/math/Math.h>
 
 namespace kaguya {
     namespace core {
         namespace bsdf {
-            BXDFSpecular::BXDFSpecular(const Spectrum &reflectance, const Spectrum &transmittance,
-                                       Float thetaI, Float thetaT, TransportMode mode) :
+            BXDFFresnelSpecular::BXDFFresnelSpecular(const Spectrum &reflectance, const Spectrum &transmittance,
+                                                     Float thetaI, Float thetaT, TransportMode mode) :
                     BXDF(BXDFType(BSDF_SPECULAR | BSDF_REFLECTION | BSDF_TRANSMISSION)),
                     _reflectance(reflectance), _transmittance(transmittance),
                     _thetaI(thetaI), _thetaT(thetaT), _mode(mode) {}
 
-            Spectrum BXDFSpecular::f(const Vector3F &wo, const Vector3F &wi) const {
+            Spectrum BXDFFresnelSpecular::f(const Vector3F &wo, const Vector3F &wi) const {
                 return Spectrum(0.0);
             }
 
-            Spectrum BXDFSpecular::sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
-                                           Sampler *const sampler, BXDFType *sampleType) {
+            Spectrum BXDFFresnelSpecular::sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
+                                                  Sampler *const sampler, BXDFType *sampleType) {
                 Float cosine = wo.y;
                 // 计算反射概率
                 // TODO move reflect probabilty computation to fresnel
-                Float reflectProb = math::fresnel::fresnelDielectric(cosine, _thetaI, _thetaT);
+                Float reflectProb = fresnel::fresnelDielectric(cosine, _thetaI, _thetaT);
                 // Fresnel 的近似计算
 //            Float reflectProb = math::schlick(cosine, _thetaI / _thetaT);
 
@@ -74,7 +74,7 @@ namespace kaguya {
                 }
             }
 
-            Float BXDFSpecular::samplePdf(const Vector3F &wo, const Vector3F &wi) const {
+            Float BXDFFresnelSpecular::samplePdf(const Vector3F &wo, const Vector3F &wi) const {
                 return 0.0;
             }
         }

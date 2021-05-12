@@ -186,52 +186,6 @@ namespace kaguya {
             return INV_4PI * (1 - g * g) / (denominator * std::sqrt(denominator));
         }
 
-        namespace fresnel {
-            // Compute reflection probability of dielectric material
-            inline Float fresnelDielectric(Float cosThetaI, Float etaI, Float etaT) {
-                cosThetaI = clamp(cosThetaI, -1, 1);
-                if (cosThetaI < 0) {
-                    // Traver form inner
-                    cosThetaI = std::abs(cosThetaI);
-                    std::swap(etaI, etaT);
-                }
-
-                Float sineI = std::sqrt((std::max)(Float(0.), Float(1 - std::pow(cosThetaI, 2))));
-                Float sineT = sineI * (etaI / etaT);
-
-                if (sineT >= 1) {
-                    // Totally reflection
-                    return 1.0f;
-                }
-
-                Float cosineT = std::sqrt((std::max)(Float(0.), Float(1 - std::pow(sineT, 2))));
-                // 计算 R_parallel
-                Float parallelR = ((etaT * cosThetaI) - (etaI * cosineT)) /
-                                  ((etaT * cosThetaI) + (etaI * cosineT));
-                Float perpendicularR = ((etaI * cosThetaI) - (etaT * cosineT)) /
-                                       ((etaI * cosThetaI) + (etaT * cosineT));
-                return 0.5 * (parallelR * parallelR + perpendicularR * perpendicularR);
-            }
-
-            // Fresnel schlick approximation
-            inline Float fresnelSchlick(Float cosine, Float ref_idx) {
-                if (cosine < 0) {
-                    ref_idx = 1 / ref_idx;
-                    cosine = -cosine;
-                }
-
-                Float sine = std::sqrt((std::max)(Float(0.), Float(1 - std::pow(cosine, 2))));
-                if (sine * ref_idx >= 1) {
-                    return 1.0;
-                }
-
-                auto r0 = (1 - ref_idx) / (1 + ref_idx);
-                r0 = r0 * r0;
-                return r0 + (1 - r0) * pow((1 - cosine), 5);
-            }
-        }
-
-
         inline bool checkRange(Float num, Float min, Float max) {
             return num >= min && num <= max;
         }

@@ -270,7 +270,8 @@ namespace kaguya {
                 Float alpha = info.getFloatValue("alpha", 0.1);
 
                 std::string distributionType = info.getStringValue("distribution", "beckmann");
-                ASSERT(distributionType == "beckmann", "Only support beckmann type. ");
+                ASSERT(distributionType == "beckmann" || distributionType == "ggx",
+                       "Microfacet distribution unsupported: " + distributionType);
 
                 Spectrum R = info.getSpectrumValue("specularReflectance", Spectrum(1.0));
                 Spectrum Eta = info.getSpectrumValue("eta", Spectrum(0.200438));

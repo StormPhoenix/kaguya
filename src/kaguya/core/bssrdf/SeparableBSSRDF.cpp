@@ -2,12 +2,14 @@
 // Created by Storm Phoenix on 2021/1/10.
 //
 
+#include <kaguya/core/bsdf/fresnel/Fresnel.h>
 #include <kaguya/core/bssrdf/SeparableBSSRDF.h>
 
 namespace kaguya {
     namespace core {
         namespace bssrdf {
             using bsdf::BSDF;
+            using namespace bsdf::fresnel;
 
             Float fresnelMoment1(Float eta) {
                 Float eta2 = eta * eta, eta3 = eta2 * eta, eta4 = eta3 * eta,
@@ -65,7 +67,7 @@ namespace kaguya {
 
             Spectrum SeparableBSSRDF::S(const SurfaceInteraction &si, const Vector3F &wi) {
                 Float cosTheta = ABS_DOT(po.direction, po.normal);
-                Float ft = math::fresnel::fresnelDielectric(cosTheta, 1, _theta);
+                Float ft = fresnelDielectric(cosTheta, 1, _theta);
                 // TODO  wi 是什么坐标系
                 return (1 - ft) * Sp(si) * subsurfaceWi(wi);
             }
@@ -214,7 +216,7 @@ namespace kaguya {
             Spectrum SeparableBSSRDF::subsurfaceWi(const Vector3F &wi) const {
                 // TODO 参考 Fresnel 积分
                 Float c = 1 - 2 * fresnelMoment1(1.0 / _theta);
-                return (1 - math::fresnel::fresnelDielectric(wi.y, 1.0, _theta)) / (c * math::PI);
+                return (1 - fresnelDielectric(wi.y, 1.0, _theta)) / (c * math::PI);
             }
         }
     }

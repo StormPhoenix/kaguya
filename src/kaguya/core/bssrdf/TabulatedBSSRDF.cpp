@@ -3,12 +3,13 @@
 //
 
 #include <kaguya/core/bssrdf/TabulatedBSSRDF.h>
+#include <kaguya/core/bsdf/fresnel/Fresnel.h>
 
 namespace kaguya {
     namespace core {
         namespace bssrdf {
-
-            using namespace kaguya::math::spline_curve;
+            using namespace bsdf;
+            using namespace math::spline_curve;
 
             Float beamDiffusionForSS(Float sigma_s, Float sigma_a, Float g, Float theta,
                                      Float radius) {
@@ -29,7 +30,7 @@ namespace kaguya {
 
                     // Add contribution of single scattering at depth $t$
                     Ess += rho * std::exp(-sigma_t * (d + tCrit)) / (d * d) *
-                           math::phaseFuncHG(cosThetaO, g) * (1 - math::fresnel::fresnelDielectric(-cosThetaO, 1, theta)) *
+                           math::phaseFuncHG(cosThetaO, g) * (1 - fresnel::fresnelDielectric(-cosThetaO, 1, theta)) *
                            std::abs(cosThetaO);
                 }
                 return Ess / nSamples;

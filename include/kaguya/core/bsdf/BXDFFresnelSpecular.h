@@ -2,8 +2,8 @@
 // Created by Storm Phoenix on 2020/10/16.
 //
 
-#ifndef KAGUYA_BXDFSPECULAR_H
-#define KAGUYA_BXDFSPECULAR_H
+#ifndef KAGUYA_BXDFFRESNELSPECULAR_H
+#define KAGUYA_BXDFFRESNELSPECULAR_H
 
 #include <kaguya/core/bsdf/BXDF.h>
 
@@ -13,12 +13,12 @@ namespace kaguya {
             /**
              * 高光类型，包含反射、折射
              */
-            class BXDFSpecular : public BXDF {
+            class BXDFFresnelSpecular : public BXDF {
             public:
-                BXDFSpecular(const Spectrum &reflectance,
-                             const Spectrum &transmittance,
-                             Float thetaI, Float thetaT,
-                             TransportMode mode = TransportMode::RADIANCE);
+                BXDFFresnelSpecular(const Spectrum &reflectance,
+                                    const Spectrum &transmittance,
+                                    Float thetaI, Float thetaT,
+                                    TransportMode mode = TransportMode::RADIANCE);
 
                 // TODO add constructor method for Fresnel *
                 virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
@@ -39,4 +39,4 @@ namespace kaguya {
     }
 }
 
-#endif //KAGUYA_BXDFSPECULAR_H
+#endif //KAGUYA_BXDFFRESNELSPECULAR_H

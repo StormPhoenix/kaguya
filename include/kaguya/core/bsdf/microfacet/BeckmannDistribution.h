@@ -23,7 +23,7 @@ namespace kaguya {
                     virtual Vector3F sampleWh(const Vector3F &wo, Sampler *sampler) const override;
 
                 protected:
-                    virtual Float lambda(const Vector3F &wo) const override;
+                    virtual Float lambda(const Vector3F &wo, const Normal3F &wh) const override;
 
                 protected:
                     Float _alphaX, _alphaZ;

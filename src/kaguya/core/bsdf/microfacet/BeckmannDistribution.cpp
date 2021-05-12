@@ -37,7 +37,7 @@ namespace kaguya {
                            / (PI * _alphaX * _alphaZ * cosThetaWh2 * cosThetaWh2);
                 }
 
-                Float BeckmannDistribution::lambda(const Vector3F &wo) const {
+                Float BeckmannDistribution::lambda(const Vector3F &wo, const Normal3F &wh) const {
                     Float tanThetaWo = std::abs(local_coord::tanTheta(wo));
                     if (std::isinf(tanThetaWo)) {
                         return 0.;

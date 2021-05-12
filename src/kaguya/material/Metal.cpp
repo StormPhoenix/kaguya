@@ -4,6 +4,7 @@
 
 #include <kaguya/material/Metal.h>
 #include <kaguya/core/bsdf/microfacet/BeckmannDistribution.h>
+#include <kaguya/core/bsdf/microfacet/GGXDistribution.h>
 #include <kaguya/core/bsdf/BXDFMicrofacetReflection.h>
 #include <kaguya/core/bsdf/fresnel/FresnelConductor.h>
 
@@ -12,6 +13,8 @@ namespace kaguya {
         using core::bsdf::fresnel::FresnelConductor;
         using core::bsdf::BXDFMicrofacetReflection;
         using core::bsdf::microfacet::BeckmannDistribution;
+        using core::bsdf::microfacet::GGXDistribution;
+        using core::bsdf::microfacet::MicrofacetDistribution;
 
         Metal::Metal(const Texture<Float>::Ptr alpha, const Texture<Spectrum>::Ptr eta, const Texture<Spectrum>::Ptr Ks,
                      const Texture<Spectrum>::Ptr K, std::string distributionType) :
@@ -25,23 +28,25 @@ namespace kaguya {
         void Metal::computeScatteringFunctions(SurfaceInteraction &insect,
                                                MemoryArena &memoryArena,
                                                TransportMode mode) {
+            // Build distribution
+            const MicrofacetDistribution *distribution = nullptr;
+            Float alpha = _alpha->evaluate(insect);
             if (_distributionType == "beckmann") {
-                // Distribution
-                Float alpha = _alpha->evaluate(insect);
-                const BeckmannDistribution *distribution = ALLOC(memoryArena, BeckmannDistribution)(alpha);
-
-                const Spectrum thetaT = _eta->evaluate(insect);
-                const Spectrum k = _K->evaluate(insect);
-                const FresnelConductor *fresnel = ALLOC(memoryArena, FresnelConductor)(Spectrum(1.), thetaT, k);
-
-                Spectrum reflectance = _Ks->evaluate(insect);
-                BSDF *bsdf = ALLOC(memoryArena, BSDF)(insect);
-                BXDF *bxdf = ALLOC(memoryArena, BXDFMicrofacetReflection)(reflectance, distribution, fresnel);
-                bsdf->addBXDF(bxdf);
-                insect.bsdf = bsdf;
+                distribution = ALLOC(memoryArena, BeckmannDistribution)(alpha);
+            } else if (_distributionType == "ggx") {
+                distribution = ALLOC(memoryArena, GGXDistribution)(alpha);
             } else {
                 ASSERT(false, "Unsupported microfacet normal distribution type. ");
             }
+
+            // Build fresnel term
+            const Spectrum etaT = _eta->evaluate(insect);
+            const Spectrum K = _K->evaluate(insect);
+            const FresnelConductor *fresnel = ALLOC(memoryArena, FresnelConductor)(Spectrum(1.), etaT, K);
+
+            Spectrum reflectance = _Ks->evaluate(insect);
+            insect.bsdf  = ALLOC(memoryArena, BSDF)(insect);
+            insect.bsdf->addBXDF( ALLOC(memoryArena, BXDFMicrofacetReflection)(reflectance, distribution, fresnel));
         }
     }
 }

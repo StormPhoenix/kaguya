@@ -3,13 +3,13 @@
 //
 
 #include <kaguya/math/Math.h>
-#include <kaguya/core/bsdf/BXDFSpecular.h>
+#include <kaguya/core/bsdf/BXDFFresnelSpecular.h>
 #include <kaguya/material/SubsurfaceMaterial.h>
 
 namespace kaguya {
     namespace material {
 
-        using kaguya::core::bsdf::BXDFSpecular;
+        using kaguya::core::bsdf::BXDFFresnelSpecular;
 
         SubsurfaceMaterial::SubsurfaceMaterial(Spectrum albedoEff, Spectrum mft, Float g, Float eta)
                 : _theta(eta), _albedoEff(albedoEff), _meanFreePath(mft), _table(100, 64) {
@@ -42,7 +42,7 @@ namespace kaguya {
         void SubsurfaceMaterial::computeScatteringFunctions(SurfaceInteraction &si, MemoryArena &memoryArena, TransportMode mode) {
 
             si.bsdf = ALLOC(memoryArena, BSDF)(si);
-            si.bsdf->addBXDF(ALLOC(memoryArena, BXDFSpecular)(1.0f, 1.0f, 1.0f, _theta, mode));
+            si.bsdf->addBXDF(ALLOC(memoryArena, BXDFFresnelSpecular)(1.0f, 1.0f, 1.0f, _theta, mode));
 
             Spectrum sigma_a, sigma_s;
             subsurfaceFromDiffuse(_table, _albedoEff, _meanFreePath, &sigma_a, &sigma_s);

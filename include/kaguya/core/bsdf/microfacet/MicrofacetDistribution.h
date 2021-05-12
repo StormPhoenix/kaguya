@@ -22,12 +22,12 @@ namespace kaguya {
 
                     // Mask and shadowing function G(wi, wh)
                     // G(wi, wh) is independent of wh, so rewrite G(wi, wh) to G(wi)
-                    virtual Float G(const Vector3F &wo) const;
+                    virtual Float G(const Vector3F &wo, const Normal3F &wh) const;
 
                     // Mask and shadowing function G(wo, wi)
                     // Which gives the fraction of microfacets in a differential area that are visible from
                     //  both directions w_o and w_i
-                    virtual Float G(const Vector3F &wo, const Vector3F &wi) const;
+                    virtual Float G(const Vector3F &wo, const Vector3F &wi, const Normal3F &wh) const;
 
                     // Sample wh
                     virtual Vector3F sampleWh(const Vector3F &wo, Sampler *sampler) const = 0;
@@ -37,7 +37,7 @@ namespace kaguya {
 
                 protected:
                     // Auxiliary function Lambda(wi) for G(wi)
-                    virtual Float lambda(const Vector3F &wo) const = 0;
+                    virtual Float lambda(const Vector3F &wo, const Normal3F &wh) const = 0;
                 };
 
             }
