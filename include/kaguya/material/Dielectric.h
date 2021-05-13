@@ -17,7 +17,8 @@ namespace kaguya {
 
         class Dielectric : public Material {
         public:
-            Dielectric(const Texture<Spectrum>::Ptr R, const Texture<Spectrum>::Ptr T, Float etaI, Float etaT);
+            Dielectric(const Texture<Spectrum>::Ptr R, const Texture<Spectrum>::Ptr T,
+                       Float etaI, Float etaT, Float roughness = 0.f);
 
             virtual bool isSpecular() const override;
 
@@ -26,6 +27,7 @@ namespace kaguya {
 
 
         private:
+            Float _roughness;
             Float _etaI, _etaT;
             const Texture<Spectrum>::Ptr _R;
             const Texture<Spectrum>::Ptr _T;

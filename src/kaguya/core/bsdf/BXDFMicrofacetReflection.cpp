@@ -67,6 +67,11 @@ namespace kaguya {
                 if (pdf != nullptr) {
                     (*pdf) = _microfacetDistribution->samplePdf(wo, wh) / (4 * DOT(wo, wh));
                 }
+
+                if (sampleType != nullptr) {
+                    (*sampleType) = BXDFType(BXDFType::BSDF_GLOSSY | BXDFType::BSDF_REFLECTION);
+                }
+
                 return f(wo, reflectDir);
             }
 

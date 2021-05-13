@@ -350,6 +350,7 @@ namespace kaguya {
                 ASSERT(intIORType == XmlAttrVal::Attr_Float && extIORType == XmlAttrVal::Attr_Float,
                        "Only support float type IOR for now");
 
+                Float roughness = info.getFloatValue("alpha", 0.0);
                 // thetaT
                 Float intIOR = info.getFloatValue("intIOR", 1.0);
                 // thetaI
@@ -357,7 +358,7 @@ namespace kaguya {
                 // 临时用 1.0 spectrum 代替
                 Texture<Spectrum>::Ptr texR = std::make_shared<ConstantTexture<Spectrum>>(1.0);
                 Texture<Spectrum>::Ptr texT = std::make_shared<ConstantTexture<Spectrum>>(1.0);
-                material = std::make_shared<Dielectric>(texR, texT, extIOR, intIOR);
+                material = std::make_shared<Dielectric>(texR, texT, extIOR, intIOR, roughness);
                 return material;
             }
 

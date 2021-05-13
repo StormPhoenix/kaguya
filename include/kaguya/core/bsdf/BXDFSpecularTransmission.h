@@ -15,14 +15,6 @@ namespace kaguya {
 
             class BXDFSpecularTransmission : public BXDF {
             public:
-                /**
-                 * TODO 说明 RADIANCE 的作用
-                 * @param albedo
-                 * @param thetaI
-                 * @param thetaT
-                 * @param fresnel
-                 * @param mode
-                 */
                 BXDFSpecularTransmission(const Spectrum &albedo, Float thetaI, Float thetaT,
                                          FresnelDielectric *fresnel, TransportMode mode = TransportMode::RADIANCE);
 

@@ -37,11 +37,6 @@ namespace kaguya {
             virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
                                                     TransportMode mode = TransportMode::RADIANCE) = 0;
 
-            /**
-             * TODO delete 逐渐删除 isSpecular
-             * 是否具有反光、折射属性
-             * @return
-             */
             virtual bool isSpecular() const {
                 return false;
             }

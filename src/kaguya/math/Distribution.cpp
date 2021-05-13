@@ -49,7 +49,6 @@ namespace kaguya {
 
             Float Distribution1D::sampleContinuous(Float *pdf, int *offset, Sampler *sampler) const {
                 Float u = sampler->sample1D();
-                // TODO Do testing
                 int discreteOffset = binarySearch(_cdf.size(), [&](int index) -> bool { return _cdf[index] <= u; });
                 if (offset != nullptr) {
                     (*offset) = discreteOffset;

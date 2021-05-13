@@ -68,7 +68,7 @@ namespace kaguya {
                     if (wo.y * wh.y < 0) {
                         wh.y *= -1;
                     }
-                    return wh;
+                    return NORMALIZE(wh);
                 }
 
                 Float GGXDistribution::lambda(const Vector3F &wo, const Normal3F &wh) const {

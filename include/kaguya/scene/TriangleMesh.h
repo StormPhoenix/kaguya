@@ -14,7 +14,6 @@
 namespace kaguya {
     namespace scene {
 
-        // TODO delete
         using namespace scene::meta;
         using kaguya::scene::acc::BVH;
         using kaguya::core::transform::Transform;
