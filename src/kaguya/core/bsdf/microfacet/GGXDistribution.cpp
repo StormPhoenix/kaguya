@@ -41,6 +41,10 @@ namespace kaguya {
                         return 0.;
                     }
 
+                    if (tanThetaO2 == 0.0f) {
+                        return 1.0f;
+                    }
+
                     Float alpha2 = _alpha_g * _alpha_g;
                     return 2.0 / (1 + std::sqrt(1 + alpha2 * tanThetaO2));
                 }

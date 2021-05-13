@@ -65,7 +65,7 @@ namespace kaguya {
                 }
 
                 if (pdf != nullptr) {
-                    (*pdf) = _microfacetDistribution->samplePdf(wo, wh) / 4 * DOT(wo, wh);
+                    (*pdf) = _microfacetDistribution->samplePdf(wo, wh) / (4 * DOT(wo, wh));
                 }
                 return f(wo, reflectDir);
             }

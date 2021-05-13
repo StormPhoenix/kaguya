@@ -45,7 +45,7 @@ namespace kaguya {
 
                     Float cosPhiWo2 = local_coord::cosPhi2(wo);
                     Float sinPhiWo2 = local_coord::sinPhi2(wo);
-                    Float alpha = std::sqrt(cosPhiWo2 / (_alphaX * _alphaX) + sinPhiWo2 / (_alphaZ * _alphaZ));
+                    Float alpha = std::sqrt(cosPhiWo2 * (_alphaX * _alphaX) + sinPhiWo2 * (_alphaZ * _alphaZ));
                     Float a = 1. / (alpha * tanThetaWo);
                     // TODO ?
                     if (a >= 1.6f) {
