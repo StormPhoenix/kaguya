@@ -19,20 +19,27 @@ namespace kaguya {
             }
 
             Spectrum BXDFMicrofacetReflection::f(const Vector3F &wo, const Vector3F &wi) const {
-                Float cosThetaO = std::abs(wo.y);
-                Float cosThetaI = std::abs(wi.y);
+                Float cosThetaO = wo.y;
+                Float cosThetaI = wi.y;
                 if (cosThetaI == 0 || cosThetaO == 0) {
-                    return 0.;
+                    return Spectrum(0.0f);
                 }
+
+                if (cosThetaI * cosThetaO <= 0) {
+                    return Spectrum(0.0f);
+                }
+
+                cosThetaO = std::abs(cosThetaO);
+                cosThetaI = std::abs(cosThetaI);
+
                 // Half angle
-                Vector3F wh = wo + wi;
-                wh = NORMALIZE(wh);
+                Vector3F wh = NORMALIZE(wo + wi);
+                // Fresnel computation
+                wh = DOT(wh, Vector3F(0, 1, 0)) > 0 ? wh : -wh;
 
                 Float D_Wh = _microfacetDistribution->D(wh);
                 Float G_Wo_Wi = _microfacetDistribution->G(wo, wi, wh);
 
-                // Fresnel computation
-                wh = DOT(wh, Vector3F(0, 1, 0)) > 0 ? wh : -wh;
                 Float cosThetaH = DOT(wi, wh);
                 Spectrum Fr = _fresnel->fresnel(cosThetaH);
 
@@ -65,7 +72,8 @@ namespace kaguya {
                 }
 
                 if (pdf != nullptr) {
-                    (*pdf) = _microfacetDistribution->samplePdf(wo, wh) / (4 * DOT(wo, wh));
+//                    (*pdf) = _microfacetDistribution->samplePdf(wo, wh) / (4 * DOT(wo, wh));
+                    (*pdf) = samplePdf(wo, reflectDir);
                 }
 
                 if (sampleType != nullptr) {

@@ -4,6 +4,7 @@
 
 #include <kaguya/material/Dielectric.h>
 #include <kaguya/core/bsdf/BXDFFresnelSpecular.h>
+#include <kaguya/core/bsdf/BXDFMicrofacet.h>
 #include <kaguya/core/bsdf/BXDFMicrofacetReflection.h>
 #include <kaguya/core/bsdf/BXDFMicrofacetTransmission.h>
 #include <kaguya/core/bsdf/fresnel/FresnelDielectric.h>
@@ -16,6 +17,7 @@ namespace kaguya {
         using core::bsdf::BXDFFresnelSpecular;
         using core::bsdf::BXDFMicrofacetReflection;
         using core::bsdf::BXDFMicrofacetTransmission;
+        using core::bsdf::BXDFMicrofacet;
         using core::bsdf::microfacet::GGXDistribution;
         using core::bsdf::fresnel::FresnelDielectric;
 
@@ -42,6 +44,9 @@ namespace kaguya {
                 insect.bsdf->addBXDF(specularBXDF);
             } else {
                 const GGXDistribution *distribution = ALLOC(memoryArena, GGXDistribution)(_roughness);
+                insect.bsdf->addBXDF(ALLOC(memoryArena, BXDFMicrofacet)(Kr, Kt, _etaI, _etaT, distribution, mode));
+
+                /*
                 if (!Kr.isBlack()) {
                     const FresnelDielectric *fresnel = ALLOC(memoryArena, FresnelDielectric)(_etaI, _etaT);
                     insect.bsdf->addBXDF(ALLOC(memoryArena, BXDFMicrofacetReflection)(Kr, distribution, fresnel));
@@ -51,6 +56,7 @@ namespace kaguya {
                     insect.bsdf->addBXDF(
                             ALLOC(memoryArena, BXDFMicrofacetTransmission)(_etaI, _etaT, Kt, distribution, mode));
                 }
+                 */
             }
         }
     }

@@ -95,15 +95,46 @@ namespace kaguya {
                     // 匹配成功，开始采样 bxdf 值
                     Vector3F wo = toObjectSpace(worldWo);
                     Vector3F wi = Vector3F(0.0f);
-                    Float samplePdf;
+                    Float samplePdf = 0.f;
                     Spectrum f = bxdf->sampleF(wo, &wi, &samplePdf, sampler, sampleType);
-                    // 一般来说 surfacePointPdf = 0 的情况不会发生
+
+                    /*
+                    {
+                        if (samplePdf == 0.) {
+                            // 重新遍历所有 bxdf 尝试找到一个 f 和 samplePdf 不为 0 的 sample
+                            for (int i = 0; i < _bxdfCount; i++) {
+                                if (_bxdfs[i] != nullptr && _bxdfs[i]->allIncludeOf(type) && _bxdfs[i] != bxdf) {
+                                    samplePdf = 0.f;
+                                    f = _bxdfs[i]->sampleF(wo, &wi, &samplePdf, sampler, sampleType);
+                                    if (samplePdf != 0.) {
+                                        if (sampleType != nullptr) {
+                                            (*sampleType) = bxdf->type;
+                                        }
+                                        bxdf = _bxdfs[i];
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                     */
+
                     if (samplePdf == 0) {
                         if (sampleType != nullptr) {
                             *sampleType = BXDFType(0);
                         }
                         return Spectrum(0.0);
                     }
+                    /*
+                     * Spectrum f = bxdf->sampleF(wo, &wi, &samplePdf, sampler, sampleType);
+                        // 一般来说 surfacePointPdf = 0 的情况不会发生
+                        if (samplePdf == 0) {
+                            if (sampleType != nullptr) {
+                                *sampleType = BXDFType(0);
+                            }
+                            return Spectrum(0.0);
+                        }
+                     */
 
                     // 计算最终 sample pdf
                     if (!bxdf->hasAllOf(BSDF_SPECULAR) && matchedCount > 1) {

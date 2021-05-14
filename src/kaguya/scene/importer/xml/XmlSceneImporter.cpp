@@ -300,9 +300,9 @@ namespace kaguya {
                        "Only support float type IOR for now");
 
                 // thetaT
-                Float intIOR = info.getFloatValue("intIOR", 1.0);
+                Float intIOR = info.getFloatValue("intIOR", 1.5);
                 // thetaI
-                Float extIOR = info.getFloatValue("extIOR", 1.5);
+                Float extIOR = info.getFloatValue("extIOR", 1);
 
                 ASSERT(info.getType("diffuseReflectance") == XmlAttrVal::Attr_Spectrum &&
                        info.getType("specularReflectance") == XmlAttrVal::Attr_Spectrum &&
@@ -352,9 +352,9 @@ namespace kaguya {
 
                 Float roughness = info.getFloatValue("alpha", 0.0);
                 // thetaT
-                Float intIOR = info.getFloatValue("intIOR", 1.0);
+                Float intIOR = info.getFloatValue("intIOR", 1.5);
                 // thetaI
-                Float extIOR = info.getFloatValue("extIOR", 1.5);
+                Float extIOR = info.getFloatValue("extIOR", 1.0);
                 // 临时用 1.0 spectrum 代替
                 Texture<Spectrum>::Ptr texR = std::make_shared<ConstantTexture<Spectrum>>(1.0);
                 Texture<Spectrum>::Ptr texT = std::make_shared<ConstantTexture<Spectrum>>(1.0);

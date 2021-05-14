@@ -17,7 +17,7 @@ namespace kaguya {
 
                 Float GGXDistribution::D(const Normal3F &wh) const {
                     Float cosThetaH = local_coord::cosTheta(wh);
-                    if (cosThetaH <= 0) {
+                    if (cosThetaH == 0) {
                         return 0;
                     }
 

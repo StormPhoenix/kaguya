@@ -30,8 +30,9 @@ namespace kaguya {
                 // Compute half angle
                 Float invEta = cosThetaWo > 0 ? _etaT / _etaI : _etaI / _etaT;
                 Normal3F wh = NORMALIZE(wo + invEta * wi);
+                // Correction for positive hemisphere
                 if (wh.y < 0) {
-                    wh.y *= -1;
+                    wh *= -1;
                 }
                 Float eta = 1.0 / invEta;
 
@@ -55,9 +56,13 @@ namespace kaguya {
                 Float scale = _mode == TransportMode::RADIANCE ? eta : 1.;
 
                 // TODO different from PBRT
-                return _Kt *
-                       ((D_Wh * G_Wo_Wi * (Spectrum(1.0) - Fr) * scale * scale) / (term * term)) *
-                       ((absCosThetaWIH * absCosThetaWOH) / (cosThetaWo * cosThetaWi));
+                return _Kt * (Spectrum(1.0) - Fr) *
+                       std::abs(((D_Wh * G_Wo_Wi * scale * scale) / (term * term)) *
+                                ((absCosThetaWIH * absCosThetaWOH) / (cosThetaWo * cosThetaWi)));
+
+//                return _Kt * (Spectrum(1.0) - Fr) *
+//                       std::abs(((D_Wh * G_Wo_Wi * scale * scale * invEta * invEta) / (term * term)) *
+//                                ((absCosThetaWIH * absCosThetaWOH) / (cosThetaWo * cosThetaWi)));
             }
 
             Spectrum BXDFMicrofacetTransmission::sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
@@ -112,7 +117,11 @@ namespace kaguya {
 
                 // TODO different from PBRT
                 Float sqrtDenom = DOT(wo, wh) + invEta * DOT(wi, wh);
+                // TODO delete
                 return _microfacetDistribution->samplePdf(wo, wh) * ABS_DOT(wi, wh) / (sqrtDenom * sqrtDenom);
+//                return _microfacetDistribution->samplePdf(wo, wh) *
+//                       std::abs(invEta * invEta * DOT(wi, wh)) /
+//                       (sqrtDenom * sqrtDenom);
             }
         }
     }
