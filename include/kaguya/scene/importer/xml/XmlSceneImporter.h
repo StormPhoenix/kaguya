@@ -33,6 +33,7 @@ namespace kaguya {
                 Tag_Ref,
 
                 Tag_Texture,
+                Tag_Medium,
                 Tag_Integer,
                 Tag_Float,
                 Tag_Boolean,
@@ -70,6 +71,8 @@ namespace kaguya {
                 void handleTagRGB(pugi::xml_node &node, XmlParseInfo &parentXmlParseInfo);
 
                 void handleTagEmitter(pugi::xml_node &node, XmlParseInfo &info, XmlParseInfo &parent);
+
+                void handleTagMedium(pugi::xml_node &node, XmlParseInfo &info, XmlParseInfo &parent);
 
                 void handleTagLookAt(pugi::xml_node &node, XmlParseInfo &parent);
 

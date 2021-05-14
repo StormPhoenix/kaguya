@@ -9,6 +9,7 @@
 #include <kaguya/material/Material.h>
 #include <kaguya/material/texture/Texture.h>
 #include <kaguya/core/Transform.h>
+#include <kaguya/core/medium/Medium.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
 namespace kaguya {
@@ -17,6 +18,7 @@ namespace kaguya {
 
             using namespace core;
             using namespace core::transform;
+            using namespace core::medium;
             using namespace material;
             using namespace material::texture;
 
@@ -56,6 +58,8 @@ namespace kaguya {
             typedef struct XmlParseInfo {
                 Transform transformMat;
                 Material::Ptr currentMaterial = nullptr;
+                Medium::Ptr currentExteriorMedium = nullptr;
+                Medium::Ptr currentInteriorMedium = nullptr;
                 bool hasAreaLight = false;
 
                 XmlAttrVal get(std::string name) {

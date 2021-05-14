@@ -17,6 +17,7 @@
 #include <kaguya/material/Dielectric.h>
 #include <kaguya/material/Mirror.h>
 #include <kaguya/material/Metal.h>
+#include <kaguya/core/medium/IsotropicMedium.h>
 #include <kaguya/scene/importer/xml/XmlSceneImporter.h>
 #include <kaguya/utils/ObjLoader.h>
 
@@ -28,6 +29,7 @@ namespace kaguya {
             using namespace scene;
             using namespace material;
             using namespace material::texture;
+            using namespace core::medium;
             using namespace scene::acc;
             using namespace scene::meta;
             using namespace core::transform;
@@ -102,6 +104,7 @@ namespace kaguya {
                 _nodeTypeMap["ref"] = Tag_Ref;
 
                 _nodeTypeMap["texture"] = Tag_Texture;
+                _nodeTypeMap["medium"] = Tag_Medium;
                 _nodeTypeMap["bool"] = Tag_Boolean;
                 _nodeTypeMap["boolean"] = Tag_Boolean;
                 _nodeTypeMap["integer"] = Tag_Integer;
@@ -467,25 +470,30 @@ namespace kaguya {
                 }
 
                 Material::Ptr material = parseInfo.currentMaterial;
-                AreaLight::Ptr light = nullptr;
+                Medium::Ptr exteriorMedium = parseInfo.currentExteriorMedium;
+                Medium::Ptr interiorMedium = parseInfo.currentInteriorMedium;
+
+                Spectrum radiance(0.0);
                 if (parseInfo.hasAreaLight) {
                     auto radianceType = parseInfo.getType("radiance");
                     if (radianceType == XmlAttrVal::Attr_Spectrum) {
-                        Spectrum radiance = parseInfo.getSpectrumValue("radiance", 0);
-                        for (auto it = shapes->begin(); it != shapes->end(); it++) {
-                            light = std::make_shared<DiffuseAreaLight>(radiance, *it, nullptr, true);
-                            _scene->addLight(light);
-                        }
+                        radiance = parseInfo.getSpectrumValue("radiance", 0);
                     } else {
                         ASSERT(false, "Only support spectrum radiance for now.");
                     }
                 }
 
                 for (auto it = shapes->begin(); it != shapes->end(); it++) {
-                    Geometry::Ptr geometry = std::make_shared<Geometry>(*it, material);
+                    AreaLight::Ptr light = nullptr;
                     if (parseInfo.hasAreaLight) {
-                        geometry->setAreaLight(light);
+                        light = std::make_shared<DiffuseAreaLight>(radiance, *it,
+                                                                   MediumBoundary(interiorMedium.get(),
+                                                                                  exteriorMedium.get()),
+                                                                   true);
                     }
+
+                    Geometry::Ptr geometry = std::make_shared<Geometry>(*it, material, interiorMedium, exteriorMedium,
+                                                                        light);
                     _shapes.push_back(geometry);
                 }
             }
@@ -581,6 +589,29 @@ namespace kaguya {
                     std::cout << "\tCreate environment light. " << std::endl;
                 } else {
                     ASSERT(false, "Emitter type not supported: <" + type + ">. ");
+                }
+            }
+
+            void XmlSceneImporter::handleTagMedium(pugi::xml_node &node, XmlParseInfo &info, XmlParseInfo &parent) {
+                std::string mediumType = node.attribute("type").value();
+                std::string mediumName = node.attribute("name").value();
+                Medium::Ptr medium = nullptr;
+                if (mediumType == "homogeneous") {
+                    ASSERT(info.attrExists("sigmaS") && info.attrExists("sigmaA"), "Medium parameter missed. ")
+                    Spectrum sigmaS = info.getSpectrumValue("sigmaS", Spectrum(0.1));
+                    Spectrum sigmaA = info.getSpectrumValue("sigmaA", Spectrum(0.1));
+                    Float g = info.getFloatValue("g", 0.0f);
+                    medium = std::make_shared<IsotropicMedium>(sigmaA, sigmaS, g);
+                } else {
+                    ASSERT(false, "Medium type not supported. ");
+                }
+
+                if (medium != nullptr) {
+                    if (mediumName == "exterior") {
+                        parent.currentExteriorMedium = medium;
+                    } else if (mediumName == "interior") {
+                        parent.currentInteriorMedium = medium;
+                    }
                 }
             }
 
@@ -688,6 +719,9 @@ namespace kaguya {
                         break;
                     case Tag_Integrator:
                         handleTagIntegrator(node, parseInfo);
+                        break;
+                    case Tag_Medium:
+                        handleTagMedium(node, parseInfo, parentParseInfo);
                         break;
                     default:
                         std::cout << "\tUnsupported tag: <" << node.name() << ">" << std::endl;

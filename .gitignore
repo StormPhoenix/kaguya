@@ -4,6 +4,7 @@
 /output
 /resource
 *.zip
+dev-gpu.md
 
 *.png
 temp.txt
