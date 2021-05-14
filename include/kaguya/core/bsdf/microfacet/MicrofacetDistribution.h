@@ -22,7 +22,8 @@ namespace kaguya {
 
                     // Mask and shadowing function G(wi, wh)
                     // G(wi, wh) is independent of wh, so rewrite G(wi, wh) to G(wi)
-                    virtual Float G(const Vector3F &wo, const Normal3F &wh) const;
+                    // Wh direction is positive hemi-sphere by default
+                    virtual Float G(const Vector3F &v, const Normal3F &wh) const;
 
                     // Mask and shadowing function G(wo, wi)
                     // Which gives the fraction of microfacets in a differential area that are visible from

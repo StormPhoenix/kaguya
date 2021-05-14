@@ -44,25 +44,20 @@ namespace kaguya {
                 Float D_Wh = _microfacetDistribution->D(wh);
                 Float G_Wo_Wi = _microfacetDistribution->G(wo, wi, wh);
 
-                Float cosThetaWOH = DOT(wo, wh);
-                Spectrum Fr = _fresnel.fresnel(cosThetaWOH);
+                Float cosThetaWoWh = DOT(wo, wh);
+                Spectrum Fr = _fresnel.fresnel(cosThetaWoWh);
 
-                Float absCosThetaWIH = ABS_DOT(wi, wh);
-                Float absCosThetaWOH = ABS_DOT(wo, wh);
+                Float absCosThetaWiWh = ABS_DOT(wi, wh);
+                Float absCosThetaWoWh = ABS_DOT(wo, wh);
 
-                Float cosThetaWIH = DOT(wi, wh);
-                Float term = cosThetaWOH + invEta * (cosThetaWIH);
+                Float cosThetaWiWh = DOT(wi, wh);
+                Float term = cosThetaWoWh + invEta * (cosThetaWiWh);
 
                 Float scale = _mode == TransportMode::RADIANCE ? eta : 1.;
-
-                // TODO different from PBRT
+                // Some difference from PBRT
                 return _Kt * (Spectrum(1.0) - Fr) *
                        std::abs(((D_Wh * G_Wo_Wi * scale * scale) / (term * term)) *
-                                ((absCosThetaWIH * absCosThetaWOH) / (cosThetaWo * cosThetaWi)));
-
-//                return _Kt * (Spectrum(1.0) - Fr) *
-//                       std::abs(((D_Wh * G_Wo_Wi * scale * scale * invEta * invEta) / (term * term)) *
-//                                ((absCosThetaWIH * absCosThetaWOH) / (cosThetaWo * cosThetaWi)));
+                                ((absCosThetaWiWh * absCosThetaWoWh) / (cosThetaWo * cosThetaWi)));
             }
 
             Spectrum BXDFMicrofacetTransmission::sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,
@@ -115,13 +110,9 @@ namespace kaguya {
                     return 0.f;
                 }
 
-                // TODO different from PBRT
                 Float sqrtDenom = DOT(wo, wh) + invEta * DOT(wi, wh);
-                // TODO delete
+                // Some difference from PBRT
                 return _microfacetDistribution->samplePdf(wo, wh) * ABS_DOT(wi, wh) / (sqrtDenom * sqrtDenom);
-//                return _microfacetDistribution->samplePdf(wo, wh) *
-//                       std::abs(invEta * invEta * DOT(wi, wh)) /
-//                       (sqrtDenom * sqrtDenom);
             }
         }
     }

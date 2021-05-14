@@ -153,12 +153,6 @@ namespace kaguya {
                     return 0.0f;
                 }
 
-//                Float reflectionProb = fresnel::fresnelDielectric(cosThetaWoWh,
-//                                                                  cosThetaWo > 0 ? _etaI : _etaT,
-//                                                                  cosThetaWo > 0 ? _etaT : _etaI);
-
-
-
                 if (cosThetaWi * cosThetaWo > 0) {
                     // Reflection
                     Vector3F wh = NORMALIZE(wo + wi);
@@ -180,8 +174,8 @@ namespace kaguya {
                     Float refractionProb = 1.0 - fresnel::fresnelDielectric(ABS_DOT(wo, wh),
                                                                             cosThetaWo > 0 ? _etaI : _etaT,
                                                                             cosThetaWi > 0 ? _etaT : _etaI);
-                    // TODO different from PBRT
                     Float sqrtDenom = DOT(wo, wh) + invEta * DOT(wi, wh);
+                    // Some difference from PBRT
                     return refractionProb * _microfacetDistribution->samplePdf(wo, wh) * ABS_DOT(wi, wh) /
                            (sqrtDenom * sqrtDenom);
                 }

@@ -17,36 +17,37 @@ namespace kaguya {
 
                 Float GGXDistribution::D(const Normal3F &wh) const {
                     Float cosThetaH = local_coord::cosTheta(wh);
+                    // Ignore wh direction eg. if (cosThetaH < 0) -> return zero.
                     if (cosThetaH == 0) {
                         return 0;
                     }
 
-                    Float tanThetaH2 = local_coord::tanTheta2(wh);
-                    if (std::isinf(tanThetaH2)) {
+                    Float tanTheta2Wh = local_coord::tanTheta2(wh);
+                    if (std::isinf(tanTheta2Wh)) {
                         return 0.;
                     }
 
                     Float cosThetaH4 = cosThetaH * cosThetaH * cosThetaH * cosThetaH;
-                    Float item = _alpha_g * _alpha_g + tanThetaH2;
+                    Float item = _alpha_g * _alpha_g + tanTheta2Wh;
                     return (_alpha_g * _alpha_g) / (math::PI * cosThetaH4 * item * item);
                 }
 
-                Float GGXDistribution::G(const Vector3F &wo, const Normal3F &wh) const {
-                    if (DOT(wo, wh) * DOT(wo, Vector3F(0, 1, 0)) < 0.) {
+                Float GGXDistribution::G(const Vector3F &v, const Normal3F &wh) const {
+                    if (DOT(v, wh) * DOT(v, Vector3F(0, 1, 0)) < 0.) {
                         return 0.;
                     }
 
-                    Float tanThetaO2 = local_coord::tanTheta2(wo);
-                    if (std::isinf(tanThetaO2)) {
+                    Float tanTheta2V = local_coord::tanTheta2(v);
+                    if (std::isinf(tanTheta2V)) {
                         return 0.;
                     }
 
-                    if (tanThetaO2 == 0.0f) {
+                    if (tanTheta2V == 0.0f) {
                         return 1.0f;
                     }
 
                     Float alpha2 = _alpha_g * _alpha_g;
-                    return 2.0 / (1 + std::sqrt(1 + alpha2 * tanThetaO2));
+                    return 2.0 / (1 + std::sqrt(1 + alpha2 * tanTheta2V));
                 }
 
                 Float GGXDistribution::G(const Vector3F &wo, const Vector3F &wi, const Normal3F &wh) const {
@@ -65,24 +66,25 @@ namespace kaguya {
                     Float cosPhi = std::cos(phi);
                     Float sinPhi = std::sin(phi);
                     Vector3F wh = Vector3F(sinTheta * cosPhi, cosTheta, sinTheta * sinPhi);
+                    // Correct wh to the same hemi-sphere
                     if (wo.y * wh.y < 0) {
-                        wh.y *= -1;
+                        wh *= -1;
                     }
                     return NORMALIZE(wh);
                 }
 
-                Float GGXDistribution::lambda(const Vector3F &wo, const Normal3F &wh) const {
-                    if (DOT(wo, wh) * DOT(wo, Vector3F(0, 1, 0)) < 0.) {
+                Float GGXDistribution::lambda(const Vector3F &v, const Normal3F &wh) const {
+                    if (DOT(v, wh) * DOT(v, Vector3F(0, 1, 0)) < 0.) {
                         return 0.;
                     }
 
-                    Float tanThetaO2 = local_coord::tanTheta2(wo);
-                    if (std::isinf(tanThetaO2)) {
+                    Float tanTheta2V = local_coord::tanTheta2(v);
+                    if (std::isinf(tanTheta2V)) {
                         return 0.;
                     }
 
                     Float alpha2 = _alpha_g * _alpha_g;
-                    return (std::sqrt(1 + alpha2 * tanThetaO2) - 1) / 2;
+                    return (std::sqrt(1 + alpha2 * tanTheta2V) - 1) / 2;
                 }
             }
         }

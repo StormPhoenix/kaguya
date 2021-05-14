@@ -7,11 +7,11 @@
 namespace kaguya {
     namespace core {
         namespace bsdf {
-            BXDFMicrofacetReflection::BXDFMicrofacetReflection(const Spectrum &specularReflectance,
+            BXDFMicrofacetReflection::BXDFMicrofacetReflection(const Spectrum &Ks,
                                                                const MicrofacetDistribution *microfacetDistribution,
                                                                const Fresnel *fresnel) :
                     BXDF(BXDFType(BSDF_REFLECTION | BSDF_GLOSSY)),
-                    _specularReflectance(specularReflectance),
+                    _Ks(Ks),
                     _microfacetDistribution(microfacetDistribution),
                     _fresnel(fresnel) {
                 ASSERT(_microfacetDistribution != nullptr, "MicrofacetDistribution can't be nullptr. ");
@@ -29,13 +29,11 @@ namespace kaguya {
                     return Spectrum(0.0f);
                 }
 
-                cosThetaO = std::abs(cosThetaO);
-                cosThetaI = std::abs(cosThetaI);
-
                 // Half angle
                 Vector3F wh = NORMALIZE(wo + wi);
-                // Fresnel computation
-                wh = DOT(wh, Vector3F(0, 1, 0)) > 0 ? wh : -wh;
+                if (wh.y < 0) {
+                    wh *= -1;
+                }
 
                 Float D_Wh = _microfacetDistribution->D(wh);
                 Float G_Wo_Wi = _microfacetDistribution->G(wo, wi, wh);
@@ -43,7 +41,7 @@ namespace kaguya {
                 Float cosThetaH = DOT(wi, wh);
                 Spectrum Fr = _fresnel->fresnel(cosThetaH);
 
-                return (D_Wh * G_Wo_Wi * Fr * _specularReflectance) / (4 * cosThetaO * cosThetaI);
+                return (D_Wh * G_Wo_Wi * Fr * _Ks) / (4 * std::abs(cosThetaO * cosThetaI));
             }
 
             Spectrum BXDFMicrofacetReflection::sampleF(const Vector3F &wo, Vector3F *wi, Float *pdf,

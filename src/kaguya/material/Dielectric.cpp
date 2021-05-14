@@ -45,18 +45,6 @@ namespace kaguya {
             } else {
                 const GGXDistribution *distribution = ALLOC(memoryArena, GGXDistribution)(_roughness);
                 insect.bsdf->addBXDF(ALLOC(memoryArena, BXDFMicrofacet)(Kr, Kt, _etaI, _etaT, distribution, mode));
-
-                /*
-                if (!Kr.isBlack()) {
-                    const FresnelDielectric *fresnel = ALLOC(memoryArena, FresnelDielectric)(_etaI, _etaT);
-                    insect.bsdf->addBXDF(ALLOC(memoryArena, BXDFMicrofacetReflection)(Kr, distribution, fresnel));
-                }
-
-                if (!Kt.isBlack()) {
-                    insect.bsdf->addBXDF(
-                            ALLOC(memoryArena, BXDFMicrofacetTransmission)(_etaI, _etaT, Kt, distribution, mode));
-                }
-                 */
             }
         }
     }

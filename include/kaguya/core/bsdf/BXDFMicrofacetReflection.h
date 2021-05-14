@@ -17,7 +17,7 @@ namespace kaguya {
 
             class BXDFMicrofacetReflection : public BXDF {
             public:
-                BXDFMicrofacetReflection(const Spectrum &specularReflectance,
+                BXDFMicrofacetReflection(const Spectrum &Ks,
                                          const MicrofacetDistribution *microfacetDistribution,
                                          const Fresnel *fresnel);
 
@@ -29,7 +29,7 @@ namespace kaguya {
                 virtual Float samplePdf(const Vector3F &wo, const Vector3F &wi) const override;
 
             private:
-                const Spectrum _specularReflectance;
+                const Spectrum _Ks;
                 const MicrofacetDistribution *_microfacetDistribution;
                 const Fresnel *_fresnel;
             };

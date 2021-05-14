@@ -18,17 +18,17 @@ namespace kaguya {
 
                     virtual Float D(const Normal3F &wh) const override;
 
-                    virtual Float G(const Vector3F &wo, const Normal3F &wh) const override;
+                    virtual Float G(const Vector3F &v, const Normal3F &wh) const override;
 
                     virtual Float G(const Vector3F &wo, const Vector3F &wi, const Normal3F &wh) const override;
 
                     virtual Vector3F sampleWh(const Vector3F &wo, Sampler *sampler) const override;
 
                 protected:
-                    virtual Float lambda(const Vector3F &wo, const Normal3F &wh) const override;
+                    virtual Float lambda(const Vector3F &v, const Normal3F &wh) const override;
 
                 private:
-                    // Width parameter
+                    // Width parameter g
                     Float _alpha_g;
                 };
             }
