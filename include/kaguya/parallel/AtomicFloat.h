@@ -33,7 +33,7 @@ namespace kaguya {
             }
 
             void add(Float val) {
-#if defined(KAGUYA_DATA_DOUBLE)
+#if defined(RENDER_DATA_DOUBLE)
                 uint64_t oldBits = bits;
                 uint64_t newBits;
 #else
@@ -47,7 +47,7 @@ namespace kaguya {
             }
 
         private:
-#if defined(KAGUYA_DATA_DOUBLE)
+#if defined(RENDER_DATA_DOUBLE)
             std::atomic<uint64_t> bits;
 #else
             std::atomic<uint32_t> bits;

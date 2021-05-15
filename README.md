@@ -48,7 +48,7 @@ A simple physically based render.
 - [ ] Material-testball 场景渲染错误
     - [x] 环境光照没有生效，mirror 反射全是黑色
     - [ ] roughconductor 材质没有生效
-    - [ ] 重构 Path Tracer 中环境光照的代码（不要用 background 这个东西代替
+    - [x] 重构 Path Tracer 中环境光照的代码（不要用 background 这个东西代替
 
 - Material
 - [x] CoatingMaterial 重构，添加 Refraction 参数
@@ -66,6 +66,9 @@ A simple physically based render.
 - [ ] Material 结构整理 
     - [ ] Texture Texture Mapping package 结构整理
     - [ ] Medium phase function 
+    
+- Code Structure
+    - [ ] 删除不必要的头文件循环引用
     
 ## TODO
 - [ ] 修正 C++ template 特化语法

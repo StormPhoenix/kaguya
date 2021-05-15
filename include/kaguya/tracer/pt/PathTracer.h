@@ -38,8 +38,8 @@ namespace kaguya {
              * @param memoryArena
              * @return
              */
-            Spectrum shaderOfProgression(const Ray &ray, std::shared_ptr<Scene> scene,
-                                         Sampler *sampler,
+            Spectrum shaderOfProgression(Point2I pixelPos, int iteration, const Ray &ray,
+                                         std::shared_ptr<Scene> scene, Sampler *sampler,
                                          MemoryArena &memoryArena);
 
             /**
@@ -47,7 +47,7 @@ namespace kaguya {
              * @param ray
              * @return
              */
-            Spectrum background(const Ray &ray);
+            Spectrum estimateEnvLight(const Ray &ray);
 
         private:
             // 开始 Russian Roulette 时机

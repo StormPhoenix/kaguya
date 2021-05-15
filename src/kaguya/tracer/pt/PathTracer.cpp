@@ -8,6 +8,7 @@
 #include <kaguya/tracer/pt/PathTracer.h>
 #include <kaguya/sampler/SamplerFactory.hpp>
 #include <kaguya/parallel/RenderPool.h>
+#include <kaguya/tracer/Recorder.h>
 
 #include <atomic>
 
@@ -30,8 +31,8 @@ namespace kaguya {
         }
 
 
-        Spectrum PathTracer::shaderOfProgression(const Ray &ray, std::shared_ptr<Scene> scene,
-                                                 Sampler *sampler,
+        Spectrum PathTracer::shaderOfProgression(Point2I pixelPos, int iteration, const Ray &ray,
+                                                 std::shared_ptr<Scene> scene, Sampler *sampler,
                                                  MemoryArena &memoryArena) {
             // 最终渲染结果
             Spectrum shaderColor = Spectrum(0);
@@ -59,7 +60,7 @@ namespace kaguya {
 
                 // check if a medium interaction occurs
                 if (mi.isValid()) {
-                    /* handle medium interaction */
+                    // handle medium interaction
                     // sample1d direct light
                     shaderColor += beta * sampleDirectLight(scene, mi, sampler);
 
@@ -69,6 +70,7 @@ namespace kaguya {
                     mi.getPhaseFunction()->sampleScatter(worldWo, &worldWi, sampler);
                     scatterRay = mi.sendRay(worldWi);
                     isSpecularBounce = false;
+                    RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, mi.point, _camera.get())
                 } else {
                     // handle surface interaction
                     // 此处参考 pbrt 的写法，需要判断 bounce = 0 和 isSpecularBounce 两种特殊情况
@@ -80,16 +82,19 @@ namespace kaguya {
                                         si, -si.direction) * beta);
                             }
                         } else {
-                            // 环境光
-                            shaderColor += (beta * background(scatterRay));
+                            // Environment light
+                            shaderColor += (beta * estimateEnvLight(scatterRay));
+                            // Record infinite position
+                            RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, scatterRay.at(20000), _camera.get())
                             break;
                         }
                     }
 
                     // 终止条件判断
                     if (!isIntersected) {
-                        // TODO 添加环境光
-                        shaderColor += (beta * background(scatterRay));
+                        // Environment light
+                        shaderColor += (beta * estimateEnvLight(scatterRay));
+                        RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, scatterRay.at(20000), _camera.get())
                         break;
                     }
 
@@ -102,6 +107,7 @@ namespace kaguya {
 
                     si.buildScatteringFunction(memoryArena);
                     assert(si.bsdf != nullptr);
+                    RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, si.point, _camera.get())
 
                     // 判断是否向光源采样
                     if (si.bsdf->allIncludeOf(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
@@ -196,7 +202,8 @@ namespace kaguya {
                             Float pixelX = col + sampler->sample1D();
                             Float pixelY = row + sampler->sample1D();
                             Ray sampleRay = _camera->generateRay(pixelX, pixelY, sampler);
-                            Spectrum shaderColor = shaderOfProgression(sampleRay, _scene, sampler, arena);
+                            Spectrum shaderColor = shaderOfProgression(Point2I(col, row), iter, sampleRay,
+                                                                       _scene, sampler, arena);
 
                             _filmPlane->addSpectrum(shaderColor, row, col);
                             arena.clean();
@@ -225,7 +232,7 @@ namespace kaguya {
             std::cout << std::endl << "scene " << _scene->getName() << " completed." << std::endl;
         }
 
-        Spectrum PathTracer::background(const Ray &ray) {
+        Spectrum PathTracer::estimateEnvLight(const Ray &ray) {
             auto lights = _scene->getEnvironmentLights();
             Spectrum ret(0);
             for (Light::Ptr light : lights) {
