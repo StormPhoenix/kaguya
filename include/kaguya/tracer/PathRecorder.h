@@ -25,6 +25,7 @@
 
 #include <kaguya/math/Math.h>
 #include <vector>
+#include <mutex>
 #include <set>
 
 namespace kaguya {
