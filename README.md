@@ -12,12 +12,12 @@ A simple physically based render.
 
 - Material
     - Microfacet material
-    - [x] Metal
-    - [x] Frosted Glass
+        - [x] Metal
+        - [x] Frosted Glass
     - Diffuse
-    - [x] Lambertian
+        - [x] Lambertian
     - Dielectric
-    - [x] Glass
+        - [x] Glass
     - Subsurface
 
 - Geometry
@@ -31,6 +31,12 @@ A simple physically based render.
     - Spot light
     - Area light
     - Environment light
+
+- Denoiser
+    - [ ] to be continued ...
+    
+- Filter
+    - [ ] to be continued ...
 
 ## Example
 

@@ -12,13 +12,13 @@ namespace kaguya {
         namespace bsdf {
             class BXDFOrenNayar : public BXDF {
             public:
-                BXDFOrenNayar(const Spectrum &reflectance, Float sigma = 0.);
+                BXDFOrenNayar(const Spectrum &reflectance, Float roughness = 0.);
 
                 virtual Spectrum f(const Vector3F &wo, const Vector3F &wi) const override;
 
             private:
-                const Spectrum _reflectance;
-                const Float _sigma;
+                Float A, B;
+                const Spectrum _Kd;
             };
         }
     }
