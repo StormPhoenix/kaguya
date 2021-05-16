@@ -1,9 +1,26 @@
-## Processing
+## Path Tracing 并行化
+
+*每一步都是可并行的！！！*
+
+1. 生成 Camera Ray，保存到队列。
+    1. 每个 Ray 都会有一个自己的上下文 Context 数据结构，生成 Camera Ray 的同时要把 Context 赋值给 Ray
+2. 队列里所有的 Ray，和场景求交点 （并行）
+    1. 这一步交给 Optix 实现。GPU 和 CPU 的求交过程应该由统一的接口封装起来（CpuIntersectableScene | GpuIntersectableScene）
+3. 各种处理，修改 Context 数据结构
+    1. 检查是否发生 Medium Intersection，如果发生了 Medium，则保存这个信息到 Context
+    2. 判断是否采样 AreaLight，如果采样，则修改 Contex
+    3. 发射 Shadow Ray 采样光源，结果存储到 Context
+    4. Sample 散射方向，结果存储到 Context
+4. 生成 Next Ray，全部放入队列
+    1. 根据 Context 判断是否生成 Next Ray
+    2. 生成的 Next Ray 要继续绑定前任 Ray 拥有的 Context 数据结构
+5. 回到 步骤 2
+
+## 需要处理的问题
 - [ ] 场景导入
     - [ ] XML
-    - [ ] GLM 的矩阵变换好像和 kaguya 坐标系有些不匹配，需要自己改矩阵
-        - [ ] LookAt 用 macro 实现
-    - [ ] Camera 内部变换修改成矩阵形式
+    - [x] GLM 的矩阵变换好像和 kaguya 坐标系有些不匹配，需要自己改矩阵
+    - [x] Camera 内部变换修改成矩阵形式
     - [x] 删除 struct Vertex
     - [x] 删除 Assimp
     - [x] 重构 TriangleMesh
@@ -29,10 +46,6 @@
 
 - [ ] 构建不依赖 C++ std 的随机数生成器    
 
-- [ ] Torrance-Sparrow Model 公式推导 - 疑惑？
-    - [ ] 课上讲解的有问题，重新阅读 PBRT radiance 章节，公主 basics
-    - [ ] 推导 Torrance-Sparrow Model formulation
-    
 - [ ] BDPT RandomWalk 添加 Russian Roullete
 
 - [ ] BSDF 局部坐标系代码重构，不然可能会影响各向异性材质
@@ -42,22 +55,12 @@
 - Sampling
 - [ ] Sampler 和 sampling 方法单独放在不同文件，不要挤在 math.h 里面
 
-- Scene
-- [ ] Material-testball 场景渲染错误
-    - [x] 环境光照没有生效，mirror 反射全是黑色
-    - [ ] roughconductor 材质没有生效
-    - [x] 重构 Path Tracer 中环境光照的代码（不要用 background 这个东西代替
-
 - Material
 - [x] CoatingMaterial 重构，添加 Refraction 参数
     - [x] mitsuba 和 pbrt 中的 CoatingMaterial 种类要区分开 （不需要额外修改了，PatinaMaterial 属于内部 diffuse，外部 glossy 材质）
     
 - [ ] Mitsuba 中的 Coating 材质研究一下
 
-- [ ] Microfacet Material
-    - [ ] 进一步理解 Mask and Shadowing 里面的 AlphaX and AlphaY (和粗糙度有关)
-    - [ ] 进一步理解 Normal Distribution 里面的 sigma
-    
 - [ ] 重新利用 Fresnel
     - [ ] FresnelConductor 中的 K 做记录
     
