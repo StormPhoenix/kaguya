@@ -35,4 +35,7 @@ A simple physically based render.
 ## Example
 
 - Material testball
-<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/Metal_testball.jpg" alt="metal-ball" width="50%">
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/Metal_testball.jpg" alt="metal-ball" width="70%">
+
+- Dragon
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/dragon.jpg" alt="dragon" width="70%">
