@@ -506,6 +506,7 @@ namespace kaguya {
                                                                    MediumBoundary(interiorMedium.get(),
                                                                                   exteriorMedium.get()),
                                                                    true);
+                        _scene->addLight(light);
                     }
 
                     Geometry::Ptr geometry = std::make_shared<Geometry>(*it, material, interiorMedium, exteriorMedium,

@@ -150,10 +150,12 @@ namespace kaguya {
             }
 
             void addLight(Light::Ptr light) {
+                ASSERT(light != nullptr, "Added light can't be nullptr. ")
                 _lights.push_back(light);
             }
 
             void addEnvironmentLight(Light::Ptr light) {
+                ASSERT(light != nullptr, "Added env-light can't be nullptr. ")
                 _environmentLights.push_back(light);
             }
 

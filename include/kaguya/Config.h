@@ -65,7 +65,7 @@ namespace kaguya {
 
         class TraceRecorder {
         public:
-            static int drawPathRadius;
+            static float drawPathRadius;
         };
 
         static std::string filenamePrefix;

@@ -30,7 +30,7 @@ namespace kaguya {
     std::vector<std::string> Config::inputSceneDirs;
 
     // Trace recorder config
-    int Config::TraceRecorder::drawPathRadius = 1;
+    float Config::TraceRecorder::drawPathRadius = 0.6;
 
     // Outputs settings
     std::string Config::filenamePrefix = "render";
