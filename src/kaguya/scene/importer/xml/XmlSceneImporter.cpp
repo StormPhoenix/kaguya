@@ -20,6 +20,7 @@
 #include <kaguya/core/medium/IsotropicMedium.h>
 #include <kaguya/scene/importer/xml/XmlSceneImporter.h>
 #include <kaguya/utils/ObjLoader.h>
+#include <kaguya/tracer/PathRecorder.h>
 
 namespace kaguya {
     namespace scene {
@@ -213,8 +214,23 @@ namespace kaguya {
                 std::shared_ptr<transform::Transform> toWorld = std::make_shared<transform::Transform>(
                         toWorldMat.mat());
 
-                // TODO check near far 属性
                 _scene->setCamera(std::make_shared<Camera>(toWorld, fov));
+            }
+
+            void XmlSceneImporter::handleTagMode(pugi::xml_node &node, XmlParseInfo &parseInfo) {
+                const std::string type = node.attribute("type").value();
+                if (type == "final") {
+                    SET_TRACE_PATH_FLAG(false)
+                    return;
+                } else if (type == "trace") {
+                    SET_TRACE_PATH_FLAG(true)
+                    int row = parseInfo.getIntValue("row", -1);
+                    int col = parseInfo.getIntValue("col", -1);
+                    int traceCount = parseInfo.getIntValue("traceCount", 0);
+                    ADD_TRACE_CRITERIA(Point2I(col, row), traceCount);
+                } else {
+                    ASSERT(false, "Mode type not supported: <" + type + ">. ");
+                }
             }
 
             void XmlSceneImporter::handleTagTexture(pugi::xml_node &node,
@@ -664,6 +680,9 @@ namespace kaguya {
                                                  XmlParseInfo &parentParseInfo) {
                 TagType tagType = _nodeTypeMap[node.name()];
                 switch (tagType) {
+                    case Tag_Mode:
+                        handleTagMode(node, parseInfo);
+                        break;
                     case Tag_Boolean:
                         handleTagBoolean(node, parentParseInfo);
                         break;

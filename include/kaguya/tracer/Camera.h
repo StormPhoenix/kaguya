@@ -31,10 +31,6 @@ namespace kaguya {
 
             Ray generateRay(Float pixelX, Float pixelY, Sampler * sampler) const;
 
-            const Vector3F &getFront() const {
-                return _front;
-            }
-
             /**
              * 相机对 eye 发射采样射线，起点随机
              * @param eye
@@ -48,20 +44,26 @@ namespace kaguya {
                                      Sampler *const sampler, VisibilityTester *visibilityTester) const;
 
             /**
+           * 计算相机发射射线 ray 的 importance（pdfPos，pdfDir）
+           * @param ray
+           * @param pdfPos
+           * @param pdfDir
+           * @return
+           */
+            void pdfWe(const Ray &ray, Float &pdfPos, Float &pdfDir) const;
+
+            Point2I worldToRaster(const Point3F &point) const;
+
+            /**
              * 构建成像平面
              * @param channel
              * @return
              */
             FilmPlane *buildFilmPlane(int channel) const;
 
-            /**
-             * 计算相机发射射线 ray 的 importance（pdfPos，pdfDir）
-             * @param ray
-             * @param pdfPos
-             * @param pdfDir
-             * @return
-             */
-            void pdfWe(const Ray &ray, Float &pdfPos, Float &pdfDir) const;
+            const Vector3F &getFront() const {
+                return _front;
+            }
 
         private:
             /**
@@ -72,6 +74,7 @@ namespace kaguya {
              * @return
              */
             Spectrum We(const Ray &ray, Point2F *const filmPosition) const;
+
         private:
             Vector3F _origin;
             Vector3F _front;

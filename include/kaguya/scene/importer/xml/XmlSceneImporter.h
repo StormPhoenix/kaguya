@@ -58,6 +58,8 @@ namespace kaguya {
 
                 void parseXml(pugi::xml_node &node, XmlParseInfo &parseInfo);
 
+                void handleTagMode(pugi::xml_node &node, XmlParseInfo &parseInfo);
+
                 void handleTagSensor(pugi::xml_node &node, XmlParseInfo &parseInfo);
 
                 void handleTagBSDF(pugi::xml_node &node, XmlParseInfo &parseInfo, XmlParseInfo &parentInfo);

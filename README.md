@@ -41,6 +41,8 @@ A simple physically based render.
 
 - [ ] BSDF 局部坐标系代码重构，不然可能会影响各向异性材质
 
+- [ ] FilmPlane 里面的 writeImage 和 ImageReader 统一起来
+
 - Sampling
 - [ ] Sampler 和 sampling 方法单独放在不同文件，不要挤在 math.h 里面
 
@@ -69,6 +71,7 @@ A simple physically based render.
     
 - Code Structure
     - [ ] 删除不必要的头文件循环引用
+    - [ ] Tracer 打印信息整合
     
 ## TODO
 - [ ] 修正 C++ template 特化语法

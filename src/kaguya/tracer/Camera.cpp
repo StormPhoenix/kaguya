@@ -145,5 +145,10 @@ namespace kaguya {
             return Spectrum(weight);
         }
 
+        Point2I Camera::worldToRaster(const Point3F &point) const {
+            Point3F cameraPoint = _worldToCamera->transformPoint(point);
+            Point3F pRaster = _cameraToRaster->transformPoint(cameraPoint);
+            return Point2I(pRaster.x, pRaster.y);
+        }
     }
 }

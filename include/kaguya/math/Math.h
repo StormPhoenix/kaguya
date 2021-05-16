@@ -31,6 +31,8 @@ using Vector4d = glm::dvec4;
 using Vector4i = glm::int4;
 using Vector4f = glm::vec4;
 
+using Color = glm::int3;
+
 using Matrix4d = glm::dmat4x4;
 using Matrix3d = glm::dmat3x3;
 

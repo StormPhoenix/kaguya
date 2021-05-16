@@ -29,6 +29,9 @@ namespace kaguya {
     std::vector<std::function<std::shared_ptr<Scene>()>> Config::innerScenes;
     std::vector<std::string> Config::inputSceneDirs;
 
+    // Trace recorder config
+    int Config::TraceRecorder::drawPathRadius = 1;
+
     // Outputs settings
     std::string Config::filenamePrefix = "render";
 

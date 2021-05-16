@@ -63,6 +63,11 @@ namespace kaguya {
             static int tileSize;
         };
 
+        class TraceRecorder {
+        public:
+            static int drawPathRadius;
+        };
+
         static std::string filenamePrefix;
         // russian roulette 从什么 depth 开始
         static int russianRouletteDepth;

@@ -8,7 +8,7 @@
 #include <kaguya/tracer/pt/PathTracer.h>
 #include <kaguya/sampler/SamplerFactory.hpp>
 #include <kaguya/parallel/RenderPool.h>
-#include <kaguya/tracer/Recorder.h>
+#include <kaguya/tracer/PathRecorder.h>
 
 #include <atomic>
 
@@ -54,6 +54,19 @@ namespace kaguya {
                 if (scatterRay.getMedium() != nullptr) {
                     beta *= scatterRay.getMedium()->sampleInteraction(scatterRay, sampler, &mi, memoryArena);
                     if (beta.isBlack()) {
+                        {
+                            // Record intersection
+                            if (mi.isValid()) {
+                                RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, mi.point, Medium_Record,
+                                                  _camera.get())
+                            } else if (isIntersected) {
+                                RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, si.point, Medium_Record,
+                                                  _camera.get())
+                            } else {
+                                RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, scatterRay.at(20000),
+                                                  Environment_Record, _camera.get())
+                            }
+                        }
                         break;
                     }
                 }
@@ -70,7 +83,7 @@ namespace kaguya {
                     mi.getPhaseFunction()->sampleScatter(worldWo, &worldWi, sampler);
                     scatterRay = mi.sendRay(worldWi);
                     isSpecularBounce = false;
-                    RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, mi.point, _camera.get())
+                    RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, mi.point, Medium_Record, _camera.get())
                 } else {
                     // handle surface interaction
                     // 此处参考 pbrt 的写法，需要判断 bounce = 0 和 isSpecularBounce 两种特殊情况
@@ -85,7 +98,8 @@ namespace kaguya {
                             // Environment light
                             shaderColor += (beta * estimateEnvLight(scatterRay));
                             // Record infinite position
-                            RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, scatterRay.at(20000), _camera.get())
+                            RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, scatterRay.at(20000),
+                                              Environment_Record, _camera.get())
                             break;
                         }
                     }
@@ -94,7 +108,8 @@ namespace kaguya {
                     if (!isIntersected) {
                         // Environment light
                         shaderColor += (beta * estimateEnvLight(scatterRay));
-                        RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, scatterRay.at(20000), _camera.get())
+                        RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, scatterRay.at(20000),
+                                          Environment_Record, _camera.get())
                         break;
                     }
 
@@ -106,8 +121,7 @@ namespace kaguya {
                     }
 
                     si.buildScatteringFunction(memoryArena);
-                    assert(si.bsdf != nullptr);
-                    RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, si.point, _camera.get())
+                    ASSERT(si.bsdf != nullptr, "BSDF can't be nullptr. ");
 
                     // 判断是否向光源采样
                     if (si.bsdf->allIncludeOf(BXDFType(BSDF_ALL & (~BSDF_SPECULAR)))) {
@@ -125,6 +139,8 @@ namespace kaguya {
                     // f(p, wo, wi)
                     Spectrum f = si.bsdf->sampleF(worldWo, &worldWi, &samplePdf, sampler, BSDF_ALL, &bxdfType);
                     isSpecularBounce = (bxdfType & BSDF_SPECULAR) > 0;
+                    RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, si.point,
+                                      isSpecularBounce ? Specular_Record : Others_Record, _camera.get())
 
                     if (samplePdf == 0 || f.isBlack()) {
                         break;
@@ -202,7 +218,7 @@ namespace kaguya {
                             Float pixelX = col + sampler->sample1D();
                             Float pixelY = row + sampler->sample1D();
                             Ray sampleRay = _camera->generateRay(pixelX, pixelY, sampler);
-                            Spectrum shaderColor = shaderOfProgression(Point2I(col, row), iter, sampleRay,
+                            Spectrum shaderColor = shaderOfProgression(Point2I(col, row), iter + 1, sampleRay,
                                                                        _scene, sampler, arena);
 
                             _filmPlane->addSpectrum(shaderColor, row, col);
