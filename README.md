@@ -44,4 +44,7 @@ A simple physically based render.
 <img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/Metal_testball.jpg" alt="metal-ball" width="70%">
 
 - Dragon
-<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/dragon.jpg" alt="dragon" width="70%">
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/Dragon.jpg" alt="dragon" width="70%">
+
+- Debug PT
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/Debug_bunny.jpg" alt="dragon" width="70%">
