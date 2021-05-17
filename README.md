@@ -46,5 +46,11 @@ A simple physically based render.
 - Dragon
 <img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/Dragon.jpg" alt="dragon" width="70%">
 
+- Teapot full
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/Teapot_full.jpg" alt="teapot-full" width="70%">
+
+- Bunny glass
+<img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/Bunny_glass.jpg" alt="bunny_glass" width="70%">
+
 - Debug PT
 <img src="https://github.com/StormPhoenix/render-repository-data/blob/master/thumbnail/Debug_bunny.jpg" alt="dragon" width="70%">
