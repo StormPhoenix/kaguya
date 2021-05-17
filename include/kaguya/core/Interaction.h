@@ -7,7 +7,7 @@
 
 #include <kaguya/core/Core.h>
 #include <kaguya/core/bsdf/BXDF.h>
-#include <kaguya/core/medium/MediumBoundary.h>
+#include <kaguya/core/medium/MediumInterface.h>
 #include <kaguya/core/phase/PhaseFunction.h>
 #include <kaguya/utils/MemoryArena.h>
 #include <kaguya/tracer/Ray.h>
@@ -37,7 +37,7 @@ namespace kaguya {
 
         using scene::Intersectable;
         using medium::Medium;
-        using medium::MediumBoundary;
+        using medium::MediumInterface;
         using kaguya::tracer::Camera;
         using kaguya::tracer::Ray;
         using kaguya::material::Material;
@@ -56,7 +56,7 @@ namespace kaguya {
             Interaction() : _mediumBoundary(nullptr, nullptr) {}
 
             Interaction(const Vector3F &point, const Vector3F &direction, const Vector3F &normal,
-                        const MediumBoundary &mediumBoundary, Material *material = nullptr);
+                        const MediumInterface &mediumBoundary, Material *material = nullptr);
 
             /**
              * 检测是否是体积碰撞
@@ -76,7 +76,7 @@ namespace kaguya {
 
             virtual Ray sendRayTo(const Interaction &it) const;
 
-            void setMediumBoundary(const MediumBoundary &mediumBoundary) {
+            void setMediumBoundary(const MediumInterface &mediumBoundary) {
                 _mediumBoundary = mediumBoundary;
             }
 
@@ -109,7 +109,7 @@ namespace kaguya {
             // 击中材质种类
             Material *_material = nullptr;
             // medium boundary
-            MediumBoundary _mediumBoundary;
+            MediumInterface _mediumBoundary;
 
         public:
             const Material *getMaterial() const {
@@ -129,7 +129,7 @@ namespace kaguya {
             SurfaceInteraction() : Interaction() {}
 
             SurfaceInteraction(const Vector3F &point, const Vector3F &direction, const Vector3F &normal,
-                               MediumBoundary &mediumBoundary, Float u = 0, Float v = 0,
+                               MediumInterface &mediumBoundary, Float u = 0, Float v = 0,
                                Material *material = nullptr);
 
             void buildScatteringFunction(MemoryArena &memoryArena, TransportMode mode = TransportMode::RADIANCE);

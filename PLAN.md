@@ -16,6 +16,9 @@
     2. 生成的 Next Ray 要继续绑定前任 Ray 拥有的 Context 数据结构
 5. 回到 步骤 2
 
+## 需要加入的新特性
+- [ ] Direct light
+
 ## 需要处理的问题
 - [ ] 场景导入
     - [ ] XML
@@ -29,6 +32,7 @@
         - [x] photon 数太少，radius 初始太大，收敛太慢。这个配置下 CPU 跑的太慢了，是时候升级到 GPU 版本了 
     
 - [ ] 添加环境光贴图
+    - [ ] 场景构建结束后，需要重新设置 EnvironmentLight 的 worldBound
     - [ ] 考虑 EnvironmentLight(EL) 在 PT \ BDPT \ SPPM 三种情况下如何处理
         - [ ] BDPT
             - [ ] connectible() cameraPath 最后一个 Vertex 是 EL

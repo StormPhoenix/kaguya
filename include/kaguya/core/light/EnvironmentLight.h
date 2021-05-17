@@ -21,7 +21,7 @@ namespace kaguya {
 
         class EnvironmentLight : public Light {
         public:
-            EnvironmentLight(Float intensity, std::string texturePath, const MediumBoundary &mediumBoundary,
+            EnvironmentLight(Float intensity, std::string texturePath, const MediumInterface &mediumBoundary,
                              Transform::Ptr lightToWorld = std::make_shared<Transform>());
 
             virtual Spectrum Le(const Ray &ray) const override;

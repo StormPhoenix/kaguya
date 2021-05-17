@@ -21,7 +21,7 @@ namespace kaguya {
              * @param center 光源位置
              * @param intensity 光源处，单位立体角的光通量
              */
-            PointLight(const Spectrum &intensity, Transform::Ptr lightToWorld, const MediumBoundary &mediumBoundary);
+            PointLight(const Spectrum &intensity, Transform::Ptr lightToWorld, const MediumInterface &mediumBoundary);
 
             virtual Spectrum sampleLi(const Interaction &eye,
                                       Vector3F *wi, Float *pdf,

@@ -11,7 +11,7 @@ namespace kaguya {
         using namespace utils;
 
         EnvironmentLight::EnvironmentLight(Float intensity, std::string texturePath,
-                                           const MediumBoundary &mediumBoundary,
+                                           const MediumInterface &mediumBoundary,
                                            Transform::Ptr lightToWorld)
                 : Light(ENVIRONMENT, mediumBoundary), _intensity(intensity), _lightToWorld(lightToWorld) {
             // Check file exists
@@ -84,7 +84,7 @@ namespace kaguya {
 
             *visibilityTester = VisibilityTester(eye, Interaction(
                     eye.point + (*wi) * Float(2. * _worldRadius),
-                    (*wi), -(*wi), _mediumBoundary));
+                    (*wi), -(*wi), _mediumInterface));
             return sampleTexture(uv);
         }
 
@@ -132,7 +132,7 @@ namespace kaguya {
 
             (*pdfPos) = 1.0 / (math::PI * _worldRadius * _worldRadius);
             (*pdfDir) = sinTheta == 0 ? 0 : samplePdf / (2.0 * math::PI * math::PI * sinTheta);
-            (*ray) = Ray(posSample, dir, _mediumBoundary.inside());
+            (*ray) = Ray(posSample, dir, _mediumInterface.inside());
             return sampleTexture(uv);
         }
 

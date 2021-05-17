@@ -16,7 +16,7 @@ namespace kaguya {
         public:
             DiffuseAreaLight(const Spectrum &intensity,
                              std::shared_ptr<Shape> shape,
-                             const MediumBoundary &mediumBoundary,
+                             const MediumInterface &mediumBoundary,
                              bool singleSide = true);
 
             Spectrum L(const Interaction &interaction, const Vector3F &wo) const override;

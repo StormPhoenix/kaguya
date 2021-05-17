@@ -28,7 +28,7 @@ namespace kaguya {
              * @param intensity
              * @param shape
              */
-            AreaLight(const Spectrum &intensity, std::shared_ptr<Shape> shape, LightType type, const MediumBoundary &mediumBoundary);
+            AreaLight(const Spectrum &intensity, std::shared_ptr<Shape> shape, LightType type, const MediumInterface &mediumBoundary);
 
             /**
              * 计算 AreaLight 表面某一点 point，方向为 wo 的亮度。

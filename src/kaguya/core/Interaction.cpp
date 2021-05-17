@@ -11,7 +11,7 @@ namespace kaguya {
 
         Vector3F offsetOrigin(const Vector3F &origin, const Vector3F &error,
                               const Vector3F &normal, const Vector3F &direction) {
-            Float dist = DOT(ABS(normal), error);
+            Float dist = 2.0 * DOT(ABS(normal), error);
             Vector3F offset = dist * normal;
             if (DOT(normal, direction) < 0) {
                 offset = -offset;
@@ -32,7 +32,7 @@ namespace kaguya {
 
         Interaction::Interaction(const Vector3F &point,
                                  const Vector3F &direction, const Vector3F &normal,
-                                 const MediumBoundary &mediumBoundary, Material *material) :
+                                 const MediumInterface &mediumBoundary, Material *material) :
                 point(point), direction(direction), normal(normal),
                 _mediumBoundary(mediumBoundary), _material(material) {}
 
@@ -75,7 +75,7 @@ namespace kaguya {
 
         SurfaceInteraction::SurfaceInteraction(const Vector3F &point, const Vector3F &direction,
                                                const Vector3F &normal,
-                                               MediumBoundary &mediumBoundary,
+                                               MediumInterface &mediumBoundary,
                                                Float u, Float v, Material *material) :
                 Interaction(point, direction, normal, mediumBoundary, material),
                 u(u), v(v) {}

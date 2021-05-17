@@ -503,8 +503,8 @@ namespace kaguya {
                     AreaLight::Ptr light = nullptr;
                     if (parseInfo.hasAreaLight) {
                         light = std::make_shared<DiffuseAreaLight>(radiance, *it,
-                                                                   MediumBoundary(interiorMedium.get(),
-                                                                                  exteriorMedium.get()),
+                                                                   MediumInterface(interiorMedium.get(),
+                                                                                   exteriorMedium.get()),
                                                                    true);
                         _scene->addLight(light);
                     }
@@ -576,8 +576,8 @@ namespace kaguya {
                     transform::Transform toWorldMat = info.getTransformValue("toWorld", Transform());
                     std::shared_ptr<transform::Transform> toWorld = std::make_shared<transform::Transform>(toWorldMat);
                     Spectrum intensity = info.getSpectrumValue("intensity", 0);
-                    Light::Ptr pointLight = std::make_shared<PointLight>(intensity, toWorld, MediumBoundary(nullptr,
-                                                                                                            nullptr));
+                    Light::Ptr pointLight = std::make_shared<PointLight>(intensity, toWorld, MediumInterface(nullptr,
+                                                                                                             nullptr));
                     _scene->addLight(pointLight);
                     std::cout << "\tCreate light: point light" << std::endl;
                 } else if (type == "spot") {
@@ -588,7 +588,7 @@ namespace kaguya {
                     Float falloffAngle = info.getFloatValue("falloffAngle", 50.);
                     Light::Ptr spotLight = std::make_shared<SpotLight>(
                             intensity, toWorld,
-                            MediumBoundary(nullptr, nullptr),
+                            MediumInterface(nullptr, nullptr),
                             falloffAngle, totalAngle);
                     _scene->addLight(spotLight);
                     std::cout << "\tCreate light: spot light" << std::endl;
@@ -600,7 +600,7 @@ namespace kaguya {
                     std::string envmapPath = info.getStringValue("filename", "");
 
                     Light::Ptr envLight = std::make_shared<EnvironmentLight>(1., _inputSceneDir + envmapPath,
-                                                                             MediumBoundary(nullptr, nullptr), toWorld);
+                                                                             MediumInterface(nullptr, nullptr), toWorld);
                     _scene->addLight(envLight);
                     _scene->addEnvironmentLight(envLight);
                     std::cout << "\tCreate environment light. " << std::endl;

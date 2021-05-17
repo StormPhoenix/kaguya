@@ -10,7 +10,7 @@ namespace kaguya {
 
         DiffuseAreaLight::DiffuseAreaLight(const Spectrum &intensity,
                                            std::shared_ptr<Shape> shape,
-                                           const MediumBoundary &mediumBoundary,
+                                           const MediumInterface &mediumBoundary,
                                            bool singleSide) :
                 AreaLight(intensity, shape, AREA, mediumBoundary), _singleSide(singleSide) {}
 
@@ -20,7 +20,7 @@ namespace kaguya {
 
             // 采样位置
             SurfaceInteraction si = _shape->sampleSurfacePoint(pdfPos, sampler);
-            si.setMediumBoundary(_mediumBoundary);
+            si.setMediumBoundary(_mediumInterface);
 
             if (normal != nullptr) {
                 *normal = si.normal;

@@ -21,7 +21,7 @@ namespace kaguya {
                   const Texture<Spectrum>::Ptr eta,
                   const Texture<Spectrum>::Ptr Ks,
                   const Texture<Spectrum>::Ptr K,
-                  std::string distributionType = "beckmann");
+                  std::string distributionType = "ggx");
 
             virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
                                                     TransportMode mode = TransportMode::RADIANCE) override;

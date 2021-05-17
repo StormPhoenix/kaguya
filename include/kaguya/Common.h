@@ -5,6 +5,7 @@
 #ifndef KAGUYA_COMMON_H
 #define KAGUYA_COMMON_H
 
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -32,9 +33,9 @@ namespace fs = std::filesystem;
 namespace fs = ghc::filesystem;
 #endif
 
-#include <cstdlib>
+#define RENDER_NAMESPACE kaguya
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
 
 #define ASSERT(condition, description) \
     do { \

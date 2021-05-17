@@ -14,7 +14,7 @@ namespace kaguya {
     namespace core {
 
         namespace medium {
-            class MediumBoundary;
+            class MediumInterface;
         }
 
         using medium::Medium;
@@ -33,8 +33,8 @@ namespace kaguya {
         public:
             typedef std::shared_ptr<Light> Ptr;
 
-            Light(LightType type, const MediumBoundary &mediumBoundary) :
-                    _type(type), _mediumBoundary(mediumBoundary) {}
+            Light(LightType type, const MediumInterface &mediumBoundary) :
+                    _type(type), _mediumInterface(mediumBoundary) {}
 
             /**
              * 计算对交点 eye 处对辐射量
@@ -95,7 +95,7 @@ namespace kaguya {
 
         protected:
             const LightType _type;
-            MediumBoundary _mediumBoundary;
+            MediumInterface _mediumInterface;
         };
 
     }

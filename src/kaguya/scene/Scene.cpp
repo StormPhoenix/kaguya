@@ -306,7 +306,7 @@ namespace kaguya {
                                                                const std::shared_ptr<Medium> outside,
                                                                bool singleSide) {
             std::shared_ptr<AreaLight> light = std::make_shared<DiffuseAreaLight>(
-                    spectrum, geometry->getShape(), MediumBoundary(inside.get(), outside.get()), singleSide);
+                    spectrum, geometry->getShape(), MediumInterface(inside.get(), outside.get()), singleSide);
             geometry->setAreaLight(light);
             return light;
         }
@@ -525,7 +525,7 @@ namespace kaguya {
             Transform::Ptr lightToWorld = std::make_shared<Transform>(lightToWorldMat);
             std::shared_ptr<PointLight> light = std::make_shared<PointLight>(lightSpectrum,
                                                                              lightToWorld,
-                                                                             MediumBoundary(nullptr, nullptr));
+                                                                             MediumInterface(nullptr, nullptr));
             scene->_lights.push_back(light);
 
             // scene
@@ -651,7 +651,7 @@ namespace kaguya {
             Transform::Ptr lightToWorld = std::make_shared<Transform>(lightToWorldMat);
             std::shared_ptr<PointLight> light = std::make_shared<PointLight>(lightSpectrum,
                                                                              lightToWorld,
-                                                                             MediumBoundary(nullptr, nullptr));
+                                                                             MediumInterface(nullptr, nullptr));
             scene->_lights.push_back(light);
 
             // scene

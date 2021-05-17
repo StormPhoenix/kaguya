@@ -7,10 +7,10 @@
 namespace kaguya {
     namespace core {
         SpotLight::SpotLight(const Spectrum &intensity, Transform::Ptr lightToWorld,
-                             const MediumBoundary &mediumBoundary, Float fallOffRange, Float totalRange) :
+                             const MediumInterface &mediumBoundary, Float fallOffRange, Float totalRange) :
                 Light(DELTA_POSITION, mediumBoundary),
                 _intensity(intensity) {
-            ASSERT(_mediumBoundary.inside() == _mediumBoundary.outside(), "SpotLight medium must be equal.");
+            ASSERT(_mediumInterface.inside() == _mediumInterface.outside(), "SpotLight medium must be equal.");
             _lightToWorld = lightToWorld != nullptr ? lightToWorld : std::make_shared<Transform>();
             _center = _lightToWorld->transformPoint(Point3F(0));
             _dir = NORMALIZE(_lightToWorld->transformVector(Vector3F(0, 1, 0)));
@@ -20,11 +20,11 @@ namespace kaguya {
         }
 
         SpotLight::SpotLight(const Vector3F center, const Vector3F dir, Spectrum intensity,
-                             const MediumBoundary &mediumBoundary, Float fallOffRange, Float totalRange) :
+                             const MediumInterface &mediumBoundary, Float fallOffRange, Float totalRange) :
                 Light(DELTA_POSITION, mediumBoundary),
                 _center(center), _dir(NORMALIZE(dir)),
                 _intensity(intensity) {
-            assert(_mediumBoundary.inside() == _mediumBoundary.outside());
+            assert(_mediumInterface.inside() == _mediumInterface.outside());
 
             _cosFallOffRange = std::cos(math::DEGREES_TO_RADIANS(fallOffRange));
             _cosTotalRange = std::cos(math::DEGREES_TO_RADIANS(totalRange));
@@ -40,7 +40,7 @@ namespace kaguya {
             Vector3F samplePoint = _center;
             Vector3F sampleDir = NORMALIZE(_center - eye.point);
             Vector3F sampleNormal = -sampleDir;
-            Interaction interaction = Interaction(samplePoint, sampleDir, sampleNormal, _mediumBoundary);
+            Interaction interaction = Interaction(samplePoint, sampleDir, sampleNormal, _mediumInterface);
 
             (*visibilityTester) = VisibilityTester(eye, interaction);
             return _intensity * fallOffWeight(-(*wi)) / std::pow(LENGTH(_center - eye.point), 2);
@@ -65,7 +65,7 @@ namespace kaguya {
             Vector3F dirWorld = dirLocal.x * tanX + dirLocal.y * tanY + dirLocal.z * tanZ;
 
             // 设置 ray
-            (*ray) = Ray(_center, NORMALIZE(dirWorld), _mediumBoundary.inside());
+            (*ray) = Ray(_center, NORMALIZE(dirWorld), _mediumInterface.inside());
 
             (*normal) = dirWorld;
             (*pdfPos) = 1.0;

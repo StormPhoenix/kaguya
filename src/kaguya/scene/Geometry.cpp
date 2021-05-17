@@ -2,13 +2,13 @@
 // Created by Storm Phoenix on 2020/12/16.
 //
 
-#include <kaguya/core/medium/MediumBoundary.h>
+#include <kaguya/core/medium/MediumInterface.h>
 #include <kaguya/scene/Geometry.h>
 
 namespace kaguya {
     namespace scene {
 
-        using kaguya::core::medium::MediumBoundary;
+        using kaguya::core::medium::MediumInterface;
 
         Geometry::Geometry(const std::shared_ptr<meta::Shape> shape,
                            const std::shared_ptr<Material> material,
@@ -25,7 +25,7 @@ namespace kaguya {
 
             if (ret) {
                 // medium
-                si.setMediumBoundary(MediumBoundary(_inside.get(), _outside.get()));
+                si.setMediumBoundary(MediumInterface(_inside.get(), _outside.get()));
                 // material
                 if (_material != nullptr) {
                     if (_material->isTwoSided() || (DOT(ray.getDirection(), si.normal) < 0)) {
