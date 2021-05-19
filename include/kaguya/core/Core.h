@@ -33,7 +33,6 @@ namespace RENDER_NAMESPACE {
 #endif
 
         class Light;
-        class InfiniteLight;
         class EnvironmentLight;
 
         namespace bsdf {

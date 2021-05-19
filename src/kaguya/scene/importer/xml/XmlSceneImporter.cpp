@@ -645,7 +645,7 @@ namespace kaguya {
                                                                                                         nullptr),
                                                                                         toWorld);
                     _scene->addLight(envLight);
-                    _scene->addInfiniteLight(envLight);
+                    _scene->addEnvironmentLight(envLight);
                     std::cout << "\tCreate environment light. " << std::endl;
                 } else if (type == "sunsky") {
                     ASSERT(info.attrExists("sunDirection") && info.attrExists("intensity"),
@@ -656,7 +656,6 @@ namespace kaguya {
                     Vector3F sunDirection = -info.getVectorValue("sunDirection", Vector3F(0, 1, 0));
                     SunLight::Ptr sunLight = std::make_shared<SunLight>(intensity, sunDirection);
                     _scene->addLight(sunLight);
-                    _scene->addInfiniteLight(sunLight);
                     std::cout << "\tCreate sun light. " << std::endl;
                 } else {
                     ASSERT(false, "Emitter type not supported: <" + type + ">. ");
@@ -832,8 +831,8 @@ namespace kaguya {
                 _scene->setWorld(bvh);
                 _scene->setSceneName(Config::Camera::filename);
 
-                const std::vector<InfiniteLight::Ptr> &infiniteLights = _scene->getInfiniteLights();
-                for (auto it = infiniteLights.begin(); it != infiniteLights.end(); it++) {
+                const std::vector<Light::Ptr> &lights = _scene->getLights();
+                for (auto it = lights.begin(); it != lights.end(); it++) {
                     (*it)->worldBound(_scene);
                 }
 

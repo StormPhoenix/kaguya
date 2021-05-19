@@ -14,7 +14,6 @@
 #include <kaguya/core/light/AreaLight.h>
 #include <kaguya/core/light/SpotLight.h>
 #include <kaguya/core/light/PointLight.h>
-#include <kaguya/core/light/InfiniteLight.h>
 #include <kaguya/core/light/DiffuseAreaLight.h>
 #include <kaguya/core/Transform.h>
 
@@ -131,14 +130,14 @@ namespace kaguya {
 
             const std::vector<std::shared_ptr<Light>> &getLights() const;
 
-            const std::vector<std::shared_ptr<InfiniteLight>> &getInfiniteLights() const;
+            const std::vector<std::shared_ptr<EnvironmentLight>> &getEnvironmentLights() const;
 
             void addLight(Light::Ptr light) {
                 ASSERT(light != nullptr, "Added light can't be nullptr. ")
                 _lights.push_back(light);
             }
 
-            void addInfiniteLight(std::shared_ptr<InfiniteLight> envLight);
+            void addEnvironmentLight(std::shared_ptr<EnvironmentLight> envLight);
 
             const std::string getName() const {
                 return _sceneName;
@@ -161,7 +160,7 @@ namespace kaguya {
             // camera
             std::shared_ptr<Camera> _camera = nullptr;
             std::vector<Light::Ptr> _lights;
-            std::vector<std::shared_ptr<InfiniteLight>> _infiniteLights;
+            std::vector<std::shared_ptr<EnvironmentLight>> _envLights;
         };
 
     }

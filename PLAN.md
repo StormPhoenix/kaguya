@@ -38,9 +38,20 @@
     - [x] 场景构建结束后，需要重新设置 EnvironmentLight 的 worldBound
     - [ ] 考虑 EnvironmentLight(EL) 在 PT \ BDPT \ SPPM 三种情况下如何处理
         - [ ] BDPT
+            - [x] 删除 InfiniteLight，只考虑 EnvrionmentLight 
+            - [ ] class Light 添加 worldBound 接口
+            - [ ] 思考： Environment light 和 Infinite light
             - [ ] connectible() cameraPath 最后一个 Vertex 是 EL
             - [ ] connectPath() cameraPath 最后一个 Vertex 是 EL，则调过 connect 步骤
-            - [ ] randomWalk() for cameraPath
+            - [ ] PathVertex 添加 InfiniteLight 类型判断
+                - [ ] PathVertex::Le() 方法添加 Infinite 判断
+                - [ ] ConvertDensity 也要添加 Infinite 判断
+                - [ ] PdfLight 也要修改
+            - [ ] generateLightPath
+                - [ ] EnvrionmentLight 也要加入 lights，光线可以从 EnvLight 出发
+                - [ ] lightPath 在最后未击中的情况下不生成 LighPoint
+                - [ ] 引入 Infinite light 类型的光源，Infinite 类型的光源的 pdfDir 不能用于计算 path[1] 的 pdfFwd
+            - [ ] CameraPath 最后未击中的情况下生成 LightPoint
         - [x] PT
             - [x] Path tracing 未击中
         - [ ] SPPM

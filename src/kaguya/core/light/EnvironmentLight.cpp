@@ -16,7 +16,7 @@ namespace kaguya {
         EnvironmentLight::EnvironmentLight(Float intensity, std::string texturePath,
                                            const MediumInterface &mediumBoundary,
                                            Transform::Ptr lightToWorld)
-                : InfiniteLight(ENVIRONMENT, mediumBoundary), _intensity(intensity), _lightToWorld(lightToWorld) {
+                : Light(ENVIRONMENT, mediumBoundary), _intensity(intensity), _lightToWorld(lightToWorld) {
             // Check file exists
             {
                 std::ifstream in(texturePath);

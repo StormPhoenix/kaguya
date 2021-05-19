@@ -5,6 +5,7 @@
 #include <kaguya/Config.h>
 #include <kaguya/core/bssrdf/BSSRDF.h>
 #include <kaguya/core/Interaction.h>
+#include <kaguya/core/light/EnvironmentLight.h>
 #include <kaguya/tracer/pt/PathTracer.h>
 #include <kaguya/sampler/SamplerFactory.hpp>
 #include <kaguya/parallel/RenderPool.h>
@@ -97,7 +98,7 @@ namespace kaguya {
                             }
                         } else {
                             // Environment light
-                            shaderColor += (beta * estimateInfiniteLight(scatterRay));
+                            shaderColor += (beta * estimateEnvironmentLights(scatterRay));
                             // Record infinite position
                             RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, scatterRay.at(20000),
                                               Environment_Record, _camera.get())
@@ -108,7 +109,7 @@ namespace kaguya {
                     // 终止条件判断
                     if (!isIntersected) {
                         // Environment light
-                        shaderColor += (beta * estimateInfiniteLight(scatterRay));
+                        shaderColor += (beta * estimateEnvironmentLights(scatterRay));
                         RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, scatterRay.at(20000),
                                           Environment_Record, _camera.get())
                         break;
@@ -249,10 +250,10 @@ namespace kaguya {
             std::cout << std::endl << "scene " << _scene->getName() << " completed." << std::endl;
         }
 
-        Spectrum PathTracer::estimateInfiniteLight(const Ray &ray) {
-            auto lights = _scene->getInfiniteLights();
+        Spectrum PathTracer::estimateEnvironmentLights(const Ray &ray) {
+            auto lights = _scene->getEnvironmentLights();
             Spectrum ret(0);
-            for (InfiniteLight::Ptr light : lights) {
+            for (EnvironmentLight::Ptr light : lights) {
                 ret += light->Le(ray);
             }
             return ret;

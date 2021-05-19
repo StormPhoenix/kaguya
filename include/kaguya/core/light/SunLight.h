@@ -7,13 +7,13 @@
 
 #include <kaguya/Common.h>
 #include <kaguya/core/Transform.h>
-#include <kaguya/core/light/InfiniteLight.h>
+#include <kaguya/core/light/Light.h>
 
 namespace RENDER_NAMESPACE {
     namespace core {
         using namespace transform;
 
-        class SunLight : public InfiniteLight {
+        class SunLight : public Light {
         public:
             SunLight(const Spectrum &intensity, const Vector3F &direction);
 

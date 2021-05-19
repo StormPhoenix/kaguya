@@ -47,7 +47,7 @@ namespace kaguya {
              * @param ray
              * @return
              */
-            Spectrum estimateInfiniteLight(const Ray &ray);
+            Spectrum estimateEnvironmentLights(const Ray &ray);
 
         private:
             // 开始 Russian Roulette 时机

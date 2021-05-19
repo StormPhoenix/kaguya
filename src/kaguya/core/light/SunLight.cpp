@@ -11,8 +11,7 @@ namespace RENDER_NAMESPACE {
         using scene::acc::AABB;
 
         SunLight::SunLight(const Spectrum &intensity, const Vector3F &direction) :
-                InfiniteLight(DELTA_DIRECTION, MediumInterface()),
-                L(intensity), _direction(direction) {}
+                Light(DELTA_DIRECTION, MediumInterface()), L(intensity), _direction(direction) {}
 
         Spectrum SunLight::sampleLi(const Interaction &eye, Vector3F *wi, Float *pdf,
                                     Sampler *sampler, VisibilityTester *visibilityTester) {

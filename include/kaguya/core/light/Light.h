@@ -18,6 +18,7 @@ namespace kaguya {
             class MediumInterface;
         }
 
+        using scene::Scene;
         using medium::Medium;
         using kaguya::utils::VisibilityTester;
         using kaguya::tracer::Ray;
@@ -34,8 +35,7 @@ namespace kaguya {
         public:
             typedef std::shared_ptr<Light> Ptr;
 
-            Light(LightType type, const MediumInterface &mediumBoundary) :
-                    _type(type), _mediumInterface(mediumBoundary) {}
+            Light(LightType type, const MediumInterface &mediumInterface);
 
             /**
              * 计算对交点 eye 处对辐射量
@@ -84,15 +84,15 @@ namespace kaguya {
              * @param ray
              * @return
              */
-            virtual Spectrum Le(const Ray &ray) const { return Spectrum(0.0); }
+            virtual Spectrum Le(const Ray &ray) const;
+
+            virtual void worldBound(const std::shared_ptr<Scene> scene);
 
             /**
              * 判断光源是否是尖端分布
              * @return
              */
-            bool isDeltaType() const {
-                return (_type & (DELTA_DIRECTION | DELTA_POSITION)) > 0;
-            }
+            bool isDeltaType() const;
 
         protected:
             const LightType _type;

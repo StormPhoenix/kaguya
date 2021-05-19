@@ -8,7 +8,7 @@
 #include <kaguya/scene/Scene.h>
 #include <kaguya/math/Distribution.h>
 #include <kaguya/core/Transform.h>
-#include <kaguya/core/light/InfiniteLight.h>
+#include <kaguya/core/light/Light.h>
 
 namespace kaguya {
     namespace core {
@@ -17,7 +17,7 @@ namespace kaguya {
         using scene::Scene;
         using math::sampling::Distribution2D;
 
-        class EnvironmentLight : public InfiniteLight {
+        class EnvironmentLight : public Light {
         public:
             typedef std::shared_ptr<EnvironmentLight> Ptr;
 

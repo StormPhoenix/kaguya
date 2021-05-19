@@ -783,13 +783,13 @@ namespace kaguya {
         }
          */
 
-        const std::vector<std::shared_ptr<InfiniteLight>> &Scene::getInfiniteLights() const {
-            return _infiniteLights;
+        const std::vector<std::shared_ptr<EnvironmentLight>> &Scene::getEnvironmentLights() const {
+            return _envLights;
         }
 
-        void Scene::addInfiniteLight(std::shared_ptr<InfiniteLight> infiniteLight) {
-            ASSERT(infiniteLight != nullptr, "Added infinite-light can't be nullptr. ")
-            _infiniteLights.push_back(infiniteLight);
+        void Scene::addEnvironmentLight(std::shared_ptr<EnvironmentLight> envLight) {
+            ASSERT(envLight != nullptr, "Added env-light can't be nullptr. ")
+            _envLights.push_back(envLight);
         }
 
         std::shared_ptr<Camera> Scene::getCamera() {
