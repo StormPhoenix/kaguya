@@ -4,13 +4,16 @@
 
 #include <kaguya/material/PatinaMaterial.h>
 #include <kaguya/core/bsdf/microfacet/BeckmannDistribution.h>
+#include <kaguya/core/bsdf/microfacet/GGXDistribution.h>
 #include <kaguya/core/bsdf/BXDFGlossyDiffuseReflection.h>
 
 namespace kaguya {
     namespace material {
 
         using core::bsdf::BXDFGlossyDiffuseReflection;
+        using core::bsdf::microfacet::GGXDistribution;
         using core::bsdf::microfacet::BeckmannDistribution;
+        using core::bsdf::microfacet::MicrofacetDistribution;
 
         PatinaMaterial::PatinaMaterial(const Texture<Spectrum>::Ptr Kd, const Texture<Spectrum>::Ptr Ks,
                                        const Texture<Float>::Ptr alpha) :
@@ -28,8 +31,7 @@ namespace kaguya {
 
             insect.bsdf = ALLOC(memoryArena, BSDF)(insect);
 
-            // TODO default beckmann
-            const BeckmannDistribution *distribution = ALLOC(memoryArena, BeckmannDistribution)(alpha);
+            const MicrofacetDistribution *distribution = ALLOC(memoryArena, GGXDistribution)(alpha);
             insect.bsdf->addBXDF(ALLOC(memoryArena, BXDFGlossyDiffuseReflection)(Rd, Rs, distribution));
         }
     }

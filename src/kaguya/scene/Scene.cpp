@@ -2,8 +2,10 @@
 // Created by Storm Phoenix on 2020/10/7.
 //
 
+#include <kaguya/tracer/Camera.h>
 #include <kaguya/core/light/Light.h>
 #include <kaguya/core/light/PointLight.h>
+#include <kaguya/core/light/EnvironmentLight.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/meta/Triangle.h>
 #include <kaguya/scene/Geometry.h>
@@ -780,6 +782,23 @@ namespace kaguya {
             return scene;
         }
          */
+
+        const std::vector<std::shared_ptr<InfiniteLight>> &Scene::getInfiniteLights() const {
+            return _infiniteLights;
+        }
+
+        void Scene::addInfiniteLight(std::shared_ptr<InfiniteLight> infiniteLight) {
+            ASSERT(infiniteLight != nullptr, "Added infinite-light can't be nullptr. ")
+            _infiniteLights.push_back(infiniteLight);
+        }
+
+        std::shared_ptr<Camera> Scene::getCamera() {
+            return _camera;
+        }
+
+        const std::vector<std::shared_ptr<Light>> &Scene::getLights() const {
+            return _lights;
+        }
 
         void Scene::setCamera(std::shared_ptr<Camera> camera) {
             _camera = camera;

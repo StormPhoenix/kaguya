@@ -7,8 +7,10 @@
 #include <kaguya/scene/meta/Triangle.h>
 #include <kaguya/scene/accumulation/BVH.h>
 #include <kaguya/scene/Cube.h>
+#include <kaguya/core/light/SunLight.h>
 #include <kaguya/core/light/EnvironmentLight.h>
 #include <kaguya/material/texture/Texture.h>
+#include <kaguya/material/texture/ImageTexture.h>
 #include <kaguya/material/texture/ConstantTexture.h>
 #include <kaguya/material/texture/ChessboardTexture.h>
 #include <kaguya/material/PatinaMaterial.h>
@@ -236,15 +238,28 @@ namespace kaguya {
             void XmlSceneImporter::handleTagTexture(pugi::xml_node &node,
                                                     XmlParseInfo &parseInfo,
                                                     XmlParseInfo &parentInfo) {
-                Spectrum color0 = parseInfo.getSpectrumValue("color0", Spectrum(0.));
-                Spectrum color1 = parseInfo.getSpectrumValue("color1", Spectrum(0.));
+                const std::string type = node.attribute("type").value();
+                const std::string name = node.attribute("name").value();
+                if (type == "checkerboard") {
+                    Spectrum color0 = parseInfo.getSpectrumValue("color0", Spectrum(0.));
+                    Spectrum color1 = parseInfo.getSpectrumValue("color1", Spectrum(0.));
 
-                Float uScale = parseInfo.getFloatValue("uscale", 1.0);
-                Float vScale = parseInfo.getFloatValue("vscale", 1.0);
+                    Float uScale = parseInfo.getFloatValue("uscale", 1.0);
+                    Float vScale = parseInfo.getFloatValue("vscale", 1.0);
 
-                Texture<Spectrum>::Ptr texture = std::make_shared<ChessboardTexture<Spectrum>>(color0, color1,
-                                                                                               uScale, vScale);
-                parentInfo.setSpectrumTextureValue("reflectance", texture);
+                    Texture<Spectrum>::Ptr texture = std::make_shared<ChessboardTexture<Spectrum>>(color0, color1,
+                                                                                                   uScale, vScale);
+                    parentInfo.setSpectrumTextureValue(name, texture);
+                } else if (type == "bitmap") {
+                    ASSERT(parseInfo.attrExists("filename"), "Bitmap path not exists. ");
+                    std::string filename = parseInfo.getStringValue("filename", "");
+                    TextureMapping2D::Ptr mapping = std::shared_ptr<UVMapping2D>();
+                    Texture<Spectrum>::Ptr texture =
+                            std::make_shared<ImageTexture<Spectrum>>(_inputSceneDir + filename, mapping);
+                    parentInfo.setSpectrumTextureValue(name, texture);
+                } else {
+                    ASSERT(false, "Texture type not supported: " + type);
+                }
             }
 
             void
@@ -261,7 +276,7 @@ namespace kaguya {
                     material = createMirrorMaterial(parseInfo);
                 } else if (type == "glass") {
                     material = createGlassMaterial(parseInfo);
-                } else if (type == "roughconductor") {
+                } else if (type == "roughconductor" || type == "conductor") {
                     material = createRoughConductorMaterial(parseInfo);
                 } else if (type == "twosided") {
                     ASSERT(parseInfo.currentMaterial != nullptr,
@@ -284,9 +299,16 @@ namespace kaguya {
             }
 
             Material::Ptr XmlSceneImporter::createRoughConductorMaterial(XmlParseInfo &info) {
-                auto alphaType = info.getType("alpha");
-                ASSERT(alphaType == XmlAttrVal::Attr_Float, "Only support float type for alpha. ")
-                Float alpha = info.getFloatValue("alpha", 0.1);
+                // Roughness
+                Float alpha = 0.01;
+                if (info.attrExists("alpha")) {
+                    auto alphaType = info.getType("alpha");
+                    ASSERT(alphaType == XmlAttrVal::Attr_Float, "Only support float type for alpha. ")
+                    alpha = info.getFloatValue("alpha", 0.01);
+                } else {
+                    alpha = info.getFloatValue("alpha", 0.01);
+                }
+
 
                 std::string distributionType = info.getStringValue("distribution", "beckmann");
                 ASSERT(distributionType == "beckmann" || distributionType == "ggx",
@@ -346,17 +368,36 @@ namespace kaguya {
             Material::Ptr XmlSceneImporter::createCoatingMaterial(XmlParseInfo &info) {
                 Material::Ptr material = nullptr;
 
-                ASSERT(info.getType("diffuseReflectance") == XmlAttrVal::Attr_Spectrum &&
-                       info.getType("specularReflectance") == XmlAttrVal::Attr_Spectrum &&
-                       info.getType("alpha") == XmlAttrVal::Attr_Float,
+                ASSERT(info.attrExists("diffuseReflectance") &&
+                       info.attrExists("specularReflectance") && info.attrExists("alpha"),
                        "CoatingMaterial parameter error: type not supported");
 
-                auto diffuseReflectance = info.getSpectrumValue("diffuseReflectance", Spectrum(1.0));
-                auto specularReflectance = info.getSpectrumValue("specularReflectance", Spectrum(1.0));
+                // Kd
+                Texture<Spectrum>::Ptr Kd = nullptr;
+                XmlAttrVal::AttrType kdType = info.getType("diffuseReflectance");
+                if (kdType == XmlAttrVal::Attr_Spectrum) {
+                    Spectrum diffuseReflectance = info.getSpectrumValue("diffuseReflectance", Spectrum(1.0));
+                    Kd = std::make_shared<ConstantTexture<Spectrum>>(diffuseReflectance);
+                } else if (kdType == XmlAttrVal::Attr_SpectrumTexture) {
+                    Kd = info.getSpectrumTextureValue("diffuseReflectance", nullptr);
+                } else {
+                    ASSERT(false, "Unsupported Kd type. ");
+                }
+
+                // Ks
+                Texture<Spectrum>::Ptr Ks = nullptr;
+                XmlAttrVal::AttrType ksType = info.getType("specularReflectance");
+                if (ksType == XmlAttrVal::Attr_Spectrum) {
+                    Spectrum specularReflectance = info.getSpectrumValue("specularReflectance", Spectrum(1.0));
+                    Ks = std::make_shared<ConstantTexture<Spectrum>>(specularReflectance);
+                } else if (ksType == XmlAttrVal::Attr_SpectrumTexture) {
+                    Ks = info.getSpectrumTextureValue("specularReflectance", nullptr);
+                } else {
+                    ASSERT(false, "Unsupported Ks type. ");
+                }
+
                 auto alpha = info.getFloatValue("alpha", 0.1);
 
-                Texture<Spectrum>::Ptr Kd = std::make_shared<ConstantTexture<Spectrum>>(diffuseReflectance);
-                Texture<Spectrum>::Ptr Ks = std::make_shared<ConstantTexture<Spectrum>>(specularReflectance);
                 Texture<Float>::Ptr roughness = std::make_shared<ConstantTexture<Float>>(alpha);
                 material = std::make_shared<PatinaMaterial>(Kd, Ks, roughness);
                 return material;
@@ -599,11 +640,24 @@ namespace kaguya {
                     ASSERT(info.attrExists("filename"), "Environment light type should has envmap. ");
                     std::string envmapPath = info.getStringValue("filename", "");
 
-                    Light::Ptr envLight = std::make_shared<EnvironmentLight>(1., _inputSceneDir + envmapPath,
-                                                                             MediumInterface(nullptr, nullptr), toWorld);
+                    EnvironmentLight::Ptr envLight = std::make_shared<EnvironmentLight>(1., _inputSceneDir + envmapPath,
+                                                                                        MediumInterface(nullptr,
+                                                                                                        nullptr),
+                                                                                        toWorld);
                     _scene->addLight(envLight);
-                    _scene->addEnvironmentLight(envLight);
+                    _scene->addInfiniteLight(envLight);
                     std::cout << "\tCreate environment light. " << std::endl;
+                } else if (type == "sunsky") {
+                    ASSERT(info.attrExists("sunDirection") && info.attrExists("intensity"),
+                           "Sunsky parameter incomplete. ");
+                    ASSERT(info.getType("intensity") == XmlAttrVal::Attr_Spectrum,
+                           "<emitter> Only support spectrum intensity. ");
+                    Spectrum intensity = info.getSpectrumValue("intensity", Spectrum(0.0));
+                    Vector3F sunDirection = -info.getVectorValue("sunDirection", Vector3F(0, 1, 0));
+                    SunLight::Ptr sunLight = std::make_shared<SunLight>(intensity, sunDirection);
+                    _scene->addLight(sunLight);
+                    _scene->addInfiniteLight(sunLight);
+                    std::cout << "\tCreate sun light. " << std::endl;
                 } else {
                     ASSERT(false, "Emitter type not supported: <" + type + ">. ");
                 }
@@ -777,6 +831,11 @@ namespace kaguya {
                 std::shared_ptr<Intersectable> bvh = std::make_shared<BVH>(_shapes);
                 _scene->setWorld(bvh);
                 _scene->setSceneName(Config::Camera::filename);
+
+                const std::vector<InfiniteLight::Ptr> &infiniteLights = _scene->getInfiniteLights();
+                for (auto it = infiniteLights.begin(); it != infiniteLights.end(); it++) {
+                    (*it)->worldBound(_scene);
+                }
 
                 std::cout << "Loading finished. " << std::endl;
                 return _scene;

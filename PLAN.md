@@ -17,7 +17,8 @@
 5. 回到 步骤 2
 
 ## 需要加入的新特性
-- [ ] Direct light
+- [x] SunLight 太阳光
+- [x] 超远距离的光源统一实现 InfiniteLight 接口。场景构建完毕之后需要统一对 InifiniteLight 添加世界 range 信息。
 
 ## 需要处理的问题
 - [ ] 场景导入
@@ -32,7 +33,9 @@
         - [x] photon 数太少，radius 初始太大，收敛太慢。这个配置下 CPU 跑的太慢了，是时候升级到 GPU 版本了 
     
 - [ ] 添加环境光贴图
-    - [ ] 场景构建结束后，需要重新设置 EnvironmentLight 的 worldBound
+    - [x] 环境光读取的 PFM 格式数据是按照浮点存储的，和 jpg png 不一样，需要单独处理下
+        - [x] 去掉 readImage 里面的 weight
+    - [x] 场景构建结束后，需要重新设置 EnvironmentLight 的 worldBound
     - [ ] 考虑 EnvironmentLight(EL) 在 PT \ BDPT \ SPPM 三种情况下如何处理
         - [ ] BDPT
             - [ ] connectible() cameraPath 最后一个 Vertex 是 EL

@@ -3,17 +3,20 @@
 //
 
 #include <kaguya/math/Math.h>
-#include <kaguya/utils/ImageReader.h>
+#include <kaguya/scene/Scene.h>
+#include <kaguya/scene/accumulation/AABB.h>
+#include <kaguya/utils/ImageIO.h>
 #include <kaguya/core/light/EnvironmentLight.h>
 
 namespace kaguya {
     namespace core {
         using namespace utils;
+        using scene::acc::AABB;
 
         EnvironmentLight::EnvironmentLight(Float intensity, std::string texturePath,
                                            const MediumInterface &mediumBoundary,
                                            Transform::Ptr lightToWorld)
-                : Light(ENVIRONMENT, mediumBoundary), _intensity(intensity), _lightToWorld(lightToWorld) {
+                : InfiniteLight(ENVIRONMENT, mediumBoundary), _intensity(intensity), _lightToWorld(lightToWorld) {
             // Check file exists
             {
                 std::ifstream in(texturePath);
@@ -25,13 +28,14 @@ namespace kaguya {
                 _lightToWorld = std::make_shared<Transform>();
             }
             _worldToLight = _lightToWorld->inverse().ptr();
+            // TODO add weight 1.0 / 255.0
             _texture = io::readImage(texturePath.c_str(), &_width, &_height);
 
             std::unique_ptr<Float[]> sampleFunction(new Float[_width * _height]);
             int sampleChannel = 1;
             for (int row = 0; row < _height; row++) {
                 // SinTheta for sampling correction
-                Float sinTheta = std::sin(Float(row) / _height * math::PI);
+                Float sinTheta = std::sin(Float(_height - 1 - row) / (_height - 1) * math::PI);
                 for (int col = 0; col < _width; col++) {
                     int offset = row * _width + col;
                     sampleFunction[offset] = _texture[offset][sampleChannel] * sinTheta;
@@ -49,7 +53,8 @@ namespace kaguya {
             // wi.z = sinTheta * sinPhi
             // wi.z / wi.x = tanPhi
             Float phi = math::local_coord::dirToPhi(wi);
-            Point2F uv = {phi * math::INV_2PI, theta * math::INV_PI};
+            // Inverse coordinator v
+            Point2F uv = {phi * math::INV_2PI, (1.0 - theta * math::INV_PI)};
             return sampleTexture(uv);
         }
 
@@ -64,7 +69,8 @@ namespace kaguya {
                 return Spectrum(0.);
             }
 
-            Float theta = math::PI * uv.y;
+            // Inverse coordinate v
+            Float theta = math::PI * (1.0 - uv.y);
             Float phi = 2 * math::PI * uv.x;
 
             Float sinTheta = std::sin(theta);
@@ -94,7 +100,8 @@ namespace kaguya {
             Float phi = math::local_coord::dirToPhi(wi);
 
             Float u = phi * math::INV_2PI;
-            Float v = theta * math::INV_PI;
+            // Inverse the v coordinator
+            Float v = (1.0 - theta * math::INV_PI);
 
             Float sinTheta = std::sin(theta);
             if (sinTheta == 0) {
@@ -110,7 +117,7 @@ namespace kaguya {
                                             Sampler *sampler) {
             Float samplePdf = 0;
             Point2F uv = _textureDistribution->sampleContinuous(&samplePdf, sampler);
-            Float theta = uv.y * math::PI;
+            Float theta = (1.0 - uv.y) * math::PI;
             Float phi = uv.x * math::PI * 2.0;
 
             Float sinTheta = std::sin(theta);
@@ -138,17 +145,18 @@ namespace kaguya {
 
         void EnvironmentLight::pdfLe(const Ray &ray, const Vector3F &normal, Float *pdfPos, Float *pdfDir) const {
             Vector3F dir = -_worldToLight->transformVector(ray.getDirection());
-            Float theta = math::local_coord::dirToTheta(dir);
+            Float theta = -math::local_coord::dirToTheta(dir);
             Float phi = math::local_coord::dirToPhi(dir);
             Float sinTheta = std::sin(theta);
-            Point2F uv(phi * math::INV_2PI, theta * math::INV_PI);
+            // Inverse the v
+            Point2F uv(phi * math::INV_2PI, (1.0 - theta * math::INV_PI));
             Float mapPdf = _textureDistribution->pdfContinuous(uv);
 
             (*pdfDir) = mapPdf / (2 * math::PI * math::PI * sinTheta);
             (*pdfPos) = 1.0 / (math::PI * _worldRadius * _worldRadius);
         }
 
-        void EnvironmentLight::worldBound(const Scene::Ptr scene) {
+        void EnvironmentLight::worldBound(const std::shared_ptr<Scene> scene) {
             const AABB &bound = scene->getWorld()->boundingBox();
             _worldRadius = 0.5 * LENGTH(bound.maxPos() - bound.minPos());
             _worldCenter = (bound.maxPos() + bound.minPos()) / Float(2.0);

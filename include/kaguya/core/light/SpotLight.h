@@ -45,7 +45,7 @@ namespace kaguya {
             SpotLight(const Vector3F eye, const Vector3F dir, Spectrum intensity, const MediumInterface &mediumBoundary,
                       Float fallOffRange = 30, Float totalRange = 45);
 
-            virtual Spectrum sampleLe(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
+            virtual Spectrum sampleLe(Ray *ray, Normal3F *normal, Float *pdfPos, Float *pdfDir,
                                       Sampler *sampler) override;
 
             virtual void pdfLe(const Ray &ray, const Vector3F &normal,

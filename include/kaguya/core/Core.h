@@ -7,10 +7,19 @@
 
 #define RGB_SPECTRUM
 
+#include <kaguya/Common.h>
 #include <kaguya/math/Math.h>
 #include <memory>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
+    namespace tracer {
+        class Camera;
+    }
+
+    namespace scene {
+        class Scene;
+    }
+
     namespace core {
 
         template<int SpectrumSamples>
@@ -22,6 +31,10 @@ namespace kaguya {
         typedef RGBSpectrum Spectrum;
         constexpr int SPECTRUM_CHANNEL = 3;
 #endif
+
+        class Light;
+        class InfiniteLight;
+        class EnvironmentLight;
 
         namespace bsdf {
             class BSDF;

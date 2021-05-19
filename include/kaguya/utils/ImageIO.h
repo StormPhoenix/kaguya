@@ -2,8 +2,8 @@
 // Created by Storm Phoenix on 2021/5/10.
 //
 
-#ifndef KAGUYA_IMAGEREADER_H
-#define KAGUYA_IMAGEREADER_H
+#ifndef KAGUYA_IMAGEIO_H
+#define KAGUYA_IMAGEIO_H
 
 #include <kaguya/Common.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
@@ -18,4 +18,4 @@ namespace kaguya {
     }
 }
 
-#endif //KAGUYA_IMAGEREADER_H
+#endif //KAGUYA_IMAGEIO_H

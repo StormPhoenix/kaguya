@@ -31,6 +31,7 @@ A simple physically based render.
     - Spot light
     - Area light
     - Environment light
+    - Sun light
 
 - Denoiser
     - [ ] to be continued ...

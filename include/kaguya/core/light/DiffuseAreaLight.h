@@ -21,7 +21,7 @@ namespace kaguya {
 
             Spectrum L(const Interaction &interaction, const Vector3F &wo) const override;
 
-            virtual Spectrum sampleLe(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
+            virtual Spectrum sampleLe(Ray *ray, Normal3F *normal, Float *pdfPos, Float *pdfDir,
                                       Sampler *sampler) override;
 
             virtual void pdfLe(const Ray &ray, const Vector3F &normal,

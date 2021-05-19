@@ -5,9 +5,10 @@
 #ifndef KAGUYA_LIGHT_H
 #define KAGUYA_LIGHT_H
 
+#include <kaguya/Common.h>
 #include <kaguya/core/Core.h>
-#include <kaguya/core/Interaction.h>
 #include <kaguya/tracer/Ray.h>
+#include <kaguya/core/Interaction.h>
 #include <kaguya/utils/VisibilityTester.h>
 
 namespace kaguya {
@@ -63,7 +64,7 @@ namespace kaguya {
              * @param pdfDir 射线方向 pdf
              * @return
              */
-            virtual Spectrum sampleLe(Ray *ray, Vector3F *normal, Float *pdfPos,
+            virtual Spectrum sampleLe(Ray *ray, Normal3F *normal, Float *pdfPos,
                                       Float *pdfDir, Sampler *sampler) = 0;
 
             /**

@@ -301,7 +301,7 @@ namespace kaguya {
          * @param tanX 切线空间 X 轴
          * @param tanZ 切线空间 Z 轴
          */
-        inline void tangentSpace(Vector3F &tanY, Vector3F *tanX, Vector3F *tanZ) {
+        inline void tangentSpace(const Vector3F &tanY, Vector3F *tanX, Vector3F *tanZ) {
             // 计算与 tanY 垂直的 tanX
             if (std::abs(tanY.x) > std::abs(tanY.y)) {
                 (*tanX) = Vector3F(-tanY.z, 0, tanY.x);

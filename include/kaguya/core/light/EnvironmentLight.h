@@ -5,22 +5,22 @@
 #ifndef KAGUYA_ENVIRONMENTLIGHT_H
 #define KAGUYA_ENVIRONMENTLIGHT_H
 
-#include <kaguya/core/light/Light.h>
-#include <kaguya/core/Transform.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/math/Distribution.h>
+#include <kaguya/core/Transform.h>
+#include <kaguya/core/light/InfiniteLight.h>
 
 namespace kaguya {
     namespace core {
 
         using namespace transform;
-        using namespace scene;
+        using scene::Scene;
         using math::sampling::Distribution2D;
 
-        // TODO 对纹理图的重要性采样 ...
-
-        class EnvironmentLight : public Light {
+        class EnvironmentLight : public InfiniteLight {
         public:
+            typedef std::shared_ptr<EnvironmentLight> Ptr;
+
             EnvironmentLight(Float intensity, std::string texturePath, const MediumInterface &mediumBoundary,
                              Transform::Ptr lightToWorld = std::make_shared<Transform>());
 
@@ -31,13 +31,13 @@ namespace kaguya {
 
             virtual Float pdfLi(const Interaction &eye, const Vector3F &dir) override;
 
-            virtual Spectrum sampleLe(Ray *ray, Vector3F *normal, Float *pdfPos,
+            virtual Spectrum sampleLe(Ray *ray, Normal3F *normal, Float *pdfPos,
                                       Float *pdfDir, Sampler *sampler) override;
 
             virtual void pdfLe(const Ray &ray, const Vector3F &normal,
                                Float *pdfPos, Float *pdfDir) const override;
 
-            void worldBound(const Scene::Ptr scene);
+            void worldBound(const std::shared_ptr<Scene> scene) override;
 
             ~EnvironmentLight();
 

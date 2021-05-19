@@ -30,7 +30,7 @@ namespace kaguya {
 
             virtual Float pdfLi(const Interaction &eye, const Vector3F &dir) override;
 
-            virtual Spectrum sampleLe(Ray *ray, Vector3F *normal, Float *pdfPos, Float *pdfDir,
+            virtual Spectrum sampleLe(Ray *ray, Normal3F *normal, Float *pdfPos, Float *pdfDir,
                                       Sampler *sampler) override;
 
             virtual void pdfLe(const Ray &ray, const Vector3F &normal,

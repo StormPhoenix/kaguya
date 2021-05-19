@@ -11,12 +11,11 @@
 #include <kaguya/core/medium/IsotropicMedium.h>
 #include <kaguya/material/Material.h>
 #include <kaguya/scene/meta/Shape.h>
-#include <kaguya/tracer/Camera.h>
-#include <kaguya/core/light/Light.h>
 #include <kaguya/core/light/AreaLight.h>
-#include <kaguya/core/light/DiffuseAreaLight.h>
-#include <kaguya/core/light/PointLight.h>
 #include <kaguya/core/light/SpotLight.h>
+#include <kaguya/core/light/PointLight.h>
+#include <kaguya/core/light/InfiniteLight.h>
+#include <kaguya/core/light/DiffuseAreaLight.h>
 #include <kaguya/core/Transform.h>
 
 #include <vector>
@@ -31,16 +30,7 @@ using kaguya::core::Spectrum;
 const int MODEL_SCALE = 5;
 
 namespace kaguya {
-    namespace core {
-        class Light;
-    }
-}
-
-namespace kaguya {
     namespace scene {
-
-        using kaguya::tracer::Camera;
-        using kaguya::core::Light;
         using kaguya::core::SurfaceInteraction;
 
         /**
@@ -137,27 +127,18 @@ namespace kaguya {
                 return _world;
             }
 
-            std::shared_ptr<Camera> getCamera() {
-                return _camera;
-            }
+            std::shared_ptr<Camera> getCamera();
 
-            const std::vector<std::shared_ptr<Light>> &getLights() const {
-                return _lights;
-            }
+            const std::vector<std::shared_ptr<Light>> &getLights() const;
 
-            const std::vector<std::shared_ptr<Light>> &getEnvironmentLights() const {
-                return _environmentLights;
-            }
+            const std::vector<std::shared_ptr<InfiniteLight>> &getInfiniteLights() const;
 
             void addLight(Light::Ptr light) {
                 ASSERT(light != nullptr, "Added light can't be nullptr. ")
                 _lights.push_back(light);
             }
 
-            void addEnvironmentLight(Light::Ptr light) {
-                ASSERT(light != nullptr, "Added env-light can't be nullptr. ")
-                _environmentLights.push_back(light);
-            }
+            void addInfiniteLight(std::shared_ptr<InfiniteLight> envLight);
 
             const std::string getName() const {
                 return _sceneName;
@@ -180,7 +161,7 @@ namespace kaguya {
             // camera
             std::shared_ptr<Camera> _camera = nullptr;
             std::vector<Light::Ptr> _lights;
-            std::vector<Light::Ptr> _environmentLights;
+            std::vector<std::shared_ptr<InfiniteLight>> _infiniteLights;
         };
 
     }

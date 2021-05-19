@@ -16,6 +16,7 @@ namespace kaguya {
     namespace tracer {
 
         using core::Interaction;
+        using core::EnvironmentLight;
         using material::Material;
         using core::bssrdf::BSSRDF;
         using namespace bsdf;
@@ -96,7 +97,7 @@ namespace kaguya {
                             }
                         } else {
                             // Environment light
-                            shaderColor += (beta * estimateEnvLight(scatterRay));
+                            shaderColor += (beta * estimateInfiniteLight(scatterRay));
                             // Record infinite position
                             RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, scatterRay.at(20000),
                                               Environment_Record, _camera.get())
@@ -107,7 +108,7 @@ namespace kaguya {
                     // 终止条件判断
                     if (!isIntersected) {
                         // Environment light
-                        shaderColor += (beta * estimateEnvLight(scatterRay));
+                        shaderColor += (beta * estimateInfiniteLight(scatterRay));
                         RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, scatterRay.at(20000),
                                           Environment_Record, _camera.get())
                         break;
@@ -248,10 +249,10 @@ namespace kaguya {
             std::cout << std::endl << "scene " << _scene->getName() << " completed." << std::endl;
         }
 
-        Spectrum PathTracer::estimateEnvLight(const Ray &ray) {
-            auto lights = _scene->getEnvironmentLights();
+        Spectrum PathTracer::estimateInfiniteLight(const Ray &ray) {
+            auto lights = _scene->getInfiniteLights();
             Spectrum ret(0);
-            for (Light::Ptr light : lights) {
+            for (InfiniteLight::Ptr light : lights) {
                 ret += light->Le(ray);
             }
             return ret;

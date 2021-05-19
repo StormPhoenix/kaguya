@@ -7,7 +7,7 @@
 
 #include <kaguya/core/Core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
-#include <kaguya/utils/ImageReader.h>
+#include <kaguya/utils/ImageIO.h>
 #include <kaguya/material/texture/Texture.h>
 #include <kaguya/material/texture/TextureMapping2D.h>
 #include <kaguya/material/texture/UVMapping2D.h>

@@ -4,7 +4,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 
-#include <kaguya/utils/ImageReader.h>
+#include <kaguya/utils/ImageIO.h>
 #include <kaguya/utils/FileReader.h>
 
 #include <ext/stb/stb_image.h>
@@ -12,6 +12,34 @@
 namespace kaguya {
     namespace utils {
         namespace io {
+            static RGBSpectrum *stbReadImage(const std::string &filename, int *width, int *height) {
+                int channelsInFile;
+                unsigned char *image = stbi_load(filename.c_str(), width, height, &channelsInFile, 0);
+                if (image == nullptr) {
+                    return nullptr;
+                }
+
+                int w = *width;
+                int h = *height;
+                RGBSpectrum *ret = (RGBSpectrum *) malloc(sizeof(RGBSpectrum) * w * h);
+
+                double weight = 1.0 / 255.0;
+                for (int row = 0; row < h; row++) {
+                    for (int col = 0; col < w; col++) {
+                        RGBSpectrum rgb(0);
+                        int imageOffset = (((h) - (row + 1)) * w + col) * channelsInFile;
+                        for (int ch = 0; ch < 3; ch++) {
+                            rgb[ch] = image[imageOffset + ch];
+                        }
+
+                        int spectrumOffset = row * w + col;
+                        ret[spectrumOffset] = rgb * weight;
+                    }
+                }
+
+                stbi_image_free(image);
+                return ret;
+            }
 
             namespace pfm {
                 static constexpr bool hostLittleEndian =
@@ -69,8 +97,7 @@ namespace kaguya {
                     return -1;
                 }
 
-                static RGBSpectrum *readImagePFM(const std::string &filename, int *xres,
-                                                 int *yres) {
+                static RGBSpectrum *readImagePFM(const std::string &filename, int *xres, int *yres) {
                     float *data = nullptr;
                     RGBSpectrum *rgb = nullptr;
                     char buffer[BUFFER_SIZE];
@@ -136,7 +163,8 @@ namespace kaguya {
                     if (nChannels == 1) {
                         for (int j = 0; j < height; j++) {
                             for (int i = 0; i < width; i++) {
-                                int rgbOffset = ((height - j - 1) * width) + i;
+//                                int rgbOffset = ((height - j - 1) * width) + i;
+                                int rgbOffset = (j * width) + i;
                                 int imageOffset = j * width + i;
                                 rgb[imageOffset] = RGBSpectrum(data[rgbOffset]);
                             }
@@ -144,7 +172,8 @@ namespace kaguya {
                     } else {
                         for (int j = 0; j < height; j++) {
                             for (int i = 0; i < width; i++) {
-                                int rgbOffset = ((height - j - 1) * width) + i;
+//                                int rgbOffset = ((height - j - 1) * width) + i;
+                                int rgbOffset = (j * width) + i;
                                 Float frgb[3] = {data[3 * rgbOffset], data[3 * rgbOffset + 1], data[3 * rgbOffset + 2]};
                                 int imageOffset = j * width + i;
                                 rgb[imageOffset] = RGBSpectrum::fromRGB(frgb);
@@ -213,32 +242,23 @@ namespace kaguya {
             }
 
             namespace png {
-                static RGBSpectrum *readImagePNG(const std::string &filename, int *width, int *height) {
-                    int channelsInFile;
-                    unsigned char *image = stbi_load(filename.c_str(), width, height, &channelsInFile, 0);
-                    if (image == nullptr) {
-                        return nullptr;
-                    }
+                static RGBSpectrum *
+                readImagePNG(const std::string &filename, int *width, int *height) {
+                    return stbReadImage(filename, width, height);
+                }
+            }
 
-                    int w = *width;
-                    int h = *height;
-                    RGBSpectrum *ret = (RGBSpectrum *) malloc(sizeof(RGBSpectrum) * w * h);
+            namespace jpg {
+                static RGBSpectrum *
+                readImageJPG(const std::string &filename, int *width, int *height) {
+                    return stbReadImage(filename, width, height);
+                }
+            }
 
-                    for (int row = 0; row < w; row++) {
-                        for (int col = 0; col < h; col++) {
-                            RGBSpectrum rgb(0);
-                            int imageOffset = (((h) - (row + 1)) * w + col) * channelsInFile;
-                            for (int ch = 0; ch < 3; ch++) {
-                                rgb[ch] = image[imageOffset + ch];
-                            }
-
-                            int spectrumOffset = row * w + col;
-                            ret[spectrumOffset] = rgb;
-                        }
-                    }
-
-                    stbi_image_free(image);
-                    return ret;
+            namespace tga {
+                static RGBSpectrum *
+                readImageTGA(const std::string &filename, int *width, int *height) {
+                    return stbReadImage(filename, width, height);
                 }
             }
 
@@ -248,6 +268,10 @@ namespace kaguya {
                     return std::unique_ptr<RGBSpectrum[]>(pfm::readImagePFM(filename, width, height));
                 } else if (extensionEquals(filename, ".png")) {
                     return std::unique_ptr<RGBSpectrum[]>(png::readImagePNG(filename, width, height));
+                } else if (extensionEquals(filename, ".jpg") || extensionEquals(filename, ".jpeg")) {
+                    return std::unique_ptr<RGBSpectrum[]>(jpg::readImageJPG(filename, width, height));
+                } else if (extensionEquals(filename, ".tga")) {
+                    return std::unique_ptr<RGBSpectrum[]>(tga::readImageTGA(filename, width, height));
                 } else {
                     ASSERT(false, "Unsupported image type: " + filename);
                 }

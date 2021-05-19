@@ -112,6 +112,8 @@ namespace kaguya {
 
                 SET_PARSE_INFO_VALUE_FUNC_DECLARE(Vector3F, Vector)
 
+                GET_PARSE_INFO_VALUE_FUNC_DECLARE(Vector3F, Vector)
+
             private:
                 std::map<std::string, XmlAttrVal> container;
             } XmlParseInfo;
