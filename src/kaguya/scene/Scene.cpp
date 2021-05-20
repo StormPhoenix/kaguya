@@ -2,9 +2,10 @@
 // Created by Storm Phoenix on 2020/10/7.
 //
 
-#include <kaguya/tracer/Camera.h>
 #include <kaguya/core/light/Light.h>
+#include <kaguya/core/light/AreaLight.h>
 #include <kaguya/core/light/PointLight.h>
+#include <kaguya/core/light/DiffuseAreaLight.h>
 #include <kaguya/core/light/EnvironmentLight.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/scene/meta/Triangle.h>
@@ -12,6 +13,7 @@
 #include <kaguya/scene/accumulation/BVH.h>
 #include <kaguya/scene/meta/Sphere.h>
 #include <kaguya/scene/TriangleMesh.h>
+#include <kaguya/tracer/Camera.h>
 #include <kaguya/material/Dielectric.h>
 #include <kaguya/material/Lambertian.h>
 #include <kaguya/material/Mirror.h>
@@ -790,6 +792,11 @@ namespace kaguya {
         void Scene::addEnvironmentLight(std::shared_ptr<EnvironmentLight> envLight) {
             ASSERT(envLight != nullptr, "Added env-light can't be nullptr. ")
             _envLights.push_back(envLight);
+        }
+
+        void Scene::addLight(Light::Ptr light) {
+            ASSERT(light != nullptr, "Added light can't be nullptr. ")
+            _lights.push_back(light);
         }
 
         std::shared_ptr<Camera> Scene::getCamera() {

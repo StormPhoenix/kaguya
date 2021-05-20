@@ -6,16 +6,18 @@
 #include <kaguya/core/bssrdf/BSSRDF.h>
 #include <kaguya/core/Interaction.h>
 #include <kaguya/core/light/EnvironmentLight.h>
+#include <kaguya/core/light/AreaLight.h>
 #include <kaguya/tracer/pt/PathTracer.h>
+#include <kaguya/tracer/PathRecorder.h>
 #include <kaguya/sampler/SamplerFactory.hpp>
 #include <kaguya/parallel/RenderPool.h>
-#include <kaguya/tracer/PathRecorder.h>
 
 #include <atomic>
 
 namespace kaguya {
     namespace tracer {
 
+        using core::AreaLight;
         using core::Interaction;
         using core::EnvironmentLight;
         using material::Material;

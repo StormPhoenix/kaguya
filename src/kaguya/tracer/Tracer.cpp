@@ -3,6 +3,8 @@
 //
 
 #include <kaguya/Config.h>
+#include <kaguya/core/light/Light.h>
+#include <kaguya/core/light/AreaLight.h>
 #include <kaguya/tracer/Tracer.h>
 
 #include <iostream>
@@ -11,6 +13,8 @@ namespace kaguya {
     namespace tracer {
 
         using kaguya::Config;
+        using core::Light;
+        using core::AreaLight;
         using core::bsdf::BXDFType;
 
         Tracer::Tracer() {}

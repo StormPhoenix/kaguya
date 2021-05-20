@@ -3,14 +3,18 @@
 //
 
 #include <kaguya/Config.h>
-#include <kaguya/parallel/AtomicFloat.h>
+#include <kaguya/core/light/Light.h>
+#include <kaguya/core/light/AreaLight.h>
 #include <kaguya/sampler/SamplerFactory.hpp>
 #include <kaguya/tracer/pm/SPPMTracer.h>
+#include <kaguya/parallel/AtomicFloat.h>
 #include <kaguya/parallel/RenderPool.h>
 
 namespace kaguya {
     namespace tracer {
 
+        using core::Light;
+        using core::AreaLight;
         using namespace parallel;
         using core::bsdf::BXDFType;
 

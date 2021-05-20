@@ -18,6 +18,7 @@ namespace RENDER_NAMESPACE {
 
     namespace scene {
         class Scene;
+        class Geometry;
     }
 
     namespace core {

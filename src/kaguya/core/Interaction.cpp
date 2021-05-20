@@ -80,6 +80,13 @@ namespace kaguya {
                 Interaction(point, direction, normal, mediumBoundary, material),
                 u(u), v(v) {}
 
+        const AreaLight *SurfaceInteraction::getAreaLight() const {
+            return _areaLight;
+        }
+
+        void SurfaceInteraction::setAreaLight(AreaLight *areaLight) {
+            _areaLight = areaLight;
+        }
 
         void SurfaceInteraction::buildScatteringFunction(MemoryArena &memoryArena, TransportMode mode) {
             assert(_material != nullptr);

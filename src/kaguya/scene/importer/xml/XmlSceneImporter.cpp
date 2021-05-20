@@ -7,7 +7,12 @@
 #include <kaguya/scene/meta/Triangle.h>
 #include <kaguya/scene/accumulation/BVH.h>
 #include <kaguya/scene/Cube.h>
+#include <kaguya/core/medium/IsotropicMedium.h>
 #include <kaguya/core/light/SunLight.h>
+#include <kaguya/core/light/PointLight.h>
+#include <kaguya/core/light/SpotLight.h>
+#include <kaguya/core/light/AreaLight.h>
+#include <kaguya/core/light/DiffuseAreaLight.h>
 #include <kaguya/core/light/EnvironmentLight.h>
 #include <kaguya/material/texture/Texture.h>
 #include <kaguya/material/texture/ImageTexture.h>
@@ -19,7 +24,6 @@
 #include <kaguya/material/Dielectric.h>
 #include <kaguya/material/Mirror.h>
 #include <kaguya/material/Metal.h>
-#include <kaguya/core/medium/IsotropicMedium.h>
 #include <kaguya/scene/importer/xml/XmlSceneImporter.h>
 #include <kaguya/utils/ObjLoader.h>
 #include <kaguya/tracer/PathRecorder.h>

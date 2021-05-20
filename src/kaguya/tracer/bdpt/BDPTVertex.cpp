@@ -136,8 +136,6 @@ namespace kaguya {
                 case CAMERA:
                     return true;
                 case LIGHT:
-//                    return (ei.light != nullptr) &&
-//                           ((ei.light->getType() & DELTA_DIRECTION) == 0);
                     return (ei.light->getType() & (int) LightType::DELTA_DIRECTION) == 0;
                 case SURFACE:
                     // 判断 specular 类型

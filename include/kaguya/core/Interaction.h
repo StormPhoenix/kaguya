@@ -151,13 +151,9 @@ namespace kaguya {
             AreaLight *_areaLight = nullptr;
 
         public:
-            const AreaLight *getAreaLight() const {
-                return _areaLight;
-            }
+            const AreaLight *getAreaLight() const;
 
-            void setAreaLight(AreaLight *areaLight) {
-                _areaLight = areaLight;
-            }
+            void setAreaLight(AreaLight *areaLight);
         };
 
         using medium::Medium;
