@@ -39,19 +39,19 @@
     - [ ] 考虑 EnvironmentLight(EL) 在 PT \ BDPT \ SPPM 三种情况下如何处理
         - [ ] BDPT
             - [x] 删除 InfiniteLight，只考虑 EnvrionmentLight 
-            - [ ] class Light 添加 worldBound 接口
-            - [ ] 思考： Environment light 和 Infinite light
+            - [x] class Light 添加 worldBound 接口
+            - [x] 思考： Environment light 和 Infinite light
             - [ ] connectible() cameraPath 最后一个 Vertex 是 EL
             - [ ] connectPath() cameraPath 最后一个 Vertex 是 EL，则调过 connect 步骤
             - [ ] PathVertex 添加 InfiniteLight 类型判断
                 - [ ] PathVertex::Le() 方法添加 Infinite 判断
                 - [ ] ConvertDensity 也要添加 Infinite 判断
                 - [ ] PdfLight 也要修改
-            - [ ] generateLightPath
-                - [ ] EnvrionmentLight 也要加入 lights，光线可以从 EnvLight 出发
-                - [ ] lightPath 在最后未击中的情况下不生成 LighPoint
-                - [ ] 引入 Infinite light 类型的光源，Infinite 类型的光源的 pdfDir 不能用于计算 path[1] 的 pdfFwd
-            - [ ] CameraPath 最后未击中的情况下生成 LightPoint
+            - [x] generateLightPath
+                - [x] EnvrionmentLight 也要加入 lights，光线可以从 EnvLight 出发
+                - [x] lightPath 在最后未击中的情况下不生成 LighPoint
+                - [x] 引入 Infinite light 类型的光源，Infinite 类型的光源的 pdfDir 不能用于计算 path[1] 的 pdfFwd
+            - [x] CameraPath 最后未击中的情况下生成 LightPoint
         - [x] PT
             - [x] Path tracing 未击中
         - [ ] SPPM
@@ -216,7 +216,7 @@
         在 MIS = 1 的情况下，除了球体外的场景在视觉上看不出什么区别，唯独是边界位置，使用 MIS 明显很暗淡
     - [x] depth = 2, s = 1，有 MIS，改变光源位置、大小，相机位置，都不会影响边界，但移动球的位置会影响边界
     - [x] 将 s = 1 作为限制条件，看是否出现 "边界"。s = 1 的情况相当于 PT 了，
-        如果继续出现边界说明 randomWalk 有问题了。
+        如果继续出现边界说明 randomBounce 有问题了。
     - [x] Solved：cameraSubPath 起始点 PathVertex 是 Camera 类型，但在创建 camera path vertex 时没有给 PathVertex
         的 point 属性赋值。
         

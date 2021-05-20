@@ -17,7 +17,7 @@
 #include <kaguya/scene/Scene.h>
 #include <kaguya/tracer/Camera.h>
 #include <kaguya/tracer/Tracer.h>
-#include <kaguya/tracer/bdpt/PathVertex.h>
+#include <kaguya/tracer/bdpt/BDPTVertex.h>
 #include <kaguya/utils/MemoryArena.h>
 
 #include <iostream>
@@ -66,7 +66,7 @@ namespace kaguya {
              * @return 路径长度
              */
             int generateCameraPath(std::shared_ptr<Scene> scene, const Ray &ray, std::shared_ptr<Camera>,
-                                   PathVertex *cameraSubPath, int maxDepth,
+                                   BDPTVertex *cameraSubPath, int maxDepth,
                                    Sampler *sampler, MemoryArena &memoryArena);
 
             /**
@@ -78,7 +78,7 @@ namespace kaguya {
              * @return
              */
             int generateLightPath(std::shared_ptr<Scene> scene,
-                                  PathVertex *lightSubPath, int maxDepth,
+                                  BDPTVertex *lightSubPath, int maxDepth,
                                   Sampler *sampler,
                                   MemoryArena &memoryArena);
 
@@ -94,9 +94,9 @@ namespace kaguya {
              * @param mode
              * @return
              */
-            int randomWalk(std::shared_ptr<Scene> scene, const Ray &ray, PathVertex *path, int maxDepth,
-                           Float pdf, Sampler *const sampler, MemoryArena &memoryArena, Spectrum &beta,
-                           TransportMode mode);
+            int randomBounce(std::shared_ptr<Scene> scene, const Ray &ray, BDPTVertex *path, int maxDepth,
+                             Float pdf, Sampler *const sampler, MemoryArena &memoryArena, Spectrum &beta,
+                             TransportMode mode);
 
             /**
              * 连接 Camera 和 Light 两条路径，并返回合成路径的 Radiance
@@ -110,8 +110,8 @@ namespace kaguya {
              * @param samplePosition 最终在成像平面上采样的点。当 cameraSubPath 只去一个相机点时，samplePosition 会改变
              * @return
              */
-            Spectrum connectPath(std::shared_ptr<Scene> scene, PathVertex *cameraSubPath, int cameraPathLength, int t,
-                                 PathVertex *lightSubPath, int lightPathLength, int s, Point2F *samplePosition,
+            Spectrum connectPath(std::shared_ptr<Scene> scene, BDPTVertex *cameraSubPath, int cameraPathLength, int t,
+                                 BDPTVertex *lightSubPath, int lightPathLength, int s, Point2F *samplePosition,
                                  Sampler *sampler);
 
             /**
@@ -126,9 +126,9 @@ namespace kaguya {
              * @param extraVertex t = 1 或 s = 1 时传入的点
              * @return
              */
-            Float misWeight(PathVertex *cameraSubPath, int t,
-                             PathVertex *lightSubPath, int s,
-                             PathVertex &extraVertex);
+            Float misWeight(BDPTVertex *cameraSubPath, int t,
+                            BDPTVertex *lightSubPath, int s,
+                            BDPTVertex &extraVertex);
 
             /**
              * 计算路径中某个段中两端点段几何关系
@@ -136,7 +136,7 @@ namespace kaguya {
              * @param next
              * @return
              */
-            Spectrum g(const PathVertex &pre, const PathVertex &next, Sampler *sampler);
+            Spectrum g(const BDPTVertex &pre, const BDPTVertex &next, Sampler *sampler);
 
         private:
             // 最大采样深度

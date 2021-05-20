@@ -17,5 +17,9 @@ namespace RENDER_NAMESPACE {
         bool Light::isDeltaType() const {
             return (_type & (DELTA_DIRECTION | DELTA_POSITION)) > 0;
         }
+
+        LightType Light::getType() const {
+            return _type;
+        }
     }
 }

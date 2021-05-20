@@ -2,8 +2,8 @@
 // Created by Storm Phoenix on 2020/10/29.
 //
 
-#ifndef KAGUYA_PATHVERTEX_H
-#define KAGUYA_PATHVERTEX_H
+#ifndef KAGUYA_BDPTVERTEX_H
+#define KAGUYA_BDPTVERTEX_H
 
 #include <kaguya/core/Interaction.h>
 #include <kaguya/core/light/Light.h>
@@ -12,6 +12,7 @@
 namespace kaguya {
     namespace tracer {
 
+        using scene::Scene;
         using kaguya::core::Light;
         using kaguya::core::Spectrum;
 
@@ -24,7 +25,9 @@ namespace kaguya {
             CAMERA, LIGHT, SURFACE, MEDIUM
         } PathVertexType;
 
-        typedef struct PathVertex {
+        Float environmentLightDensity(const std::shared_ptr<Scene> scene, Vector3F toLightDirection);
+
+        typedef struct BDPTVertex {
             // f(p, wo, wi) * cosine / p(w_i)
             Spectrum beta;
             // 路径点类型
@@ -42,15 +45,15 @@ namespace kaguya {
             MediumInteraction mi;
             StartEndInteraction ei;
 
-            PathVertex() {}
+            BDPTVertex() {}
 
-            PathVertex(const SurfaceInteraction &si, const Spectrum &beta) :
+            BDPTVertex(const SurfaceInteraction &si, const Spectrum &beta) :
                     si(si), beta(beta), point(si.point), type(PathVertexType::SURFACE) {}
 
-            PathVertex(const MediumInteraction &mi, const Spectrum &beta) :
+            BDPTVertex(const MediumInteraction &mi, const Spectrum &beta) :
                     mi(mi), beta(beta), point(mi.point), type(PathVertexType::MEDIUM) {}
 
-            PathVertex(PathVertexType type, const StartEndInteraction &ei, const Spectrum &beta) :
+            BDPTVertex(PathVertexType type, const StartEndInteraction &ei, const Spectrum &beta) :
                     type(type), ei(ei), point(ei.point), beta(beta) {
             }
 
@@ -78,7 +81,7 @@ namespace kaguya {
              * @param p
              * @return
              */
-            Spectrum f(const PathVertex &next) const;
+            Spectrum f(const BDPTVertex &next) const;
 
             /**
              * 当前点发出射线指向下一个点 next，计算 next 的概率密度
@@ -87,7 +90,7 @@ namespace kaguya {
              * @param next 下一个点
              * @return
              */
-            Float convertToDensity(Float pdfWi, const PathVertex &next) const;
+            Float convertToDensity(Float pdfWi, const BDPTVertex &next) const;
 
             /**
              * 计算 pre -> p -> next 的 density ，这个 ，density 是 next 的。
@@ -98,7 +101,8 @@ namespace kaguya {
              * @param next
              * @return
              */
-            Float computeDensity(const PathVertex *pre, const PathVertex &next) const;
+            Float
+            computeDensity(const std::shared_ptr<Scene> scene, const BDPTVertex *pre, const BDPTVertex &next) const;
 
             /**
              * 计算 p -> next 的 density pdf（密度 pdf），这个 density pdf 是 next 的 density pdf，
@@ -107,28 +111,24 @@ namespace kaguya {
              * @param next
              * @return
              */
-            Float densityFromLight(const PathVertex &next) const;
+            Float densityFromLight(const std::shared_ptr<Scene> scene, const BDPTVertex &next) const;
 
             /**
              * 当前 PathVertex 作为发光体的时候，计算这个发光体上的发光点的 density pdf
              * @param next
              * @return
              */
-            Float densityLightOrigin(const PathVertex &next) const;
+            Float densityLightOrigin(std::shared_ptr<Scene> scene, const BDPTVertex &next) const;
 
             const Interaction getInteraction() const;
 
-            /**
-             * 判断 PathVertex 是否是光源并且为 Delta 分布
-             * @return
-             */
+            bool isSurfaceType() const;
+
+            bool isLight() const;
+
             bool isDeltaLight() const;
 
-            /**
-             * 判断是否是光源类型
-             * @return
-             */
-            bool isLight() const;
+            bool isInfiniteLight() const;
 
             /**
              * 假设 PathVertex 可以发光，则此处计算 PathVertex 向 eye 方向投射射线的 Radiance
@@ -136,50 +136,50 @@ namespace kaguya {
              * @param eye
              * @return
              */
-            Spectrum Le(const Vector3F &eye) const;
+            Spectrum Le(std::shared_ptr<Scene> scene, const Vector3F &eye) const;
 
-            static inline PathVertex createCameraVertex(const Camera *camera, const Ray &ray, Spectrum beta) {
+            static inline BDPTVertex createCameraVertex(const Camera *camera, const Ray &ray, Spectrum beta) {
                 StartEndInteraction ei = StartEndInteraction(camera, ray);
-                PathVertex cameraVertex = PathVertex(PathVertexType::CAMERA, ei, beta);
+                BDPTVertex cameraVertex = BDPTVertex(PathVertexType::CAMERA, ei, beta);
                 cameraVertex.pdfForward = 1.0;
                 return cameraVertex;
             }
 
-            static inline PathVertex createMediumVertex(const MediumInteraction &mi, Float forwardDensity,
-                                                        const PathVertex &preVertex, const Spectrum &beta) {
-                PathVertex vertex = PathVertex(mi, beta);
+            static inline BDPTVertex createMediumVertex(const MediumInteraction &mi, Float forwardDensity,
+                                                        const BDPTVertex &preVertex, const Spectrum &beta) {
+                BDPTVertex vertex = BDPTVertex(mi, beta);
                 vertex.pdfForward = preVertex.convertToDensity(forwardDensity, vertex);
                 return vertex;
             }
 
-            static inline PathVertex createLightVertex(const Light *light, const Vector3F &p, const Vector3F &dir,
+            static inline BDPTVertex createLightVertex(const Light *light, const Vector3F &p, const Vector3F &dir,
                                                        const Vector3F &n, const Spectrum &intensity, Float pdf) {
                 StartEndInteraction ei = StartEndInteraction(light, p, dir, n);
-                PathVertex pathVertex = PathVertex(PathVertexType::LIGHT, ei, intensity);
+                BDPTVertex pathVertex = BDPTVertex(PathVertexType::LIGHT, ei, intensity);
                 pathVertex.pdfForward = pdf;
                 return pathVertex;
             }
 
 
-            static inline PathVertex createLightVertex(const StartEndInteraction &ei, Spectrum &beta) {
-                return PathVertex(PathVertexType::LIGHT, ei, beta);
+            static inline BDPTVertex createLightVertex(const StartEndInteraction &ei, Spectrum &beta, Float pdfFwd) {
+                BDPTVertex v(PathVertexType::LIGHT, ei, beta);
+                v.pdfForward = pdfFwd;
+                return v;
             }
 
-            static inline PathVertex createSurfaceVertex(const SurfaceInteraction &si,
+            static inline BDPTVertex createSurfaceVertex(const SurfaceInteraction &si,
                                                          Float pdfPreWi,
-                                                         const PathVertex &pre,
+                                                         const BDPTVertex &pre,
                                                          const Spectrum &beta) {
                 // 创建路径点
-                PathVertex v = PathVertex(si, beta);
+                BDPTVertex v = BDPTVertex(si, beta);
                 // 计算上个点发射线击中当前点时，当前点对应的概率
                 v.pdfForward = pre.convertToDensity(pdfPreWi, v);
                 return v;
             }
 
         } PathVertex;
-
-
     }
 }
 
-#endif //KAGUYA_PATHVERTEX_H
+#endif //KAGUYA_BDPTVERTEX_H

@@ -88,6 +88,8 @@ namespace kaguya {
 
             virtual void worldBound(const std::shared_ptr<Scene> scene);
 
+            LightType getType() const;
+
             /**
              * 判断光源是否是尖端分布
              * @return
