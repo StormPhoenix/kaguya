@@ -21,9 +21,9 @@ namespace kaguya {
         using kaguya::core::SurfaceInteraction;
         using kaguya::core::MediumInteraction;
 
-        typedef enum PathVertexType {
+        typedef enum BDPTVertexType {
             CAMERA, LIGHT, SURFACE, MEDIUM
-        } PathVertexType;
+        } BDPTVertexType;
 
         Float environmentLightDensity(const std::shared_ptr<Scene> scene, Vector3F toLightDirection);
 
@@ -31,7 +31,7 @@ namespace kaguya {
             // f(p, wo, wi) * cosine / p(w_i)
             Spectrum beta;
             // 路径点类型
-            PathVertexType type;
+            BDPTVertexType type;
             // 路径点位置
             Vector3F point;
             // 当前点的概率密度，从上一个点发射射线选取
@@ -48,12 +48,12 @@ namespace kaguya {
             BDPTVertex() {}
 
             BDPTVertex(const SurfaceInteraction &si, const Spectrum &beta) :
-                    si(si), beta(beta), point(si.point), type(PathVertexType::SURFACE) {}
+                    si(si), beta(beta), point(si.point), type(BDPTVertexType::SURFACE) {}
 
             BDPTVertex(const MediumInteraction &mi, const Spectrum &beta) :
-                    mi(mi), beta(beta), point(mi.point), type(PathVertexType::MEDIUM) {}
+                    mi(mi), beta(beta), point(mi.point), type(BDPTVertexType::MEDIUM) {}
 
-            BDPTVertex(PathVertexType type, const StartEndInteraction &ei, const Spectrum &beta) :
+            BDPTVertex(BDPTVertexType type, const StartEndInteraction &ei, const Spectrum &beta) :
                     type(type), ei(ei), point(ei.point), beta(beta) {
             }
 
@@ -62,7 +62,7 @@ namespace kaguya {
             }
 
             Normal3F shadingNormal() const {
-                if (type == PathVertexType::SURFACE) {
+                if (type == BDPTVertexType::SURFACE) {
                     return getInteraction().rendering.normal;
                 } else {
                     return getInteraction().normal;
@@ -140,7 +140,7 @@ namespace kaguya {
 
             static inline BDPTVertex createCameraVertex(const Camera *camera, const Ray &ray, Spectrum beta) {
                 StartEndInteraction ei = StartEndInteraction(camera, ray);
-                BDPTVertex cameraVertex = BDPTVertex(PathVertexType::CAMERA, ei, beta);
+                BDPTVertex cameraVertex = BDPTVertex(BDPTVertexType::CAMERA, ei, beta);
                 cameraVertex.pdfForward = 1.0;
                 return cameraVertex;
             }
@@ -155,14 +155,14 @@ namespace kaguya {
             static inline BDPTVertex createLightVertex(const Light *light, const Vector3F &p, const Vector3F &dir,
                                                        const Vector3F &n, const Spectrum &intensity, Float pdf) {
                 StartEndInteraction ei = StartEndInteraction(light, p, dir, n);
-                BDPTVertex pathVertex = BDPTVertex(PathVertexType::LIGHT, ei, intensity);
+                BDPTVertex pathVertex = BDPTVertex(BDPTVertexType::LIGHT, ei, intensity);
                 pathVertex.pdfForward = pdf;
                 return pathVertex;
             }
 
 
             static inline BDPTVertex createLightVertex(const StartEndInteraction &ei, Spectrum &beta, Float pdfFwd) {
-                BDPTVertex v(PathVertexType::LIGHT, ei, beta);
+                BDPTVertex v(BDPTVertexType::LIGHT, ei, beta);
                 v.pdfForward = pdfFwd;
                 return v;
             }

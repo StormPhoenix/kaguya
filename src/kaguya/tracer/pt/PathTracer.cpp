@@ -108,8 +108,6 @@ namespace kaguya {
 
                     // 终止条件判断
                     if (!isIntersected) {
-                        // Environment light
-                        shaderColor += (beta * estimateEnvironmentLights(scatterRay));
                         RECORD_TRACE_PATH(pixelPos.x, pixelPos.y, iteration, scatterRay.at(20000),
                                           Environment_Record, _camera.get())
                         break;

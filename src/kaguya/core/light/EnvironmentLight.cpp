@@ -28,7 +28,6 @@ namespace kaguya {
                 _lightToWorld = std::make_shared<Transform>();
             }
             _worldToLight = _lightToWorld->inverse().ptr();
-            // TODO add weight 1.0 / 255.0
             _texture = io::readImage(texturePath.c_str(), &_width, &_height);
 
             std::unique_ptr<Float[]> sampleFunction(new Float[_width * _height]);
@@ -176,7 +175,7 @@ namespace kaguya {
             }
 
             // flip
-            hOffset = _height - (hOffset + 1);
+//            hOffset = _height - (hOffset + 1);
             int offset = (hOffset * _width + wOffset);
 
             Spectrum ret(0);

@@ -102,16 +102,16 @@ namespace kaguya {
              * 连接 Camera 和 Light 两条路径，并返回合成路径的 Radiance
              * @param scene
              * @param cameraSubPath
-             * @param cameraPathLength
+             * @param nCameraVertices
              * @param t cameraSubPath 参与路径构建的点数
              * @param lightSubPath
-             * @param lightPathLength
+             * @param nLightVertices
              * @param s lightSubPath 参与路径构建的点数
              * @param samplePosition 最终在成像平面上采样的点。当 cameraSubPath 只去一个相机点时，samplePosition 会改变
              * @return
              */
-            Spectrum connectPath(std::shared_ptr<Scene> scene, BDPTVertex *cameraSubPath, int cameraPathLength, int t,
-                                 BDPTVertex *lightSubPath, int lightPathLength, int s, Point2F *samplePosition,
+            Spectrum connectPath(std::shared_ptr<Scene> scene, BDPTVertex *cameraSubPath, int nCameraVertices, int t,
+                                 BDPTVertex *lightSubPath, int nLightVertices, int s, Point2F *samplePosition,
                                  Sampler *sampler);
 
             /**

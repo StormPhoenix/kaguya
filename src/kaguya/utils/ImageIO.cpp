@@ -138,7 +138,8 @@ namespace kaguya {
                     nFloats = nChannels * width * height;
                     data = new float[nFloats];
                     // Flip in Y, as P*M has the origin at the lower left.
-                    for (int y = height - 1; y >= 0; --y) {
+//                    for (int y = height - 1; y >= 0; --y) {
+                    for (int y = 0; y < height; y++) {
                         if (fread(&data[y * nChannels * width], sizeof(float),
                                   nChannels * width, fp) != nChannels * width)
                             goto fail;

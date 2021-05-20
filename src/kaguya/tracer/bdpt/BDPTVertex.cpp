@@ -24,10 +24,10 @@ namespace kaguya {
             Float nLight = scene->getEnvironmentLights().size();
             Float lightPdf = 1.0 / nLight;
             for (Light::Ptr light : scene->getEnvironmentLights()) {
-                density += light->pdfLi(Interaction(), toLightDirection) * lightPdf;
+                density += light->pdfLi(Interaction(), toLightDirection);
             }
 //            return density / scene->getEnvironmentLights().size();
-            return density;
+            return density * lightPdf;
         }
 
         Spectrum BDPTVertex::f(const BDPTVertex &next) const {
@@ -48,24 +48,24 @@ namespace kaguya {
 
         bool BDPTVertex::isDeltaLight() const {
             // TODO 缺少 env light 的考虑
-            return (type == PathVertexType::LIGHT && ei.light != nullptr
+            return (type == BDPTVertexType::LIGHT && ei.light != nullptr
                     && ei.light->isDeltaType());
         }
 
         bool BDPTVertex::isSurfaceType() const {
-            return type == PathVertexType::SURFACE;
+            return type == BDPTVertexType::SURFACE;
         }
 
         bool BDPTVertex::isLight() const {
-            return (type == PathVertexType::LIGHT ||
-                    (type == PathVertexType::SURFACE && si.getAreaLight() != nullptr));
+            return (type == BDPTVertexType::LIGHT ||
+                    (type == BDPTVertexType::SURFACE && si.getAreaLight() != nullptr));
         }
 
         bool BDPTVertex::isInfiniteLight() const {
             // ei.light == nullptr -> environment light
             // ei.light != nullptr && ei.light is env light
             // ei.light != nullptr && ei.light is deltaDirection -> sun light
-            return type == PathVertexType::LIGHT &&
+            return type == BDPTVertexType::LIGHT &&
                    (ei.light == nullptr ||
                     ((ei.light->getType() & core::ENVIRONMENT) > 0) ||
                     ((ei.light->getType() & core::DELTA_DIRECTION) > 0));

@@ -103,14 +103,14 @@ namespace kaguya {
         }
 
         Spectrum BDPathTracer::connectPath(std::shared_ptr<Scene> scene,
-                                           BDPTVertex *cameraSubPath, int cameraPathLength, int t,
-                                           BDPTVertex *lightSubPath, int lightPathLength, int s,
+                                           BDPTVertex *cameraSubPath, int nCameraVertices, int t,
+                                           BDPTVertex *lightSubPath, int nLightVertices, int s,
                                            Point2F *samplePosition, Sampler *sampler) {
             // 检查 t 和 s 的范围，必须处于 cameraPath 和 lightPathLength 的长度范围之中
-            assert(t >= 1 && t <= cameraPathLength);
-            assert(s >= 0 && s <= lightPathLength);
+            assert(t >= 1 && t <= nCameraVertices);
+            assert(s >= 0 && s <= nLightVertices);
 
-            if (t > 1 && s != 0 && cameraSubPath[t - 1].type == PathVertexType::LIGHT) {
+            if (t > 1 && s != 0 && cameraSubPath[t - 1].type == BDPTVertexType::LIGHT) {
                 return Spectrum(0.);
             }
 
@@ -130,12 +130,12 @@ namespace kaguya {
             // New sample
             BDPTVertex extraVertex;
 
-            Spectrum ret = Spectrum(0.0);
+            Spectrum radiance = Spectrum(0.0);
             if (s == 0) {
                 // lightSubPath 上没有任何路径点
                 const BDPTVertex &pt = cameraSubPath[t - 1];
                 if (pt.isLight()) {
-                    ret = pt.Le(scene, cameraSubPath[t - 2].point) * pt.beta;
+                    radiance = pt.Le(scene, cameraSubPath[t - 2].point) * pt.beta;
                 }
             } else if (t == 1) {
                 // 去 lightSubPath 连接点
@@ -150,20 +150,20 @@ namespace kaguya {
                     if (pdf > 0 && !we.isBlack() && visibilityTester.isVisible(scene)) {
                         Ray newRay = visibilityTester.getEnd().sendRay(-worldWi);
                         extraVertex = BDPTVertex::createCameraVertex(_camera.get(), newRay, we / pdf);
-                        ret = ps.beta * ps.f(extraVertex) * extraVertex.beta;
-                        if (ps.type == PathVertexType::SURFACE) {
-                            ret *= ABS_DOT(ps.shadingNormal(), worldWi);
+                        radiance = ps.beta * ps.f(extraVertex) * extraVertex.beta;
+                        if (ps.type == BDPTVertexType::SURFACE) {
+                            radiance *= ABS_DOT(ps.shadingNormal(), worldWi);
                         }
 
                         // transmittance
-                        if (!ret.isBlack()) {
-                            ret *= visibilityTester.transmittance(scene, sampler);
+                        if (!radiance.isBlack()) {
+                            radiance *= visibilityTester.transmittance(scene, sampler);
                         }
                     }
                 }
             } else if (s == 1) {
                 // 由于 lightSubPath 没有任何点参与路径构建，所以我们重新采样一个光源点，加到 cameraSubPath 上
-                BDPTVertex &pt = cameraSubPath[t - 1];
+                const BDPTVertex &pt = cameraSubPath[t - 1];
                 if (pt.isConnectible()) {
                     Float lightPdf = 0;
                     auto light = uniformSampleLight(scene, &lightPdf, sampler);
@@ -182,7 +182,7 @@ namespace kaguya {
                     if (sampleLightPdf == 0. || sampleIntensity.isBlack() ||
                         !visibilityTester.isVisible(scene)) {
                         // 没有任何光源亮度贡献的情况，直接返回 0
-                        ret = Spectrum(0.0);
+                        radiance = Spectrum(0.0);
                     } else {
                         // 构建一个新 StartEndInteraction，用于保存路径点上的光源
                         StartEndInteraction ei = StartEndInteraction(light.get(), visibilityTester.getEnd());
@@ -192,14 +192,14 @@ namespace kaguya {
                         // 计算 pdfForward
                         extraVertex.pdfForward = extraVertex.densityLightOrigin(_scene, pt);
 
-                        ret = pt.beta * pt.f(extraVertex) * extraVertex.beta;
-                        if (pt.type == PathVertexType::SURFACE) {
-                            ret *= std::abs(DOT(pt.shadingNormal(), worldWi));
+                        radiance = pt.beta * pt.f(extraVertex) * extraVertex.beta;
+                        if (pt.type == BDPTVertexType::SURFACE) {
+                            radiance *= std::abs(DOT(pt.shadingNormal(), worldWi));
                         }
 
                         // transmittance
-                        if (!ret.isBlack()) {
-                            ret *= visibilityTester.transmittance(scene, sampler);
+                        if (!radiance.isBlack()) {
+                            radiance *= visibilityTester.transmittance(scene, sampler);
                         }
                     }
                 }
@@ -210,15 +210,15 @@ namespace kaguya {
                 if (pt.isConnectible() && ps.isConnectible()) {
                     // 调用 pt.f() 和 ps.f，计算 pt 和 ps 连接起来的 pdf，其中 g 包含了 visible 项
                     // 这里没有做 MC 采样，所以不需要除以 MC 的 pdf
-                    ret = pt.beta * pt.f(ps) * ps.f(pt) * ps.beta * g(pt, ps, sampler);
+                    radiance = pt.beta * pt.f(ps) * ps.f(pt) * ps.beta * g(pt, ps, sampler);
                 } else {
-                    ret = Spectrum(0.0);
+                    radiance = Spectrum(0.0);
                 }
             }
 
-            Float misWt = ret.isBlack() ? 0.0 : misWeight(cameraSubPath, t, lightSubPath, s, extraVertex);
-            ret *= misWt;
-            return ret;
+            Float misWt = radiance.isBlack() ? 0.0 : misWeight(cameraSubPath, t, lightSubPath, s, extraVertex);
+            radiance *= misWt;
+            return radiance;
         }
 
         int BDPathTracer::generateCameraPath(std::shared_ptr<Scene> scene, const Ray &ray,
@@ -250,26 +250,22 @@ namespace kaguya {
                 return 0;
             }
 
-            // 光源位置采样概率
-            Float pdfPos = 0;
-            // 光线发射方向采样概率
-            Float pdfDir = 0;
-            // 光源发射光线切面的法线
+            Float pdfPos, pdfDir;
+            pdfPos = pdfDir = 0;
             Vector3F lightNormal;
-            // 光源发射光线
+
             Ray scatterRay;
-            // 采样光源发射
-            Spectrum intensity = light->sampleLe(&scatterRay, &lightNormal,
-                                                 &pdfPos, &pdfDir, sampler);
-            if (pdfPos == 0 || pdfDir == 0 || intensity.isBlack()) {
+            Spectrum L = light->sampleLe(&scatterRay, &lightNormal,
+                                         &pdfPos, &pdfDir, sampler);
+            if (pdfPos == 0 || pdfDir == 0 || L.isBlack()) {
                 return 0;
             }
             // 创建光源点
             lightSubPath[0] = BDPTVertex::createLightVertex(light.get(), scatterRay.getOrigin(),
-                                                            scatterRay.getDirection(), lightNormal, intensity,
+                                                            scatterRay.getDirection(), lightNormal, L,
                                                             pdfPos * lightPdf);
 
-            Spectrum beta = intensity * std::abs(DOT(scatterRay.getDirection(), lightNormal)) /
+            Spectrum beta = L * std::abs(DOT(scatterRay.getDirection(), lightNormal)) /
                             (pdfPos * pdfDir * lightPdf);
 
             int nVertices = randomBounce(scene, scatterRay, lightSubPath, maxDepth, pdfDir,
@@ -496,8 +492,7 @@ namespace kaguya {
                 }
             }
 
-            Float ret = 1. / (sumRi + 1);
-            return ret;
+            return 1. / (sumRi + 1);
         }
 
         Spectrum BDPathTracer::g(const BDPTVertex &pre, const BDPTVertex &next, Sampler *sampler) {
@@ -510,12 +505,12 @@ namespace kaguya {
             dirToNext = NORMALIZE(dirToNext);
 
             Float cosPre = 1.0;
-            if (pre.type == PathVertexType::SURFACE) {
+            if (pre.type == BDPTVertexType::SURFACE) {
                 cosPre = std::abs(DOT(pre.shadingNormal(), dirToNext));
             }
 
             Float cosNext = 1.0;
-            if (next.type == PathVertexType::SURFACE) {
+            if (next.type == BDPTVertexType::SURFACE) {
                 cosNext = std::abs(DOT(next.shadingNormal(), dirToNext));
             }
 
@@ -530,23 +525,23 @@ namespace kaguya {
             BDPTVertex *lightSubPath = memoryArena.alloc<BDPTVertex>(maxDepth, false);
 
             // Generate camera path
-            int cameraPathLength = generateCameraPath(_scene, ray, _camera, cameraSubPath, maxDepth + 1,
-                                                      sampler, memoryArena);
+            int nCameraVertices = generateCameraPath(_scene, ray, _camera, cameraSubPath, maxDepth + 1,
+                                                     sampler, memoryArena);
 
             // Generate light path
-            int lightPathLength = generateLightPath(_scene, lightSubPath, maxDepth, sampler, memoryArena);
+            int nLightVertices = generateLightPath(_scene, lightSubPath, maxDepth, sampler, memoryArena);
 
             Spectrum shaderColor = Spectrum(0.0);
             // Connect path
-            for (int t = 1; t <= cameraPathLength; t++) {
-                for (int s = 0; s <= lightPathLength; s++) {
+            for (int t = 1; t <= nCameraVertices; t++) {
+                for (int s = 0; s <= nLightVertices; s++) {
                     int depth = t + s - 2;
                     if ((s == 1 && t == 1) || depth < 0 || depth > maxDepth) {
                         continue;
                     }
                     Point2F samplePosition;
-                    Spectrum value = connectPath(scene, cameraSubPath, cameraPathLength, t,
-                                                 lightSubPath, lightPathLength, s,
+                    Spectrum value = connectPath(scene, cameraSubPath, nCameraVertices, t,
+                                                 lightSubPath, nLightVertices, s,
                                                  &samplePosition, sampler);
 
                     if (t == 1) {
