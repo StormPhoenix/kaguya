@@ -5,7 +5,7 @@
 #include <kaguya/Config.h>
 #include <kaguya/scene/importer/xml/XmlSceneImporter.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
 
     // Camera settings
     std::string Config::Camera::type = "perspective";

@@ -7,7 +7,7 @@
 
 #include <kaguya/core/bsdf/BSDF.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bsdf {
             class FourierBSDF : public BSDF {

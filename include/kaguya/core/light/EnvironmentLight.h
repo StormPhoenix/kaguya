@@ -10,7 +10,7 @@
 #include <kaguya/core/Transform.h>
 #include <kaguya/core/light/Light.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
 
         using namespace transform;

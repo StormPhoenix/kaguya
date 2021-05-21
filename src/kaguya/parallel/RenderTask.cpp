@@ -5,7 +5,7 @@
 #include <kaguya/parallel/RenderTask.h>
 #include <iostream>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace parallel {
 
         RenderTask::RenderTask(const std::function<void(const int)> func1D, int taskCount, int chunkSize)

@@ -5,7 +5,7 @@
 #ifndef KAGUYA_SCOPESWAPPER_HPP
 #define KAGUYA_SCOPESWAPPER_HPP
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace memory {
 
         /**

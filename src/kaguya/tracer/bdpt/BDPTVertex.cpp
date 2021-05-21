@@ -12,7 +12,7 @@
 #include <kaguya/tracer/bdpt/BDPTVertex.h>
 #include <kaguya/tracer/Camera.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace tracer {
 
         using scene::acc::AABB;

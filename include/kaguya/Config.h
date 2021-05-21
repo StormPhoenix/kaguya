@@ -14,7 +14,7 @@
 #include <memory>
 #include <vector>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
 
     using kaguya::tracer::Camera;
     using kaguya::scene::meta::Shape;

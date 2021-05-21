@@ -12,12 +12,13 @@
 #include <kaguya/material/texture/TextureMapping2D.h>
 #include <kaguya/material/texture/UVMapping2D.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
         namespace texture {
 
 #define MAX_CHANNEL 10
             using namespace utils;
+
             template<typename T>
             class ImageTexture : public Texture<T> {
             public:

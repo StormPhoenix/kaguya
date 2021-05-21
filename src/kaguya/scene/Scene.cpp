@@ -26,7 +26,7 @@
 #include <iostream>
 
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
         using namespace kaguya::material;
         using namespace kaguya::material::texture;

@@ -12,7 +12,7 @@
 #include <kaguya/tracer/Camera.h>
 #include <kaguya/tracer/FilmPlane.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace tracer {
 
         using namespace kaguya::core;

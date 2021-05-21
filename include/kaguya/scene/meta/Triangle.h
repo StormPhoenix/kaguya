@@ -12,7 +12,7 @@
 
 #include <memory>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
         namespace meta {
             using core::transform::Transform;

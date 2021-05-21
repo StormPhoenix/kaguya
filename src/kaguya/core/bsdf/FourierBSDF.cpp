@@ -4,7 +4,7 @@
 
 #include <kaguya/core/bsdf/FourierBSDF.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bsdf {
             typedef struct FourierCoefficientTable {

@@ -7,11 +7,11 @@
 
 #include <algorithm>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace medium {
 
-			using namespace math;
+            using namespace math;
 
             core::Spectrum IsotropicMedium::transmittance(const tracer::Ray &ray, Sampler *sampler) const {
                 // e^{-\sigma_t * dist}

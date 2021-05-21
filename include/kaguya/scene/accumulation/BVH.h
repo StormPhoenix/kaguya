@@ -11,7 +11,7 @@
 
 #include <memory>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
         namespace acc {
 

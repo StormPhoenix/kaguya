@@ -9,7 +9,7 @@
 #include <kaguya/material/Material.h>
 #include <kaguya/scene/meta/Shape.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
 
     namespace core {
         class AreaLight;

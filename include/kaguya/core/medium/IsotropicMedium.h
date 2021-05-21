@@ -8,7 +8,7 @@
 #include <kaguya/core/medium/Medium.h>
 #include <kaguya/core/phase/HenyeyGreensteinFunction.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace medium {
 

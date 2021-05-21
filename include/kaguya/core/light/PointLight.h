@@ -9,7 +9,7 @@
 #include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/core/Transform.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
 
         using namespace transform;

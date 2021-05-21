@@ -9,7 +9,7 @@
 #include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/scene/meta/Shape.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
 
     namespace scene {
         class Geometry;

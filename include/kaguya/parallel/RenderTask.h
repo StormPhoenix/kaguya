@@ -10,7 +10,7 @@
 #include <condition_variable>
 #include <functional>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace parallel {
 
         using sampler::Sampler;

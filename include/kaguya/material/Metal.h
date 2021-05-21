@@ -9,7 +9,7 @@
 #include <kaguya/material/texture/Texture.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
 
         using core::Spectrum;

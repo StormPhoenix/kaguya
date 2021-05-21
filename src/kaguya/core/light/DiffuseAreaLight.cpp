@@ -5,7 +5,7 @@
 #include <kaguya/core/light/DiffuseAreaLight.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
 
         DiffuseAreaLight::DiffuseAreaLight(const Spectrum &intensity,

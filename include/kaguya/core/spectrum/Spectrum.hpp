@@ -13,7 +13,7 @@
 #include <kaguya/Common.h>
 #include <kaguya/math/Math.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
 
         /**

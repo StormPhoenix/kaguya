@@ -4,7 +4,7 @@
 
 #include <kaguya/utils/FileReader.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace utils {
         namespace io {
             bool extensionEquals(const std::string &filename, const std::string &extension) {

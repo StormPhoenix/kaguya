@@ -4,7 +4,7 @@
 
 #include <kaguya/core/bsdf/BXDFLambertianReflection.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bsdf {
             BXDFLambertianReflection::BXDFLambertianReflection(const Spectrum &albedo) :

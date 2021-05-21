@@ -9,7 +9,7 @@
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/core/Interaction.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bsdf {
             class BSDF {

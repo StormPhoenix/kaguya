@@ -7,7 +7,7 @@
 
 #include <kaguya/core/bssrdf/SeparableBSSRDF.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bssrdf {
 

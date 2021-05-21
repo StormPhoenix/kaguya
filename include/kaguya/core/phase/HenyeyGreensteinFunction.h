@@ -7,7 +7,7 @@
 
 #include <kaguya/core/phase/PhaseFunction.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
 
         class HenyeyGreensteinFunction : public PhaseFunction {

@@ -9,6 +9,7 @@
 #include <list>
 #include <cstddef>
 #include <cstdint>
+#include <kaguya/Common.h>
 
 #ifndef KAGUYA_CACHE_LINE_SIZE
 // cache line size 默认为 64 字节
@@ -27,7 +28,7 @@ T *allocAlignedMemory(size_t count) {
     return (T *) allocAlignedMemory(count * sizeof(T));
 }
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace memory {
 
         // 计算字节对其量

@@ -11,7 +11,7 @@
 #include <kaguya/sampler/HaltonSampler.h>
 #include <kaguya/sampler/DefaultSampler.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace sampler {
         class SamplerFactory {
         public:

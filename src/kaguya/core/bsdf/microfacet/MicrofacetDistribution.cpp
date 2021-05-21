@@ -5,7 +5,7 @@
 #include <kaguya/core/bsdf/microfacet/MicrofacetDistribution.h>
 #include <kaguya/math/Math.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bsdf {
             namespace microfacet {

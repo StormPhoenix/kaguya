@@ -9,7 +9,7 @@
 #include <kaguya/scene/accumulation/AABB.h>
 #include <kaguya/tracer/Ray.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
 
         using kaguya::core::SurfaceInteraction;
@@ -19,6 +19,7 @@ namespace kaguya {
         class Intersectable {
         public:
             typedef std::shared_ptr<Intersectable> Ptr;
+
             /**
              * 求交判定
              * @param ray

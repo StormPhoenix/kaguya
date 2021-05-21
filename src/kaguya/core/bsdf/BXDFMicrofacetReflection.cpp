@@ -4,7 +4,7 @@
 
 #include <kaguya/core/bsdf/BXDFMicrofacetReflection.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bsdf {
             BXDFMicrofacetReflection::BXDFMicrofacetReflection(const Spectrum &Ks,

@@ -9,7 +9,7 @@
 #include <kaguya/core/bsdf/microfacet/MicrofacetDistribution.h>
 #include <kaguya/core/bsdf/fresnel/Fresnel.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bsdf {
             using microfacet::MicrofacetDistribution;

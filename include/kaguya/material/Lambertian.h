@@ -10,7 +10,7 @@
 #include <kaguya/material/texture/Texture.h>
 #include <memory>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
 
         using namespace texture;

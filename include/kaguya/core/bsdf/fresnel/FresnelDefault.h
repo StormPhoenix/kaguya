@@ -7,7 +7,7 @@
 
 #include <kaguya/core/bsdf/fresnel/Fresnel.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bsdf {
             namespace fresnel {

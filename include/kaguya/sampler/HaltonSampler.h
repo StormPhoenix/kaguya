@@ -7,7 +7,7 @@
 
 #include <kaguya/sampler/Sampler.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace sampler {
 
         class HaltonSampler : public Sampler {

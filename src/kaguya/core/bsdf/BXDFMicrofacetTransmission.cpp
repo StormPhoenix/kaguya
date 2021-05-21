@@ -5,7 +5,7 @@
 #include <kaguya/math/Math.h>
 #include <kaguya/core/bsdf/BXDFMicrofacetTransmission.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bsdf {
             BXDFMicrofacetTransmission::BXDFMicrofacetTransmission(Float etaI, Float etaT, const Spectrum &Kt,

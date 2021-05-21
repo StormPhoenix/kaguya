@@ -5,7 +5,7 @@
 #include <kaguya/tracer/PathRecorder.h>
 #include <kaguya/tracer/Camera.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace tracer {
         // Initialization
         PathRecorder *PathRecorder::_recorder = nullptr;

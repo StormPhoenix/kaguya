@@ -7,7 +7,7 @@
 #include <kaguya/material/Mirror.h>
 #include <kaguya/material/texture/ConstantTexture.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
 
         using core::bsdf::BSDF;

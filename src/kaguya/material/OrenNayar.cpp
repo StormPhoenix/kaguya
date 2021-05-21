@@ -6,7 +6,7 @@
 #include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/core/bsdf/BXDFOrenNayar.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
 
         using kaguya::core::bsdf::BSDF;

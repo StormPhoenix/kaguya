@@ -21,18 +21,17 @@
 #include <kaguya/utils/MemoryArena.h>
 
 #include <iostream>
-#include <omp.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace tracer {
 
-        using kaguya::core::bsdf::BSDF;
-        using kaguya::core::bsdf::BXDFType;
-        using kaguya::core::Spectrum;
-        using kaguya::core::TransportMode;
-        using kaguya::material::Material;
-        using kaguya::memory::MemoryArena;
-        using kaguya::tracer::Camera;
+        using RENDER_NAMESPACE::core::bsdf::BSDF;
+        using RENDER_NAMESPACE::core::bsdf::BXDFType;
+        using RENDER_NAMESPACE::core::Spectrum;
+        using RENDER_NAMESPACE::core::TransportMode;
+        using RENDER_NAMESPACE::material::Material;
+        using RENDER_NAMESPACE::memory::MemoryArena;
+        using RENDER_NAMESPACE::tracer::Camera;
 
         /**
          * Bidirectional Path Tracing

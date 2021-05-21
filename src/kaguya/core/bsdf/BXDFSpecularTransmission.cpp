@@ -5,7 +5,7 @@
 #include <kaguya/core/bsdf/BXDFSpecularTransmission.h>
 #include <kaguya/core/bsdf/fresnel/FresnelDielectric.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bsdf {
             BXDFSpecularTransmission::BXDFSpecularTransmission(const Spectrum &albedo, Float thetaI, Float thetaT,

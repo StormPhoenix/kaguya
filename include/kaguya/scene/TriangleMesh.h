@@ -11,7 +11,7 @@
 
 #include <vector>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
 
         using namespace scene::meta;

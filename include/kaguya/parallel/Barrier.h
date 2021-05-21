@@ -5,10 +5,11 @@
 #ifndef KAGUYA_BARRIER_H
 #define KAGUYA_BARRIER_H
 
+#include <kaguya/Common.h>
 #include <cassert>
 #include <condition_variable>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace parallel {
 
         class Barrier {

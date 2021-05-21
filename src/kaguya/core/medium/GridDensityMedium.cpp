@@ -6,7 +6,7 @@
 #include <kaguya/core/phase/HenyeyGreensteinFunction.h>
 #include <kaguya/scene/accumulation/AABB.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace medium {
 

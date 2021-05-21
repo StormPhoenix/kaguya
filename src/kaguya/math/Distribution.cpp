@@ -4,7 +4,7 @@
 
 #include <kaguya/math/Distribution.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace math {
         namespace sampling {
 

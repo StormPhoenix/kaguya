@@ -5,7 +5,7 @@
 #include <kaguya/core/medium/MediumInterface.h>
 #include <kaguya/scene/Geometry.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
 
         using kaguya::core::medium::MediumInterface;

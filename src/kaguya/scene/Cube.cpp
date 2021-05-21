@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
 
         Cube::Cube(Matrix4F transfromMat) : _transformMat(transfromMat) {

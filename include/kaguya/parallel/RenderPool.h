@@ -6,15 +6,14 @@
 #define KAGUYA_RENDERPOOL_H
 
 #include <kaguya/sampler/Sampler.h>
-
 #include <kaguya/parallel/Barrier.h>
 #include <kaguya/parallel/RenderTask.h>
 
-#include <condition_variable>
 #include <thread>
 #include <vector>
+#include <condition_variable>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace parallel {
 
         extern thread_local int threadIdx;
@@ -60,8 +59,7 @@ namespace kaguya {
 
         private:
             // renderFunc for each thread
-            static void renderFunc(const int threadId,
-                                   std::shared_ptr<Barrier> barrier);
+            static void renderFunc(const int threadId, std::shared_ptr<Barrier> barrier);
 
         private:
             // is _pool shutdown

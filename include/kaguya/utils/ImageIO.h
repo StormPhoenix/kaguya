@@ -8,7 +8,7 @@
 #include <kaguya/Common.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace utils {
         namespace io {
             using core::RGBSpectrum;

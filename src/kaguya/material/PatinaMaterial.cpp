@@ -7,7 +7,7 @@
 #include <kaguya/core/bsdf/microfacet/GGXDistribution.h>
 #include <kaguya/core/bsdf/BXDFGlossyDiffuseReflection.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
 
         using core::bsdf::BXDFGlossyDiffuseReflection;

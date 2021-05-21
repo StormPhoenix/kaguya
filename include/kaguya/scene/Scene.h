@@ -24,7 +24,7 @@ using kaguya::core::Spectrum;
 
 const int MODEL_SCALE = 5;
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
         using kaguya::core::SurfaceInteraction;
 

@@ -4,7 +4,7 @@
 
 #include <kaguya/scene/meta/Shape.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
         namespace meta {
             Float Shape::surfacePointPdf(const SurfaceInteraction &si) const {

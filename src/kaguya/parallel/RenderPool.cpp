@@ -8,7 +8,7 @@
 #include <cassert>
 #include <cstdlib>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace parallel {
 
         thread_local int threadIdx;

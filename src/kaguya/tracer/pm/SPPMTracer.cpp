@@ -10,7 +10,7 @@
 #include <kaguya/parallel/AtomicFloat.h>
 #include <kaguya/parallel/RenderPool.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace tracer {
 
         using core::Light;

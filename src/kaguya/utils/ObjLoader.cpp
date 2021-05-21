@@ -7,7 +7,7 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <ext/tinyobjloader/tiny_obj_loader.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace utils {
         namespace io {
             using kaguya::scene::TriMesh;

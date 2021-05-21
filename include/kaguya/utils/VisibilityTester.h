@@ -12,13 +12,13 @@
 #include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/sampler/Sampler.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
         class Scene;
     }
 }
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace utils {
 
         using kaguya::core::Interaction;

@@ -4,7 +4,7 @@
 
 #include <kaguya/core/bsdf/BXDF.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bsdf {
             BXDF::BXDF(BXDFType type) : type(type) {}

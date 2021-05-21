@@ -6,7 +6,7 @@
 #include <kaguya/scene/meta/Triangle.h>
 #include <kaguya/scene/TriangleMesh.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
 
         using meta::Shape;

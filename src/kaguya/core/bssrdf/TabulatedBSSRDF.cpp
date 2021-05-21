@@ -5,7 +5,7 @@
 #include <kaguya/core/bssrdf/TabulatedBSSRDF.h>
 #include <kaguya/core/bsdf/fresnel/Fresnel.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bssrdf {
             using namespace bsdf;

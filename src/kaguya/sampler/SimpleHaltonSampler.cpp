@@ -6,7 +6,7 @@
 #include <kaguya/math/Math.h>
 #include <kaguya/sampler/SimpleHaltonSampler.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace sampler {
 
         using namespace math;

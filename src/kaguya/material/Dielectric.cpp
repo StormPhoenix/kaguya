@@ -10,7 +10,7 @@
 #include <kaguya/core/bsdf/fresnel/FresnelDielectric.h>
 #include <kaguya/core/bsdf/microfacet/GGXDistribution.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
 
         using core::bsdf::BSDF;

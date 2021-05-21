@@ -8,7 +8,7 @@
 #include <kaguya/material/texture/Texture.h>
 #include <kaguya/material/texture/UVMapping2D.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
         namespace texture {
 

@@ -4,7 +4,7 @@
 
 #include <kaguya/core/bsdf/BXDFSpecularReflection.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bsdf {
             BXDFSpecularReflection::BXDFSpecularReflection(const Spectrum &albedo, Fresnel *fresnel) :

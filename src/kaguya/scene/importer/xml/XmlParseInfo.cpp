@@ -4,7 +4,7 @@
 
 #include <kaguya/scene/importer/xml/XmlParseInfo.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
         namespace importer {
 

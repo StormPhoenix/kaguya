@@ -4,7 +4,7 @@
 
 #include <kaguya/core/light/SpotLight.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         SpotLight::SpotLight(const Spectrum &intensity, Transform::Ptr lightToWorld,
                              const MediumInterface &mediumBoundary, Float fallOffRange, Float totalRange) :

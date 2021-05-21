@@ -6,7 +6,7 @@
 #include <kaguya/core/bsdf/BXDFFresnelSpecular.h>
 #include <kaguya/material/SubsurfaceMaterial.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
 
         using kaguya::core::bsdf::BXDFFresnelSpecular;

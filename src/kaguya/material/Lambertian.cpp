@@ -6,7 +6,7 @@
 #include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/core/bsdf/BXDFLambertianReflection.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
 
         using kaguya::core::bsdf::BSDF;
@@ -14,7 +14,8 @@ namespace kaguya {
 
         Lambertian::Lambertian(std::shared_ptr<Texture<Spectrum>> Kd) : _Kd(Kd) {}
 
-        void Lambertian::computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena, TransportMode mode) {
+        void Lambertian::computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
+                                                    TransportMode mode) {
             Spectrum albedo = _Kd->evaluate(insect);
             BXDFLambertianReflection *lambertianBXDF =
                     ALLOC(memoryArena, BXDFLambertianReflection)(albedo);

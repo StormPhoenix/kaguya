@@ -5,7 +5,9 @@
 #ifndef KAGUYA_MEDIUMINTERFACE_H
 #define KAGUYA_MEDIUMINTERFACE_H
 
-namespace kaguya {
+#include <kaguya/Common.h>
+
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace medium {
             class Medium;

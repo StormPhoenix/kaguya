@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace tracer {
 
         using kaguya::Config;

@@ -7,7 +7,7 @@
 
 #include <kaguya/core/light/AreaLight.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
 
         using kaguya::scene::Geometry;

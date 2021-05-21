@@ -5,7 +5,7 @@
 #include <kaguya/Config.h>
 #include <kaguya/tracer/Camera.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace tracer {
 
         Camera::Camera(Transform::Ptr cameraToWorld, Float hFov, Float nearClip, Float farClip, Medium::Ptr medium)

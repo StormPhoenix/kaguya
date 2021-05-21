@@ -8,7 +8,7 @@
 #include <kaguya/core/bsdf/microfacet/BeckmannDistribution.h>
 #include <kaguya/core/bsdf/fresnel/FresnelDielectric.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
 
         using core::bsdf::BXDFLambertianReflection;

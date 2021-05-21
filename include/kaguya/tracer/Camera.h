@@ -13,7 +13,7 @@
 #include <kaguya/core/Transform.h>
 #include <kaguya/core/medium/Medium.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace tracer {
 
         using kaguya::core::Interaction;

@@ -7,7 +7,7 @@
 
 #include <kaguya/scene/TriangleMesh.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
         class Cube : public TriangleMesh {
         public:

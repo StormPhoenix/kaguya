@@ -7,7 +7,7 @@
 
 #include <kaguya/tracer/Tracer.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace tracer {
 
         class SPPMTracer : public Tracer {

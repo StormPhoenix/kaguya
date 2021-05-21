@@ -7,7 +7,7 @@
 
 #include <kaguya/core/Interaction.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
         namespace texture {
 

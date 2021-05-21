@@ -4,7 +4,7 @@
 
 #include <kaguya/parallel/Barrier.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace parallel {
 
         Barrier::Barrier(int threadCount) :

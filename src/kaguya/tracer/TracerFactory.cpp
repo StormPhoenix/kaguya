@@ -8,7 +8,7 @@
 #include <kaguya/tracer/pt/PathTracer.h>
 #include <kaguya/tracer/pm/SPPMTracer.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace tracer {
         Tracer *TracerFactory::newTracer() {
             Tracer *tracer = nullptr;

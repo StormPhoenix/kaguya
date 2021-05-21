@@ -4,7 +4,7 @@
 
 #include <kaguya/core/light/PointLight.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
 
         PointLight::PointLight(const Spectrum &intensity, Transform::Ptr lightToWorld,

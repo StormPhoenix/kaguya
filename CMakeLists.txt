@@ -3,8 +3,7 @@ project(kaguya)
 
 set(CMAKE_CXX_STANDARD 14)
 
-include_directories(./include)
-include_directories(/usr/local/include)
+set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 
 message(${CMAKE_SYSTEM_NAME})
 message(${CMAKE_CXX_COMPILER_ID})
@@ -71,4 +70,7 @@ file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pugixml/*.cpp)
 
-add_executable(kaguya ${sources})
+add_executable(${PROJECT_NAME} ${sources})
+target_include_directories(${PROJECT_NAME}
+        PRIVATE
+        ${PROJECT_INCLUDE_DIR})

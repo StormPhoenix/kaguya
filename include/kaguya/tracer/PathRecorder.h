@@ -28,7 +28,7 @@
 #include <mutex>
 #include <set>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace tracer {
         class Camera;
 

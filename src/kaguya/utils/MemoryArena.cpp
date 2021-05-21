@@ -36,7 +36,7 @@ void freeAlignedMemory(void *ptr) {
 #endif
 }
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace memory {
 
         MemoryArena::MemoryArena(const size_t blockSize) :

@@ -9,7 +9,7 @@
 
 #include <ext/stb/stb_image.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace utils {
         namespace io {
             static RGBSpectrum *stbReadImage(const std::string &filename, int *width, int *height) {

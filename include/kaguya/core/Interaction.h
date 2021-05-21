@@ -12,7 +12,7 @@
 #include <kaguya/utils/MemoryArena.h>
 #include <kaguya/tracer/Ray.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
 
     namespace scene {
         class Intersectable;

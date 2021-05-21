@@ -4,7 +4,7 @@
 
 #include <kaguya/scene/meta/Sphere.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
         namespace meta {
 

@@ -4,7 +4,7 @@
 
 #include <kaguya/core/phase/HenyeyGreensteinFunction.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
 
         HenyeyGreensteinFunction::HenyeyGreensteinFunction(Float g) : _g(g) {}
@@ -14,7 +14,7 @@ namespace kaguya {
         }
 
         Float HenyeyGreensteinFunction::sampleScatter(const Vector3F &wo, Vector3F *wi,
-                                                       Sampler *sampler) const {
+                                                      Sampler *sampler) const {
             // Henyey-Greenstein phase function
             assert(sampler != nullptr);
 

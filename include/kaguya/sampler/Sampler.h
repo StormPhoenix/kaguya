@@ -9,7 +9,7 @@
 #include <random>
 #include <kaguya/math/Math.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace sampler {
 
         class Sampler {

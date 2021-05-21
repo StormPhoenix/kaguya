@@ -8,7 +8,7 @@
 #include <kaguya/core/Transform.h>
 #include <kaguya/material/texture/TextureMapping2D.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
         namespace texture {
             using namespace core;

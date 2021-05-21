@@ -18,7 +18,7 @@
 #define COLOR_GREEN Color(0, 255, 0)
 #define COLOR_BLUE Color(0, 0, 255)
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace tracer {
 
         FilmTile::FilmTile(Point2I offset, int width, int height) :

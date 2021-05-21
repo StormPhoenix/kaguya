@@ -11,7 +11,7 @@
 #include <kaguya/scene/Scene.h>
 #include <kaguya/utils/MemoryArena.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bssrdf {
 

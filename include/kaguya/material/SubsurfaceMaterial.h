@@ -8,7 +8,7 @@
 #include <kaguya/core/bssrdf/TabulatedBSSRDF.h>
 #include <kaguya/material/Material.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
 
         using namespace bssrdf;
@@ -18,7 +18,7 @@ namespace kaguya {
             SubsurfaceMaterial(Spectrum albedoEff, Spectrum mft, Float g, Float eta);
 
             virtual void computeScatteringFunctions(SurfaceInteraction &si, MemoryArena &memoryArena,
-                               TransportMode mode = TransportMode::RADIANCE) override;
+                                                    TransportMode mode = TransportMode::RADIANCE) override;
 
         private:
             BSSRDFTable _table;

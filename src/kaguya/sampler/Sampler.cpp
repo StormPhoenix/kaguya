@@ -4,7 +4,7 @@
 
 #include <kaguya/sampler/Sampler.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace sampler {
 
         Sampler::Sampler(int nSamples) :

@@ -4,7 +4,7 @@
 
 #include <kaguya/core/Transform.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace transform {
             Transform::Transform() : _identity(true) {}

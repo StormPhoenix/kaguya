@@ -4,8 +4,8 @@
 
 #include <kaguya/core/bsdf/BSDF.h>
 
-namespace kaguya {
-	namespace core {
+namespace RENDER_NAMESPACE {
+    namespace core {
         namespace bsdf {
             BSDF::BSDF(const Interaction &interaction) {
                 // Build tangent space

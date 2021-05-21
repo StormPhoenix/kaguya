@@ -8,7 +8,7 @@
 #include <kaguya/material/Material.h>
 #include <kaguya/material/texture/Texture.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
 
         using namespace texture;

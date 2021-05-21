@@ -6,7 +6,7 @@
 #include <kaguya/material/Material.h>
 #include <kaguya/tracer/Camera.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
 
         Vector3F offsetOrigin(const Vector3F &origin, const Vector3F &error,

@@ -6,7 +6,7 @@
 #include <kaguya/core/bsdf/fresnel/Fresnel.h>
 #include <kaguya/core/bsdf/BXDFMicrofacet.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bsdf {
             BXDFMicrofacet::BXDFMicrofacet(const Spectrum &Ks, const Spectrum &Kt, Float etaI, Float etaT,

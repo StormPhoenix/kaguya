@@ -8,7 +8,7 @@
 #include <kaguya/core/bsdf/BXDFMicrofacetReflection.h>
 #include <kaguya/core/bsdf/fresnel/FresnelConductor.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
         using core::bsdf::fresnel::FresnelConductor;
         using core::bsdf::BXDFMicrofacetReflection;

@@ -8,7 +8,7 @@
 #include <kaguya/core/Core.h>
 #include <kaguya/sampler/Sampler.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
 
         using kaguya::sampler::Sampler;

@@ -6,7 +6,7 @@
 #include <kaguya/scene/Scene.h>
 #include <kaguya/utils/VisibilityTester.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace utils {
 
         // TODO Move namespace

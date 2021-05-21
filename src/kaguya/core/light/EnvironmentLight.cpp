@@ -8,7 +8,7 @@
 #include <kaguya/utils/ImageIO.h>
 #include <kaguya/core/light/EnvironmentLight.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         using namespace utils;
         using scene::acc::AABB;

@@ -81,7 +81,7 @@ using Point4I= Vector4i;
 #define CROSS(x, y) glm::cross(x, y)
 #define LOOK_AT(eye, center, up) glm::lookAt(eye, center, up)
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace sampler {
         class Sampler;
     }

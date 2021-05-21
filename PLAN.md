@@ -1,4 +1,4 @@
-## Path Tracing 并行化
+## Path Tracing 并行化 -> GPU Path Tracing
 
 *每一步都是可并行的！！！*
 
@@ -7,18 +7,27 @@
 2. 队列里所有的 Ray，和场景求交点 （并行）
     1. 这一步交给 Optix 实现。GPU 和 CPU 的求交过程应该由统一的接口封装起来（CpuIntersectableScene | GpuIntersectableScene）
 3. 各种处理，修改 Context 数据结构
-    1. 检查是否发生 Medium Intersection，如果发生了 Medium，则保存这个信息到 Context
-    2. 判断是否采样 AreaLight，如果采样，则修改 Contex
-    3. 发射 Shadow Ray 采样光源，结果存储到 Context
-    4. Sample 散射方向，结果存储到 Context
+    1. 调用 Medium 求交程序，判断是否发生 Medium Intersection，如果发生了 Medium，则保存这个信息到 Context
+    2. 判断上一步是否有采样光源，如果没有则采样 Light
+        2. 判断是否击中 AreaLight，如果采样，则修改 Context，记录采样值
+        2. 判断是否未击中，采样 EnvironmentLight，记录到 Context
+    3. 判断是否发射 Shadow Ray 采样光源，结果存储到 Context
+    4. Sample 散射方向，记录到 Context
 4. 生成 Next Ray，全部放入队列
     1. 根据 Context 判断是否生成 Next Ray
     2. 生成的 Next Ray 要继续绑定前任 Ray 拥有的 Context 数据结构
 5. 回到 步骤 2
 
-## 需要加入的新特性
-- [x] SunLight 太阳光
-- [x] 超远距离的光源统一实现 InfiniteLight 接口。场景构建完毕之后需要统一对 InifiniteLight 添加世界 range 信息。
+*任务细分*
+深度图生成
+- [x] CMakeList 配置环境
+- [ ] 相机 / 场景数据导入，Params 参数设置
+    - [x] Params 参数导入
+    - [ ] Camera 导入
+- [ ] image 生成
+    - [ ] cpu image 怎么导入
+    - [ ] gpu image 怎么导出
+- [ ] 简单的只做一次求交，生成黑白图就可以
 
 ## 需要处理的问题
 - [ ] 场景导入
@@ -37,28 +46,11 @@
         - [x] 去掉 readImage 里面的 weight
     - [x] 场景构建结束后，需要重新设置 EnvironmentLight 的 worldBound
     - [ ] 考虑 EnvironmentLight(EL) 在 PT \ BDPT \ SPPM 三种情况下如何处理
-        - [ ] BDPT
-            - [x] 删除 InfiniteLight，只考虑 EnvrionmentLight 
-            - [x] class Light 添加 worldBound 接口
-            - [x] 思考： Environment light 和 Infinite light
-            - [ ] connectible() cameraPath 最后一个 Vertex 是 EL
-            - [ ] connectPath() cameraPath 最后一个 Vertex 是 EL，则调过 connect 步骤
-            - [ ] PathVertex 添加 InfiniteLight 类型判断
-                - [ ] PathVertex::Le() 方法添加 Infinite 判断
-                - [ ] ConvertDensity 也要添加 Infinite 判断
-                - [ ] PdfLight 也要修改
-            - [x] generateLightPath
-                - [x] EnvrionmentLight 也要加入 lights，光线可以从 EnvLight 出发
-                - [x] lightPath 在最后未击中的情况下不生成 LighPoint
-                - [x] 引入 Infinite light 类型的光源，Infinite 类型的光源的 pdfDir 不能用于计算 path[1] 的 pdfFwd
-            - [x] CameraPath 最后未击中的情况下生成 LightPoint
+        - [x] BDPT
         - [x] PT
-            - [x] Path tracing 未击中
         - [ ] SPPM
             - [ ] Visible point 未击中
-    - [ ] Light::Le() 
-
-
+    - [x] Light::Le() 
 
 - [ ] FilmPlane 添加 Filter
 
@@ -83,7 +75,7 @@
     - [ ] FresnelConductor 中的 K 做记录
     
 - [ ] Material 结构整理 
-    - [ ] Texture Texture Mapping package 结构整理
+    - [x] Texture Texture Mapping package 结构整理
     - [ ] Medium phase function 
     
 - Code Structure
@@ -119,9 +111,6 @@
 - [x] Bunny 透明材质出现黑块，且整体偏暗；光源面积缩小一倍，提高光源亮度，整个场景变成暗色，出现大量白色燥点；
     参考 [知乎-文刀秋二](https://www.zhihu.com/question/48961286/answer/113580178)
 
-- [ ] 电解质折射率问题
-    无法在光线传输过程中确定碰撞位置两端的折射率。程序采用的是将外界材质的折射率固定设置为空气折射率（1.0）
-    
 ## Solved
 - [x] 添加纹理
     - [x] 添加 ImageTexture

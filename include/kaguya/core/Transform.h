@@ -9,7 +9,7 @@
 
 #include <cstdlib>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace transform {
 

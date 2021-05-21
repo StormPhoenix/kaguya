@@ -8,7 +8,7 @@
 #include <kaguya/math/Math.h>
 #include <atomic>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace parallel {
 
         using namespace math;

@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
         namespace meta {
             Triangle::Triangle(const Vector3F &a, const Vector3F &b, const Vector3F &c,

@@ -8,7 +8,7 @@
 #include <kaguya/core/bsdf/BXDFOrenNayar.h>
 #include <kaguya/math/Math.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bsdf {
             BXDFOrenNayar::BXDFOrenNayar(const Spectrum &reflectance, Float roughness) :

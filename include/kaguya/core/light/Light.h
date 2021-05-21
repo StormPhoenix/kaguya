@@ -11,7 +11,7 @@
 #include <kaguya/core/Interaction.h>
 #include <kaguya/utils/VisibilityTester.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
 
         namespace medium {

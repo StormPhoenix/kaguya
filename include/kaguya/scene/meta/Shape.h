@@ -11,7 +11,7 @@
 #include <kaguya/scene/accumulation/AABB.h>
 #include <kaguya/scene/Intersectable.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
 
     namespace tracer {
         class Ray;

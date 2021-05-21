@@ -4,7 +4,7 @@
 
 #include <kaguya/core/bsdf/BXDFGlossyDiffuseReflection.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace core {
         namespace bsdf {
             Spectrum fresnelSchlick(Float cosTheta, const Spectrum &Rs) {

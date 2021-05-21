@@ -12,7 +12,7 @@
 
 #include <mutex>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace tracer {
 
         using kaguya::core::Spectrum;

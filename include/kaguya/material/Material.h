@@ -12,7 +12,7 @@
 #include <kaguya/scene/meta/Shape.h>
 #include <kaguya/utils/MemoryArena.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace material {
 
         using kaguya::core::Interaction;

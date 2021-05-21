@@ -8,7 +8,7 @@
 #include <kaguya/Common.h>
 #include <kaguya/scene/Scene.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
         namespace importer {
             class SceneImporter {

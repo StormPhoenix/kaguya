@@ -12,7 +12,7 @@
 #include <kaguya/core/medium/Medium.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
         namespace importer {
 

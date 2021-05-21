@@ -6,7 +6,7 @@
 #include <kaguya/sampler/Sampler.h>
 #include <kaguya/sampler/DefaultSampler.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace scene {
         namespace acc {
 

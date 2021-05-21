@@ -4,7 +4,7 @@
 
 #include <kaguya/tracer/Ray.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace tracer {
 
         Ray::Ray() : _medium(nullptr), _minStep(0.0), _step(math::infinity) {}

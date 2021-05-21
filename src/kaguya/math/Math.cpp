@@ -6,7 +6,7 @@
 #include <kaguya/math/Math.h>
 #include <kaguya/sampler/Sampler.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace math {
         Float randomDouble(Float min, Float max, Sampler *const sampler) {
             return min + (max - min) * sampler->sample1D();

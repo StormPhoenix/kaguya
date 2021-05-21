@@ -8,7 +8,7 @@
 #include <vector>
 #include <kaguya/scene/TriangleMesh.h>
 
-namespace kaguya {
+namespace RENDER_NAMESPACE {
     namespace utils {
         namespace io {
             using kaguya::scene::TriMesh;
