@@ -5,7 +5,7 @@
 #ifndef KAGUYA_MICROFACETDISTRIBUTION_H
 #define KAGUYA_MICROFACETDISTRIBUTION_H
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 #include <kaguya/core/Core.h>
 #include <kaguya/sampler/Sampler.h>
 

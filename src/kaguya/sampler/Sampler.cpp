@@ -11,18 +11,21 @@ namespace kaguya {
                 nSamples(nSamples),
                 randomSeed(0) {}
 
-        void Sampler::forPixel(const Point2F pixel) {
+        Sampler::Sampler(int nSamples, int seed) :
+                nSamples(nSamples), randomSeed(seed) {}
+
+        void Sampler::forPixel(const Point2I pixel) {
             currentPixel = pixel;
-            randomSeed = 0;
+            sampleIndex = 0;
         }
 
-        void Sampler::setCurrentSeed(int seed) {
-            randomSeed = seed;
+        void Sampler::setSampleIndex(int sampleIndex) {
+            sampleIndex = sampleIndex;
         }
 
         bool Sampler::nextSampleRound() {
-            randomSeed++;
-            return randomSeed < nSamples;
+            sampleIndex++;
+            return sampleIndex < nSamples;
         }
     }
 }

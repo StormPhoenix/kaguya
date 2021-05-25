@@ -5,7 +5,7 @@
 #ifndef KAGUYA_SCENEIMPORTER_H
 #define KAGUYA_SCENEIMPORTER_H
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 #include <kaguya/scene/Scene.h>
 
 namespace kaguya {

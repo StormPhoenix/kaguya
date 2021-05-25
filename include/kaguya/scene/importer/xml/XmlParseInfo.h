@@ -5,7 +5,7 @@
 #ifndef KAGUYA_XMLPARSEINFO_H
 #define KAGUYA_XMLPARSEINFO_H
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 #include <kaguya/material/Material.h>
 #include <kaguya/material/texture/Texture.h>
 #include <kaguya/core/Transform.h>

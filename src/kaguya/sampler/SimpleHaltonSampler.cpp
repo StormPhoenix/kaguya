@@ -36,8 +36,8 @@ namespace kaguya {
             return true;
         }
 
-        void SimpleHaltonSampler::setCurrentSeed(int seed) {
-            _haltonIndex = seed;
+        void SimpleHaltonSampler::setSampleIndex(int sampleIndex) {
+            _haltonIndex = sampleIndex;
             _haltonDimension = 0;
         }
 

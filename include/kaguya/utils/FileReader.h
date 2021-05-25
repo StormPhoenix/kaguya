@@ -5,7 +5,7 @@
 #ifndef KAGUYA_FILEREADER_H
 #define KAGUYA_FILEREADER_H
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 
 namespace kaguya {
     namespace utils {

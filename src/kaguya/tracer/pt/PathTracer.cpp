@@ -214,8 +214,8 @@ namespace kaguya {
                     for (int row = startRow; row <= endRow; row++) {
                         for (int col = startCol; col <= endCol; col++) {
                             // set current sampling pixel
-                            sampler->forPixel(Point2F(row, col));
-                            sampler->setCurrentSeed(iter);
+                            sampler->forPixel(Point2I(row, col));
+                            sampler->setSampleIndex(iter);
 
                             Float pixelX = col + sampler->sample1D();
                             Float pixelY = row + sampler->sample1D();

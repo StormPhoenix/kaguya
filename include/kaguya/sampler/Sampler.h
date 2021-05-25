@@ -18,13 +18,15 @@ namespace kaguya {
 
             Sampler(int nSamples);
 
+            Sampler(int nSamples, int seed);
+
             /**
              * Set current sampling pixel
              * @param pixel
              */
-            virtual void forPixel(const Point2F pixel);
+            virtual void forPixel(const Point2I pixel);
 
-            virtual void setCurrentSeed(int seed);
+            virtual void setSampleIndex(int sampleIndex);
 
             /**
              * Begin next sample round
@@ -39,14 +41,14 @@ namespace kaguya {
             virtual ~Sampler() {};
 
         protected:
-            // current pixel on which sampling
+            // Current pixel on which sampling
             Point2I currentPixel;
-
-            // sample times
+            // Sample times
             const int nSamples;
-
-            // random number seed
+            // Random number seed
             int randomSeed = 0;
+            // Sample index
+            int sampleIndex;
         };
     }
 }

@@ -17,7 +17,7 @@
 #include <functional>
 #include <random>
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 
 using Vector2d = glm::dvec2;
 using Vector2f = glm::vec2;
@@ -39,9 +39,9 @@ using Matrix3d = glm::dmat3x3;
 using Matrix4f = glm::mat4x4;
 using Matrix3f = glm::mat3x3;
 
-//#define RENDER_DATA_DOUBLE
+//#define _RENDER_DATA_DOUBLE_
 
-#if defined(RENDER_DATA_DOUBLE)
+#if defined(_RENDER_DATA_DOUBLE_)
 using Float = double;
 using Vector4F = Vector4d;
 using Vector3F = Vector3d;
@@ -96,7 +96,7 @@ namespace kaguya {
 		const float floatOneMinusEpsilon = 0x1.fffffep-1;
 #endif
 
-#if defined(RENDER_DATA_DOUBLE)
+#if defined(_RENDER_DATA_DOUBLE_)
         const Float ONE_MINUS_EPSILON = doubleOneMinusEpsilon;
 #else
         const Float ONE_MINUS_EPSILON = floatOneMinusEpsilon;

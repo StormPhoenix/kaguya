@@ -13,12 +13,20 @@
 #include <map>
 
 #if defined(_WINDOWS)
-	#ifndef WINDOWS
-		#define WINDOWS
-		#define NOMINMAX
-	#endif
+#ifndef WINDOWS
+#define WINDOWS
+#define NOMINMAX
+#endif
 #endif
 
+// GPU mode
+#ifdef _RENDER_GPU_MODE_
+#define RENDER_CPU_GPU __host__ __device__
+#define RENDER_GPU __device__
+#else
+#define RENDER_CPU_GPU
+#define RENDER_GPU
+#endif
 
 #if defined(__cplusplus) && __cplusplus >= 201703L && defined(__has_include)
 #if __has_include(<filesystem>)

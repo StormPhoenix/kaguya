@@ -5,7 +5,7 @@
 #ifndef KAGUYA_SUNLIGHT_H
 #define KAGUYA_SUNLIGHT_H
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 #include <kaguya/core/Transform.h>
 #include <kaguya/core/light/Light.h>
 
