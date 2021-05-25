@@ -2,7 +2,7 @@
 // Created by Storm Phoenix on 2020/10/28.
 //
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/core/medium/Medium.h>
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
@@ -59,8 +59,8 @@ namespace RENDER_NAMESPACE {
                     for (int row = startRow; row <= endRow; row++) {
                         for (int col = startCol; col <= endCol; col++) {
                             // Set current sampling pixel
-                            sampler->forPixel(Point2F(row, col));
-                            sampler->setCurrentSeed(iter);
+                            sampler->forPixel(Point2I(row, col));
+                            sampler->setSampleIndex(iter);
 
                             Float pixelX = col + sampler->sample1D();
                             Float pixelY = row + sampler->sample1D();

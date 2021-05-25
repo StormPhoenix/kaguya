@@ -5,11 +5,12 @@
 #ifndef KAGUYA_SAMPLERFACTORY_HPP
 #define KAGUYA_SAMPLERFACTORY_HPP
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 #include <kaguya/Config.h>
 #include <kaguya/sampler/SimpleHaltonSampler.h>
 #include <kaguya/sampler/HaltonSampler.h>
 #include <kaguya/sampler/DefaultSampler.h>
+#include <kaguya/sampler/IndependentSampler.h>
 
 namespace RENDER_NAMESPACE {
     namespace sampler {
@@ -23,6 +24,8 @@ namespace RENDER_NAMESPACE {
 
                 if (Config::samplerType == "halton") {
                     return HaltonSampler::newInstance(nSamples);
+                } else if (Config::samplerType == "independent") {
+                    return IndependentSampler::newInstance(nSamples);
                 } else {
                     return DefaultSampler::newInstance(nSamples);
                 }

@@ -2,7 +2,7 @@
 // Created by Storm Phoenix on 2021/5/19.
 //
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 #include <kaguya/core/light/Light.h>
 
 namespace RENDER_NAMESPACE {

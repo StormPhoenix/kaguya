@@ -33,7 +33,7 @@ namespace RENDER_NAMESPACE {
             }
 
             void add(Float val) {
-#if defined(RENDER_DATA_DOUBLE)
+#if defined(_RENDER_DATA_DOUBLE_)
                 uint64_t oldBits = bits;
                 uint64_t newBits;
 #else
@@ -47,7 +47,7 @@ namespace RENDER_NAMESPACE {
             }
 
         private:
-#if defined(RENDER_DATA_DOUBLE)
+#if defined(_RENDER_DATA_DOUBLE_)
             std::atomic<uint64_t> bits;
 #else
             std::atomic<uint32_t> bits;

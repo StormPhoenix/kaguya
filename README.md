@@ -1,6 +1,8 @@
 # Kaguya Render
 
 A simple physically based render.
+
+[CPU / GPU development plan](https://github.com/StormPhoenix/kaguya/blob/master/PLAN.md)
    
 ## Feature
 

@@ -1,6 +1,6 @@
 ## Path Tracing 并行化 -> GPU Path Tracing
 
-*每一步都是可并行的！！！*
+##### *每一步都是可并行的！！！*
 
 1. 生成 Camera Ray，保存到队列。
     1. 每个 Ray 都会有一个自己的上下文 Context 数据结构，生成 Camera Ray 的同时要把 Context 赋值给 Ray
@@ -18,16 +18,47 @@
     2. 生成的 Next Ray 要继续绑定前任 Ray 拥有的 Context 数据结构
 5. 回到 步骤 2
 
-*任务细分*
+
+##### *任务细分*
 深度图生成
 - [x] CMakeList 配置环境
-- [ ] 相机 / 场景数据导入，Params 参数设置
+- [x] 相机 / 场景数据导入，Params 参数设置
     - [x] Params 参数导入
-    - [ ] Camera 导入
-- [ ] image 生成
-    - [ ] cpu image 怎么导入
-    - [ ] gpu image 怎么导出
+    - [x] Camera 导入 (直接在 GPU 上分配 Camera 属性)
+- [x] image 生成
+    - [x] cpu image 怎么导入
+    - [x] gpu image 怎么导出
+- [ ] kaguya 代码复用
+    - [ ] 如果 kaguya 代码复用
+        - [ ] 每个 method 都需要加上 __device__ __host__ __global__ 这类关键字，工作量很大，如何解决
+        - [ ] 加上 __device__ __host__ __global__ 的 method 内部 variable 都需在 GPU 端重新分配，工作量非常大，如何解决？
+        - [ ] MemoryArena 无法在 GPU 上分配显存，如何修改？
+        
+    - [ ] 为什么 GLM 在 GPU 上可以起作用
+        - [ ] GLM 库没有 __device__ __host__ __global__ keyword，是如何在 GPU 上运行的？
+        
+    - [ ] 采样 Sampler 在 GPU 里面如何实现？（不能使用 stl 库了）
 - [ ] 简单的只做一次求交，生成黑白图就可以
+    - [ ] 参考 optixPathTracer
+
+##### *pbrt-v4记录 (看代码可以了解到很多细节)*
+- （*DMA* *Zero-Copy*）Unified Memory. Windows 10 只支持 basic unified memory，所以不能把整个 Wavefront Integrator 分配到 Unified Memory 上
+（空间太少了），所以 gpuMemoryAllocator 需要传入 WavefrontIntegrator，把大部分 variable 分配到 GPU，而不是 Unified Memory。
+    但是对于 Linux，Unified Memory 支持的空间更大，可以直接用 Alloc 在 Unified Memory 上分配。
+
+- WavefrontPathIntegrator 传入了一个 Alloc，大部分数据通过 Alloc 分配。 Alloc 应该是控制 GPU / CPU 的关键变量，并且 Allocator 全部
+    函数都是 host-method。（注意，凡是调用 CUDA 库的代码，都需要在 CMake 里设置 CUDA LANGUAGES）
+    - GPU / CPU 统一用一个 Allocator 来分配内存，区分点是 Allocator 所持有的 memoryResource。
+    - memoryResource 有两种类型，分别代表在 CPU / GPU 上分配资源，也就是 Allocator 相当于 GPU / CPU 资源的代理（Proxy）
+    
+- WavefrontPathIntegrator 内部是如何融合 CPU / GPU 代码的？（没有 __host__ __device__ 前缀）。猜测是，涉及到 GPU / CUDA 的代码，会被封装
+成组件？
+    - Integrator 内部引用变量分配的接口是统一的，根据 CMakeList 编译的结果修改底层函数（CUDA / CPU）
+    - 利用 TaggedPointer + static_cast 在 CUDA 中实现 virtual method
+    - Sampler 底层函数修改为 RNG
+    
+## 需要增加的新特性
+- [ ] Denoise 参考 pbrt-v4 imgtool.cpp 2279 行 int denoise() 方法 
 
 ## 需要处理的问题
 - [ ] 场景导入
@@ -48,9 +79,10 @@
     - [ ] 考虑 EnvironmentLight(EL) 在 PT \ BDPT \ SPPM 三种情况下如何处理
         - [x] BDPT
         - [x] PT
+            - [x] Path tracing 未击中
         - [ ] SPPM
             - [ ] Visible point 未击中
-    - [x] Light::Le() 
+    - [ ] Light::Le() 
 
 - [ ] FilmPlane 添加 Filter
 

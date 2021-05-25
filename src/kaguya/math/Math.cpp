@@ -2,7 +2,7 @@
 // Created by Storm Phoenix on 2020/12/28.
 //
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 #include <kaguya/math/Math.h>
 #include <kaguya/sampler/Sampler.h>
 

@@ -5,7 +5,7 @@
 #ifndef KAGUYA_IMAGEIO_H
 #define KAGUYA_IMAGEIO_H
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
 namespace RENDER_NAMESPACE {

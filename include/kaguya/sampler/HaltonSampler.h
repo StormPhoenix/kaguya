@@ -12,11 +12,11 @@ namespace RENDER_NAMESPACE {
 
         class HaltonSampler : public Sampler {
         public:
-            virtual void forPixel(const Point2F pixel) override;
+            virtual void forPixel(const Point2I pixel) override;
 
             virtual bool nextSampleRound() override;
 
-            virtual void setCurrentSeed(int seed) override;
+            virtual void setSampleIndex(int sampleIndex) override;
 
             virtual Float sample1D() override;
 
@@ -60,8 +60,8 @@ namespace RENDER_NAMESPACE {
         public:
 
             // TODO move to factory
-                static Sampler *newInstance(int nSamples);
-            };
+            static Sampler *newInstance(int nSamples);
+        };
     }
 }
 

@@ -5,7 +5,7 @@
 #ifndef KAGUYA_DISTRIBUTION_H
 #define KAGUYA_DISTRIBUTION_H
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 #include <kaguya/core/Core.h>
 #include <kaguya/sampler/Sampler.h>
 

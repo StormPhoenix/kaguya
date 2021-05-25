@@ -5,7 +5,7 @@
 #ifndef KAGUYA_LIGHT_H
 #define KAGUYA_LIGHT_H
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 #include <kaguya/core/Core.h>
 #include <kaguya/tracer/Ray.h>
 #include <kaguya/core/Interaction.h>

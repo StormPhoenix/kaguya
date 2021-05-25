@@ -67,7 +67,7 @@ namespace RENDER_NAMESPACE {
 
             inline Float toFloat(const std::string &val) {
                 char *tmp = nullptr;
-#if defined(RENDER_DATA_DOUBLE)
+#if defined(_RENDER_DATA_DOUBLE_)
                 Float v = strtod(val.c_str(), &tmp);
 #else
                 Float v = strtof(val.c_str(), &tmp);
@@ -79,7 +79,7 @@ namespace RENDER_NAMESPACE {
             inline Vector3F toVector(const std::string &val) {
                 Vector3F ret;
                 char *tmp;
-#if defined(RENDER_DATA_DOUBLE)
+#if defined(_RENDER_DATA_DOUBLE_)
                 ret[0] = strtod(val.c_str(), &tmp);
                 for (int i = 1; i < 3; i++) {
                     tmp++;
@@ -162,7 +162,7 @@ namespace RENDER_NAMESPACE {
 
                 Matrix4F ret;
                 char *tmp = nullptr;
-#if defined(RENDER_DATA_DOUBLE)
+#if defined(_RENDER_DATA_DOUBLE_)
                 ret[0][0] = strtod(value.c_str(), &tmp);
                 for (int i = 0; i < 4; i++) {
                     for (int j = 0; j < 4;j ++) {
@@ -574,7 +574,7 @@ namespace RENDER_NAMESPACE {
                     Spectrum ret;
                     std::string colorValue = node.attribute("value").value();
                     char *tmp;
-#if defined(RENDER_DATA_DOUBLE)
+#if defined(_RENDER_DATA_DOUBLE_)
                     ret[0] = strtod(colorValue.c_str(), &tmp);
                     for (int i = 1; i < 3; i++) {
                         tmp++;

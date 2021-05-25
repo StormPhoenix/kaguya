@@ -135,8 +135,8 @@ namespace RENDER_NAMESPACE {
                         Sampler *sampler = sampler::SamplerFactory::newSampler(nIterations);
                         for (int row = startRow; row <= endRow; row++) {
                             for (int col = startCol; col <= endCol; col++) {
-                                sampler->forPixel(Point2F(row, col));
-                                sampler->setCurrentSeed(iter);
+                                sampler->forPixel(Point2I(row, col));
+                                sampler->setSampleIndex(iter);
 
                                 // 选取 pixel
                                 int pixelOffset = row * width + col;
@@ -336,7 +336,7 @@ namespace RENDER_NAMESPACE {
                     std::vector<MemoryArena> photonMemoryArena(renderCores());
                     auto tracePhotonFunc = [&](const int idxPhoton) {
                         MemoryArena &photonArena = photonMemoryArena[threadIdx];
-                        haltonSampler->setCurrentSeed(iter * _shootPhotonsPerIter + idxPhoton);
+                        haltonSampler->setSampleIndex(iter * _shootPhotonsPerIter + idxPhoton);
 
                         // Uniform sample light
                         Float lightPdf = 0;

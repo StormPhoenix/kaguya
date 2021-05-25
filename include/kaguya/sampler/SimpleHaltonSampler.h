@@ -14,7 +14,7 @@ namespace RENDER_NAMESPACE {
         public:
             virtual bool nextSampleRound() override;
 
-            virtual void setCurrentSeed(int seed) override;
+            virtual void setSampleIndex(int sampleIndex) override;
 
             virtual Float sample1D() override;
 

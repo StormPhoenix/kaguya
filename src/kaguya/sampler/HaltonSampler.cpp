@@ -23,83 +23,83 @@ namespace RENDER_NAMESPACE {
         static uint64_t multiplicativeInverse(int64_t a, int64_t b) {
             int64_t x, y;
             math::extendGCD(a, b, &x, &y);
-                return math::mod(x, b);
-            }
+            return math::mod(x, b);
+        }
 
-            bool HaltonSampler::isPrimesValid = false;
+        bool HaltonSampler::isPrimesValid = false;
 
-            HaltonSampler::HaltonSampler(int nSamples) : Sampler(nSamples) {
-                // First two dimension scale
-                for (int i = 0; i < 2; i++) {
-                    int scale = 1;
-                    int digits = 0;
-                    int base = (i == 0) ? 2 : 3;
-                    while (scale < std::min(MAX_TILE_RESOLUTION, Config::Parallel::tileSize)) {
-                        scale *= base;
-                        digits++;
-                    }
-                    firstTwoDimScales[i] = scale;
-                    firstTwoDimScaleDigits[i] = digits;
+        HaltonSampler::HaltonSampler(int nSamples) : Sampler(nSamples) {
+            // First two dimension scale
+            for (int i = 0; i < 2; i++) {
+                int scale = 1;
+                int digits = 0;
+                int base = (i == 0) ? 2 : 3;
+                while (scale < std::min(MAX_TILE_RESOLUTION, Config::Parallel::tileSize)) {
+                    scale *= base;
+                    digits++;
                 }
-                sampleStride = firstTwoDimScales[0] * firstTwoDimScales[1];
-                numTheoreticReciprocal[0] = multiplicativeInverse(firstTwoDimScales[1], firstTwoDimScales[0]);
-                numTheoreticReciprocal[1] = multiplicativeInverse(firstTwoDimScales[0], firstTwoDimScales[1]);
+                firstTwoDimScales[i] = scale;
+                firstTwoDimScaleDigits[i] = digits;
             }
+            sampleStride = firstTwoDimScales[0] * firstTwoDimScales[1];
+            numTheoreticReciprocal[0] = multiplicativeInverse(firstTwoDimScales[1], firstTwoDimScales[0]);
+            numTheoreticReciprocal[1] = multiplicativeInverse(firstTwoDimScales[0], firstTwoDimScales[1]);
+        }
 
-            void HaltonSampler::forPixel(const Point2F pixel) {
-                Sampler::forPixel(pixel);
-                // new seed
-                seedForPixel = seedForCurrentPixel(0);
-                dimension = START_DIMENSION;
-            }
+        void HaltonSampler::forPixel(const Point2I pixel) {
+            Sampler::forPixel(pixel);
+            // new seed
+            seedForPixel = seedForCurrentPixel(0);
+            dimension = START_DIMENSION;
+        }
 
-            void HaltonSampler::setCurrentSeed(int seed) {
-                Sampler::setCurrentSeed(seed);
-                seedForPixel = seedForCurrentPixel(randomSeed);
-            }
+        void HaltonSampler::setSampleIndex(int sampleIndex) {
+            Sampler::setSampleIndex(sampleIndex);
+            seedForPixel = seedForCurrentPixel(randomSeed);
+        }
 
-            bool HaltonSampler::nextSampleRound() {
-                seedForPixel = seedForCurrentPixel(randomSeed + 1);
+        bool HaltonSampler::nextSampleRound() {
+            seedForPixel = seedForCurrentPixel(randomSeed + 1);
 
-                dimension = START_DIMENSION;
-                return Sampler::nextSampleRound();
-            }
+            dimension = START_DIMENSION;
+            return Sampler::nextSampleRound();
+        }
 
-            static std::mutex singleInstance;
+        static std::mutex singleInstance;
 
-            Sampler *HaltonSampler::newInstance(int nSamples) {
-                // TODO add locker
-                if (!isPrimesValid) {
-                    {
-                        std::lock_guard<std::mutex> lock(singleInstance);
-                        if (!isPrimesValid) {
-                            permutation = math::sampling::low_discrepancy::computePermutationArray(true);
-                            isPrimesValid = true;
-                        }
+        Sampler *HaltonSampler::newInstance(int nSamples) {
+            // TODO add locker
+            if (!isPrimesValid) {
+                {
+                    std::lock_guard<std::mutex> lock(singleInstance);
+                    if (!isPrimesValid) {
+                        permutation = math::sampling::low_discrepancy::computePermutationArray(true);
+                        isPrimesValid = true;
                     }
                 }
-                return new HaltonSampler(nSamples);
             }
+            return new HaltonSampler(nSamples);
+        }
 
         Float HaltonSampler::sample1D() {
-                if (dimension >= math::sampling::low_discrepancy::primeArraySize) {
-                    // TODO add warning
-                    dimension = math::sampling::low_discrepancy::primeArraySize - 1;
-                }
-
-                const int dim = dimension;
-                dimension++;
-                if (dim == 0) {
-                    return math::sampling::low_discrepancy::radicalReverse(dim,
-                                                                           seedForPixel >> firstTwoDimScaleDigits[0]);
-                } else if (dim == 1) {
-                    return math::sampling::low_discrepancy::radicalReverse(dim,
-                                                                           seedForPixel / firstTwoDimScales[1]);
-                } else {
-                    uint16_t *perm = &permutation[math::sampling::low_discrepancy::primeSums[dim]];
-                    return math::sampling::low_discrepancy::scrambledRadicalReverse(dim, seedForPixel, perm);
-                }
+            if (dimension >= math::sampling::low_discrepancy::primeArraySize) {
+                // TODO add warning
+                dimension = math::sampling::low_discrepancy::primeArraySize - 1;
             }
+
+            const int dim = dimension;
+            dimension++;
+            if (dim == 0) {
+                return math::sampling::low_discrepancy::radicalReverse(dim,
+                                                                       seedForPixel >> firstTwoDimScaleDigits[0]);
+            } else if (dim == 1) {
+                return math::sampling::low_discrepancy::radicalReverse(dim,
+                                                                       seedForPixel / firstTwoDimScales[1]);
+            } else {
+                uint16_t *perm = &permutation[math::sampling::low_discrepancy::primeSums[dim]];
+                return math::sampling::low_discrepancy::scrambledRadicalReverse(dim, seedForPixel, perm);
+            }
+        }
 
         Vector2F HaltonSampler::sample2D() {
             Float u = sample1D();

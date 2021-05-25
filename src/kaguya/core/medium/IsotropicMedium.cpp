@@ -2,7 +2,7 @@
 // Created by Storm Phoenix on 2020/12/17.
 //
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 #include <kaguya/core/medium/IsotropicMedium.h>
 
 #include <algorithm>
