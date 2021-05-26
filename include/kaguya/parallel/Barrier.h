@@ -5,7 +5,7 @@
 #ifndef KAGUYA_BARRIER_H
 #define KAGUYA_BARRIER_H
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 #include <cassert>
 #include <condition_variable>
 

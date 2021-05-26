@@ -43,7 +43,13 @@ endif (POSIX_MALLOC_ALIGNED)
 message("${CMAKE_CXX_COMPILER}")
 message("${APPLE}")
 
-file(GLOB sources
+set(RENDER_UTILS_SOURCE_HEADERS
+        include/kaguya/utils/TaggedPointer.h)
+
+set(RENDER_SAMPLER_SOURCE_HEADERS
+        include/kaguya/sampler/RNG.h)
+
+file(GLOB RENDER_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/*.cpp
@@ -70,7 +76,11 @@ file(GLOB sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pugixml/*.cpp)
 
-add_executable(${PROJECT_NAME} ${sources})
+add_executable(${PROJECT_NAME}
+        ${RENDER_SOURCES}
+        ${RENDER_UTILS_SOURCE_HEADERS}
+        ${RENDER_SAMPLER_SOURCE_HEADERS})
+
 target_include_directories(${PROJECT_NAME}
         PRIVATE
         ${PROJECT_INCLUDE_DIR})

@@ -5,7 +5,7 @@
 #ifndef KAGUYA_MEDIUMINTERFACE_H
 #define KAGUYA_MEDIUMINTERFACE_H
 
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 
 namespace RENDER_NAMESPACE {
     namespace core {

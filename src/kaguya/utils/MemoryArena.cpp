@@ -15,13 +15,13 @@
 
 void *allocAlignedMemory(size_t bytes) {
 #if defined(KAGUYA_WINDOWS_MALLOC_ALIGNED)
-    return _aligned_malloc(bytes, KAGUYA_CACHE_LINE_SIZE);
+    return _aligned_malloc(bytes, RENDER_CACHE_LINE_SIZE);
 #elif defined(KAGUYA_POSIX_MALLOC_ALIGNED)
     void *ptr;
-    if (posix_memalign(&ptr, KAGUYA_CACHE_LINE_SIZE, bytes) != 0) ptr = nullptr;
+    if (posix_memalign(&ptr, RENDER_CACHE_LINE_SIZE, bytes) != 0) ptr = nullptr;
     return ptr;
 #else
-    return memalign(KAGUYA_CACHE_LINE_SIZE, bytes);
+    return memalign(RENDER_CACHE_LINE_SIZE, bytes);
 #endif
 }
 

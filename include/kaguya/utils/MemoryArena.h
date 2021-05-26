@@ -9,11 +9,11 @@
 #include <list>
 #include <cstddef>
 #include <cstdint>
-#include <kaguya/Common.h>
+#include <kaguya/common.h>
 
-#ifndef KAGUYA_CACHE_LINE_SIZE
+#ifndef RENDER_CACHE_LINE_SIZE
 // cache line size 默认为 64 字节
-#define KAGUYA_CACHE_LINE_SIZE 64
+#define RENDER_CACHE_LINE_SIZE 64
 #endif
 
 // 内存分配函数
@@ -40,7 +40,7 @@ namespace RENDER_NAMESPACE {
 
         class
 #ifdef KAGUYA_CACHE_ALIGNAS
-            alignas(KAGUYA_CACHE_LINE_SIZE)
+            alignas(RENDER_CACHE_LINE_SIZE)
 #endif
         MemoryArena {
         public:

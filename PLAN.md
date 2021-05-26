@@ -1,6 +1,6 @@
 ## Path Tracing 并行化 -> GPU Path Tracing
 
-##### *每一步都是可并行的！！！*
+##### *每一步都是可并行的 ！！！*
 
 1. 生成 Camera Ray，保存到队列。
     1. 每个 Ray 都会有一个自己的上下文 Context 数据结构，生成 Camera Ray 的同时要把 Context 赋值给 Ray
@@ -20,7 +20,7 @@
 
 
 ##### *任务细分*
-深度图生成
+*深度图生成*
 - [x] CMakeList 配置环境
 - [x] 相机 / 场景数据导入，Params 参数设置
     - [x] Params 参数导入
@@ -34,12 +34,26 @@
         - [ ] 加上 __device__ __host__ __global__ 的 method 内部 variable 都需在 GPU 端重新分配，工作量非常大，如何解决？
         - [ ] MemoryArena 无法在 GPU 上分配显存，如何修改？
         
-    - [ ] 为什么 GLM 在 GPU 上可以起作用
-        - [ ] GLM 库没有 __device__ __host__ __global__ keyword，是如何在 GPU 上运行的？
-        
     - [ ] 采样 Sampler 在 GPU 里面如何实现？（不能使用 stl 库了）
 - [ ] 简单的只做一次求交，生成黑白图就可以
     - [ ] 参考 optixPathTracer
+    
+*代码设计*
+- 准备 RayQueue
+    - [x] Allocator 调用了 cudaMalloc 方法，所以不可动态修改 RayQueue 的长度。所以在 Integrator 创建之初，就要分配固定内存。
+    - [ ] RayQueue 内部结构
+    - [ ] Queue 是一个容器，那么 Queue 元素的类型如何定义？
+    
+- 准备 Parameter
+    - [ ] params 里面分配多少个 queue.
+    
+- Optix 求交（目前只实现一个求深度图的功能）
+    - [ ] 分析 Scene 和 GPU scene 的接口，统一两者的接口。然后在 GPUScene 中实现 Optix 代码
+        - [ ] lights、envLights 还是要放置在 Scene 里面吗？如果不能，那如何与 PathTracer 统一起来？
+        （一种替代的方法：Scene 作为 GPUScene 的参数内部构建）
+    - [ ] sbt 暂时用默认 rgb 代替
+ 
+- Material / BSDF / BXDF
 
 ##### *pbrt-v4记录 (看代码可以了解到很多细节)*
 - （*DMA* *Zero-Copy*）Unified Memory. Windows 10 只支持 basic unified memory，所以不能把整个 Wavefront Integrator 分配到 Unified Memory 上
@@ -56,6 +70,14 @@
     - Integrator 内部引用变量分配的接口是统一的，根据 CMakeList 编译的结果修改底层函数（CUDA / CPU）
     - 利用 TaggedPointer + static_cast 在 CUDA 中实现 virtual method
     - Sampler 底层函数修改为 RNG
+    
+- CPU / GPU 内存管理。alloc 分配的数据都是提前分配的。在 Render 过程中没有用 alloc 进行内存分配。
+    - Allocator 是通用接口，并且禁止了 Allocator 之间的 operator= 方法
+    - 已经确定，CPU/GPU 两种模式的是不会 clean memory 的，就看自己如何实现了
+    - GPU mode 下，SurfaceInteraction 是由 Sbt + optix 创建；CPU mode 下，SurfaceInteraction 直接由 aggregation 创建。
+    - BSDF 如何创建 
+
+- RayQueue 的实现，属实无法理解，继续看下去只会浪费时间。
     
 ## 需要增加的新特性
 - [ ] Denoise 参考 pbrt-v4 imgtool.cpp 2279 行 int denoise() 方法 
