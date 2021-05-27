@@ -3,8 +3,6 @@ project(kaguya)
 
 set(CMAKE_CXX_STANDARD 14)
 
-set(PROJECT_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
-
 message(${CMAKE_SYSTEM_NAME})
 message(${CMAKE_CXX_COMPILER_ID})
 message(${CMAKE_C_COMPILER_ID})
@@ -43,11 +41,73 @@ endif (POSIX_MALLOC_ALIGNED)
 message("${CMAKE_CXX_COMPILER}")
 message("${APPLE}")
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMake/)
+
+find_package(CUDA REQUIRED)
+if (CUDA_FOUND)
+    enable_language(CUDA)
+    set(CUDA_LINK_LIBRARY ${CUDA_LIBRARIES})
+    set(CUDA_INCLUDE_DIRECTORY ${CUDA_INCLUDE_DIRS})
+    set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_61，code=sm_61;)
+    message(STATUS "Found CUDA")
+endif (CUDA_FOUND)
+
+find_package(OptiX REQUIRED)
+if (OptiX_FOUND)
+    set(OPTIX_INCLUDE_DIRECTORY ${OptiX_INCLUDE_DIR})
+    message(STATUS "Found OptiX")
+endif (OptiX_FOUND)
+
+get_filename_component(cuda_compiler_bin ${CMAKE_CUDA_COMPILER} DIRECTORY)
+find_program(BIN2C
+        NAMES bin2c
+        PATHS ${cuda_compiler_bin}
+        NO_DEFAULT_PATH)
+if (BIN2C)
+    message(STATUS "Found program bin2c")
+elseif (BIN2C)
+    message(FATAL_ERROR "BIN2C not found")
+endif (BIN2C)
+
+set(RENDER_GPU_MODE_ENABLED false)
+#if (CUDA_FOUND AND CUDA_FOUND)
+#    set(RENDER_GPU_MODE_ENABLED true)
+#    add_definitions(-D _RENDER_GPU_MODE_)
+#endif (CUDA_FOUND AND CUDA_FOUND)
+
+set(PROJECT_INCLUDE_DIRECTORY ${PROJECT_SOURCE_DIR}/include)
+
+set(RENDER_UTILS_HEADERS
+        include/kaguya/utils/memory/MemoryAllocator.h)
+set(RENDER_UTILS_SOURCES
+        src/kaguya/utils/memory/MemoryAllocator.cpp)
+
 set(RENDER_UTILS_SOURCE_HEADERS
         include/kaguya/utils/TaggedPointer.h)
 
 set(RENDER_SAMPLER_SOURCE_HEADERS
         include/kaguya/sampler/RNG.h)
+
+if (RENDER_GPU_MODE_ENABLED)
+    set(RENDER_GPU_UTILS_SOURCE_HEADERS
+            include/kaguya/utils/TaggedPointer.h)
+
+    set(RENDER_GPU_SAMPLER_HEADERS
+            include/kaguya/sampler/IndependentSampler.h)
+    set(RENDER_GPU_SAMPLER_SOURCES
+            src/kaguya/sampler/IndependentSampler.cpp)
+    set(RENDER_GPU_SAMPLER_SOURCE_HEADERS
+            include/kaguya/sampler/RNG.h)
+
+    set_source_files_properties(
+            ${RENDER_GPU_UTILS_SOURCE_HEADERS}
+
+            ${RENDER_GPU_SAMPLER_HEADERS}
+            ${RENDER_GPU_SAMPLER_SOURCES}
+            ${RENDER_GPU_SAMPLER_SOURCE_HEADERS}
+
+            PROPERTIES LANGUAGE CUDA)
+endif (RENDER_GPU_MODE_ENABLED)
 
 file(GLOB RENDER_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
@@ -78,9 +138,10 @@ file(GLOB RENDER_SOURCES
 
 add_executable(${PROJECT_NAME}
         ${RENDER_SOURCES}
+        ${RENDER_UTILS_SOURCES}
         ${RENDER_UTILS_SOURCE_HEADERS}
         ${RENDER_SAMPLER_SOURCE_HEADERS})
 
 target_include_directories(${PROJECT_NAME}
         PRIVATE
-        ${PROJECT_INCLUDE_DIR})
+        ${PROJECT_INCLUDE_DIRECTORY})
