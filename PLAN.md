@@ -39,13 +39,19 @@
     - [ ] 参考 optixPathTracer
     
 *代码设计*
-- 准备 RayQueue
+- 准备 RayQueue<>
     - [x] Allocator 调用了 cudaMalloc 方法，所以不可动态修改 RayQueue 的长度。所以在 Integrator 创建之初，就要分配固定内存。
     - [ ] RayQueue 内部结构
     - [ ] Queue 是一个容器，那么 Queue 元素的类型如何定义？
     
+- Ray - RayQueue<Ray>
+    - Camera 在 parallel 里面负责生成 Ray，所以 Ray 需要有 origin\direction
+    - GenerateRay 需要 sampler. pbrt-v4 对 sampler 的处理和 pbrt-v3 类似，sampler 提前生成随机值，然后 pass 给后续操作。
+    我这儿还是选择直接传 Sampler 的方式。
+    - Ray 中 origin/direction 类型，默认使用 glm 的。查了一下 GLM 是支持 CUDA 编程的
+    
 - 准备 Parameter
-    - [ ] params 里面分配多少个 queue.
+    - [ ] params 里面分配哪些类型的 queue.
     
 - Optix 求交（目前只实现一个求深度图的功能）
     - [ ] 分析 Scene 和 GPU scene 的接口，统一两者的接口。然后在 GPUScene 中实现 Optix 代码

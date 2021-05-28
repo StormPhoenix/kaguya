@@ -43,7 +43,7 @@ message("${APPLE}")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/CMake/)
 
-find_package(CUDA REQUIRED)
+find_package(CUDA)
 if (CUDA_FOUND)
     enable_language(CUDA)
     set(CUDA_LINK_LIBRARY ${CUDA_LIBRARIES})
@@ -52,28 +52,28 @@ if (CUDA_FOUND)
     message(STATUS "Found CUDA")
 endif (CUDA_FOUND)
 
-find_package(OptiX REQUIRED)
+find_package(OptiX)
 if (OptiX_FOUND)
     set(OPTIX_INCLUDE_DIRECTORY ${OptiX_INCLUDE_DIR})
     message(STATUS "Found OptiX")
 endif (OptiX_FOUND)
 
-get_filename_component(cuda_compiler_bin ${CMAKE_CUDA_COMPILER} DIRECTORY)
-find_program(BIN2C
-        NAMES bin2c
-        PATHS ${cuda_compiler_bin}
-        NO_DEFAULT_PATH)
-if (BIN2C)
-    message(STATUS "Found program bin2c")
-elseif (BIN2C)
-    message(FATAL_ERROR "BIN2C not found")
-endif (BIN2C)
-
 set(RENDER_GPU_MODE_ENABLED false)
-#if (CUDA_FOUND AND CUDA_FOUND)
-#    set(RENDER_GPU_MODE_ENABLED true)
-#    add_definitions(-D _RENDER_GPU_MODE_)
-#endif (CUDA_FOUND AND CUDA_FOUND)
+if (CUDA_FOUND AND CUDA_FOUND)
+    get_filename_component(cuda_compiler_bin ${CMAKE_CUDA_COMPILER} DIRECTORY)
+    find_program(BIN2C
+            NAMES bin2c
+            PATHS ${cuda_compiler_bin}
+            NO_DEFAULT_PATH)
+    if (BIN2C)
+        message(STATUS "Found program bin2c")
+    elseif (BIN2C)
+        message(FATAL_ERROR "BIN2C not found")
+    endif (BIN2C)
+
+    set(RENDER_GPU_MODE_ENABLED true)
+    add_definitions(-D _RENDER_GPU_MODE_)
+endif (CUDA_FOUND AND CUDA_FOUND)
 
 set(PROJECT_INCLUDE_DIRECTORY ${PROJECT_SOURCE_DIR}/include)
 

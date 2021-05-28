@@ -5,6 +5,8 @@
 #ifndef KAGUYA_MATH_H
 #define KAGUYA_MATH_H
 
+#include <kaguya/common.h>
+
 #include <ext/glm/glm.hpp>
 #include <ext/glm/gtc/matrix_transform.hpp>
 #include <ext/glm/gtc/matrix_inverse.hpp>
@@ -16,8 +18,6 @@
 
 #include <functional>
 #include <random>
-
-#include <kaguya/common.h>
 
 using Vector2d = glm::dvec2;
 using Vector2f = glm::vec2;
