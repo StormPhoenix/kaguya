@@ -37,7 +37,9 @@ namespace fs = std::filesystem;
 #endif
 #ifndef GHC_USE_STD_FS
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+
 #include <ext/ghc/filesystem.hpp>
+
 namespace fs = ghc::filesystem;
 #endif
 

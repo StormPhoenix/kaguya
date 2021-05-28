@@ -25,7 +25,7 @@ int main() {
     void *p = _aligned_malloc(1024, 32);
 } " WINDOWS_MALLOC_ALIGNED)
 if (WINDOWS_MALLOC_ALIGNED)
-    add_definitions(-D KAGUYA_WINDOWS_MALLOC_ALIGNED)
+    add_definitions(-D RENDER_WINDOWS_MALLOC_ALIGNED)
 endif (WINDOWS_MALLOC_ALIGNED)
 
 CHECK_CXX_SOURCE_COMPILES("
@@ -35,7 +35,7 @@ int main() {
     posix_memalign(&p, 32, 1024);
 } " POSIX_MALLOC_ALIGNED)
 if (POSIX_MALLOC_ALIGNED)
-    add_definitions(-D KAGUYA_POSIX_MALLOC_ALIGNED)
+    add_definitions(-D RENDER_POSIX_MALLOC_ALIGNED)
 endif (POSIX_MALLOC_ALIGNED)
 
 message("${CMAKE_CXX_COMPILER}")
@@ -77,34 +77,33 @@ set(RENDER_GPU_MODE_ENABLED false)
 
 set(PROJECT_INCLUDE_DIRECTORY ${PROJECT_SOURCE_DIR}/include)
 
-set(RENDER_UTILS_HEADERS
-        include/kaguya/utils/memory/MemoryAllocator.h)
 set(RENDER_UTILS_SOURCES
-        src/kaguya/utils/memory/MemoryAllocator.cpp)
+        src/kaguya/utils/memory/MemoryAllocator.cpp
+        src/kaguya/utils/memory/HostResource.cpp
+        src/kaguya/utils/FileReader.cpp
+        src/kaguya/utils/ImageIO.cpp
+        src/kaguya/utils/MemoryArena.cpp
+        src/kaguya/utils/ObjLoader.cpp
+        src/kaguya/utils/VisibilityTester.cpp)
 
-set(RENDER_UTILS_SOURCE_HEADERS
-        include/kaguya/utils/TaggedPointer.h)
+set(RENDER_SAMPLER_SOURCES
+        src/kaguya/sampler/DefaultSampler.cpp
+        src/kaguya/sampler/HaltonSampler.cpp
+        src/kaguya/sampler/IndependentSampler.cpp
+        src/kaguya/sampler/Sampler.cpp
+        src/kaguya/sampler/SimpleHaltonSampler.cpp)
 
-set(RENDER_SAMPLER_SOURCE_HEADERS
-        include/kaguya/sampler/RNG.h)
-
+set(RENDER_GPU_SOURCES "")
 if (RENDER_GPU_MODE_ENABLED)
-    set(RENDER_GPU_UTILS_SOURCE_HEADERS
-            include/kaguya/utils/TaggedPointer.h)
-
-    set(RENDER_GPU_SAMPLER_HEADERS
-            include/kaguya/sampler/IndependentSampler.h)
-    set(RENDER_GPU_SAMPLER_SOURCES
-            src/kaguya/sampler/IndependentSampler.cpp)
-    set(RENDER_GPU_SAMPLER_SOURCE_HEADERS
-            include/kaguya/sampler/RNG.h)
+    set(RENDER_GPU_SOURCES
+            src/kaguya/utils/memory/CUDAResource.cpp)
 
     set_source_files_properties(
-            ${RENDER_GPU_UTILS_SOURCE_HEADERS}
+            include/kaguya/sampler/RNG.h
+            include/kaguya/utils/TaggedPointer.h
 
-            ${RENDER_GPU_SAMPLER_HEADERS}
-            ${RENDER_GPU_SAMPLER_SOURCES}
-            ${RENDER_GPU_SAMPLER_SOURCE_HEADERS}
+            include/kaguya/sampler/IndependentSampler.h
+            src/kaguya/sampler/IndependentSampler.cpp
 
             PROPERTIES LANGUAGE CUDA)
 endif (RENDER_GPU_MODE_ENABLED)
@@ -122,14 +121,13 @@ file(GLOB RENDER_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/medium/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/material/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/math/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/sampler/*.cpp
+
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/parallel/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/accumulation/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/importer/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/importer/xml/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/meta/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/utils/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/bdpt/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/pm/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/pt/*.cpp
@@ -137,11 +135,17 @@ file(GLOB RENDER_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pugixml/*.cpp)
 
 add_executable(${PROJECT_NAME}
-        ${RENDER_SOURCES}
         ${RENDER_UTILS_SOURCES}
-        ${RENDER_UTILS_SOURCE_HEADERS}
-        ${RENDER_SAMPLER_SOURCE_HEADERS})
+        ${RENDER_SAMPLER_SOURCES}
+
+        ${RENDER_SOURCES}
+        ${RENDER_GPU_SOURCES})
 
 target_include_directories(${PROJECT_NAME}
         PRIVATE
+        ${CUDA_INCLUDE_DIRECTORY}
         ${PROJECT_INCLUDE_DIRECTORY})
+
+target_link_libraries(${PROJECT_NAME}
+        PRIVATE
+        ${CUDA_LINK_LIBRARY})
