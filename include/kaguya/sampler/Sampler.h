@@ -17,15 +17,7 @@ namespace RENDER_NAMESPACE {
 
         class Sampler : public TaggedPointer<IndependentSampler, SimpleHaltonSampler> {
         public:
-            // TODO delete
-            typedef std::shared_ptr<Sampler> Ptr;
             using TaggedPointer::TaggedPointer;
-
-            /* TODO delete
-            Sampler(int nSamples);
-
-            Sampler(int nSamples, int seed);
-             */
 
             /**
              * Set current sampling pixel
@@ -44,18 +36,6 @@ namespace RENDER_NAMESPACE {
             RENDER_CPU_GPU Float sample1D();
 
             RENDER_CPU_GPU Vector2F sample2D();
-
-        protected:
-            /* TODO delete
-            // Current pixel on which sampling
-            Point2I currentPixel;
-            // Sample times
-            const int nSamples;
-            // Random number seed
-            int randomSeed = 0;
-            // Sample index
-            int sampleIndex;
-             */
         };
     }
 }

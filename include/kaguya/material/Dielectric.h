@@ -5,8 +5,8 @@
 #ifndef KAGUYA_DIELECTRIC_H
 #define KAGUYA_DIELECTRIC_H
 
+#include <kaguya/common.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
-#include <kaguya/material/Material.h>
 #include <kaguya/material/texture/Texture.h>
 
 namespace RENDER_NAMESPACE {
@@ -15,18 +15,26 @@ namespace RENDER_NAMESPACE {
         using namespace texture;
         using namespace core;
 
-        class Dielectric : public Material {
+        class Dielectric {
         public:
             Dielectric(const Texture<Spectrum>::Ptr R, const Texture<Spectrum>::Ptr T,
                        Float etaI, Float etaT, Float roughness = 0.f);
 
-            virtual bool isSpecular() const override;
+            RENDER_CPU_GPU bool isSpecular();
 
-            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
-                                                    TransportMode mode = TransportMode::RADIANCE) override;
+            RENDER_CPU_GPU void evaluateBSDF(SurfaceInteraction &insect, MemoryAllocator &allocator,
+                                             TransportMode mode = TransportMode::RADIANCE);
 
+            RENDER_CPU_GPU bool isTwoSided() {
+                return _twoSided;
+            }
+
+            RENDER_CPU_GPU void setTwoSided(bool twoSided) {
+                _twoSided = twoSided;
+            }
 
         private:
+            bool _twoSided = true;
             Float _roughness;
             Float _etaI, _etaT;
             const Texture<Spectrum>::Ptr _R;

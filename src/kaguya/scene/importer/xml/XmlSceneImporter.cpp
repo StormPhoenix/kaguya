@@ -271,7 +271,7 @@ namespace RENDER_NAMESPACE {
                 std::string type = node.attribute("type").value();
                 std::string id = node.attribute("id").value();
 
-                Material::Ptr material = nullptr;
+                Material material;
                 if (type == "diffuse") {
                     material = createDiffuseMaterial(parseInfo);
                 } else if (type == "dielectric") {
@@ -283,10 +283,11 @@ namespace RENDER_NAMESPACE {
                 } else if (type == "roughconductor" || type == "conductor") {
                     material = createRoughConductorMaterial(parseInfo);
                 } else if (type == "twosided") {
-                    ASSERT(parseInfo.currentMaterial != nullptr,
+                    ASSERT(!parseInfo.currentMaterial.nullable(),
                            "BSDF twosided should have {currentMaterial} attribute. ");
                     material = parseInfo.currentMaterial;
                     material->setTwoSided(true);
+                } else if (type == "coating") {
                 } else if (type == "coating") {
                     material = createCoatingMaterial(parseInfo);
                 } else if (type == "plastic") {
@@ -329,7 +330,7 @@ namespace RENDER_NAMESPACE {
                 return std::make_shared<Metal>(texAlpha, texEta, texR, texK, distributionType);
             }
 
-            Material::Ptr XmlSceneImporter::createGlassMaterial(XmlParseInfo &info) {
+            Material XmlSceneImporter::createGlassMaterial(XmlParseInfo &info) {
                 Float extIOR = 1.;
                 Float intIOR = 1.5;
                 Texture<Spectrum>::Ptr texR = std::make_shared<ConstantTexture<Spectrum>>(1.0);

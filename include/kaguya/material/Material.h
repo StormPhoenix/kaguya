@@ -5,53 +5,50 @@
 #ifndef KAGUYA_MATERIAL_H
 #define KAGUYA_MATERIAL_H
 
+#include <kaguya/common.h>
+#include <kaguya/core/core.h>
 #include <kaguya/core/Interaction.h>
-#include <kaguya/core/bsdf/BSDF.h>
-#include <kaguya/core/bsdf/BXDF.h>
-#include <kaguya/math/Math.h>
-#include <kaguya/scene/meta/Shape.h>
+#include <kaguya/utils/TaggedPointer.h>
 #include <kaguya/utils/memory/MemoryAllocator.h>
 
 namespace RENDER_NAMESPACE {
     namespace material {
 
+        using memory::TaggedPointer;
         using kaguya::core::Interaction;
         using kaguya::core::SurfaceInteraction;
-        using kaguya::core::bsdf::BSDF;
-        using kaguya::core::bsdf::BXDF;
         using kaguya::core::bsdf::TransportMode;
         using kaguya::memory::MemoryAllocator;
 
-        /**
-         * 物体材质
-         */
-        class Material {
+        class Dielectric;
+
+        class Lambertian;
+
+        class Metal;
+
+        class Mirror;
+
+        class OrenNayar;
+
+        class PatinaMaterial;
+
+        class PlasticMaterial;
+
+        class SubsurfaceMaterial;
+
+        class Material : public TaggedPointer<Dielectric, Lambertian, Metal, Mirror,
+                OrenNayar, PatinaMaterial, PlasticMaterial, SubsurfaceMaterial> {
         public:
+            using TaggedPointer::TaggedPointer;
 
-            typedef std::shared_ptr<Material> Ptr;
+            RENDER_CPU_GPU void evaluateBSDF(SurfaceInteraction &insect, MemoryAllocator &allocator,
+                                             TransportMode mode = TransportMode::RADIANCE);
 
-            /**
-             * 计算材质的 bsdf
-             * @param insect ray 与 shape 的相交点
-             */
-            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
-                                                    TransportMode mode = TransportMode::RADIANCE) = 0;
+            RENDER_CPU_GPU bool isSpecular();
 
-            virtual bool isSpecular() const {
-                return false;
-            }
+            RENDER_CPU_GPU bool isTwoSided();
 
-            virtual bool isTwoSided() const {
-                return _twoSided;
-            }
-
-            virtual void setTwoSided(bool twoSided) {
-                _twoSided = twoSided;
-            }
-
-        protected:
-            bool _twoSided = true;
-
+            RENDER_CPU_GPU void setTwoSided(bool twoSided);
         };
 
     }

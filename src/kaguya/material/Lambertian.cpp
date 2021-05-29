@@ -14,11 +14,10 @@ namespace RENDER_NAMESPACE {
 
         Lambertian::Lambertian(std::shared_ptr<Texture<Spectrum>> Kd) : _Kd(Kd) {}
 
-        void Lambertian::computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
-                                                    TransportMode mode) {
+        void Lambertian::evaluateBSDF(SurfaceInteraction &insect, MemoryAllocator &allocator,
+                                      TransportMode mode) {
             Spectrum albedo = _Kd->evaluate(insect);
-            BXDFLambertianReflection *lambertianBXDF =
-            allocator.newObject<BXDFLambertianReflection>(albedo);
+            BXDFLambertianReflection *lambertianBXDF = allocator.newObject<BXDFLambertianReflection>(albedo);
             insect.bsdf = allocator.newObject<BSDF>(insect);
             insect.bsdf->addBXDF(lambertianBXDF);
         }

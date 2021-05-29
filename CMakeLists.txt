@@ -96,14 +96,39 @@ set(RENDER_SAMPLER_SOURCES
         src/kaguya/sampler/IndependentSampler.cpp
         src/kaguya/sampler/SimpleHaltonSampler.cpp)
 
+set(RENDER_MATERIAL_SOURCES
+        src/kaguya/material/Material.cpp
+        src/kaguya/material/Lambertian.cpp
+        src/kaguya/material/Dielectric.cpp
+        src/kaguya/material/Metal.cpp
+        src/kaguya/material/Mirror.cpp
+        src/kaguya/material/PatinaMaterial.cpp
+        src/kaguya/material/PlasticMaterial.cpp
+        src/kaguya/material/SubsurfaceMaterial.cpp
+        src/kaguya/material/OrenNayar.cpp)
+
+set(RENDER_MATERIAL_HEADERS
+        include/kaguya/material/Material.h
+        include/kaguya/material/Lambertian.h
+        include/kaguya/material/Dielectric.h
+        include/kaguya/material/Metal.h
+        include/kaguya/material/Mirror.h
+        include/kaguya/material/PatinaMaterial.h
+        include/kaguya/material/PlasticMaterial.h
+        include/kaguya/material/SubsurfaceMaterial.h
+        include/kaguya/material/OrenNayar.h)
+
 set(RENDER_GPU_SOURCES "")
 if (RENDER_GPU_MODE_ENABLED)
     set(RENDER_GPU_SOURCES
-            src/kaguya/utils/memory/CUDAResource.cpp include/kaguya/utils/type_utils.h)
+            src/kaguya/utils/memory/CUDAResource.cpp include/kaguya/utils/type_utils.h src/kaguya/material/Material.cpp)
 
     set_source_files_properties(
             include/kaguya/sampler/RNG.h
             include/kaguya/utils/TaggedPointer.h
+
+            ${RENDER_MATERIAL_HEADERS}
+            ${RENDER_MATERIAL_SOURCES}
 
             include/kaguya/sampler/Sampler.h
             src/kaguya/sampler/Sampler.cpp
@@ -125,7 +150,6 @@ file(GLOB RENDER_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/light/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/phase/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/medium/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/material/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/math/*.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/parallel/*.cpp
@@ -152,6 +176,13 @@ target_include_directories(render_utils_lib
         PRIVATE
         ${PROJECT_INCLUDE_DIRECTORY})
 
+add_library(render_material_lib
+        ${RENDER_MATERIAL_SOURCES})
+target_include_directories(render_material_lib
+        PRIVATE
+        ${RENDER_MATERIAL_HEADERS}
+        ${PROJECT_INCLUDE_DIRECTORY})
+
 add_executable(${PROJECT_NAME}
         ${RENDER_SOURCES}
         ${RENDER_GPU_SOURCES})
@@ -161,6 +192,7 @@ target_include_directories(${PROJECT_NAME}
         ${PROJECT_INCLUDE_DIRECTORY})
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
+        render_material_lib
         render_sampler_lib
         render_utils_lib
         ${CUDA_LINK_LIBRARY})

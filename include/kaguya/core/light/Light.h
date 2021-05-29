@@ -6,7 +6,7 @@
 #define KAGUYA_LIGHT_H
 
 #include <kaguya/common.h>
-#include <kaguya/core/Core.h>
+#include <kaguya/core/core.h>
 #include <kaguya/tracer/Ray.h>
 #include <kaguya/core/Interaction.h>
 #include <kaguya/utils/VisibilityTester.h>

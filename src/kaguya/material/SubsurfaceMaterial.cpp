@@ -2,7 +2,8 @@
 // Created by Storm Phoenix on 2021/3/6.
 //
 
-#include <kaguya/math/Math.h>
+#include <kaguya/core/bsdf/BSDF.h>
+#include <kaguya/core/bssrdf/TabulatedBSSRDF.h>
 #include <kaguya/core/bsdf/BXDFFresnelSpecular.h>
 #include <kaguya/material/SubsurfaceMaterial.h>
 
@@ -39,8 +40,8 @@ namespace RENDER_NAMESPACE {
             }
         }
 
-        void SubsurfaceMaterial::computeScatteringFunctions(SurfaceInteraction &si, MemoryAllocator &allocator,
-                                                            TransportMode mode) {
+        void SubsurfaceMaterial::evaluateBSDF(SurfaceInteraction &si, MemoryAllocator &allocator,
+                                              TransportMode mode) {
 
             si.bsdf = allocator.newObject<BSDF>(si);
             si.bsdf->addBXDF(allocator.newObject<BXDFFresnelSpecular>(1.0f, 1.0f, 1.0f, _theta, mode));

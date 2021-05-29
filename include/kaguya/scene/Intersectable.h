@@ -21,11 +21,11 @@ namespace RENDER_NAMESPACE {
             typedef std::shared_ptr<Intersectable> Ptr;
 
             /**
-             * 求交判定
+             * Interseciton check
              * @param ray
              * @param si
-             * @param minStep 射线步长最小值
-             * @param maxStep 射线步长最大值
+             * @param minStep ray min step
+             * @param maxStep ray max step
              * @return
              */
             virtual bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const = 0;

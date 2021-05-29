@@ -5,7 +5,7 @@
 #ifndef KAGUYA_CONSTANTTEXTURE_H
 #define KAGUYA_CONSTANTTEXTURE_H
 
-#include <kaguya/core/Core.h>
+#include <kaguya/core/core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/material/texture/Texture.h>
 

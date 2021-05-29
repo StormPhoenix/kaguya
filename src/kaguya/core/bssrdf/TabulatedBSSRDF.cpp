@@ -147,7 +147,7 @@ namespace RENDER_NAMESPACE {
                                              const Spectrum &sigma_s,
                                              const BSSRDFTable &table,
                                              const SurfaceInteraction &po,
-                                             Material *material, Float theta)
+                                             Material material, Float theta)
                     : _table(table), SeparableBSSRDF(po, material, theta) {
                 _sigma_t = sigma_a + sigma_s;
                 for (int ch = 0; ch < SPECTRUM_CHANNEL; ++ch)

@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include <kaguya/core/Core.h>
+#include <kaguya/core/core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
 #include <kaguya/tracer/Tracer.h>

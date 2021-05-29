@@ -2,6 +2,7 @@
 // Created by Storm Phoenix on 2021/5/11.
 //
 
+#include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/material/PlasticMaterial.h>
 #include <kaguya/core/bsdf/BXDFLambertianReflection.h>
 #include <kaguya/core/bsdf/BXDFMicrofacetReflection.h>
@@ -11,6 +12,7 @@
 namespace RENDER_NAMESPACE {
     namespace material {
 
+        using core::bsdf::BSDF;
         using core::bsdf::BXDFLambertianReflection;
         using core::bsdf::BXDFMicrofacetReflection;
         using core::bsdf::fresnel::Fresnel;
@@ -24,8 +26,8 @@ namespace RENDER_NAMESPACE {
                                          Texture<Float>::Ptr etaI, Texture<Float>::Ptr etaT, Float alpha) :
                 _Kd(Kd), _Ks(Ks), _etaI(etaI), _etaT(etaT), _alpha(alpha) {}
 
-        void PlasticMaterial::computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
-                                                         TransportMode mode) {
+        void PlasticMaterial::evaluateBSDF(SurfaceInteraction &insect, MemoryAllocator &allocator,
+                                           TransportMode mode) {
             insect.bsdf =  allocator.newObject<BSDF>(insect);
 
             // Evaluate diffuse material

@@ -2,6 +2,7 @@
 // Created by Storm Phoenix on 2021/5/10.
 //
 
+#include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/material/PatinaMaterial.h>
 #include <kaguya/core/bsdf/microfacet/BeckmannDistribution.h>
 #include <kaguya/core/bsdf/microfacet/GGXDistribution.h>
@@ -23,8 +24,8 @@ namespace RENDER_NAMESPACE {
             ASSERT(_Ks != nullptr, "CoatingMaterial parameter Ks is nullptr. ");
         }
 
-        void PatinaMaterial::computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
-                                                        TransportMode mode) {
+        void PatinaMaterial::evaluateBSDF(SurfaceInteraction &insect, MemoryAllocator &allocator,
+                                          TransportMode mode) {
             Float alpha = _alpha->evaluate(insect);
             Spectrum Rd = _Kd->evaluate(insect);
             Spectrum Rs = _Ks->evaluate(insect);

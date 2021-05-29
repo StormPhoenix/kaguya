@@ -5,7 +5,7 @@
 #ifndef KAGUYA_MEDIUM_H
 #define KAGUYA_MEDIUM_H
 
-#include <kaguya/core/Core.h>
+#include <kaguya/core/core.h>
 #include <kaguya/core/Interaction.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/tracer/Ray.h>

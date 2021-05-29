@@ -14,22 +14,30 @@ namespace RENDER_NAMESPACE {
         using namespace texture;
         using kaguya::core::Spectrum;
 
-        class Mirror : public Material {
+        class Mirror {
         public:
             Mirror();
 
-            Mirror(std::shared_ptr<Texture<Spectrum>> albedo, Float fuzzy = 0);
+            Mirror(std::shared_ptr<Texture<Spectrum>> albedo);
 
-            virtual bool isSpecular() const override;
+            RENDER_CPU_GPU void evaluateBSDF(SurfaceInteraction &si, MemoryAllocator &allocator,
+                                             TransportMode mode = TransportMode::RADIANCE);
 
-            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
-                                                    TransportMode mode = TransportMode::RADIANCE) override;
+            RENDER_CPU_GPU bool isSpecular() {
+                return true;
+            }
+
+            RENDER_CPU_GPU bool isTwoSided() {
+                return _twoSided;
+            }
+
+            RENDER_CPU_GPU void setTwoSided(bool twoSided) {
+                _twoSided = twoSided;
+            }
 
         private:
-            // 反射率
+            bool _twoSided = true;
             std::shared_ptr<Texture<Spectrum>> _albedo;
-            // 毛玻璃效果系数
-            Float _fuzzy;
         };
 
     }

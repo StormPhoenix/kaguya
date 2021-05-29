@@ -5,7 +5,7 @@
 #ifndef KAGUYA_TRANSFORM_H
 #define KAGUYA_TRANSFORM_H
 
-#include <kaguya/core/Core.h>
+#include <kaguya/core/core.h>
 
 #include <cstdlib>
 

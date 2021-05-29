@@ -15,7 +15,7 @@ namespace RENDER_NAMESPACE {
         using core::Spectrum;
         using texture::Texture;
 
-        class Metal : public Material {
+        class Metal {
         public:
             Metal(const Texture<Float>::Ptr alpha,
                   const Texture<Spectrum>::Ptr eta,
@@ -23,10 +23,23 @@ namespace RENDER_NAMESPACE {
                   const Texture<Spectrum>::Ptr K,
                   std::string distributionType = "ggx");
 
-            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
-                                                    TransportMode mode = TransportMode::RADIANCE) override;
+            RENDER_CPU_GPU void evaluateBSDF(SurfaceInteraction &si, MemoryAllocator &allocator,
+                                             TransportMode mode = TransportMode::RADIANCE);
+
+            RENDER_CPU_GPU bool isSpecular() {
+                return false;
+            }
+
+            RENDER_CPU_GPU bool isTwoSided() {
+                return _twoSided;
+            }
+
+            RENDER_CPU_GPU void setTwoSided(bool twoSided) {
+                _twoSided = twoSided;
+            }
 
         private:
+            bool _twoSided = true;
             std::string _distributionType;
             const Texture<Float>::Ptr _alpha;
             const Texture<Spectrum>::Ptr _eta;

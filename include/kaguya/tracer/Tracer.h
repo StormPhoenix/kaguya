@@ -5,7 +5,7 @@
 #ifndef KAGUYA_TRACER_H
 #define KAGUYA_TRACER_H
 
-#include <kaguya/core/Core.h>
+#include <kaguya/core/core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
 #include <kaguya/scene/Scene.h>

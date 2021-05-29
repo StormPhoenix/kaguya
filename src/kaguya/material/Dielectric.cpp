@@ -2,6 +2,7 @@
 // Created by Storm Phoenix on 2020/10/8.
 //
 
+#include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/material/Dielectric.h>
 #include <kaguya/core/bsdf/BXDFFresnelSpecular.h>
 #include <kaguya/core/bsdf/BXDFMicrofacet.h>
@@ -25,12 +26,12 @@ namespace RENDER_NAMESPACE {
                                Float etaI, Float etaT, Float roughness) :
                 _R(R), _T(T), _etaI(etaI), _etaT(etaT), _roughness(roughness) {}
 
-        bool Dielectric::isSpecular() const {
+        bool Dielectric::isSpecular() {
             return _roughness == 0.f;
         }
 
-        void Dielectric::computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
-                                                    TransportMode mode) {
+        void Dielectric::evaluateBSDF(SurfaceInteraction &insect, MemoryAllocator &allocator,
+                                      TransportMode mode) {
             insect.bsdf = allocator.newObject<BSDF>(insect);
             Spectrum Kr = _R->evaluate(insect);
             Spectrum Kt = _T->evaluate(insect);
@@ -40,7 +41,8 @@ namespace RENDER_NAMESPACE {
             }
 
             if (isSpecular()) {
-                BXDFFresnelSpecular *specularBXDF = allocator.newObject<BXDFFresnelSpecular>(Kr, Kt, _etaI, _etaT, mode);
+                BXDFFresnelSpecular *specularBXDF = allocator.newObject<BXDFFresnelSpecular>(Kr, Kt, _etaI, _etaT,
+                                                                                             mode);
                 insect.bsdf->addBXDF(specularBXDF);
             } else {
                 const GGXDistribution *distribution = allocator.newObject<GGXDistribution>(_roughness);

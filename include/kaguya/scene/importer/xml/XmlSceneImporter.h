@@ -88,19 +88,19 @@ namespace RENDER_NAMESPACE {
 
                 std::shared_ptr<std::vector<Shape::Ptr>> createObjMeshes(XmlParseInfo &info);
 
-                Material::Ptr createDiffuseMaterial(XmlParseInfo &info);
+                Material createDiffuseMaterial(XmlParseInfo &info);
 
-                Material::Ptr createMirrorMaterial(XmlParseInfo &info);
+                Material createMirrorMaterial(XmlParseInfo &info);
 
-                Material::Ptr createGlassMaterial(XmlParseInfo &info);
+                Material createGlassMaterial(XmlParseInfo &info);
 
-                Material::Ptr createDielectricMaterial(XmlParseInfo &info);
+                Material createDielectricMaterial(XmlParseInfo &info);
 
-                Material::Ptr createRoughConductorMaterial(XmlParseInfo &info);
+                Material createRoughConductorMaterial(XmlParseInfo &info);
 
-                Material::Ptr createCoatingMaterial(XmlParseInfo &info);
+                Material createCoatingMaterial(XmlParseInfo &info);
 
-                Material::Ptr createPlasticMaterial(XmlParseInfo &info);
+                Material createPlasticMaterial(XmlParseInfo &info);
 
             private:
                 std::map<std::string, TagType> _nodeTypeMap;

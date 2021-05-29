@@ -6,7 +6,7 @@
 #define KAGUYA_BDPATHTRACER_H
 
 #include <kaguya/Config.h>
-#include <kaguya/core/Core.h>
+#include <kaguya/core/core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/core/Interaction.h>
 #include <kaguya/core/light/Light.h>

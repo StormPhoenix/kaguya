@@ -42,7 +42,7 @@ namespace RENDER_NAMESPACE {
                                 const Spectrum &sigma_s,
                                 const BSSRDFTable &table,
                                 const SurfaceInteraction &po,
-                                Material *material, Float theta);
+                                Material material, Float theta);
 
             protected:
                 virtual Spectrum Sr(Float radius) const override;

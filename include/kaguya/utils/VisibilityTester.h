@@ -5,7 +5,7 @@
 #ifndef KAGUYA_VISIBILITYTESTER_H
 #define KAGUYA_VISIBILITYTESTER_H
 
-#include <kaguya/core/Core.h>
+#include <kaguya/core/core.h>
 #include <kaguya/core/Interaction.h>
 // TODO Ray 放到 core
 #include <kaguya/tracer/Ray.h>

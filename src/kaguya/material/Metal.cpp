@@ -2,6 +2,7 @@
 // Created by Storm Phoenix on 2021/5/7.
 //
 
+#include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/material/Metal.h>
 #include <kaguya/core/bsdf/microfacet/BeckmannDistribution.h>
 #include <kaguya/core/bsdf/microfacet/GGXDistribution.h>
@@ -10,6 +11,7 @@
 
 namespace RENDER_NAMESPACE {
     namespace material {
+        using core::bsdf::BSDF;
         using core::bsdf::fresnel::FresnelConductor;
         using core::bsdf::BXDFMicrofacetReflection;
         using core::bsdf::microfacet::BeckmannDistribution;
@@ -25,9 +27,9 @@ namespace RENDER_NAMESPACE {
             ASSERT(_K != nullptr, "K is nullptr. ");
         }
 
-        void Metal::computeScatteringFunctions(SurfaceInteraction &insect,
-                                               MemoryAllocator &allocator,
-                                               TransportMode mode) {
+        void Metal::evaluateBSDF(SurfaceInteraction &insect,
+                                 MemoryAllocator &allocator,
+                                 TransportMode mode) {
             // Build distribution
             const MicrofacetDistribution *distribution = nullptr;
             Float alpha = _alpha->evaluate(insect);

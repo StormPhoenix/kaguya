@@ -25,7 +25,7 @@ namespace RENDER_NAMESPACE {
                 friend class SeparableBSSRDFAdapter;
 
             public:
-                SeparableBSSRDF(const SurfaceInteraction &po, Material *material, Float theta);
+                SeparableBSSRDF(const SurfaceInteraction &po, Material material, Float theta);
 
                 /**
                  * S(p_o, p_i, w_o, w_i) = (1 - Fr(w_o)) * S_p(p_o, p_i) * S_w(w_i)
@@ -94,7 +94,7 @@ namespace RENDER_NAMESPACE {
                 Vector3F _tanX;
                 Vector3F _tanZ;
 
-                Material *_material;
+                Material _material;
                 Float _theta;
             };
         }

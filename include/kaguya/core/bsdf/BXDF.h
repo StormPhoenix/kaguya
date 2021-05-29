@@ -5,7 +5,7 @@
 #ifndef KAGUYA_BXDF_H
 #define KAGUYA_BXDF_H
 
-#include <kaguya/core/Core.h>
+#include <kaguya/core/core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
 namespace RENDER_NAMESPACE {

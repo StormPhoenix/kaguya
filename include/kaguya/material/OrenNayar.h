@@ -14,14 +14,27 @@ namespace RENDER_NAMESPACE {
         using namespace texture;
 //        using namespace core;
 
-        class OrenNayar : public Material {
+        class OrenNayar {
         public:
             OrenNayar(Texture<Spectrum>::Ptr Kd, Texture<Float>::Ptr roughness);
 
-            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
-                                                    TransportMode mode = TransportMode::RADIANCE) override;
+            RENDER_CPU_GPU void evaluateBSDF(SurfaceInteraction &si, MemoryAllocator &allocator,
+                                             TransportMode mode = TransportMode::RADIANCE);
+
+            RENDER_CPU_GPU bool isSpecular() {
+                return false;
+            }
+
+            RENDER_CPU_GPU bool isTwoSided() {
+                return _twoSided;
+            }
+
+            RENDER_CPU_GPU void setTwoSided(bool twoSided) {
+                _twoSided = twoSided;
+            }
 
         private:
+            bool _twoSided = true;
             Texture<Spectrum>::Ptr _Kd = nullptr;
             Texture<Float>::Ptr _roughness = nullptr;
         };

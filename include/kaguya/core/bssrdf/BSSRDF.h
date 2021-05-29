@@ -5,7 +5,7 @@
 #ifndef KAGUYA_BSSRDF_H
 #define KAGUYA_BSSRDF_H
 
-#include <kaguya/core/Core.h>
+#include <kaguya/core/core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/core/Interaction.h>
 #include <kaguya/scene/Scene.h>

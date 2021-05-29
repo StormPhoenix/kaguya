@@ -6,7 +6,7 @@
 #define KAGUYA_FILMPLANE_H
 
 #include <kaguya/math/Math.h>
-#include <kaguya/core/Core.h>
+#include <kaguya/core/core.h>
 #include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/parallel/AtomicFloat.h>
 

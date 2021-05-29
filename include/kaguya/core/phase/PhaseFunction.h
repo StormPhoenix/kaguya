@@ -5,7 +5,7 @@
 #ifndef KAGUYA_PHASEFUNCTION_H
 #define KAGUYA_PHASEFUNCTION_H
 
-#include <kaguya/core/Core.h>
+#include <kaguya/core/core.h>
 #include <kaguya/sampler/Sampler.h>
 
 namespace RENDER_NAMESPACE {

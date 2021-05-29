@@ -2,6 +2,7 @@
 // Created by Storm Phoenix on 2021/1/10.
 //
 
+#include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/core/bsdf/fresnel/Fresnel.h>
 #include <kaguya/core/bssrdf/SeparableBSSRDF.h>
 
@@ -36,7 +37,7 @@ namespace RENDER_NAMESPACE {
                 }
             }
 
-            SeparableBSSRDF::SeparableBSSRDF(const SurfaceInteraction &po, Material *material, Float theta) :
+            SeparableBSSRDF::SeparableBSSRDF(const SurfaceInteraction &po, Material material, Float theta) :
                     BSSRDF(po), _material(material), _theta(theta) {
                 // build local coordinate
                 // 构造切线空间

@@ -16,14 +16,27 @@ namespace RENDER_NAMESPACE {
         using namespace texture;
         using namespace core;
 
-        class Lambertian : public Material {
+        class Lambertian {
         public:
             Lambertian(std::shared_ptr<Texture<Spectrum>> Kd);
 
-            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
-                                                    TransportMode mode = TransportMode::RADIANCE) override;
+            RENDER_CPU_GPU void evaluateBSDF(SurfaceInteraction &si, MemoryAllocator &allocator,
+                                             TransportMode mode = TransportMode::RADIANCE);
+
+            RENDER_CPU_GPU bool isSpecular() {
+                return false;
+            }
+
+            RENDER_CPU_GPU bool isTwoSided() {
+                return _twoSided;
+            }
+
+            RENDER_CPU_GPU void setTwoSided(bool twoSided) {
+                _twoSided = twoSided;
+            }
 
         private:
+            bool _twoSided = true;
             std::shared_ptr<Texture<Spectrum>> _Kd = nullptr;
         };
 

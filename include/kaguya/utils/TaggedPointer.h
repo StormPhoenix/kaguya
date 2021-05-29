@@ -17,12 +17,20 @@ namespace RENDER_NAMESPACE {
         public:
             using Types = TypePack<Ts...>;
 
+            TaggedPointer() = default;
+
             template<typename T>
             RENDER_CPU_GPU TaggedPointer(T *ptr) {
                 uintptr_t p = reinterpret_cast<uintptr_t>(ptr);
                 ASSERT((p & ptrMask) == p, "TaggedPointer address too large. ");
                 constexpr unsigned int typeId = typeIndex<T>();
                 taggedPtr = p | ((uintptr_t) typeId << typeShift);
+            }
+
+            RENDER_CPU_GPU TaggedPointer(decltype(__nullptr) p) {}
+
+            RENDER_CPU_GPU TaggedPointer(TaggedPointer &tp) {
+                taggedPtr = tp.taggedPtr;
             }
 
             RENDER_CPU_GPU
@@ -66,6 +74,10 @@ namespace RENDER_NAMESPACE {
             RENDER_CPU_GPU const T *cast() const {
                 ASSERT(isType<T>(), "TaggedPointer type can not be cast. ");
                 return reinterpret_cast<T *>(ptr());
+            }
+
+            RENDER_CPU_GPU bool nullable() const {
+                return taggedPtr == 0;
             }
 
             template<typename F>

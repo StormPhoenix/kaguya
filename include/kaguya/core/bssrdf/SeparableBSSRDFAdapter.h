@@ -10,8 +10,9 @@
 namespace RENDER_NAMESPACE {
     namespace core {
         namespace bssrdf {
-            class SeparableBSSRDF;
+            using bsdf::BXDF;
 
+            class SeparableBSSRDF;
             class SeparableBSSRDFAdapter : public BXDF {
             public:
                 SeparableBSSRDFAdapter(const SeparableBSSRDF *bssrdf);

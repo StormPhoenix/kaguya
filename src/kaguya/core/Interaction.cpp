@@ -90,7 +90,7 @@ namespace RENDER_NAMESPACE {
 
         void SurfaceInteraction::buildScatteringFunction(MemoryAllocator &allocator, TransportMode mode) {
             assert(_material != nullptr);
-            _material->computeScatteringFunctions(*this, allocator, mode);
+            _material->evaluateBSDF(*this, allocator, mode);
         }
 
         StartEndInteraction::StartEndInteraction(const Camera *camera,

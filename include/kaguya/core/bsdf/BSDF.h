@@ -5,7 +5,7 @@
 #ifndef KAGUYA_BSDF_H
 #define KAGUYA_BSDF_H
 
-#include <kaguya/core/Core.h>
+#include <kaguya/core/core.h>
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/core/Interaction.h>
 

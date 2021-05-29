@@ -57,7 +57,7 @@ namespace RENDER_NAMESPACE {
 
             typedef struct XmlParseInfo {
                 Transform transformMat;
-                Material::Ptr currentMaterial = nullptr;
+                Material currentMaterial;
                 Medium::Ptr currentExteriorMedium = nullptr;
                 Medium::Ptr currentInteriorMedium = nullptr;
                 bool hasAreaLight = false;

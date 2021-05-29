@@ -6,7 +6,7 @@
 #define KAGUYA_MICROFACETDISTRIBUTION_H
 
 #include <kaguya/common.h>
-#include <kaguya/core/Core.h>
+#include <kaguya/core/core.h>
 #include <kaguya/sampler/Sampler.h>
 
 namespace RENDER_NAMESPACE {
