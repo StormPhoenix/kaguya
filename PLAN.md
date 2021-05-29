@@ -58,6 +58,10 @@
         - [ ] lights、envLights 还是要放置在 Scene 里面吗？如果不能，那如何与 PathTracer 统一起来？
         （一种替代的方法：Scene 作为 GPUScene 的参数内部构建）
     - [ ] sbt 暂时用默认 rgb 代替
+    
+- Material 和 Sbt
+    - Material -> TaggedPointer
+    - SbtRecord -> store material (value pass)
  
 - Material / BSDF / BXDF
 
@@ -114,7 +118,9 @@
 
 - [ ] FilmPlane 添加 Filter
 
-- [ ] 构建不依赖 C++ std 的随机数生成器    
+- [ ] Move light to new package 
+
+- [x] 构建不依赖 C++ std 的随机数生成器    
 
 - [ ] BDPT RandomWalk 添加 Russian Roullete
 
