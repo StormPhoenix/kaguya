@@ -11,7 +11,7 @@ namespace RENDER_NAMESPACE {
 
         using namespace math;
 
-        SimpleHaltonSampler::SimpleHaltonSampler(int nSamples) : Sampler(nSamples) {
+        SimpleHaltonSampler::SimpleHaltonSampler(int nSamples) : _nSamples(nSamples) {
             _haltonDimension = 0;
             _haltonIndex = 0;
         }
@@ -30,7 +30,7 @@ namespace RENDER_NAMESPACE {
             _haltonDimension = 0;
             _haltonIndex++;
 
-            if (_haltonIndex >= nSamples) {
+            if (_haltonIndex >= _nSamples) {
                 _haltonIndex = 0;
             }
             return true;
@@ -41,11 +41,11 @@ namespace RENDER_NAMESPACE {
             _haltonDimension = 0;
         }
 
-        Sampler *SimpleHaltonSampler::newInstance(int nSamples) {
+        SimpleHaltonSampler *SimpleHaltonSampler::newInstance(int nSamples, MemoryAllocator &allocator) {
             if (nSamples <= 0) {
                 nSamples = Config::Tracer::sampleNum;
             }
-            return new SimpleHaltonSampler(nSamples);
+            return allocator.newObject<SimpleHaltonSampler>(nSamples);
         }
     }
 }

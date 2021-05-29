@@ -20,7 +20,7 @@ namespace RENDER_NAMESPACE {
                            const Texture<Spectrum>::Ptr Ks,
                            const Texture<Float>::Ptr alpha);
 
-            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
+            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
                                                     TransportMode mode = TransportMode::RADIANCE) override;
 
         protected:

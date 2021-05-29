@@ -20,8 +20,8 @@ namespace RENDER_NAMESPACE {
         public:
             Lambertian(std::shared_ptr<Texture<Spectrum>> Kd);
 
-            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
-                                                     TransportMode mode = TransportMode::RADIANCE) override;
+            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
+                                                    TransportMode mode = TransportMode::RADIANCE) override;
 
         private:
             std::shared_ptr<Texture<Spectrum>> _Kd = nullptr;

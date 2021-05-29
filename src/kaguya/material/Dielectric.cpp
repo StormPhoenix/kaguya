@@ -29,9 +29,9 @@ namespace RENDER_NAMESPACE {
             return _roughness == 0.f;
         }
 
-        void Dielectric::computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
+        void Dielectric::computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
                                                     TransportMode mode) {
-            insect.bsdf = ALLOC(memoryArena, BSDF)(insect);
+            insect.bsdf = allocator.newObject<BSDF>(insect);
             Spectrum Kr = _R->evaluate(insect);
             Spectrum Kt = _T->evaluate(insect);
 
@@ -40,11 +40,11 @@ namespace RENDER_NAMESPACE {
             }
 
             if (isSpecular()) {
-                BXDFFresnelSpecular *specularBXDF = ALLOC(memoryArena, BXDFFresnelSpecular)(Kr, Kt, _etaI, _etaT, mode);
+                BXDFFresnelSpecular *specularBXDF = allocator.newObject<BXDFFresnelSpecular>(Kr, Kt, _etaI, _etaT, mode);
                 insect.bsdf->addBXDF(specularBXDF);
             } else {
-                const GGXDistribution *distribution = ALLOC(memoryArena, GGXDistribution)(_roughness);
-                insect.bsdf->addBXDF(ALLOC(memoryArena, BXDFMicrofacet)(Kr, Kt, _etaI, _etaT, distribution, mode));
+                const GGXDistribution *distribution = allocator.newObject<GGXDistribution>(_roughness);
+                insect.bsdf->addBXDF(allocator.newObject<BXDFMicrofacet>(Kr, Kt, _etaI, _etaT, distribution, mode));
             }
         }
     }

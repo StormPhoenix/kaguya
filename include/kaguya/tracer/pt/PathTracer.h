@@ -11,14 +11,14 @@
 #include <kaguya/core/spectrum/Spectrum.hpp>
 
 #include <kaguya/tracer/Tracer.h>
-#include <kaguya/utils/MemoryArena.h>
+#include <kaguya/utils/memory/MemoryAllocator.h>
 
 namespace RENDER_NAMESPACE {
     namespace tracer {
 
         using namespace kaguya::core;
         using namespace kaguya::sampler;
-        using kaguya::memory::MemoryArena;
+        using kaguya::memory::MemoryAllocator;
 
         class PathTracer : public Tracer {
         public:
@@ -35,12 +35,12 @@ namespace RENDER_NAMESPACE {
              * Path Tracing 渲染代码，渐进式实现
              * @param ray
              * @param scene
-             * @param memoryArena
+             * @param allocator
              * @return
              */
             Spectrum shaderOfProgression(Point2I pixelPos, int iteration, const Ray &ray,
                                          std::shared_ptr<Scene> scene, Sampler *sampler,
-                                         MemoryArena &memoryArena);
+                                         MemoryAllocator &allocator);
 
             /**
              * 获取背景颜色，这里可以用来设置背景贴图

@@ -117,7 +117,7 @@ namespace RENDER_NAMESPACE {
             // Display
             Float minSearchRadius = _initialRadius;
 
-            std::vector<MemoryArena> memoryArenaPerThread(renderCores());
+            std::vector<MemoryAllocator> memoryAllocatorPerThread(renderCores());
 
             // Loop iterations
             int nIterations = Config::Tracer::sampleNum;
@@ -131,21 +131,21 @@ namespace RENDER_NAMESPACE {
                         int startCol = idxTileX * Config::Parallel::tileSize;
                         int endCol = (std::min)(startCol + Config::Parallel::tileSize - 1, width - 1);
 
-                        MemoryArena &arena = memoryArenaPerThread[threadIdx];
-                        Sampler *sampler = sampler::SamplerFactory::newSampler(nIterations);
+                        MemoryAllocator &allocator = memoryAllocatorPerThread[threadIdx];
+                        Sampler sampler = sampler::SamplerFactory::newSampler(nIterations);
                         for (int row = startRow; row <= endRow; row++) {
                             for (int col = startCol; col <= endCol; col++) {
-                                sampler->forPixel(Point2I(row, col));
-                                sampler->setSampleIndex(iter);
+                                sampler.forPixel(Point2I(row, col));
+                                sampler.setSampleIndex(iter);
 
                                 // 选取 pixel
                                 int pixelOffset = row * width + col;
                                 SPPMPixel &pixel = pixels[pixelOffset];
 
                                 // Sample camera ray
-                                Float pixelX = col + sampler->sample1D();
-                                Float pixelY = row + sampler->sample1D();
-                                Ray cameraRay = _camera->generateRay(pixelX, pixelY, sampler);
+                                Float pixelX = col + sampler.sample1D();
+                                Float pixelY = row + sampler.sample1D();
+                                Ray cameraRay = _camera->generateRay(pixelX, pixelY, &sampler);
 
                                 Spectrum beta(1.0f);
                                 bool isSpecularBounce = false;
@@ -158,8 +158,8 @@ namespace RENDER_NAMESPACE {
                                     // Intersect with volume ?
                                     MediumInteraction mi;
                                     if (cameraRay.getMedium() != nullptr) {
-                                        beta *= cameraRay.getMedium()->sampleInteraction(cameraRay, sampler, &mi,
-                                                                                         arena);
+                                        beta *= cameraRay.getMedium()->sampleInteraction(cameraRay, &sampler, &mi,
+                                                                                         allocator);
                                         if (beta.isBlack()) {
                                             break;
                                         }
@@ -169,11 +169,11 @@ namespace RENDER_NAMESPACE {
                                     if (mi.isValid()) {
                                         /* Medium intersection */
                                         // Sample direct light
-                                        pixel.Ld += beta * sampleDirectLight(_scene, mi, sampler);
+                                        pixel.Ld += beta * sampleDirectLight(_scene, mi, &sampler);
 
                                         Vector3F wo = -cameraRay.getDirection();
                                         Vector3F wi;
-                                        mi.getPhaseFunction()->sampleScatter(wo, &wi, sampler);
+                                        mi.getPhaseFunction()->sampleScatter(wo, &wi, &sampler);
                                         cameraRay = mi.sendRay(wi);
                                         isSpecularBounce = false;
                                     } else {
@@ -200,12 +200,12 @@ namespace RENDER_NAMESPACE {
                                             continue;
                                         }
 
-                                        si.buildScatteringFunction(arena);
+                                        si.buildScatteringFunction(allocator);
                                         assert(si.bsdf != nullptr);
 
                                         // Sample from direct light
                                         if (si.bsdf->allIncludeOf(BXDFType(BXDFType::BSDF_ALL & (~BXDFType::BSDF_SPECULAR)))) {
-                                            pixel.Ld += beta * sampleDirectLight(_scene, si, sampler);
+                                            pixel.Ld += beta * sampleDirectLight(_scene, si, &sampler);
                                         }
 
                                         // Judge visible point
@@ -229,7 +229,7 @@ namespace RENDER_NAMESPACE {
                                             Vector3F wi(0.0);
                                             Float samplePdf = 0;
                                             BXDFType sampleType;
-                                            Spectrum f = si.bsdf->sampleF(wo, &wi, &samplePdf, sampler,
+                                            Spectrum f = si.bsdf->sampleF(wo, &wi, &samplePdf, &sampler,
                                                                           BXDFType::BSDF_ALL, &sampleType);
 
                                             if (f.isBlack() || samplePdf == 0.) {
@@ -245,7 +245,7 @@ namespace RENDER_NAMESPACE {
                                             // Russian Roultte
                                             if (beta.g() < 0.25) {
                                                 Float terminateProb = 1 - (std::min)(Float(1.), beta.g());
-                                                if (sampler->sample1D() < terminateProb) {
+                                                if (sampler.sample1D() < terminateProb) {
                                                     break;
                                                 }
                                                 beta /= 1 - terminateProb;
@@ -256,7 +256,7 @@ namespace RENDER_NAMESPACE {
                                 }
                             }
                         }
-                        delete sampler;
+                        delete sampler.ptr();
                     };
                     parallel::parallelFor2D(cameraPassFunc, Point2I(nTileX, nTileY));
                 }
@@ -301,7 +301,7 @@ namespace RENDER_NAMESPACE {
                     {
                         auto hashTableCreateFunc = [&](int idxPixel) {
                             SPPMPixel &pixel = pixels[idxPixel];
-                            MemoryArena &arena = memoryArenaPerThread[threadIdx];
+                            MemoryAllocator &allocator = memoryAllocatorPerThread[threadIdx];
                             if (!pixel.vp.beta.isBlack()) {
                                 Float searchRadius = pixel.searchRadius;
                                 Point3F vpMin = pixel.vp.p - searchRadius;
@@ -316,7 +316,7 @@ namespace RENDER_NAMESPACE {
                                         for (int z = vpIdxMin[2]; z <= vpIdxMax[2]; z++) {
                                             unsigned int h = hashOfIndex({x, y, z}, hashSize);
 
-                                            SPPMPixelNode *node = ALLOC(arena, SPPMPixelNode)(&pixel);
+                                            SPPMPixelNode *node = allocator.newObject<SPPMPixelNode>(&pixel);
                                             // TODO 学习 compare_exchange_weak
                                             while (pixelHashTable[h].compare_exchange_weak(
                                                     node->next, node) == false);
@@ -331,16 +331,16 @@ namespace RENDER_NAMESPACE {
 
                 /* Trace photons */
                 {
-                    Sampler *haltonSampler = sampler::SamplerFactory::newSimpleHalton(
+                    Sampler haltonSampler = sampler::SamplerFactory::newSimpleHalton(
                             nIterations * _shootPhotonsPerIter);
-                    std::vector<MemoryArena> photonMemoryArena(renderCores());
+                    std::vector<MemoryAllocator> photonMemoryArena(renderCores());
                     auto tracePhotonFunc = [&](const int idxPhoton) {
-                        MemoryArena &photonArena = photonMemoryArena[threadIdx];
-                        haltonSampler->setSampleIndex(iter * _shootPhotonsPerIter + idxPhoton);
+                        MemoryAllocator &photonAllocator = photonMemoryArena[threadIdx];
+                        haltonSampler.setSampleIndex(iter * _shootPhotonsPerIter + idxPhoton);
 
                         // Uniform sample light
                         Float lightPdf = 0;
-                        std::shared_ptr<Light> light = uniformSampleLight(_scene, &lightPdf, haltonSampler);
+                        std::shared_ptr<Light> light = uniformSampleLight(_scene, &lightPdf, &haltonSampler);
 
                         Ray photonRay;
                         Spectrum beta;
@@ -350,7 +350,7 @@ namespace RENDER_NAMESPACE {
                             Vector3F lightNormal;
                             Float pdfPos, pdfDir;
                             Spectrum radiance = light->sampleLe(&photonRay, &lightNormal,
-                                                                &pdfPos, &pdfDir, haltonSampler);
+                                                                &pdfPos, &pdfDir, &haltonSampler);
                             if (radiance.isBlack() || pdfPos == 0. || pdfDir == 0.) {
                                 return;
                             }
@@ -406,14 +406,14 @@ namespace RENDER_NAMESPACE {
 
                             // TODO 考虑 BSSRDF
 
-                            si.buildScatteringFunction(photonArena);
+                            si.buildScatteringFunction(photonAllocator);
                             assert(si.bsdf != nullptr);
 
                             Vector3F wo = -photonRay.getDirection();
                             Vector3F wi;
                             Float samplePdf = 0;
 
-                            Spectrum f = si.bsdf->sampleF(wo, &wi, &samplePdf, haltonSampler, BXDFType::BSDF_ALL, nullptr);
+                            Spectrum f = si.bsdf->sampleF(wo, &wi, &samplePdf, &haltonSampler, BXDFType::BSDF_ALL, nullptr);
                             if (f.isBlack() || samplePdf == 0.) {
                                 break;
                             }
@@ -421,7 +421,7 @@ namespace RENDER_NAMESPACE {
 
                             // Russian Roulette
                             Float terminateProb = (std::max)(1. - newBeta.r() / beta.r(), 0.);
-                            if (haltonSampler->sample1D() < terminateProb) {
+                            if (haltonSampler.sample1D() < terminateProb) {
                                 break;
                             }
                             beta = newBeta / (1 - terminateProb);
@@ -429,11 +429,11 @@ namespace RENDER_NAMESPACE {
                             // Next bounce
                             photonRay = si.sendRay(wi);
                         }
-                        photonArena.clean();
+                        photonAllocator.reset();
 
                     };
                     parallelFor1D(tracePhotonFunc, _shootPhotonsPerIter, 125);
-                    delete haltonSampler;
+                    delete haltonSampler.ptr();
                 }
 
                 /* Density estimation */
@@ -496,8 +496,8 @@ namespace RENDER_NAMESPACE {
                     }
                 }
 
-                for (int i = 0; i < memoryArenaPerThread.size(); i++) {
-                    memoryArenaPerThread[i].clean();
+                for (int i = 0; i < memoryAllocatorPerThread.size(); i++) {
+                    memoryAllocatorPerThread[i].reset();
                 }
                 std::cout << "\r" << (iter + 1) << "/" << nIterations << "(" << float(iter + 1) * 100 / nIterations
                           << "%) max/min radius: " << gridSize << "/" << minSearchRadius << std::flush;

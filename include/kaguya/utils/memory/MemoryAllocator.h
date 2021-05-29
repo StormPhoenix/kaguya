@@ -22,9 +22,16 @@ namespace RENDER_NAMESPACE {
 
             void *allocate(size_t bytes, size_t alignBytes);
 
-            template<typename T>
-            T *allocateObject(size_t count) {
-                return static_cast<T *>(allocate(count * sizeof(T), sizeof(T)));
+            template<class T>
+            T *allocateObjects(size_t count = 1) {
+                return static_cast<T *>(allocate(sizeof(T) * count, sizeof(T)));
+            }
+
+            template<class T, class... Args>
+            T *newObject(Args &&... args) {
+                T *obj = allocateObjects<T>(1);
+                new((void *) obj) T(std::forward<Args>(args)...);
+                return obj;
             }
 
             void reset();

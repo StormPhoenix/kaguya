@@ -88,9 +88,9 @@ namespace RENDER_NAMESPACE {
             _areaLight = areaLight;
         }
 
-        void SurfaceInteraction::buildScatteringFunction(MemoryArena &memoryArena, TransportMode mode) {
+        void SurfaceInteraction::buildScatteringFunction(MemoryAllocator &allocator, TransportMode mode) {
             assert(_material != nullptr);
-            _material->computeScatteringFunctions(*this, memoryArena, mode);
+            _material->computeScatteringFunctions(*this, allocator, mode);
         }
 
         StartEndInteraction::StartEndInteraction(const Camera *camera,

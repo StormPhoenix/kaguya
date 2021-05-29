@@ -27,7 +27,7 @@ namespace RENDER_NAMESPACE {
                 virtual core::Spectrum sampleInteraction(const tracer::Ray &ray,
                                                          Sampler *sampler,
                                                          MediumInteraction *mi,
-                                                         MemoryArena &memoryArena) const override;
+                                                         MemoryAllocator &allocator) const override;
 
                 ~GridDensityMedium();
 

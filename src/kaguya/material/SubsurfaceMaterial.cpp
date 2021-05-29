@@ -39,14 +39,15 @@ namespace RENDER_NAMESPACE {
             }
         }
 
-        void SubsurfaceMaterial::computeScatteringFunctions(SurfaceInteraction &si, MemoryArena &memoryArena, TransportMode mode) {
+        void SubsurfaceMaterial::computeScatteringFunctions(SurfaceInteraction &si, MemoryAllocator &allocator,
+                                                            TransportMode mode) {
 
-            si.bsdf = ALLOC(memoryArena, BSDF)(si);
-            si.bsdf->addBXDF(ALLOC(memoryArena, BXDFFresnelSpecular)(1.0f, 1.0f, 1.0f, _theta, mode));
+            si.bsdf = allocator.newObject<BSDF>(si);
+            si.bsdf->addBXDF(allocator.newObject<BXDFFresnelSpecular>(1.0f, 1.0f, 1.0f, _theta, mode));
 
             Spectrum sigma_a, sigma_s;
             subsurfaceFromDiffuse(_table, _albedoEff, _meanFreePath, &sigma_a, &sigma_s);
-            si.bssrdf = ALLOC(memoryArena, TabulatedBSSRDF)(sigma_a, sigma_s, _table, si, this, _theta);
+            si.bssrdf = allocator.newObject<TabulatedBSSRDF>(sigma_a, sigma_s, _table, si, this, _theta);
         }
     }
 }

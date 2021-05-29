@@ -9,7 +9,7 @@
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/core/medium/MediumInterface.h>
 #include <kaguya/core/phase/PhaseFunction.h>
-#include <kaguya/utils/MemoryArena.h>
+#include <kaguya/utils/memory/MemoryAllocator.h>
 #include <kaguya/tracer/Ray.h>
 
 namespace RENDER_NAMESPACE {
@@ -41,7 +41,7 @@ namespace RENDER_NAMESPACE {
         using kaguya::tracer::Camera;
         using kaguya::tracer::Ray;
         using kaguya::material::Material;
-        using kaguya::memory::MemoryArena;
+        using kaguya::memory::MemoryAllocator;
         using bssrdf::BSSRDF;
 
         inline Vector3F offsetOrigin(const Vector3F &origin, const Vector3F &error,
@@ -132,7 +132,7 @@ namespace RENDER_NAMESPACE {
                                MediumInterface &mediumBoundary, Float u = 0, Float v = 0,
                                Material *material = nullptr);
 
-            void buildScatteringFunction(MemoryArena &memoryArena, TransportMode mode = TransportMode::RADIANCE);
+            void buildScatteringFunction(MemoryAllocator &allocator, TransportMode mode = TransportMode::RADIANCE);
 
             virtual void reset() override {
                 Interaction::reset();

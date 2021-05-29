@@ -63,7 +63,7 @@ using Point4F = Vector4F;
 using Normal3F = Vector3F;
 using Point2I = Vector2i;
 using Point3I = Vector3i;
-using Point4I= Vector4i;
+using Point4I = Vector4i;
 
 #define RADIANS(radius) glm::radians(radius)
 #define ROTATE(matrix, radius, axis) glm::rotate(matrix, glm::radians(radius), axis)
@@ -92,8 +92,8 @@ namespace RENDER_NAMESPACE {
         const double doubleOneMinusEpsilon = 0.99999999999999989;
         const float floatOneMinusEpsilon = 0.99999994;
 #else
-		const double doubleOneMinusEpsilon = 0x1.fffffffffffffp-1;
-		const float floatOneMinusEpsilon = 0x1.fffffep-1;
+        const double doubleOneMinusEpsilon = 0x1.fffffffffffffp-1;
+        const float floatOneMinusEpsilon = 0x1.fffffep-1;
 #endif
 
 #if defined(_RENDER_DATA_DOUBLE_)
@@ -105,9 +105,9 @@ namespace RENDER_NAMESPACE {
 #ifdef WINDOWS
 #define MAX_FLOAT std::numeric_limits<Float>::max()
 #else
-		constexpr Float MAX_FLOAT = std::numeric_limits<Float>::max();
+        constexpr Float MAX_FLOAT = std::numeric_limits<Float>::max();
 #endif
-        
+
         constexpr Float infinity = std::numeric_limits<Float>::infinity();
         constexpr Float epsilon = std::numeric_limits<Float>::epsilon() * 0.5;
         constexpr Float shadowEpsilon = 0.0001;
@@ -145,12 +145,12 @@ namespace RENDER_NAMESPACE {
 
             void merge(const Bound3 &b) {
                 _min = {(std::min)(_min.x, b._min.x),
-						(std::min)(_min.y, b._min.y),
-						(std::min)(_min.z, b._min.z)};
+                        (std::min)(_min.y, b._min.y),
+                        (std::min)(_min.z, b._min.z)};
 
                 _max = {(std::max)(_max.x, b._max.x),
-						(std::max)(_max.y, b._max.y),
-						(std::max)(_max.z, b._max.z)};
+                        (std::max)(_max.y, b._max.y),
+                        (std::max)(_max.z, b._max.z)};
             }
 
             Vector3F offset(const Point3F &p) const {

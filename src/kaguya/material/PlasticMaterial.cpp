@@ -24,27 +24,27 @@ namespace RENDER_NAMESPACE {
                                          Texture<Float>::Ptr etaI, Texture<Float>::Ptr etaT, Float alpha) :
                 _Kd(Kd), _Ks(Ks), _etaI(etaI), _etaT(etaT), _alpha(alpha) {}
 
-        void PlasticMaterial::computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
+        void PlasticMaterial::computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
                                                          TransportMode mode) {
-            insect.bsdf = ALLOC(memoryArena, BSDF)(insect);
+            insect.bsdf =  allocator.newObject<BSDF>(insect);
 
             // Evaluate diffuse material
             Spectrum Kd = _Kd->evaluate(insect);
             if (!Kd.isBlack()) {
-                insect.bsdf->addBXDF(ALLOC(memoryArena, BXDFLambertianReflection)(Kd));
+                insect.bsdf->addBXDF( allocator.newObject<BXDFLambertianReflection>(Kd));
             }
 
             // Evaluate specular material
             Spectrum Ks = _Ks->evaluate(insect);
             if (!Ks.isBlack()) {
                 // Distribution
-                MicrofacetDistribution *distribution = ALLOC(memoryArena, BeckmannDistribution)(_alpha);
+                MicrofacetDistribution *distribution =  allocator.newObject<BeckmannDistribution>(_alpha);
                 // Fresnel
                 Float etaI = _etaI->evaluate(insect);
                 Float etaT = _etaT->evaluate(insect);
-                Fresnel *fresnel = ALLOC(memoryArena, FresnelDielectric)(etaI, etaT);
+                Fresnel *fresnel =  allocator.newObject<FresnelDielectric>(etaI, etaT);
                 // Microfacet distribution
-                insect.bsdf->addBXDF(ALLOC(memoryArena, BXDFMicrofacetReflection)(Ks, distribution, fresnel));
+                insect.bsdf->addBXDF( allocator.newObject<BXDFMicrofacetReflection>(Ks, distribution, fresnel));
             }
         }
     }

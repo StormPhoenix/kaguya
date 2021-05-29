@@ -5,42 +5,48 @@
 #ifndef KAGUYA_SAMPLER_H
 #define KAGUYA_SAMPLER_H
 
-#include <functional>
-#include <random>
-#include <kaguya/math/Math.h>
+#include <kaguya/common.h>
+#include <kaguya/utils/TaggedPointer.h>
+#include <kaguya/sampler/IndependentSampler.h>
+#include <kaguya/sampler/HaltonSampler.h>
+#include <kaguya/sampler/SimpleHaltonSampler.h>
 
 namespace RENDER_NAMESPACE {
     namespace sampler {
+        using memory::TaggedPointer;
 
-        class Sampler {
+        class Sampler : public TaggedPointer<IndependentSampler, SimpleHaltonSampler> {
         public:
+            // TODO delete
             typedef std::shared_ptr<Sampler> Ptr;
+            using TaggedPointer::TaggedPointer;
 
+            /* TODO delete
             Sampler(int nSamples);
 
             Sampler(int nSamples, int seed);
+             */
 
             /**
              * Set current sampling pixel
              * @param pixel
              */
-            virtual void forPixel(const Point2I pixel);
+            RENDER_CPU_GPU void forPixel(const Point2I pixel);
 
-            virtual void setSampleIndex(int sampleIndex);
+            RENDER_CPU_GPU void setSampleIndex(int sampleIndex);
 
             /**
              * Begin next sample round
              * @return
              */
-            virtual bool nextSampleRound();
+            RENDER_CPU_GPU bool nextSampleRound();
 
-            virtual Float sample1D() = 0;
+            RENDER_CPU_GPU Float sample1D();
 
-            virtual Vector2F sample2D() = 0;
-
-            virtual ~Sampler() {};
+            RENDER_CPU_GPU Vector2F sample2D();
 
         protected:
+            /* TODO delete
             // Current pixel on which sampling
             Point2I currentPixel;
             // Sample times
@@ -49,6 +55,7 @@ namespace RENDER_NAMESPACE {
             int randomSeed = 0;
             // Sample index
             int sampleIndex;
+             */
         };
     }
 }

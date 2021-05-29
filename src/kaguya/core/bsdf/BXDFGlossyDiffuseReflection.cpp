@@ -68,7 +68,7 @@ namespace RENDER_NAMESPACE {
                 }
 
                 // Diffuse reflection pdf
-                Float pdfDiffuse  = 0.5 * math::local_coord::absCosTheta(wi) * math::INV_PI;
+                Float pdfDiffuse = 0.5 * math::local_coord::absCosTheta(wi) * math::INV_PI;
 
                 // Specular reflection pdf
                 Vector3F wh = NORMALIZE(wo + wi);

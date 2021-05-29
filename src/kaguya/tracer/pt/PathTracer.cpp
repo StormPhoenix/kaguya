@@ -34,10 +34,9 @@ namespace RENDER_NAMESPACE {
             _russianRoulette = Config::russianRoulette;
         }
 
-
         Spectrum PathTracer::shaderOfProgression(Point2I pixelPos, int iteration, const Ray &ray,
                                                  std::shared_ptr<Scene> scene, Sampler *sampler,
-                                                 MemoryArena &memoryArena) {
+                                                 MemoryAllocator &allocator) {
             // 最终渲染结果
             Spectrum shaderColor = Spectrum(0);
             // 光线是否是 delta distribution
@@ -56,7 +55,7 @@ namespace RENDER_NAMESPACE {
                 // deal with participating medium
                 core::MediumInteraction mi;
                 if (scatterRay.getMedium() != nullptr) {
-                    beta *= scatterRay.getMedium()->sampleInteraction(scatterRay, sampler, &mi, memoryArena);
+                    beta *= scatterRay.getMedium()->sampleInteraction(scatterRay, sampler, &mi, allocator);
                     if (beta.isBlack()) {
                         {
                             // Record intersection
@@ -122,7 +121,7 @@ namespace RENDER_NAMESPACE {
                         continue;
                     }
 
-                    si.buildScatteringFunction(memoryArena);
+                    si.buildScatteringFunction(allocator);
                     ASSERT(si.bsdf != nullptr, "BSDF can't be nullptr. ");
 
                     // 判断是否向光源采样
@@ -159,7 +158,7 @@ namespace RENDER_NAMESPACE {
                         // Subsurface
                         SurfaceInteraction pi;
                         Float pdf = 0;
-                        Spectrum S = si.bssrdf->sampleS(scene, &pi, &pdf, memoryArena, sampler);
+                        Spectrum S = si.bssrdf->sampleS(scene, &pi, &pdf, allocator, sampler);
                         if (S.isBlack() || pdf == 0) {
                             break;
                         }
@@ -209,25 +208,25 @@ namespace RENDER_NAMESPACE {
                     int startCol = idxTileX * Config::Parallel::tileSize;
                     int endCol = std::min(startCol + Config::Parallel::tileSize - 1, width - 1);
 
-                    MemoryArena arena;
-                    Sampler *sampler = sampler::SamplerFactory::newSampler(Config::Tracer::sampleNum);
+                    MemoryAllocator allocator;
+                    Sampler sampler = sampler::SamplerFactory::newSampler(Config::Tracer::sampleNum);
                     for (int row = startRow; row <= endRow; row++) {
                         for (int col = startCol; col <= endCol; col++) {
                             // set current sampling pixel
-                            sampler->forPixel(Point2I(row, col));
-                            sampler->setSampleIndex(iter);
+                            sampler.forPixel(Point2I(row, col));
+                            sampler.setSampleIndex(iter);
 
-                            Float pixelX = col + sampler->sample1D();
-                            Float pixelY = row + sampler->sample1D();
-                            Ray sampleRay = _camera->generateRay(pixelX, pixelY, sampler);
+                            Float pixelX = col + sampler.sample1D();
+                            Float pixelY = row + sampler.sample1D();
+                            Ray sampleRay = _camera->generateRay(pixelX, pixelY, &sampler);
                             Spectrum shaderColor = shaderOfProgression(Point2I(col, row), iter + 1, sampleRay,
-                                                                       _scene, sampler, arena);
+                                                                       _scene, &sampler, allocator);
 
                             _filmPlane->addSpectrum(shaderColor, row, col);
-                            arena.clean();
+                            allocator.reset();
                         }
                     }
-                    delete sampler;
+                    delete sampler.ptr();
                 };
                 parallel::parallelFor2D(renderFunc, Point2I(nTileX, nTileY));
                 nFinished++;

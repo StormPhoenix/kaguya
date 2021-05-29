@@ -36,8 +36,8 @@ namespace RENDER_NAMESPACE {
                  * Sample S(p_o, p_i, w_o, w_i) = (1 - Fr(w_o)) * S_p(p_o, p_i) * S_w(w_i)
                  */
                 virtual Spectrum
-                sampleS(std::shared_ptr<Scene> scene, SurfaceInteraction *pi, Float *pdf, MemoryArena &memoryArena,
-                        Sampler *sampler) override;
+                sampleS(std::shared_ptr<Scene> scene, SurfaceInteraction *pi, Float *pdf,
+                        MemoryAllocator &allocator, Sampler *sampler) override;
 
             protected:
                 /**
@@ -45,7 +45,7 @@ namespace RENDER_NAMESPACE {
                  * @return
                  */
                 virtual Spectrum sampleSp(std::shared_ptr<Scene> scene, SurfaceInteraction *pi, Float *pdf,
-                                          MemoryArena &memoryArena, Sampler *sampler);
+                                          MemoryAllocator &allocator, Sampler *sampler);
 
                 /**
                  * S_(p_o, p_i)

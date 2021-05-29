@@ -9,13 +9,13 @@
 #include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/core/Interaction.h>
 #include <kaguya/scene/Scene.h>
-#include <kaguya/utils/MemoryArena.h>
+#include <kaguya/utils/memory/MemoryAllocator.h>
 
 namespace RENDER_NAMESPACE {
     namespace core {
         namespace bssrdf {
 
-            using memory::MemoryArena;
+            using memory::MemoryAllocator;
             using scene::Scene;
 
             /*
@@ -35,7 +35,7 @@ namespace RENDER_NAMESPACE {
                  * Sample S(p_o, p_i, w_o, w_i)
                  */
                 virtual Spectrum sampleS(std::shared_ptr<Scene> scene, SurfaceInteraction *pi, Float *pdf,
-                                         MemoryArena &memoryArena, Sampler *sampler) = 0;
+                                         MemoryAllocator &allocator, Sampler *sampler) = 0;
 
             protected:
                 const SurfaceInteraction &po;

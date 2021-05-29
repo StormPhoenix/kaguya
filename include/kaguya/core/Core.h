@@ -18,6 +18,7 @@ namespace RENDER_NAMESPACE {
 
     namespace scene {
         class Scene;
+
         class Geometry;
     }
 
@@ -34,10 +35,12 @@ namespace RENDER_NAMESPACE {
 #endif
 
         class Light;
+
         class EnvironmentLight;
 
         namespace bsdf {
             class BSDF;
+
             class BXDF;
         }
 

@@ -29,7 +29,7 @@ namespace RENDER_NAMESPACE {
                         const tracer::Ray &ray,
                         Sampler *sampler,
                         MediumInteraction *mi,
-                        MemoryArena &memoryArena
+                        MemoryAllocator &allocator
                 ) const override;
 
             private:

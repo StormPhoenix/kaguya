@@ -22,7 +22,7 @@ namespace RENDER_NAMESPACE {
 
             virtual bool isSpecular() const override;
 
-            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
+            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
                                                     TransportMode mode = TransportMode::RADIANCE) override;
 
 

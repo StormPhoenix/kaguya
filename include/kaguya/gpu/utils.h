@@ -18,7 +18,7 @@
         ASSERT(false, "CUDA error: " + std::string(cudaGetErrorString(error))); \
     } else {}
 
-#els【
+#else
 
 #define CUDA_CHECK(exp) ASSERT(false, "CUDA error: unimplemented");
 

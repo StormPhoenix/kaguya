@@ -18,7 +18,7 @@ namespace RENDER_NAMESPACE {
         public:
             OrenNayar(Texture<Spectrum>::Ptr Kd, Texture<Float>::Ptr roughness);
 
-            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
+            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
                                                     TransportMode mode = TransportMode::RADIANCE) override;
 
         private:

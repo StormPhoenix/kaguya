@@ -10,7 +10,7 @@
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/math/Math.h>
 #include <kaguya/scene/meta/Shape.h>
-#include <kaguya/utils/MemoryArena.h>
+#include <kaguya/utils/memory/MemoryAllocator.h>
 
 namespace RENDER_NAMESPACE {
     namespace material {
@@ -20,7 +20,7 @@ namespace RENDER_NAMESPACE {
         using kaguya::core::bsdf::BSDF;
         using kaguya::core::bsdf::BXDF;
         using kaguya::core::bsdf::TransportMode;
-        using kaguya::memory::MemoryArena;
+        using kaguya::memory::MemoryAllocator;
 
         /**
          * 物体材质
@@ -34,7 +34,7 @@ namespace RENDER_NAMESPACE {
              * 计算材质的 bsdf
              * @param insect ray 与 shape 的相交点
              */
-            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
+            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
                                                     TransportMode mode = TransportMode::RADIANCE) = 0;
 
             virtual bool isSpecular() const {

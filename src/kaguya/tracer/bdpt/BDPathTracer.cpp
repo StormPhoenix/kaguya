@@ -54,26 +54,26 @@ namespace RENDER_NAMESPACE {
                     FilmTile::Ptr filmTile = std::make_shared<FilmTile>(Point2I(startCol, startRow),
                                                                         tileWidth, tileHeight);
 
-                    MemoryArena arena;
-                    Sampler *sampler = sampler::SamplerFactory::newSampler(Config::Tracer::sampleNum);
+                    MemoryAllocator allocator;
+                    Sampler sampler = sampler::SamplerFactory::newSampler(Config::Tracer::sampleNum);
                     for (int row = startRow; row <= endRow; row++) {
                         for (int col = startCol; col <= endCol; col++) {
                             // Set current sampling pixel
-                            sampler->forPixel(Point2I(row, col));
-                            sampler->setSampleIndex(iter);
+                            sampler.forPixel(Point2I(row, col));
+                            sampler.setSampleIndex(iter);
 
-                            Float pixelX = col + sampler->sample1D();
-                            Float pixelY = row + sampler->sample1D();
-                            Ray sampleRay = _camera->generateRay(pixelX, pixelY, sampler);
+                            Float pixelX = col + sampler.sample1D();
+                            Float pixelY = row + sampler.sample1D();
+                            Ray sampleRay = _camera->generateRay(pixelX, pixelY, &sampler);
 
-                            Spectrum shaderColor = shader(sampleRay, _scene, _maxDepth, sampler, arena);
-                            arena.clean();
+                            Spectrum shaderColor = shader(sampleRay, _scene, _maxDepth, &sampler, allocator);
+                            allocator.reset();
 
                             filmTile->addSpectrum(shaderColor, row - startRow, col - startCol);
                         }
                     }
                     _filmPlane->mergeTile(filmTile);
-                    delete sampler;
+                    delete sampler.ptr();
                 };
                 parallel::parallelFor2D(renderFunc, Point2I(nTileX, nTileY));
                 nFinished++;
@@ -223,7 +223,7 @@ namespace RENDER_NAMESPACE {
 
         int BDPathTracer::generateCameraPath(std::shared_ptr<Scene> scene, const Ray &ray,
                                              std::shared_ptr<Camera> camera, BDPTVertex *cameraSubPath,
-                                             int maxDepth, Sampler *sampler, MemoryArena &memoryArena) {
+                                             int maxDepth, Sampler *sampler, MemoryAllocator &allocator) {
             assert(cameraSubPath != nullptr);
             // 初始 beta
             Spectrum beta = Spectrum(1.0);
@@ -237,11 +237,11 @@ namespace RENDER_NAMESPACE {
             camera->pdfWe(scatterRay, pdfPos, pdfDir);
 
             return randomBounce(scene, scatterRay, cameraSubPath, maxDepth, pdfDir,
-                                sampler, memoryArena, beta, TransportMode::RADIANCE);
+                                sampler, allocator, beta, TransportMode::RADIANCE);
         }
 
         int BDPathTracer::generateLightPath(std::shared_ptr<Scene> scene, BDPTVertex *lightSubPath, int maxDepth,
-                                            Sampler *sampler, MemoryArena &memoryArena) {
+                                            Sampler *sampler, MemoryAllocator &allocator) {
             assert(lightSubPath != nullptr);
 
             Float lightPdf = 0;
@@ -269,7 +269,7 @@ namespace RENDER_NAMESPACE {
                             (pdfPos * pdfDir * lightPdf);
 
             int nVertices = randomBounce(scene, scatterRay, lightSubPath, maxDepth, pdfDir,
-                                         sampler, memoryArena, beta, TransportMode::IMPORTANCE);
+                                         sampler, allocator, beta, TransportMode::IMPORTANCE);
 
             // If first vertex is infinite light, the pdfForward for path[1] is incorrect.
             if (lightSubPath[0].isInfiniteLight()) {
@@ -288,7 +288,7 @@ namespace RENDER_NAMESPACE {
         int BDPathTracer::randomBounce(std::shared_ptr<Scene> scene, const Ray &ray,
                                        BDPTVertex *path, int maxDepth, Float pdf,
                                        Sampler *const sampler,
-                                       MemoryArena &memoryArena,
+                                       MemoryAllocator &allocator,
                                        Spectrum &beta, TransportMode mode) {
             // 上个路径点发射射线的 pdf
             Float pdfPreWi = pdf;
@@ -302,7 +302,7 @@ namespace RENDER_NAMESPACE {
                 // sample1d medium interaction
                 MediumInteraction mi;
                 if (scatterRay.getMedium() != nullptr) {
-                    beta *= scatterRay.getMedium()->sampleInteraction(scatterRay, sampler, &mi, memoryArena);
+                    beta *= scatterRay.getMedium()->sampleInteraction(scatterRay, sampler, &mi, allocator);
                 }
 
                 if (beta.isBlack()) {
@@ -336,7 +336,7 @@ namespace RENDER_NAMESPACE {
                         }
 
                         // build BSDF
-                        si.buildScatteringFunction(memoryArena, mode);
+                        si.buildScatteringFunction(allocator, mode);
                         assert(si.bsdf != nullptr);
 
                         // 添加新点 TODO 默认只有 Surface 类型
@@ -520,16 +520,16 @@ namespace RENDER_NAMESPACE {
 
 
         Spectrum BDPathTracer::shader(const Ray &ray, std::shared_ptr<Scene> scene, int maxDepth,
-                                      Sampler *sampler, MemoryArena &memoryArena) {
-            BDPTVertex *cameraSubPath = memoryArena.alloc<BDPTVertex>(maxDepth + 2, false);
-            BDPTVertex *lightSubPath = memoryArena.alloc<BDPTVertex>(maxDepth, false);
+                                      Sampler *sampler, MemoryAllocator &allocator) {
+            BDPTVertex *cameraSubPath = allocator.allocateObjects<BDPTVertex>(maxDepth + 2);
+            BDPTVertex *lightSubPath = allocator.allocateObjects<BDPTVertex>(maxDepth);
 
             // Generate camera path
             int nCameraVertices = generateCameraPath(_scene, ray, _camera, cameraSubPath, maxDepth + 1,
-                                                     sampler, memoryArena);
+                                                     sampler, allocator);
 
             // Generate light path
-            int nLightVertices = generateLightPath(_scene, lightSubPath, maxDepth, sampler, memoryArena);
+            int nLightVertices = generateLightPath(_scene, lightSubPath, maxDepth, sampler, allocator);
 
             Spectrum shaderColor = Spectrum(0.0);
             // Connect path

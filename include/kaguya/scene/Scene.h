@@ -145,6 +145,7 @@ namespace RENDER_NAMESPACE {
             void setSceneName(std::string filename) {
                 _sceneName = filename;
             }
+
         protected:
             // scene name
             std::string _sceneName;

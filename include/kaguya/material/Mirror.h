@@ -22,8 +22,8 @@ namespace RENDER_NAMESPACE {
 
             virtual bool isSpecular() const override;
 
-            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
-                                                     TransportMode mode = TransportMode::RADIANCE) override;
+            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
+                                                    TransportMode mode = TransportMode::RADIANCE) override;
 
         private:
             // 反射率

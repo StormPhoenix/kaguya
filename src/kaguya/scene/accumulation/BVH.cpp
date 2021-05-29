@@ -3,8 +3,7 @@
 //
 
 #include <kaguya/scene/accumulation/BVH.h>
-#include <kaguya/sampler/Sampler.h>
-#include <kaguya/sampler/DefaultSampler.h>
+#include <kaguya/sampler/IndependentSampler.h>
 
 namespace RENDER_NAMESPACE {
     namespace scene {
@@ -34,11 +33,11 @@ namespace RENDER_NAMESPACE {
 
             AABB BVH::mergeAABB(const AABB &a, const AABB &b) const {
                 Vector3F minimum((std::min)(a.minPos().x, b.minPos().x),
-                               (std::min)(a.minPos().y, b.minPos().y),
-                               (std::min)(a.minPos().z, b.minPos().z));
+                                 (std::min)(a.minPos().y, b.minPos().y),
+                                 (std::min)(a.minPos().z, b.minPos().z));
                 Vector3F maxmum((std::max)(a.maxPos().x, b.maxPos().x),
-                             (std::max)(a.maxPos().y, b.maxPos().y),
-                             (std::max)(a.maxPos().z, b.maxPos().z));
+                                (std::max)(a.maxPos().y, b.maxPos().y),
+                                (std::max)(a.maxPos().z, b.maxPos().z));
                 return AABB(minimum, maxmum);
             }
 
@@ -70,7 +69,7 @@ namespace RENDER_NAMESPACE {
 
             void BVH::build(std::vector<std::shared_ptr<Intersectable>> &objects,
                             size_t start, size_t end) {
-                Sampler *sampler = DefaultSampler::newInstance();
+                Sampler *sampler = new Sampler(new IndependentSampler(100000));
                 // 采用最简单的平均分配法
                 int axis = math::randomInt(0, 2, sampler);
                 auto comparator = (axis == 0) ? compareX

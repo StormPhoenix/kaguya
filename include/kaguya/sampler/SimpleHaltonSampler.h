@@ -10,24 +10,29 @@
 namespace RENDER_NAMESPACE {
     namespace sampler {
 
-        class SimpleHaltonSampler : public Sampler {
+        class SimpleHaltonSampler {
         public:
-            virtual bool nextSampleRound() override;
+            RENDER_CPU_GPU
+            void forPixel(const Point2I pixel) {}
 
-            virtual void setSampleIndex(int sampleIndex) override;
+            RENDER_CPU_GPU
+            bool nextSampleRound();
 
-            virtual Float sample1D() override;
+            RENDER_CPU_GPU
+            void setSampleIndex(int sampleIndex);
 
-            virtual Vector2F sample2D() override;
+            RENDER_CPU_GPU
+            Float sample1D();
 
-            virtual ~SimpleHaltonSampler() override {}
+            RENDER_CPU_GPU
+            Vector2F sample2D();
 
-            static Sampler *newInstance(int nSamples = -1);
+            static SimpleHaltonSampler *newInstance(int nSamples, MemoryAllocator &allocator);
 
-        private:
             SimpleHaltonSampler(int nSamples = -1);
 
         private:
+            const int _nSamples;
             int _haltonDimension;
             int _haltonIndex;
         };

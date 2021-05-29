@@ -5,27 +5,33 @@
 #ifndef KAGUYA_HALTONSAMPLER_H
 #define KAGUYA_HALTONSAMPLER_H
 
-#include <kaguya/sampler/Sampler.h>
+#include <kaguya/common.h>
+#include <kaguya/utils/memory/MemoryAllocator.h>
 
 namespace RENDER_NAMESPACE {
     namespace sampler {
+        using memory::MemoryAllocator;
 
-        class HaltonSampler : public Sampler {
+        class HaltonSampler {
         public:
-            virtual void forPixel(const Point2I pixel) override;
+            RENDER_CPU_GPU
+            void forPixel(const Point2I pixel);
 
-            virtual bool nextSampleRound() override;
+            RENDER_CPU_GPU
+            bool nextSampleRound();
 
-            virtual void setSampleIndex(int sampleIndex) override;
+            RENDER_CPU_GPU
+            void setSampleIndex(int sampleIndex);
 
-            virtual Float sample1D() override;
+            RENDER_CPU_GPU
+            Float sample1D();
 
-            virtual Vector2F sample2D() override;
+            RENDER_CPU_GPU
+            Vector2F sample2D();
 
-            ~HaltonSampler() {}
+            HaltonSampler(int nSamples);
 
         private:
-            HaltonSampler(int nSamples);
 
             /**
              * Calculate new random seed
@@ -39,6 +45,9 @@ namespace RENDER_NAMESPACE {
         private:
             Point2I pixelForOffset = Point2I((std::numeric_limits<int>::max)(),
                                              (std::numeric_limits<int>::max)());
+            Point2I _currentPixel;
+            int _sampleIndex = 0;
+            const int _nSamples;
             // Sampling seed
             int seedForPixel;
             // Dimension of sampling serial
@@ -60,7 +69,7 @@ namespace RENDER_NAMESPACE {
         public:
 
             // TODO move to factory
-            static Sampler *newInstance(int nSamples);
+            static HaltonSampler *newInstance(int nSamples, MemoryAllocator &allocator);
         };
     }
 }

@@ -49,7 +49,8 @@ if (CUDA_FOUND)
     set(CUDA_LINK_LIBRARY ${CUDA_LIBRARIES})
     set(CUDA_INCLUDE_DIRECTORY ${CUDA_INCLUDE_DIRS})
     set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS};-gencode arch=compute_61，code=sm_61;)
-    message(STATUS "Found CUDA")
+    message(STATUS "Found CUDA: ${CUDA_VERSION_MAJOR}.${CUDA_VERSION_MINOR}")
+    #    add_definitions(-D CUDA_VERSION)
 endif (CUDA_FOUND)
 
 find_package(OptiX)
@@ -58,8 +59,10 @@ if (OptiX_FOUND)
     message(STATUS "Found OptiX")
 endif (OptiX_FOUND)
 
+option(START_CUDA "option for cuda" OFF)
+
 set(RENDER_GPU_MODE_ENABLED false)
-if (CUDA_FOUND AND CUDA_FOUND)
+if (CUDA_FOUND AND CUDA_FOUND AND START_CUDA)
     get_filename_component(cuda_compiler_bin ${CMAKE_CUDA_COMPILER} DIRECTORY)
     find_program(BIN2C
             NAMES bin2c
@@ -73,7 +76,9 @@ if (CUDA_FOUND AND CUDA_FOUND)
 
     set(RENDER_GPU_MODE_ENABLED true)
     add_definitions(-D _RENDER_GPU_MODE_)
-endif (CUDA_FOUND AND CUDA_FOUND)
+
+    message(STATUS "Compile in GPU Mode.")
+endif (CUDA_FOUND AND CUDA_FOUND AND START_CUDA)
 
 set(PROJECT_INCLUDE_DIRECTORY ${PROJECT_SOURCE_DIR}/include)
 
@@ -82,25 +87,26 @@ set(RENDER_UTILS_SOURCES
         src/kaguya/utils/memory/HostResource.cpp
         src/kaguya/utils/FileReader.cpp
         src/kaguya/utils/ImageIO.cpp
-        src/kaguya/utils/MemoryArena.cpp
         src/kaguya/utils/ObjLoader.cpp
         src/kaguya/utils/VisibilityTester.cpp)
 
 set(RENDER_SAMPLER_SOURCES
-        src/kaguya/sampler/DefaultSampler.cpp
-        src/kaguya/sampler/HaltonSampler.cpp
-        src/kaguya/sampler/IndependentSampler.cpp
+        #        src/kaguya/sampler/HaltonSampler.cpp
         src/kaguya/sampler/Sampler.cpp
+        src/kaguya/sampler/IndependentSampler.cpp
         src/kaguya/sampler/SimpleHaltonSampler.cpp)
 
 set(RENDER_GPU_SOURCES "")
 if (RENDER_GPU_MODE_ENABLED)
     set(RENDER_GPU_SOURCES
-            src/kaguya/utils/memory/CUDAResource.cpp)
+            src/kaguya/utils/memory/CUDAResource.cpp include/kaguya/utils/type_utils.h)
 
     set_source_files_properties(
             include/kaguya/sampler/RNG.h
             include/kaguya/utils/TaggedPointer.h
+
+            include/kaguya/sampler/Sampler.h
+            src/kaguya/sampler/Sampler.cpp
 
             include/kaguya/sampler/IndependentSampler.h
             src/kaguya/sampler/IndependentSampler.cpp
@@ -134,18 +140,27 @@ file(GLOB RENDER_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pugixml/*.cpp)
 
-add_executable(${PROJECT_NAME}
-        ${RENDER_UTILS_SOURCES}
-        ${RENDER_SAMPLER_SOURCES}
+add_library(render_sampler_lib
+        ${RENDER_SAMPLER_SOURCES})
+target_include_directories(render_sampler_lib
+        PRIVATE
+        ${PROJECT_INCLUDE_DIRECTORY})
 
+add_library(render_utils_lib
+        ${RENDER_UTILS_SOURCES})
+target_include_directories(render_utils_lib
+        PRIVATE
+        ${PROJECT_INCLUDE_DIRECTORY})
+
+add_executable(${PROJECT_NAME}
         ${RENDER_SOURCES}
         ${RENDER_GPU_SOURCES})
-
 target_include_directories(${PROJECT_NAME}
         PRIVATE
         ${CUDA_INCLUDE_DIRECTORY}
         ${PROJECT_INCLUDE_DIRECTORY})
-
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
+        render_sampler_lib
+        render_utils_lib
         ${CUDA_LINK_LIBRARY})

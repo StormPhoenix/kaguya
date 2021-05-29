@@ -72,7 +72,7 @@ namespace RENDER_NAMESPACE {
 
 
             core::Spectrum GridDensityMedium::sampleInteraction(const tracer::Ray &ray, Sampler *sampler,
-                                                                MediumInteraction *mi, MemoryArena &memoryArena) const {
+                                                                MediumInteraction *mi, MemoryAllocator &allocator) const {
                 // transform ray from world space to medium space
                 const Vector3F origin = _invTransformMatrix->transformPoint(ray.getOrigin());
                 const Vector3F dir = _invTransformMatrix->transformVector(ray.getDirection());
@@ -102,7 +102,7 @@ namespace RENDER_NAMESPACE {
                             if (std::max(Float(0.), (Float) d * _maxInvDensity)
                                 > sampler->sample1D()) {
                                 (*mi) = MediumInteraction(ray.at(step), -ray.getDirection(), this,
-                                                          ALLOC(memoryArena, HenyeyGreensteinFunction)(_g));
+                                                          allocator.newObject<HenyeyGreensteinFunction>(_g));
                                 return _sigma_s / _sigma_t;
                             }
                         }

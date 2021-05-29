@@ -17,6 +17,7 @@
 #endif
 
 // 内存分配函数
+// TODO delete
 #define ALLOC(memoryArena, type) new (memoryArena.alloc(sizeof(type))) type
 
 void *allocAlignedMemory(size_t bytes);

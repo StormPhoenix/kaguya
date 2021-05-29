@@ -18,7 +18,7 @@
 #include <kaguya/tracer/Camera.h>
 #include <kaguya/tracer/Tracer.h>
 #include <kaguya/tracer/bdpt/BDPTVertex.h>
-#include <kaguya/utils/MemoryArena.h>
+#include <kaguya/utils/memory/MemoryAllocator.h>
 
 #include <iostream>
 
@@ -30,7 +30,7 @@ namespace RENDER_NAMESPACE {
         using RENDER_NAMESPACE::core::Spectrum;
         using RENDER_NAMESPACE::core::TransportMode;
         using RENDER_NAMESPACE::material::Material;
-        using RENDER_NAMESPACE::memory::MemoryArena;
+        using RENDER_NAMESPACE::memory::MemoryAllocator;
         using RENDER_NAMESPACE::tracer::Camera;
 
         /**
@@ -51,11 +51,11 @@ namespace RENDER_NAMESPACE {
              * @param ray
              * @param scene
              * @param maxDepth
-             * @param memoryArena
+             * @param allocator
              * @return
              */
             Spectrum shader(const Ray &ray, std::shared_ptr<Scene> scene, int maxDepth,
-                            Sampler *sampler, MemoryArena &memoryArena);
+                            Sampler *sampler, MemoryAllocator &allocator);
 
             /**
              * 计算从相机位置出发的路径，统计每一条路径的概率密度
@@ -66,20 +66,20 @@ namespace RENDER_NAMESPACE {
              */
             int generateCameraPath(std::shared_ptr<Scene> scene, const Ray &ray, std::shared_ptr<Camera>,
                                    BDPTVertex *cameraSubPath, int maxDepth,
-                                   Sampler *sampler, MemoryArena &memoryArena);
+                                   Sampler *sampler, MemoryAllocator &allocator);
 
             /**
              * 生成光照路径
              * @param scene
              * @param lightSubPath
              * @param maxDepth
-             * @param memoryArena
+             * @param allocator
              * @return
              */
             int generateLightPath(std::shared_ptr<Scene> scene,
                                   BDPTVertex *lightSubPath, int maxDepth,
                                   Sampler *sampler,
-                                  MemoryArena &memoryArena);
+                                  MemoryAllocator &allocator);
 
             /**
              * 在场景中做随机采样
@@ -88,13 +88,13 @@ namespace RENDER_NAMESPACE {
              * @param path
              * @param maxDepth
              * @param pdf
-             * @param memoryArena
+             * @param allocator
              * @param beta
              * @param mode
              * @return
              */
             int randomBounce(std::shared_ptr<Scene> scene, const Ray &ray, BDPTVertex *path, int maxDepth,
-                             Float pdf, Sampler *const sampler, MemoryArena &memoryArena, Spectrum &beta,
+                             Float pdf, Sampler *const sampler, MemoryAllocator &allocator, Spectrum &beta,
                              TransportMode mode);
 
             /**

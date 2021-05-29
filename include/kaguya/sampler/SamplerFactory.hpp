@@ -8,43 +8,50 @@
 #include <kaguya/common.h>
 #include <kaguya/Config.h>
 #include <kaguya/sampler/SimpleHaltonSampler.h>
-#include <kaguya/sampler/HaltonSampler.h>
-#include <kaguya/sampler/DefaultSampler.h>
+// TODO
+// #include <kaguya/sampler/HaltonSampler.h>
 #include <kaguya/sampler/IndependentSampler.h>
 
 namespace RENDER_NAMESPACE {
     namespace sampler {
         class SamplerFactory {
         public:
-            static Sampler *newSampler(int nSamples = -1) {
+            static Sampler newSampler(int nSamples) {
                 if (nSamples <= 0) {
                     nSamples = Config::Tracer::sampleNum;
                 }
                 ASSERT(nSamples > 0, "nSamples <= 0.");
-
-                if (Config::samplerType == "halton") {
-                    return HaltonSampler::newInstance(nSamples);
-                } else if (Config::samplerType == "independent") {
-                    return IndependentSampler::newInstance(nSamples);
-                } else {
-                    return DefaultSampler::newInstance(nSamples);
-                }
+                // TODO add halton sampler
+                return new IndependentSampler(nSamples);
             }
 
-            static Sampler *newSimpleHalton(int nSamples = -1) {
+            static Sampler newSampler(int nSamples, MemoryAllocator &allocator) {
                 if (nSamples <= 0) {
                     nSamples = Config::Tracer::sampleNum;
                 }
                 ASSERT(nSamples > 0, "nSamples <= 0.");
-                return SimpleHaltonSampler::newInstance(nSamples);
+// TODO
+//                if (Config::samplerType == "halton") {
+//                    return HaltonSampler::newInstance(nSamples, allocator);
+//                } else {
+                return IndependentSampler::newInstance(nSamples, allocator);
+//                }
             }
 
-            static Sampler *newHaltonSampler(int nSamples = -1) {
+            static SimpleHaltonSampler *newSimpleHalton(int nSamples) {
                 if (nSamples <= 0) {
                     nSamples = Config::Tracer::sampleNum;
                 }
                 ASSERT(nSamples > 0, "nSamples <= 0.");
-                return HaltonSampler::newInstance(nSamples);
+                return new SimpleHaltonSampler(nSamples);
+            }
+
+            static Sampler newSimpleHalton(int nSamples, MemoryAllocator &allocator) {
+                if (nSamples <= 0) {
+                    nSamples = Config::Tracer::sampleNum;
+                }
+                ASSERT(nSamples > 0, "nSamples <= 0.");
+                return SimpleHaltonSampler::newInstance(nSamples, allocator);
             }
         };
     }

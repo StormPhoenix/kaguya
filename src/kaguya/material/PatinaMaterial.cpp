@@ -23,16 +23,16 @@ namespace RENDER_NAMESPACE {
             ASSERT(_Ks != nullptr, "CoatingMaterial parameter Ks is nullptr. ");
         }
 
-        void PatinaMaterial::computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
+        void PatinaMaterial::computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
                                                         TransportMode mode) {
             Float alpha = _alpha->evaluate(insect);
             Spectrum Rd = _Kd->evaluate(insect);
             Spectrum Rs = _Ks->evaluate(insect);
 
-            insect.bsdf = ALLOC(memoryArena, BSDF)(insect);
+            insect.bsdf = allocator.newObject<BSDF>(insect);
 
-            const MicrofacetDistribution *distribution = ALLOC(memoryArena, GGXDistribution)(alpha);
-            insect.bsdf->addBXDF(ALLOC(memoryArena, BXDFGlossyDiffuseReflection)(Rd, Rs, distribution));
+            const MicrofacetDistribution *distribution =  allocator.newObject<GGXDistribution>(alpha);
+            insect.bsdf->addBXDF( allocator.newObject<BXDFGlossyDiffuseReflection>(Rd, Rs, distribution));
         }
     }
 }

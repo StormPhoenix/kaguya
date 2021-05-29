@@ -20,7 +20,7 @@ namespace RENDER_NAMESPACE {
 
             core::Spectrum
             IsotropicMedium::sampleInteraction(const tracer::Ray &ray, Sampler *sampler,
-                                               MediumInteraction *mi, MemoryArena &memoryArena) const {
+                                               MediumInteraction *mi, MemoryAllocator &allocator) const {
                 // different channel has different sigma, randomly chose a channel
                 int channel = math::randomInt(0, SPECTRUM_CHANNEL - 1, sampler);
 
@@ -32,7 +32,7 @@ namespace RENDER_NAMESPACE {
                 bool sampleMedium = step < ray.getStep();
                 if (sampleMedium) {
                     (*mi) = MediumInteraction(ray.at(step), -ray.getDirection(), this,
-                                              ALLOC(memoryArena, HenyeyGreensteinFunction)(_g));
+                                              allocator.newObject<HenyeyGreensteinFunction>(_g));
                 } else {
                     step = ray.getStep();
                 }

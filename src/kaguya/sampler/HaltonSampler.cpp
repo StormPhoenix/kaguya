@@ -28,7 +28,7 @@ namespace RENDER_NAMESPACE {
 
         bool HaltonSampler::isPrimesValid = false;
 
-        HaltonSampler::HaltonSampler(int nSamples) : Sampler(nSamples) {
+        HaltonSampler::HaltonSampler(int nSamples) : _nSamples(nSamples) {
             // First two dimension scale
             for (int i = 0; i < 2; i++) {
                 int scale = 1;
@@ -47,27 +47,27 @@ namespace RENDER_NAMESPACE {
         }
 
         void HaltonSampler::forPixel(const Point2I pixel) {
-            Sampler::forPixel(pixel);
+            _currentPixel = pixel;
             // new seed
             seedForPixel = seedForCurrentPixel(0);
             dimension = START_DIMENSION;
         }
 
         void HaltonSampler::setSampleIndex(int sampleIndex) {
-            Sampler::setSampleIndex(sampleIndex);
-            seedForPixel = seedForCurrentPixel(randomSeed);
+            _sampleIndex = sampleIndex;
+            seedForPixel = seedForCurrentPixel(_sampleIndex);
         }
 
         bool HaltonSampler::nextSampleRound() {
-            seedForPixel = seedForCurrentPixel(randomSeed + 1);
-
+            bool ret = (++_sampleIndex) < _nSamples;
+            seedForPixel = seedForCurrentPixel(_sampleIndex);
             dimension = START_DIMENSION;
-            return Sampler::nextSampleRound();
+            return ret;
         }
 
         static std::mutex singleInstance;
 
-        Sampler *HaltonSampler::newInstance(int nSamples) {
+        HaltonSampler *HaltonSampler::newInstance(int nSamples, MemoryAllocator &allocator) {
             // TODO add locker
             if (!isPrimesValid) {
                 {
@@ -78,7 +78,7 @@ namespace RENDER_NAMESPACE {
                     }
                 }
             }
-            return new HaltonSampler(nSamples);
+            return allocator.newObject<HaltonSampler>(nSamples);
         }
 
         Float HaltonSampler::sample1D() {
@@ -108,10 +108,10 @@ namespace RENDER_NAMESPACE {
         }
 
         int HaltonSampler::seedForCurrentPixel(int seed) {
-            if (currentPixel.x != pixelForOffset.x ||
-                currentPixel.y != pixelForOffset.y) {
-                Point2I p_j = Point2I(mod(currentPixel[0], MAX_TILE_RESOLUTION),
-                                      mod(currentPixel[1], MAX_TILE_RESOLUTION));
+            if (_currentPixel.x != pixelForOffset.x ||
+                _currentPixel.y != pixelForOffset.y) {
+                Point2I p_j = Point2I(mod(_currentPixel[0], MAX_TILE_RESOLUTION),
+                                      mod(_currentPixel[1], MAX_TILE_RESOLUTION));
                 seedForPixel = 0;
                 for (int i = 0; i < 2; i++) {
                     // l_j
@@ -127,7 +127,7 @@ namespace RENDER_NAMESPACE {
                         seedForPixel += l_j * m_j * numTheoreticReciprocal[i];
                     }
                     seedForPixel %= sampleStride;
-                    pixelForOffset = currentPixel;
+                    pixelForOffset = _currentPixel;
                 }
                 return seedForPixel + seed * sampleStride;
             }

@@ -21,7 +21,7 @@ namespace RENDER_NAMESPACE {
             PlasticMaterial(Texture<Spectrum>::Ptr Kd, Texture<Spectrum>::Ptr Ks,
                             Texture<Float>::Ptr etaI, Texture<Float>::Ptr etaT, Float alpha);
 
-            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
+            virtual void computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
                                                     TransportMode mode = TransportMode::RADIANCE) override;
 
         private:

@@ -1,6 +1,6 @@
-/// @ref gtc_swizzle
-/// @file glm/gtc/swizzle.inl
+/// @ref gtc_precision
 
-namespace glm {
+namespace glm
+{
 
 }

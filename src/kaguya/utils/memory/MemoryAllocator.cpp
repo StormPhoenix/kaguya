@@ -14,12 +14,14 @@ namespace RENDER_NAMESPACE {
     namespace memory {
 
         MemoryAllocator::MemoryAllocator()
-                : _defaultBlockSize(262144), _currentBlock(nullptr), _blockOffset(0) {
+                : _defaultBlockSize(262144), _currentBlock(nullptr),
+                  _blockOffset(0), _allocatedBlockSize(0) {
             _resource = new HostResource();
         }
 
         MemoryAllocator::MemoryAllocator(MemoryResource *resource)
-                : _defaultBlockSize(262144), _currentBlock(nullptr), _blockOffset(0),
+                : _defaultBlockSize(262144), _currentBlock(nullptr),
+                _blockOffset(0),_allocatedBlockSize(0),
                   _resource(resource) {}
 
         void *MemoryAllocator::allocate(size_t bytes, size_t alignBytes) {

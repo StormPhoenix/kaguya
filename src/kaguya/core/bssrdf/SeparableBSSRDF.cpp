@@ -52,12 +52,12 @@ namespace RENDER_NAMESPACE {
             }
 
             Spectrum SeparableBSSRDF::sampleS(std::shared_ptr<Scene> scene, SurfaceInteraction *pi, Float *pdf,
-                                              MemoryArena &memoryArena, Sampler *sampler) {
+                                              MemoryAllocator &allocator, Sampler *sampler) {
                 // Sampling S_p(p_o, p_i)
-                Spectrum sp = sampleSp(scene, pi, pdf, memoryArena, sampler);
+                Spectrum sp = sampleSp(scene, pi, pdf, allocator, sampler);
                 if (!sp.isBlack()) {
-                    pi->bsdf = ALLOC(memoryArena, BSDF)(*pi);
-                    pi->bsdf->addBXDF(ALLOC(memoryArena, SeparableBSSRDFAdapter)(this));
+                    pi->bsdf = allocator.newObject<BSDF>(*pi);
+                    pi->bsdf->addBXDF(allocator.newObject<SeparableBSSRDFAdapter>(this));
                     // TODO delete why
                     pi->direction = -pi->rendering.normal;
                     pi->wo = pi->rendering.normal;
@@ -73,7 +73,7 @@ namespace RENDER_NAMESPACE {
             }
 
             Spectrum SeparableBSSRDF::sampleSp(std::shared_ptr<Scene> scene, SurfaceInteraction *pi, Float *pdf,
-                                               MemoryArena &memoryArena, Sampler *sampler) {
+                                               MemoryAllocator &allocator, Sampler *sampler) {
                 // Randomly chose probe ray direction
                 Vector3F ry, rx, rz;
 
@@ -135,7 +135,7 @@ namespace RENDER_NAMESPACE {
                     SurfaceInteraction si;
                     InteractionChain *next;
                 };
-                InteractionChain *chain = ALLOC(memoryArena, InteractionChain)();
+                InteractionChain *chain = allocator.newObject<InteractionChain>();
 
                 // Do intersection
                 InteractionChain *pChain = chain;
@@ -153,7 +153,7 @@ namespace RENDER_NAMESPACE {
                     // Check same geometry
                     if (pChain->si.getMaterial() == _material) {
                         found++;
-                        pChain->next = ALLOC(memoryArena, InteractionChain)();
+                        pChain->next = allocator.newObject<InteractionChain>();
                         pChain = pChain->next;
                     }
                 }

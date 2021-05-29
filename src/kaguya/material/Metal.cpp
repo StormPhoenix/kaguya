@@ -26,15 +26,15 @@ namespace RENDER_NAMESPACE {
         }
 
         void Metal::computeScatteringFunctions(SurfaceInteraction &insect,
-                                               MemoryArena &memoryArena,
+                                               MemoryAllocator &allocator,
                                                TransportMode mode) {
             // Build distribution
             const MicrofacetDistribution *distribution = nullptr;
             Float alpha = _alpha->evaluate(insect);
             if (_distributionType == "beckmann") {
-                distribution = ALLOC(memoryArena, BeckmannDistribution)(alpha);
+                distribution =  allocator.newObject<BeckmannDistribution>(alpha);
             } else if (_distributionType == "ggx") {
-                distribution = ALLOC(memoryArena, GGXDistribution)(alpha);
+                distribution =  allocator.newObject<GGXDistribution>(alpha);
             } else {
                 ASSERT(false, "Unsupported microfacet normal distribution type. ");
             }
@@ -42,11 +42,11 @@ namespace RENDER_NAMESPACE {
             // Build fresnel term
             const Spectrum etaT = _eta->evaluate(insect);
             const Spectrum K = _K->evaluate(insect);
-            const FresnelConductor *fresnel = ALLOC(memoryArena, FresnelConductor)(Spectrum(1.), etaT, K);
+            const FresnelConductor *fresnel =  allocator.newObject<FresnelConductor>(Spectrum(1.), etaT, K);
 
             Spectrum reflectance = _Ks->evaluate(insect);
-            insect.bsdf  = ALLOC(memoryArena, BSDF)(insect);
-            insect.bsdf->addBXDF( ALLOC(memoryArena, BXDFMicrofacetReflection)(reflectance, distribution, fresnel));
+            insect.bsdf  =  allocator.newObject<BSDF>(insect);
+            insect.bsdf->addBXDF(  allocator.newObject<BXDFMicrofacetReflection>(reflectance, distribution, fresnel));
         }
     }
 }

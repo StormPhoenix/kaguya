@@ -6,31 +6,11 @@
 #define KAGUYA_TAGGEDPOINTER_H
 
 #include <kaguya/common.h>
-#include <type_traits>
+#include <kaguya/utils/type_utils.h>
 
 namespace RENDER_NAMESPACE {
     namespace memory {
-
-        template<typename... Ts>
-        struct TypePack {
-            static const int count = sizeof...(Ts);
-        };
-
-        template<typename T, typename... Ts>
-        struct TypeIndex {
-            static const int index = 0;
-            static_assert(!std::is_same<T, T>::value, "Type not in type parameter pack.");
-        };
-
-        template<typename T, typename... Ts>
-        struct TypeIndex<T, TypePack<T, Ts...>> {
-            static const int index = 0;
-        };
-
-        template<typename T, typename U, typename... Ts>
-        struct TypeIndex<T, TypePack<U, Ts...>> {
-            static const int index = TypeIndex<T, TypePack<Ts...>>::index + 1;
-        };
+        using namespace type_utils;
 
         template<typename... Ts>
         class TaggedPointer {
@@ -40,13 +20,20 @@ namespace RENDER_NAMESPACE {
             template<typename T>
             RENDER_CPU_GPU TaggedPointer(T *ptr) {
                 uintptr_t p = reinterpret_cast<uintptr_t>(ptr);
-                ASSERT(p & ptrMask == p, "TaggedPointer address too large. ");
+                ASSERT((p & ptrMask) == p, "TaggedPointer address too large. ");
                 constexpr unsigned int typeId = typeIndex<T>();
                 taggedPtr = p | ((uintptr_t) typeId << typeShift);
             }
 
+            RENDER_CPU_GPU
+            TaggedPointer &operator=(TaggedPointer &tp) {
+                this->taggedPtr = tp.taggedPtr;
+                return *this;
+            }
+
             template<typename T>
-            RENDER_CPU_GPU int typeIndex() {
+            RENDER_CPU_GPU
+            static constexpr unsigned int typeIndex() {
                 using Tp = typename std::remove_cv_t<T>;
                 if (std::is_same<Tp, std::nullptr_t>::value) {
                     // nullptr
@@ -72,7 +59,22 @@ namespace RENDER_NAMESPACE {
             template<typename T>
             RENDER_CPU_GPU T *cast() {
                 ASSERT(isType<T>(), "TaggedPointer type can not be cast. ");
-                return reinterpret_cast<T>(ptr());
+                return reinterpret_cast<T *>(ptr());
+            }
+
+            template<typename T>
+            RENDER_CPU_GPU const T *cast() const {
+                ASSERT(isType<T>(), "TaggedPointer type can not be cast. ");
+                return reinterpret_cast<T *>(ptr());
+            }
+
+            template<typename F>
+            RENDER_CPU_GPU inline auto proxyCall(F func) {
+                return EvaluateTpType<maxTag()>()(func, *this, typeId(), Types());
+            }
+
+            RENDER_CPU_GPU static constexpr unsigned int maxTag() {
+                return sizeof...(Ts);
             }
 
         private:

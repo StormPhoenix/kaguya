@@ -10,13 +10,13 @@
 #include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/tracer/Ray.h>
 #include <kaguya/sampler/Sampler.h>
-#include <kaguya/utils/MemoryArena.h>
+#include <kaguya/utils/memory/MemoryAllocator.h>
 
 namespace RENDER_NAMESPACE {
     namespace core {
         namespace medium {
 
-            using kaguya::memory::MemoryArena;
+            using kaguya::memory::MemoryAllocator;
 
             class Medium {
             public:
@@ -30,7 +30,7 @@ namespace RENDER_NAMESPACE {
                         const tracer::Ray &ray,
                         Sampler *sampler,
                         MediumInteraction *mi,
-                        MemoryArena &memoryArena
+                        MemoryAllocator &allocator
                 ) const = 0;
             };
 

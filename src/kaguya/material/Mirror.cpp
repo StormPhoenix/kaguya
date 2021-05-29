@@ -27,11 +27,11 @@ namespace RENDER_NAMESPACE {
         }
 
         void
-        Mirror::computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena, TransportMode mode) {
-            FresnelDefault *fresnel = ALLOC(memoryArena, FresnelDefault)();
-            BXDFSpecularReflection *bxdf = ALLOC(memoryArena, BXDFSpecularReflection)(
+        Mirror::computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator, TransportMode mode) {
+            FresnelDefault *fresnel = allocator.newObject<FresnelDefault>();
+            BXDFSpecularReflection *bxdf = allocator.newObject<BXDFSpecularReflection>(
                     _albedo->evaluate(insect), fresnel);
-            insect.bsdf = ALLOC(memoryArena, BSDF)(insect);
+            insect.bsdf =  allocator.newObject<BSDF>(insect);
             insect.bsdf->addBXDF(bxdf);
         }
     }

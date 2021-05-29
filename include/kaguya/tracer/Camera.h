@@ -29,7 +29,7 @@ namespace RENDER_NAMESPACE {
             Camera(Transform::Ptr cameraToWorld, Float hFov, Float nearClip = 1.0, Float farClip = 10000,
                    Medium::Ptr medium = nullptr);
 
-            Ray generateRay(Float pixelX, Float pixelY, Sampler * sampler) const;
+            Ray generateRay(Float pixelX, Float pixelY, Sampler *sampler) const;
 
             /**
              * 相机对 eye 发射采样射线，起点随机

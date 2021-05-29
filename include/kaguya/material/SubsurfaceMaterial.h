@@ -17,7 +17,7 @@ namespace RENDER_NAMESPACE {
         public:
             SubsurfaceMaterial(Spectrum albedoEff, Spectrum mft, Float g, Float eta);
 
-            virtual void computeScatteringFunctions(SurfaceInteraction &si, MemoryArena &memoryArena,
+            virtual void computeScatteringFunctions(SurfaceInteraction &si, MemoryAllocator &allocator,
                                                     TransportMode mode = TransportMode::RADIANCE) override;
 
         private:

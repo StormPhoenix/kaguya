@@ -15,13 +15,13 @@ namespace RENDER_NAMESPACE {
         OrenNayar::OrenNayar(Texture<Spectrum>::Ptr Kd, Texture<Float>::Ptr roughness) :
                 _Kd(Kd), _roughness(roughness) {}
 
-        void OrenNayar::computeScatteringFunctions(SurfaceInteraction &insect, MemoryArena &memoryArena,
+        void OrenNayar::computeScatteringFunctions(SurfaceInteraction &insect, MemoryAllocator &allocator,
                                                    TransportMode mode) {
             Spectrum Kd = _Kd->evaluate(insect);
             Float roughness = _roughness->evaluate(insect);
 
-            BXDFOrenNayar *bxdfOrenNayar = ALLOC(memoryArena, BXDFOrenNayar)(Kd, roughness);
-            insect.bsdf = ALLOC(memoryArena, BSDF)(insect);
+            BXDFOrenNayar *bxdfOrenNayar =  allocator.newObject<BXDFOrenNayar>(Kd, roughness);
+            insect.bsdf =  allocator.newObject<BSDF>(insect);
             insect.bsdf->addBXDF(bxdfOrenNayar);
         }
 

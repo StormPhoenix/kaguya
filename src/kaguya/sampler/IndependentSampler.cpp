@@ -7,28 +7,29 @@
 
 namespace RENDER_NAMESPACE {
     namespace sampler {
-        IndependentSampler * IndependentSampler::newInstance(int nSamples) {
+        IndependentSampler *IndependentSampler::newInstance(int nSamples, MemoryAllocator &allocator) {
             if (nSamples <= 0) {
                 nSamples = Config::Tracer::sampleNum;
             }
-            return new IndependentSampler(nSamples);
+            return allocator.newObject<IndependentSampler>(nSamples);
         }
 
         void IndependentSampler::forPixel(const Point2I pixel) {
-            Sampler::forPixel(pixel);
-            rng.newSequence((pixel.x + pixel.y * 65536) | (uint64_t(randomSeed) << 32));
+            _currentPixel = pixel;
+            rng.newSequence((pixel.x + pixel.y * 65536) | (uint64_t(_seed) << 32));
         }
 
         void IndependentSampler::setSampleIndex(int sampleIndex) {
-            int px = currentPixel.x;
-            int py = currentPixel.y;
-            rng.newSequence((px + py * 65536) | (uint64_t(randomSeed) << 32));
-            rng.advance(sampleIndex * 65536 + 0);
+            _sampleIndex = sampleIndex;
+            int px = _currentPixel.x;
+            int py = _currentPixel.y;
+            rng.newSequence((px + py * 65536) | (uint64_t(_seed) << 32));
+            rng.advance(_sampleIndex * 65536 + 0);
         }
 
         bool IndependentSampler::nextSampleRound() {
-            bool ret = Sampler::nextSampleRound();
-            rng.advance(sampleIndex * 65536 + 0);
+            bool ret = (++_sampleIndex) < _nSamples;
+            rng.advance(_sampleIndex * 65536 + 0);
             return ret;
         }
 

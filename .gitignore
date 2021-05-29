@@ -3,6 +3,7 @@
 /cmake-build-release
 /output
 /resource
+/build
 *.zip
 dev-gpu.md
 
