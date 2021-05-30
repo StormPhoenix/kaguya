@@ -6,7 +6,7 @@
 #define KAGUYA_BVH_H
 
 #include <kaguya/scene/Intersectable.h>
-#include <kaguya/scene/Geometry.h>
+#include <kaguya/scene/meta/Geometry.h>
 #include <kaguya/scene/accumulation/AABB.h>
 
 #include <memory>

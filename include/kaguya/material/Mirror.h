@@ -12,7 +12,7 @@
 namespace RENDER_NAMESPACE {
     namespace material {
         using namespace texture;
-        using kaguya::core::Spectrum;
+        using core::Spectrum;
 
         class Mirror {
         public:

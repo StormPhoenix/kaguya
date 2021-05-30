@@ -12,9 +12,9 @@
 namespace RENDER_NAMESPACE {
     namespace scene {
 
-        using kaguya::core::SurfaceInteraction;
-        using kaguya::scene::acc::AABB;
-        using kaguya::tracer::Ray;
+        using core::SurfaceInteraction;
+        using scene::acc::AABB;
+        using tracer::Ray;
 
         class Intersectable {
         public:

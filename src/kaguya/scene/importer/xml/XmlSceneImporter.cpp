@@ -6,7 +6,7 @@
 #include <kaguya/core/Transform.h>
 #include <kaguya/scene/meta/Triangle.h>
 #include <kaguya/scene/accumulation/BVH.h>
-#include <kaguya/scene/Cube.h>
+#include <kaguya/scene/meta/Cube.h>
 #include <kaguya/core/medium/IsotropicMedium.h>
 #include <kaguya/core/light/SunLight.h>
 #include <kaguya/core/light/PointLight.h>
@@ -26,6 +26,7 @@
 #include <kaguya/material/Metal.h>
 #include <kaguya/scene/importer/xml/XmlSceneImporter.h>
 #include <kaguya/utils/ObjLoader.h>
+#include <kaguya/tracer/Camera.h>
 #include <kaguya/tracer/PathRecorder.h>
 
 namespace RENDER_NAMESPACE {
@@ -816,7 +817,7 @@ namespace RENDER_NAMESPACE {
                 handleXmlNode(node, parseInfo, parentParseInfo);
             }
 
-            std::shared_ptr<Scene> XmlSceneImporter::importScene(std::string sceneDir) {
+            std::shared_ptr<SimpleScene> XmlSceneImporter::importScene(std::string sceneDir) {
                 _inputSceneDir = sceneDir;
                 std::string xml_file = sceneDir + "scene.xml";
                 std::cout << "Loading scene file: " << xml_file << std::endl;
@@ -826,7 +827,7 @@ namespace RENDER_NAMESPACE {
 
                 ASSERT(ret, "Error while parsing \"" + xml_file + "\": " + ret.description()
                             + " (at " + getOffset(ret.offset, xml_file) + ")");
-                _scene = std::make_shared<Scene>();
+                _scene = std::make_shared<SimpleScene>();
 
                 XmlParseInfo parseInfo;
                 parseXml(*xml_doc.begin(), parseInfo);

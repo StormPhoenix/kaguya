@@ -21,10 +21,10 @@ namespace RENDER_NAMESPACE {
 namespace RENDER_NAMESPACE {
     namespace utils {
 
-        using kaguya::core::Interaction;
-        using kaguya::core::SurfaceInteraction;
-        using kaguya::scene::Scene;
-        using kaguya::tracer::Ray;
+        using core::Interaction;
+        using core::SurfaceInteraction;
+        using scene::Scene;
+        using tracer::Ray;
 
         class VisibilityTester {
         public:

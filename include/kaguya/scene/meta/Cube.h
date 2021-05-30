@@ -5,7 +5,7 @@
 #ifndef KAGUYA_CUBE_H
 #define KAGUYA_CUBE_H
 
-#include <kaguya/scene/TriangleMesh.h>
+#include <kaguya/scene/meta/TriangleMesh.h>
 
 namespace RENDER_NAMESPACE {
     namespace scene {

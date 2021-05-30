@@ -11,7 +11,7 @@
 namespace RENDER_NAMESPACE {
     namespace core {
 
-        using kaguya::sampler::Sampler;
+        using sampler::Sampler;
 
         class PhaseFunction {
         public:

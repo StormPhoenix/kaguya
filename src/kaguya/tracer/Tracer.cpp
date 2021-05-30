@@ -13,7 +13,7 @@
 namespace RENDER_NAMESPACE {
     namespace tracer {
 
-        using kaguya::Config;
+        using RENDER_NAMESPACE::Config;
         using core::Light;
         using core::AreaLight;
         using core::bsdf::BSDF;

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(kaguya)
+project(Tunan)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -59,7 +59,8 @@ if (OptiX_FOUND)
     message(STATUS "Found OptiX")
 endif (OptiX_FOUND)
 
-option(START_CUDA "option for cuda" OFF)
+option(START_CUDA "option for cuda" ON)
+#option(START_CUDA "option for cuda" OFF)
 
 set(RENDER_GPU_MODE_ENABLED false)
 if (CUDA_FOUND AND CUDA_FOUND AND START_CUDA)
@@ -92,6 +93,7 @@ set(RENDER_UTILS_SOURCES
 
 set(RENDER_SAMPLER_SOURCES
         #        src/kaguya/sampler/HaltonSampler.cpp
+        src/kaguya/sampler/RNG.cpp
         src/kaguya/sampler/Sampler.cpp
         src/kaguya/sampler/IndependentSampler.cpp
         src/kaguya/sampler/SimpleHaltonSampler.cpp)
@@ -118,13 +120,46 @@ set(RENDER_MATERIAL_HEADERS
         include/kaguya/material/SubsurfaceMaterial.h
         include/kaguya/material/OrenNayar.h)
 
+set(RENDER_SCENE_SOURCES
+        src/kaguya/scene/accumulation/AABB.cpp
+        src/kaguya/scene/accumulation/BVH.cpp
+        src/kaguya/scene/meta/Cube.cpp
+        src/kaguya/scene/meta/Geometry.cpp
+        src/kaguya/scene/meta/Sphere.cpp
+        src/kaguya/scene/meta/Triangle.cpp
+        src/kaguya/scene/meta/TriangleMesh.cpp
+        src/kaguya/scene/SimpleScene.cpp
+        src/kaguya/scene/Shape.cpp
+        src/kaguya/scene/Scene.cpp
+        src/kaguya/scene/importer/xml/XmlParseInfo.cpp
+        src/kaguya/scene/importer/xml/XmlSceneImporter.cpp)
+
+set(RENDER_SCENE_HEADERS
+        ${PROJECT_INCLUDE_DIRECTORY})
+
 set(RENDER_GPU_SOURCES "")
 if (RENDER_GPU_MODE_ENABLED)
     set(RENDER_GPU_SOURCES
-            src/kaguya/utils/memory/CUDAResource.cpp include/kaguya/utils/type_utils.h src/kaguya/material/Material.cpp)
+            src/kaguya/utils/memory/CUDAResource.cpp
+            include/kaguya/utils/type_utils.h)
+
+    set(RENDER_GPU_HEADERS
+            ${CUDA_INCLUDE_DIRECTORY}
+            ${OPTIX_INCLUDE_DIRECTORY})
+
+    set(RENDER_SCENE_SOURCES
+            ${RENDER_SCENE_SOURCES}
+            src/kaguya/scene/importer/xml/XmlOptiXSceneImporter.cpp
+            src/kaguya/scene/OptiXScene.cpp)
+    set(RENDER_SCENE_HEADERS
+            ${RENDER_SCENE_HEADERS}
+            ${CUDA_INCLUDE_DIRECTORY}
+            ${OPTIX_INCLUDE_DIRECTORY})
 
     set_source_files_properties(
             include/kaguya/sampler/RNG.h
+            src/kaguya/sampler/RNG.cpp
+
             include/kaguya/utils/TaggedPointer.h
 
             ${RENDER_MATERIAL_HEADERS}
@@ -153,16 +188,18 @@ file(GLOB RENDER_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/math/*.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/parallel/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/accumulation/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/importer/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/importer/xml/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/meta/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/scene/*.cpp
+
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/bdpt/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/pm/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/pt/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pugixml/*.cpp)
+
+add_library(render_scene_lib
+        ${RENDER_SCENE_SOURCES})
+target_include_directories(render_scene_lib
+        PRIVATE
+        ${RENDER_SCENE_HEADERS})
 
 add_library(render_sampler_lib
         ${RENDER_SAMPLER_SOURCES})
@@ -188,10 +225,11 @@ add_executable(${PROJECT_NAME}
         ${RENDER_GPU_SOURCES})
 target_include_directories(${PROJECT_NAME}
         PRIVATE
-        ${CUDA_INCLUDE_DIRECTORY}
+        ${RENDER_GPU_HEADERS}
         ${PROJECT_INCLUDE_DIRECTORY})
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
+        render_scene_lib
         render_material_lib
         render_sampler_lib
         render_utils_lib

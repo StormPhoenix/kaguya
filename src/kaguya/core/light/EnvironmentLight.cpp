@@ -156,7 +156,7 @@ namespace RENDER_NAMESPACE {
         }
 
         void EnvironmentLight::worldBound(const std::shared_ptr<Scene> scene) {
-            const AABB &bound = scene->getWorld()->boundingBox();
+            const AABB &bound = scene->getWorldBox();
             _worldRadius = 0.5 * LENGTH(bound.maxPos() - bound.minPos());
             _worldCenter = (bound.maxPos() + bound.minPos()) / Float(2.0);
         }

@@ -19,15 +19,14 @@ namespace RENDER_NAMESPACE {
 
     namespace scene {
         namespace meta {
-            using kaguya::sampler::Sampler;
-            using kaguya::scene::acc::AABB;
-            using kaguya::tracer::Ray;
-            using kaguya::core::SurfaceInteraction;
-            using kaguya::core::Interaction;
+            using sampler::Sampler;
+            using scene::acc::AABB;
+            using tracer::Ray;
+            using core::SurfaceInteraction;
+            using core::Interaction;
 
             class Shape {
             public:
-
                 typedef std::shared_ptr<Shape> Ptr;
 
                 virtual bool intersect(Ray &ray, SurfaceInteraction &si, Float minStep, Float maxStep) const = 0;

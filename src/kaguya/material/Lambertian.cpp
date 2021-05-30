@@ -9,8 +9,8 @@
 namespace RENDER_NAMESPACE {
     namespace material {
 
-        using kaguya::core::bsdf::BSDF;
-        using kaguya::core::bsdf::BXDFLambertianReflection;
+        using core::bsdf::BSDF;
+        using core::bsdf::BXDFLambertianReflection;
 
         Lambertian::Lambertian(std::shared_ptr<Texture<Spectrum>> Kd) : _Kd(Kd) {}
 

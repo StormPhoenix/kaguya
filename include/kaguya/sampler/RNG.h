@@ -22,8 +22,7 @@ namespace RENDER_NAMESPACE {
 
         class RNG {
         public:
-            RENDER_CPU_GPU
-            RNG() : state(PCG32_DEFAULT_STATE), inc(PCG32_DEFAULT_STREAM) {};
+            RENDER_CPU_GPU RNG() : state(PCG32_DEFAULT_STATE), inc(PCG32_DEFAULT_STREAM) {};
 
             RENDER_CPU_GPU
             RNG(uint64_t initState, uint64_t initSeq) { newSequence(initState, initSeq); }

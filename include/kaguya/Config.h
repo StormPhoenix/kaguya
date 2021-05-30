@@ -5,9 +5,8 @@
 #ifndef KAGUYA_CONFIG_H
 #define KAGUYA_CONFIG_H
 
-#include <kaguya/scene/meta/Shape.h>
 #include <kaguya/scene/Scene.h>
-#include <kaguya/tracer/Camera.h>
+#include <kaguya/scene/SimpleScene.h>
 #include <kaguya/utils/memory/MemoryAllocator.h>
 
 #include <cstring>
@@ -16,10 +15,9 @@
 #include <vector>
 
 namespace RENDER_NAMESPACE {
-
-    using kaguya::tracer::Camera;
-    using kaguya::scene::meta::Shape;
-    using kaguya::scene::Scene;
+    using scene::Scene;
+    using scene::SimpleScene;
+    using memory::MemoryAllocator;
 
     class Config {
     public:
@@ -83,13 +81,15 @@ namespace RENDER_NAMESPACE {
         static std::string samplerType;
         // Render type
         static std::string renderType;
+        // GPU options
+        static bool usingGPU;
 
         // TODO 临时代码，用于测试构建场景
         static std::shared_ptr<Scene> nextScene(MemoryAllocator &allocator);
 
         static std::vector<std::string> inputSceneDirs;
 
-        static std::vector<std::function<std::shared_ptr<Scene>(MemoryAllocator &)>> innerScenes;
+        static std::vector<std::function<std::shared_ptr<SimpleScene>(MemoryAllocator &)>> innerScenes;
     private:
         // Scene id
         static int sceneId;

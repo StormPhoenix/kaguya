@@ -16,7 +16,7 @@ namespace RENDER_NAMESPACE {
     namespace core {
         namespace medium {
 
-            using kaguya::memory::MemoryAllocator;
+            using memory::MemoryAllocator;
 
             class Medium {
             public:

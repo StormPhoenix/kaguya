@@ -27,7 +27,7 @@ namespace RENDER_NAMESPACE {
             return o;
         }
 
-        using kaguya::material::Material;
+        using material::Material;
 
         Interaction::Interaction(const Vector3F &point,
                                  const Vector3F &direction, const Vector3F &normal,

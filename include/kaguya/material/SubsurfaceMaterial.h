@@ -6,12 +6,13 @@
 #define KAGUYA_SUBSURFACEMATERIAL_H
 
 #include <kaguya/common.h>
+#include <kaguya/core/spectrum/Spectrum.hpp>
 #include <kaguya/core/bssrdf/TabulatedBSSRDF.h>
 
 namespace RENDER_NAMESPACE {
     namespace material {
-
-        using namespace bssrdf;
+        using core::Spectrum;
+        using core::bssrdf::BSSRDFTable;
 
         class SubsurfaceMaterial {
         public:

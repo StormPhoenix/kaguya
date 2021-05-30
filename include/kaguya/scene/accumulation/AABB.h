@@ -11,8 +11,7 @@
 namespace RENDER_NAMESPACE {
     namespace scene {
         namespace acc {
-
-            using kaguya::tracer::Ray;
+            using tracer::Ray;
 
             /**
              * 物体沿坐标轴线包围盒

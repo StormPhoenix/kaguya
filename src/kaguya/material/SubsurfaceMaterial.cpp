@@ -2,6 +2,7 @@
 // Created by Storm Phoenix on 2021/3/6.
 //
 
+#include <kaguya/core/core.h>
 #include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/core/bssrdf/TabulatedBSSRDF.h>
 #include <kaguya/core/bsdf/BXDFFresnelSpecular.h>
@@ -9,8 +10,9 @@
 
 namespace RENDER_NAMESPACE {
     namespace material {
-
-        using kaguya::core::bsdf::BXDFFresnelSpecular;
+        using namespace core;
+        using core::bssrdf::TabulatedBSSRDF;
+        using core::bsdf::BXDFFresnelSpecular;
 
         SubsurfaceMaterial::SubsurfaceMaterial(Spectrum albedoEff, Spectrum mft, Float g, Float eta)
                 : _theta(eta), _albedoEff(albedoEff), _meanFreePath(mft), _table(100, 64) {

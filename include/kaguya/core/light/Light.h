@@ -20,8 +20,8 @@ namespace RENDER_NAMESPACE {
 
         using scene::Scene;
         using medium::Medium;
-        using kaguya::utils::VisibilityTester;
-        using kaguya::tracer::Ray;
+        using utils::VisibilityTester;
+        using tracer::Ray;
 
         // 灯光类型
         typedef enum LightType {

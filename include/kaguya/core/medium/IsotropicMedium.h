@@ -12,7 +12,7 @@ namespace RENDER_NAMESPACE {
     namespace core {
         namespace medium {
 
-            using kaguya::core::HenyeyGreensteinFunction;
+            using core::HenyeyGreensteinFunction;
 
             class IsotropicMedium : public Medium {
             public:

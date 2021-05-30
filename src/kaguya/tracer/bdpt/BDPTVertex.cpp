@@ -14,6 +14,7 @@
 namespace RENDER_NAMESPACE {
     namespace tracer {
 
+        using core::LightType;
         using core::bsdf::BSDF;
         using core::bsdf::BXDFType;
         using scene::acc::AABB;
@@ -204,7 +205,7 @@ namespace RENDER_NAMESPACE {
             toNextDirection = NORMALIZE(toNextDirection);
             Float density;
             if (isInfiniteLight()) {
-                const AABB &bound = scene->getWorld()->boundingBox();
+                const AABB &bound = scene->getWorldBox();
                 Float worldRadius = 0.5 * LENGTH(bound.maxPos() - bound.minPos());
                 density = 1.0 / (math::PI * worldRadius * worldRadius);
             } else {

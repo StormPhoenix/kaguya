@@ -2,7 +2,7 @@
 // Created by Storm Phoenix on 2020/12/21.
 //
 
-#include <kaguya/scene/Cube.h>
+#include <kaguya/scene/meta/Cube.h>
 #include <kaguya/scene/meta/Triangle.h>
 
 #include <iostream>

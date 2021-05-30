@@ -3,12 +3,12 @@
 //
 
 #include <kaguya/core/medium/MediumInterface.h>
-#include <kaguya/scene/Geometry.h>
+#include <kaguya/scene/meta/Geometry.h>
 
 namespace RENDER_NAMESPACE {
     namespace scene {
 
-        using kaguya::core::medium::MediumInterface;
+        using core::medium::MediumInterface;
 
         Geometry::Geometry(const std::shared_ptr<meta::Shape> shape,
                            const Material material,

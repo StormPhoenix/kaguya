@@ -6,7 +6,7 @@
 #define KAGUYA_OBJLOADER_H
 
 #include <vector>
-#include <kaguya/scene/TriangleMesh.h>
+#include <kaguya/scene/meta/TriangleMesh.h>
 
 namespace RENDER_NAMESPACE {
     namespace utils {

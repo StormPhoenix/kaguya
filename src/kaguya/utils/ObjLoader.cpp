@@ -10,7 +10,7 @@
 namespace RENDER_NAMESPACE {
     namespace utils {
         namespace io {
-            using kaguya::scene::TriMesh;
+            using scene::TriMesh;
 
             bool ObjLoader::loadObj(const std::string path,
                                     std::vector<Vector3F> &vertices,

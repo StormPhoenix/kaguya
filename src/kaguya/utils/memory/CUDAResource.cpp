@@ -3,7 +3,7 @@
 //
 
 #include <kaguya/utils/memory/CUDAResource.h>
-#include <kaguya/gpu/utils.h>
+#include <kaguya/gpu/cuda_utils.h>
 
 #include <cuda.h>
 #include <cuda_runtime.h>

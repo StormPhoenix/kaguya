@@ -39,11 +39,11 @@ namespace RENDER_NAMESPACE {
         using scene::Intersectable;
         using medium::Medium;
         using medium::MediumInterface;
-        using kaguya::tracer::Camera;
-        using kaguya::tracer::Ray;
-        using kaguya::material::Material;
-        using kaguya::memory::MemoryAllocator;
-        using bssrdf::BSSRDF;
+        using tracer::Camera;
+        using tracer::Ray;
+        using material::Material;
+        using memory::MemoryAllocator;
+        using core::bssrdf::BSSRDF;
 
         inline Vector3F offsetOrigin(const Vector3F &origin, const Vector3F &error,
                                      const Vector3F &normal, const Vector3F &direction);

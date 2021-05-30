@@ -10,8 +10,8 @@ namespace RENDER_NAMESPACE {
     namespace core {
         namespace medium {
 
-            using kaguya::scene::acc::AABB;
-            using kaguya::core::HenyeyGreensteinFunction;
+            using scene::acc::AABB;
+            using core::HenyeyGreensteinFunction;
 
             GridDensityMedium::GridDensityMedium(const Spectrum &sigma_a, const Spectrum &sigma_s,
                                                  Float g, int axisXGrid, int axisYGrid, int axisZGrid,

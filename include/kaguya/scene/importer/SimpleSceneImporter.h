@@ -6,14 +6,14 @@
 #define KAGUYA_SCENEIMPORTER_H
 
 #include <kaguya/common.h>
-#include <kaguya/scene/Scene.h>
+#include <kaguya/scene/SimpleScene.h>
 
 namespace RENDER_NAMESPACE {
     namespace scene {
         namespace importer {
-            class SceneImporter {
+            class SimpleSceneImporter {
             public:
-                virtual std::shared_ptr<Scene> importScene(std::string sceneFile) = 0;
+                virtual std::shared_ptr<SimpleScene> importScene(std::string sceneFile) = 0;
             };
         }
     }

@@ -6,18 +6,18 @@
 #define KAGUYA_XMLSCENEIMPORTER_H
 
 #include <ext/pugixml/pugixml.hpp>
+#include <kaguya/scene/meta/Shape.h>
 #include <kaguya/core/Transform.h>
-#include <kaguya/scene/importer/SceneImporter.h>
+#include <kaguya/scene/importer/SimpleSceneImporter.h>
 #include <kaguya/scene/importer/xml/XmlParseInfo.h>
 #include <kaguya/utils/memory/MemoryAllocator.h>
 
 namespace RENDER_NAMESPACE {
     namespace scene {
         namespace importer {
+            using meta::Shape;
 
-            /**
-             * XML 标签对应的场景元素类型
-             */
+            // XML Tag
             typedef enum TagType {
                 Tag_Scene,
                 Tag_Mode,
@@ -46,11 +46,11 @@ namespace RENDER_NAMESPACE {
                 Tag_RGB,
             } TagType;
 
-            class XmlSceneImporter : public SceneImporter {
+            class XmlSceneImporter : public SimpleSceneImporter {
             public:
                 XmlSceneImporter(MemoryAllocator &allocator);
 
-                std::shared_ptr<Scene> importScene(std::string sceneDir) override;
+                std::shared_ptr<SimpleScene> importScene(std::string sceneDir) override;
 
             private:
                 void handleXmlNode(pugi::xml_node &node,
@@ -106,7 +106,7 @@ namespace RENDER_NAMESPACE {
             private:
                 MemoryAllocator &_allocator;
                 std::map<std::string, TagType> _nodeTypeMap;
-                std::shared_ptr<Scene> _scene;
+                std::shared_ptr<SimpleScene> _scene;
                 std::map<std::string, Material> _materialMap;
                 std::vector<Intersectable::Ptr> _shapes;
                 std::string _inputSceneDir;

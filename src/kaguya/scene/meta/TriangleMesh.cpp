@@ -4,7 +4,7 @@
 
 #include <kaguya/math/Math.h>
 #include <kaguya/scene/meta/Triangle.h>
-#include <kaguya/scene/TriangleMesh.h>
+#include <kaguya/scene/meta/TriangleMesh.h>
 
 namespace RENDER_NAMESPACE {
     namespace scene {

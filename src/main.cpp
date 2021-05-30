@@ -1,3 +1,4 @@
+#include <kaguya/common.h>
 #include <kaguya/Config.h>
 #include <kaguya/tracer/TracerFactory.h>
 
@@ -5,7 +6,7 @@
 #include <ext/clipp.h>
 
 using namespace kaguya;
-using namespace kaguya::tracer;
+using namespace RENDER_NAMESPACE::tracer;
 
 using namespace clipp;
 using namespace std;
@@ -46,10 +47,13 @@ int main(int argc, char *argv[]) {
 
     if (sceneDir != "") {
         Config::inputSceneDirs.push_back(sceneDir);
-    } else {
+    }
+#ifdef _RENDER_GPU_MODE_
+    else {
         Config::innerScenes.push_back(Scene::innerSceneWithAreaLight);
         Config::innerScenes.push_back(Scene::innerSceneBunnyWithPointLight);
     }
+#endif // _RENDER_GPU_MODE_
 
     if (Config::Parallel::tileSize <= 0) {
         Config::Parallel::tileSize = 50;

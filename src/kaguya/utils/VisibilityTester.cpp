@@ -2,17 +2,17 @@
 // Created by Storm Phoenix on 2020/11/13.
 //
 
-#include <kaguya/core/medium/Medium.h>
+#include <kaguya/sampler/Sampler.h>
 #include <kaguya/scene/Scene.h>
+#include <kaguya/core/medium/Medium.h>
 #include <kaguya/utils/VisibilityTester.h>
 
 namespace RENDER_NAMESPACE {
     namespace utils {
+        using sampler::Sampler;
+        using core::medium::Medium;
 
-        // TODO Move namespace
-        using kaguya::core::medium::Medium;
-
-        VisibilityTester::VisibilityTester(const kaguya::core::Interaction start, const kaguya::core::Interaction end) :
+        VisibilityTester::VisibilityTester(const core::Interaction start, const core::Interaction end) :
                 _start(start), _end(end) {
         }
 
