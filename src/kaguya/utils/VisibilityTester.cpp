@@ -21,7 +21,7 @@ namespace RENDER_NAMESPACE {
             while (true) {
                 SurfaceInteraction si;
                 bool foundIntersection = scene->intersect(ray, si);
-                if (foundIntersection && si.getMaterial() != nullptr) {
+                if (foundIntersection && !si.getMaterial().nullable()) {
                     return false;
                 }
 
@@ -40,7 +40,7 @@ namespace RENDER_NAMESPACE {
                 SurfaceInteraction si;
                 bool foundIntersection = scene->intersect(ray, si);
                 // check whether interaction is between _start and _end
-                if (foundIntersection && si.getMaterial() != nullptr) {
+                if (foundIntersection && !si.getMaterial().nullable()) {
                     // occluded
                     return core::Spectrum(0);
                 }

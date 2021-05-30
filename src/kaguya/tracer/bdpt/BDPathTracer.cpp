@@ -5,6 +5,7 @@
 #include <kaguya/common.h>
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/core/medium/Medium.h>
+#include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/tracer/bdpt/BDPathTracer.h>
 #include <kaguya/tracer/bdpt/BDPTVertex.h>
 #include <kaguya/utils/VisibilityTester.h>
@@ -17,11 +18,12 @@
 namespace RENDER_NAMESPACE {
     namespace tracer {
 
-        using kaguya::core::bsdf::BXDFType;
-        using kaguya::core::medium::Medium;
-        using kaguya::core::TransportMode;
-        using kaguya::memory::ScopeSwapper;
-        using kaguya::utils::VisibilityTester;
+        using core::bsdf::BSDF;
+        using core::bsdf::BXDFType;
+        using core::medium::Medium;
+        using core::TransportMode;
+        using memory::ScopeSwapper;
+        using utils::VisibilityTester;
 
         BDPathTracer::BDPathTracer() {
             init();
@@ -54,10 +56,10 @@ namespace RENDER_NAMESPACE {
                     FilmTile::Ptr filmTile = std::make_shared<FilmTile>(Point2I(startCol, startRow),
                                                                         tileWidth, tileHeight);
 
-                    MemoryAllocator allocator;
-                    Sampler sampler = sampler::SamplerFactory::newSampler(Config::Tracer::sampleNum);
+                    MemoryAllocator localAllocator;
                     for (int row = startRow; row <= endRow; row++) {
                         for (int col = startCol; col <= endCol; col++) {
+                            Sampler sampler = sampler::SamplerFactory::newSampler(Config::Tracer::sampleNum, localAllocator);
                             // Set current sampling pixel
                             sampler.forPixel(Point2I(row, col));
                             sampler.setSampleIndex(iter);
@@ -65,15 +67,13 @@ namespace RENDER_NAMESPACE {
                             Float pixelX = col + sampler.sample1D();
                             Float pixelY = row + sampler.sample1D();
                             Ray sampleRay = _camera->generateRay(pixelX, pixelY, &sampler);
-
-                            Spectrum shaderColor = shader(sampleRay, _scene, _maxDepth, &sampler, allocator);
-                            allocator.reset();
+                            Spectrum shaderColor = shader(sampleRay, _scene, _maxDepth, &sampler, localAllocator);
 
                             filmTile->addSpectrum(shaderColor, row - startRow, col - startCol);
+                            localAllocator.reset();
                         }
                     }
                     _filmPlane->mergeTile(filmTile);
-                    delete sampler.ptr();
                 };
                 parallel::parallelFor2D(renderFunc, Point2I(nTileX, nTileY));
                 nFinished++;
@@ -96,6 +96,7 @@ namespace RENDER_NAMESPACE {
         }
 
         void BDPathTracer::init() {
+            _globalAllocator = new MemoryAllocator();
             _sampleLightProb = Config::sampleLightProb;
             _maxDepth = Config::Tracer::maxDepth;
             _russianRouletteBounce = Config::russianRouletteDepth;

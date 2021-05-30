@@ -29,14 +29,28 @@ namespace RENDER_NAMESPACE {
 
             RENDER_CPU_GPU TaggedPointer(decltype(__nullptr) p) {}
 
+            RENDER_CPU_GPU TaggedPointer(const TaggedPointer &tp) {
+                taggedPtr = tp.taggedPtr;
+            }
+
             RENDER_CPU_GPU TaggedPointer(TaggedPointer &tp) {
                 taggedPtr = tp.taggedPtr;
             }
 
             RENDER_CPU_GPU
-            TaggedPointer &operator=(TaggedPointer &tp) {
-                this->taggedPtr = tp.taggedPtr;
+            TaggedPointer &operator=(const TaggedPointer &tp) {
+                taggedPtr = tp.taggedPtr;
                 return *this;
+            }
+
+            RENDER_CPU_GPU
+            bool operator==(const TaggedPointer &tp) const {
+                return taggedPtr == tp.taggedPtr;
+            }
+
+            RENDER_CPU_GPU
+            bool operator!=(const TaggedPointer &tp) const {
+                return taggedPtr != tp.taggedPtr;
             }
 
             template<typename T>
@@ -51,16 +65,16 @@ namespace RENDER_NAMESPACE {
                 }
             }
 
-            RENDER_CPU_GPU unsigned int typeId() {
+            RENDER_CPU_GPU unsigned int typeId() const {
                 return ((taggedPtr & typeMask) >> typeShift);
             }
 
-            RENDER_CPU_GPU void *ptr() {
+            RENDER_CPU_GPU void *ptr() const {
                 return reinterpret_cast<void *>(taggedPtr & ptrMask);
             }
 
             template<typename T>
-            RENDER_CPU_GPU bool isType() {
+            RENDER_CPU_GPU bool isType() const {
                 return typeId() == typeIndex<T>();
             }
 
@@ -82,6 +96,11 @@ namespace RENDER_NAMESPACE {
 
             template<typename F>
             RENDER_CPU_GPU inline auto proxyCall(F func) {
+                return EvaluateTpType<maxTag()>()(func, *this, typeId(), Types());
+            }
+
+            template<typename F>
+            RENDER_CPU_GPU inline auto proxyCall(F func) const{
                 return EvaluateTpType<maxTag()>()(func, *this, typeId(), Types());
             }
 

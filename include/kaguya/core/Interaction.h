@@ -9,6 +9,7 @@
 #include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/core/medium/MediumInterface.h>
 #include <kaguya/core/phase/PhaseFunction.h>
+#include <kaguya/material/Material.h>
 #include <kaguya/utils/memory/MemoryAllocator.h>
 #include <kaguya/tracer/Ray.h>
 
@@ -56,12 +57,8 @@ namespace RENDER_NAMESPACE {
             Interaction() : _mediumBoundary(nullptr, nullptr) {}
 
             Interaction(const Vector3F &point, const Vector3F &direction, const Vector3F &normal,
-                        const MediumInterface &mediumBoundary, Material *material = nullptr);
+                        const MediumInterface &mediumBoundary, Material material = Material());
 
-            /**
-             * 检测是否是体积碰撞
-             * @return
-             */
             virtual bool isMediumInteraction() const {
                 return false;
             }
@@ -107,16 +104,16 @@ namespace RENDER_NAMESPACE {
             Vector3F error = Vector3F(0., 0., 0.);
         protected:
             // 击中材质种类
-            Material *_material = nullptr;
+            Material _material;
             // medium boundary
             MediumInterface _mediumBoundary;
 
         public:
-            const Material *getMaterial() const {
+            const Material getMaterial() const {
                 return _material;
             }
 
-            void setMaterial(Material *material) {
+            void setMaterial(Material material) {
                 _material = material;
             }
         };
@@ -130,7 +127,7 @@ namespace RENDER_NAMESPACE {
 
             SurfaceInteraction(const Vector3F &point, const Vector3F &direction, const Vector3F &normal,
                                MediumInterface &mediumBoundary, Float u = 0, Float v = 0,
-                               Material *material = nullptr);
+                               Material material = Material());
 
             void buildScatteringFunction(MemoryAllocator &allocator, TransportMode mode = TransportMode::RADIANCE);
 

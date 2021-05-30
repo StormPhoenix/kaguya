@@ -8,6 +8,7 @@
 #include <kaguya/scene/meta/Shape.h>
 #include <kaguya/scene/Scene.h>
 #include <kaguya/tracer/Camera.h>
+#include <kaguya/utils/memory/MemoryAllocator.h>
 
 #include <cstring>
 #include <functional>
@@ -84,11 +85,11 @@ namespace RENDER_NAMESPACE {
         static std::string renderType;
 
         // TODO 临时代码，用于测试构建场景
-        static std::shared_ptr<Scene> nextScene();
+        static std::shared_ptr<Scene> nextScene(MemoryAllocator &allocator);
 
         static std::vector<std::string> inputSceneDirs;
 
-        static std::vector<std::function<std::shared_ptr<Scene>()>> innerScenes;
+        static std::vector<std::function<std::shared_ptr<Scene>(MemoryAllocator &)>> innerScenes;
     private:
         // Scene id
         static int sceneId;

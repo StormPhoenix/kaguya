@@ -26,7 +26,7 @@ namespace RENDER_NAMESPACE {
 
     // Scene config
     int Config::sceneId = -1;
-    std::vector<std::function<std::shared_ptr<Scene>()>> Config::innerScenes;
+    std::vector<std::function<std::shared_ptr<Scene>(MemoryAllocator &)>> Config::innerScenes;
     std::vector<std::string> Config::inputSceneDirs;
 
     // Trace recorder config
@@ -55,12 +55,12 @@ namespace RENDER_NAMESPACE {
     int Config::Parallel::tileSize = 50;
     int Config::Parallel::kernelCount = 1;
 
-    std::shared_ptr<Scene> Config::nextScene() {
+    std::shared_ptr<Scene> Config::nextScene(MemoryAllocator &allocator) {
         sceneId++;
         std::shared_ptr<Scene> scene = nullptr;
         if (inputSceneDirs.size() > 0) {
             using namespace kaguya::scene::importer;
-            XmlSceneImporter importer = XmlSceneImporter();
+            XmlSceneImporter importer = XmlSceneImporter(allocator);
             if (sceneId < inputSceneDirs.size()) {
                 std::string scene_dir = fs::current_path().generic_u8string() + inputSceneDirs[sceneId];
                 scene = importer.importScene(scene_dir);
@@ -72,7 +72,7 @@ namespace RENDER_NAMESPACE {
         } else {
             // Rendering inner scene
             if (sceneId < innerScenes.size()) {
-                scene = innerScenes[sceneId]();
+                scene = innerScenes[sceneId](allocator);
                 std::cout << "Rendering inner scene: " << scene->getName() << std::endl;
                 return scene;
             } else {

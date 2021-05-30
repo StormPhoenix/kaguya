@@ -26,7 +26,7 @@ namespace RENDER_NAMESPACE {
             typedef std::shared_ptr<Geometry> Ptr;
 
             Geometry(const std::shared_ptr<meta::Shape> shape,
-                     const std::shared_ptr<Material> material,
+                     const Material material,
                      const std::shared_ptr<Medium> inside = nullptr,
                      const std::shared_ptr<Medium> outside = nullptr,
                      const std::shared_ptr<AreaLight> areaLight = nullptr);
@@ -41,7 +41,7 @@ namespace RENDER_NAMESPACE {
 
         private:
             const std::shared_ptr<meta::Shape> _shape;
-            const std::shared_ptr<Material> _material;
+            const Material _material;
             const std::shared_ptr<Medium> _inside;
             const std::shared_ptr<Medium> _outside;
             std::shared_ptr<AreaLight> _areaLight = nullptr;

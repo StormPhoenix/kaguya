@@ -16,15 +16,6 @@ namespace RENDER_NAMESPACE {
     namespace sampler {
         class SamplerFactory {
         public:
-            static Sampler newSampler(int nSamples) {
-                if (nSamples <= 0) {
-                    nSamples = Config::Tracer::sampleNum;
-                }
-                ASSERT(nSamples > 0, "nSamples <= 0.");
-                // TODO add halton sampler
-                return new IndependentSampler(nSamples);
-            }
-
             static Sampler newSampler(int nSamples, MemoryAllocator &allocator) {
                 if (nSamples <= 0) {
                     nSamples = Config::Tracer::sampleNum;
@@ -36,14 +27,6 @@ namespace RENDER_NAMESPACE {
 //                } else {
                 return IndependentSampler::newInstance(nSamples, allocator);
 //                }
-            }
-
-            static SimpleHaltonSampler *newSimpleHalton(int nSamples) {
-                if (nSamples <= 0) {
-                    nSamples = Config::Tracer::sampleNum;
-                }
-                ASSERT(nSamples > 0, "nSamples <= 0.");
-                return new SimpleHaltonSampler(nSamples);
             }
 
             static Sampler newSimpleHalton(int nSamples, MemoryAllocator &allocator) {

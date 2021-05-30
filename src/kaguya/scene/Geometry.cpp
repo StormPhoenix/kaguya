@@ -11,7 +11,7 @@ namespace RENDER_NAMESPACE {
         using kaguya::core::medium::MediumInterface;
 
         Geometry::Geometry(const std::shared_ptr<meta::Shape> shape,
-                           const std::shared_ptr<Material> material,
+                           const Material material,
                            const std::shared_ptr<Medium> inside,
                            const std::shared_ptr<Medium> outside,
                            const std::shared_ptr<AreaLight> areaLight) :
@@ -27,9 +27,9 @@ namespace RENDER_NAMESPACE {
                 // medium
                 si.setMediumBoundary(MediumInterface(_inside.get(), _outside.get()));
                 // material
-                if (_material != nullptr) {
-                    if (_material->isTwoSided() || (DOT(ray.getDirection(), si.normal) < 0)) {
-                        si.setMaterial(_material.get());
+                if (!_material.nullable()) {
+                    if (_material.isTwoSided() || (DOT(ray.getDirection(), si.normal) < 0)) {
+                        si.setMaterial(_material);
                     }
                 } else {
                     si.setMaterial(nullptr);

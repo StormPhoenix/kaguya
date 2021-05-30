@@ -3,6 +3,7 @@
 //
 
 #include <kaguya/Config.h>
+#include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/core/bssrdf/BSSRDF.h>
 #include <kaguya/core/Interaction.h>
 #include <kaguya/core/light/EnvironmentLight.h>
@@ -17,6 +18,7 @@
 namespace RENDER_NAMESPACE {
     namespace tracer {
 
+        using core::BSDF;
         using core::AreaLight;
         using core::Interaction;
         using core::EnvironmentLight;
@@ -29,6 +31,7 @@ namespace RENDER_NAMESPACE {
         }
 
         void PathTracer::init() {
+            _globalAllocator = new MemoryAllocator();
             _sampleLightProb = Config::sampleLightProb;
             _russianRouletteBounce = Config::russianRouletteDepth;
             _russianRoulette = Config::russianRoulette;
@@ -208,10 +211,10 @@ namespace RENDER_NAMESPACE {
                     int startCol = idxTileX * Config::Parallel::tileSize;
                     int endCol = std::min(startCol + Config::Parallel::tileSize - 1, width - 1);
 
-                    MemoryAllocator allocator;
-                    Sampler sampler = sampler::SamplerFactory::newSampler(Config::Tracer::sampleNum);
+                    MemoryAllocator localAllocator;
                     for (int row = startRow; row <= endRow; row++) {
                         for (int col = startCol; col <= endCol; col++) {
+                            Sampler sampler = sampler::SamplerFactory::newSampler(Config::Tracer::sampleNum, localAllocator);
                             // set current sampling pixel
                             sampler.forPixel(Point2I(row, col));
                             sampler.setSampleIndex(iter);
@@ -220,13 +223,12 @@ namespace RENDER_NAMESPACE {
                             Float pixelY = row + sampler.sample1D();
                             Ray sampleRay = _camera->generateRay(pixelX, pixelY, &sampler);
                             Spectrum shaderColor = shaderOfProgression(Point2I(col, row), iter + 1, sampleRay,
-                                                                       _scene, &sampler, allocator);
+                                                                       _scene, &sampler, localAllocator);
 
                             _filmPlane->addSpectrum(shaderColor, row, col);
-                            allocator.reset();
+                            localAllocator.reset();
                         }
                     }
-                    delete sampler.ptr();
                 };
                 parallel::parallelFor2D(renderFunc, Point2I(nTileX, nTileY));
                 nFinished++;
@@ -247,6 +249,7 @@ namespace RENDER_NAMESPACE {
             }
             writeImage(Config::filenamePrefix + "_" + _scene->getName(), 1.0 / nIterations);
             std::cout << std::endl << "scene " << _scene->getName() << " completed." << std::endl;
+            _globalAllocator->reset();
         }
 
         Spectrum PathTracer::estimateEnvironmentLights(const Ray &ray) {

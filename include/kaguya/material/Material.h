@@ -7,18 +7,19 @@
 
 #include <kaguya/common.h>
 #include <kaguya/core/core.h>
-#include <kaguya/core/Interaction.h>
+#include <kaguya/core/bsdf/BXDF.h>
 #include <kaguya/utils/TaggedPointer.h>
 #include <kaguya/utils/memory/MemoryAllocator.h>
 
 namespace RENDER_NAMESPACE {
+    namespace core {
+        class SurfaceInteraction;
+    }
     namespace material {
-
         using memory::TaggedPointer;
-        using kaguya::core::Interaction;
-        using kaguya::core::SurfaceInteraction;
-        using kaguya::core::bsdf::TransportMode;
-        using kaguya::memory::MemoryAllocator;
+        using core::SurfaceInteraction;
+        using core::bsdf::TransportMode;
+        using memory::MemoryAllocator;
 
         class Dielectric;
 
@@ -46,7 +47,7 @@ namespace RENDER_NAMESPACE {
 
             RENDER_CPU_GPU bool isSpecular();
 
-            RENDER_CPU_GPU bool isTwoSided();
+            RENDER_CPU_GPU bool isTwoSided() const ;
 
             RENDER_CPU_GPU void setTwoSided(bool twoSided);
         };

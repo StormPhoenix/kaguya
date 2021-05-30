@@ -3,7 +3,6 @@
 //
 
 #include <kaguya/core/Interaction.h>
-#include <kaguya/material/Material.h>
 #include <kaguya/tracer/Camera.h>
 
 namespace RENDER_NAMESPACE {
@@ -32,7 +31,7 @@ namespace RENDER_NAMESPACE {
 
         Interaction::Interaction(const Vector3F &point,
                                  const Vector3F &direction, const Vector3F &normal,
-                                 const MediumInterface &mediumBoundary, Material *material) :
+                                 const MediumInterface &mediumBoundary, Material material) :
                 point(point), direction(direction), normal(normal),
                 _mediumBoundary(mediumBoundary), _material(material) {}
 
@@ -76,7 +75,7 @@ namespace RENDER_NAMESPACE {
         SurfaceInteraction::SurfaceInteraction(const Vector3F &point, const Vector3F &direction,
                                                const Vector3F &normal,
                                                MediumInterface &mediumBoundary,
-                                               Float u, Float v, Material *material) :
+                                               Float u, Float v, Material material) :
                 Interaction(point, direction, normal, mediumBoundary, material),
                 u(u), v(v) {}
 
@@ -89,8 +88,8 @@ namespace RENDER_NAMESPACE {
         }
 
         void SurfaceInteraction::buildScatteringFunction(MemoryAllocator &allocator, TransportMode mode) {
-            assert(_material != nullptr);
-            _material->evaluateBSDF(*this, allocator, mode);
+            assert(!_material.nullable());
+            _material.evaluateBSDF(*this, allocator, mode);
         }
 
         StartEndInteraction::StartEndInteraction(const Camera *camera,

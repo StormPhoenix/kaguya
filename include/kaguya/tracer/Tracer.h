@@ -6,11 +6,11 @@
 #define KAGUYA_TRACER_H
 
 #include <kaguya/core/core.h>
-#include <kaguya/core/spectrum/Spectrum.hpp>
-
 #include <kaguya/scene/Scene.h>
 #include <kaguya/tracer/Camera.h>
 #include <kaguya/tracer/FilmPlane.h>
+#include <kaguya/core/spectrum/Spectrum.hpp>
+#include <kaguya/utils/memory/MemoryAllocator.h>
 
 namespace RENDER_NAMESPACE {
     namespace tracer {
@@ -55,11 +55,9 @@ namespace RENDER_NAMESPACE {
             virtual void render() = 0;
 
         protected:
-            // 场景
+            MemoryAllocator *_globalAllocator = nullptr;
             std::shared_ptr<Scene> _scene = nullptr;
-            // 相机
             std::shared_ptr<Camera> _camera = nullptr;
-            // 成像平面
             FilmPlane *_filmPlane = nullptr;
         };
 

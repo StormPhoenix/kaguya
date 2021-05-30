@@ -9,6 +9,7 @@
 #include <kaguya/core/Transform.h>
 #include <kaguya/scene/importer/SceneImporter.h>
 #include <kaguya/scene/importer/xml/XmlParseInfo.h>
+#include <kaguya/utils/memory/MemoryAllocator.h>
 
 namespace RENDER_NAMESPACE {
     namespace scene {
@@ -47,7 +48,7 @@ namespace RENDER_NAMESPACE {
 
             class XmlSceneImporter : public SceneImporter {
             public:
-                XmlSceneImporter();
+                XmlSceneImporter(MemoryAllocator &allocator);
 
                 std::shared_ptr<Scene> importScene(std::string sceneDir) override;
 
@@ -88,24 +89,25 @@ namespace RENDER_NAMESPACE {
 
                 std::shared_ptr<std::vector<Shape::Ptr>> createObjMeshes(XmlParseInfo &info);
 
-                Material createDiffuseMaterial(XmlParseInfo &info);
+                const Material createDiffuseMaterial(XmlParseInfo &info);
 
-                Material createMirrorMaterial(XmlParseInfo &info);
+                const Material createMirrorMaterial(XmlParseInfo &info);
 
-                Material createGlassMaterial(XmlParseInfo &info);
+                const Material createGlassMaterial(XmlParseInfo &info);
 
-                Material createDielectricMaterial(XmlParseInfo &info);
+                const Material createDielectricMaterial(XmlParseInfo &info);
 
-                Material createRoughConductorMaterial(XmlParseInfo &info);
+                const Material createRoughConductorMaterial(XmlParseInfo &info);
 
-                Material createCoatingMaterial(XmlParseInfo &info);
+                const Material createCoatingMaterial(XmlParseInfo &info);
 
-                Material createPlasticMaterial(XmlParseInfo &info);
+                const Material createPlasticMaterial(XmlParseInfo &info);
 
             private:
+                MemoryAllocator &_allocator;
                 std::map<std::string, TagType> _nodeTypeMap;
                 std::shared_ptr<Scene> _scene;
-                std::map<std::string, Material::Ptr> _materialMap;
+                std::map<std::string, Material> _materialMap;
                 std::vector<Intersectable::Ptr> _shapes;
                 std::string _inputSceneDir;
             };

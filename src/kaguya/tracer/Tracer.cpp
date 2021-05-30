@@ -3,6 +3,7 @@
 //
 
 #include <kaguya/Config.h>
+#include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/core/light/Light.h>
 #include <kaguya/core/light/AreaLight.h>
 #include <kaguya/tracer/Tracer.h>
@@ -15,12 +16,13 @@ namespace RENDER_NAMESPACE {
         using kaguya::Config;
         using core::Light;
         using core::AreaLight;
+        using core::bsdf::BSDF;
         using core::bsdf::BXDFType;
 
         Tracer::Tracer() {}
 
         void Tracer::run() {
-            _scene = Config::nextScene();
+            _scene = Config::nextScene(*_globalAllocator);
             while (_scene != nullptr) {
                 // Print config info
                 std::cout << std::endl << "Using render type: " << Config::renderType << std::endl;
@@ -40,11 +42,12 @@ namespace RENDER_NAMESPACE {
                 _filmPlane = nullptr;
 
                 _camera = nullptr;
-                _scene = Config::nextScene();
+                _scene = Config::nextScene(*_globalAllocator);
             }
         }
 
-        std::shared_ptr<Light> Tracer::uniformSampleLight(std::shared_ptr<Scene> scene, Float *lightPdf, Sampler *sampler) {
+        std::shared_ptr<Light>
+        Tracer::uniformSampleLight(std::shared_ptr<Scene> scene, Float *lightPdf, Sampler *sampler) {
             // Sample from multiple light
             auto lights = scene->getLights();
             int nLights = lights.size();
@@ -59,7 +62,7 @@ namespace RENDER_NAMESPACE {
         }
 
         Spectrum Tracer::sampleDirectLight(std::shared_ptr<Scene> scene, const Interaction &eye,
-                                               Sampler *sampler) {
+                                           Sampler *sampler) {
             Float lightPdf = 0;
             auto light = uniformSampleLight(scene, &lightPdf, sampler);
             if (light == nullptr) {
@@ -71,7 +74,7 @@ namespace RENDER_NAMESPACE {
         }
 
         Spectrum Tracer::evaluateDirectLight(std::shared_ptr<Scene> scene, const Interaction &eye,
-                                                 const std::shared_ptr<Light> light, Sampler *sampler) {
+                                             const std::shared_ptr<Light> light, Sampler *sampler) {
             // p(wi)
             Float lightPdf = 0;
             // light dir

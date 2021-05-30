@@ -4,20 +4,20 @@
 
 #include <kaguya/scene/accumulation/AABB.h>
 #include <kaguya/core/bsdf/BXDF.h>
+#include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/core/light/Light.h>
 #include <kaguya/core/light/EnvironmentLight.h>
 #include <kaguya/core/light/AreaLight.h>
-#include <kaguya/material/Material.h>
-#include <kaguya/scene/Scene.h>
 #include <kaguya/tracer/bdpt/BDPTVertex.h>
 #include <kaguya/tracer/Camera.h>
 
 namespace RENDER_NAMESPACE {
     namespace tracer {
 
+        using core::bsdf::BSDF;
+        using core::bsdf::BXDFType;
         using scene::acc::AABB;
-        using kaguya::material::Material;
-        using kaguya::core::bsdf::BXDFType;
+        using material::Material;
 
         Float environmentLightDensity(const std::shared_ptr<Scene> scene, Vector3F toLightDirection) {
             Float density = 0.0;

@@ -14,6 +14,8 @@
 
 namespace RENDER_NAMESPACE {
     namespace material {
+        using core::SurfaceInteraction;
+
         void Material::evaluateBSDF(SurfaceInteraction &insect, MemoryAllocator &allocator, TransportMode mode) {
             auto func = [&](auto ptr) { return ptr->evaluateBSDF(insect, allocator, mode); };
             return proxyCall(func);
@@ -24,7 +26,7 @@ namespace RENDER_NAMESPACE {
             return proxyCall(func);
         }
 
-        bool Material::isTwoSided() {
+        bool Material::isTwoSided() const {
             auto func = [&](auto ptr) { return ptr->isTwoSided(); };
             return proxyCall(func);
         }

@@ -73,9 +73,10 @@ namespace RENDER_NAMESPACE {
          */
 
         std::vector<std::shared_ptr<Geometry>>
-        Scene::testLeftWall(const std::shared_ptr<Material> material,
+        Scene::testLeftWall(const Material material,
                             const std::shared_ptr<Medium> insideMedium,
-                            const std::shared_ptr<Medium> outsideMedium) {
+                            const std::shared_ptr<Medium> outsideMedium,
+                            MemoryAllocator &allocator) {
 
             const Vector3F a1(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
             const Vector3F a2(-0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE);
@@ -103,7 +104,7 @@ namespace RENDER_NAMESPACE {
         }
 
         std::vector<std::shared_ptr<Geometry>>
-        Scene::testRightWall(const std::shared_ptr<Material> material,
+        Scene::testRightWall(const Material material,
                              const std::shared_ptr<Medium> insideMedium,
                              const std::shared_ptr<Medium> outsideMedium) {
             const Vector3F a1(0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
@@ -132,7 +133,7 @@ namespace RENDER_NAMESPACE {
         }
 
         std::vector<std::shared_ptr<Geometry>>
-        Scene::testBottomWall(const std::shared_ptr<Material> material,
+        Scene::testBottomWall(const Material material,
                               const std::shared_ptr<Medium> insideMedium,
                               const std::shared_ptr<Medium> outsideMedium) {
             const Vector3F a1(0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
@@ -162,7 +163,7 @@ namespace RENDER_NAMESPACE {
 
 /*
         std::vector<std::shared_ptr<Geometry>>
-        Scene::testBottomPlane(const std::shared_ptr<Material> material,
+        Scene::testBottomPlane(const Material material,
                               const std::shared_ptr<Medium> insideMedium,
                               const std::shared_ptr<Medium> outsideMedium) {
             const Vector3F a1(10.5 * MODEL_SCALE, -0.5 * MODEL_SCALE, -10.5 * MODEL_SCALE);
@@ -195,7 +196,7 @@ namespace RENDER_NAMESPACE {
 
         std::vector<std::shared_ptr<Geometry>>
         Scene::testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
-                                std::vector<std::shared_ptr<Light>> &lights, const std::shared_ptr<Material> material) {
+                                std::vector<std::shared_ptr<Light>> &lights, const Material material) {
             Float top = 0.46;
             const Vector3F a1(0.2 * MODEL_SCALE, top * MODEL_SCALE, -0.2 * MODEL_SCALE);
             const Vector3F a2(-0.2 * MODEL_SCALE, top * MODEL_SCALE, -0.2 * MODEL_SCALE);
@@ -227,7 +228,7 @@ namespace RENDER_NAMESPACE {
             return v;
         }
 
-        std::vector<std::shared_ptr<Geometry>> Scene::testTopWall(const std::shared_ptr<Material> material,
+        std::vector<std::shared_ptr<Geometry>> Scene::testTopWall(const Material material,
                                                                   const std::shared_ptr<Medium> insideMedium,
                                                                   const std::shared_ptr<Medium> outsideMedium) {
             const Vector3F a1(0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
@@ -256,7 +257,7 @@ namespace RENDER_NAMESPACE {
         }
 
         std::vector<std::shared_ptr<Geometry>>
-        Scene::testFrontWall(const std::shared_ptr<Material> material,
+        Scene::testFrontWall(const Material material,
                              const std::shared_ptr<Medium> insideMedium,
                              const std::shared_ptr<Medium> outsideMedium) {
             const Vector3F a1(0.5 * MODEL_SCALE, 0.5 * MODEL_SCALE, -0.5 * MODEL_SCALE);
@@ -287,7 +288,7 @@ namespace RENDER_NAMESPACE {
         }
 
 /*
-        std::shared_ptr<Aggregation> Scene::testSubsurfaceBunny(const std::shared_ptr<Material> material,
+        std::shared_ptr<Aggregation> Scene::testSubsurfaceBunny(const Material material,
                                                       const std::shared_ptr<Medium> inside,
                                                       const std::shared_ptr<Medium> outside,
                                                       const std::shared_ptr<AreaLight> areaLight) {
@@ -315,7 +316,7 @@ namespace RENDER_NAMESPACE {
             return light;
         }
 
-        std::shared_ptr<Scene> Scene::innerSceneWithAreaLight() {
+        std::shared_ptr<Scene> Scene::innerSceneWithAreaLight(MemoryAllocator &allocator) {
             // For testing
             // albedos
             // total white
@@ -356,13 +357,13 @@ namespace RENDER_NAMESPACE {
             lightSpectrum.b(Float(180.0) / 255.0 * lightIntensity);
 
             // lambertian materials
-            std::shared_ptr<Material> lambertLeft = std::make_shared<Lambertian>(red);
-            std::shared_ptr<Material> lambertRight = std::make_shared<Lambertian>(green);
-            std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, totalWhite, 1, 1.5);
-            std::shared_ptr<Material> metal = std::make_shared<Mirror>();
+            Material lambertLeft = allocator.newObject<Lambertian>(red);
+            Material lambertRight = allocator.newObject<Lambertian>(green);
+            Material lambertBottom = allocator.newObject<Lambertian>(white);
+            Material lambertTop = allocator.newObject<Lambertian>(white);
+            Material lambertFront = allocator.newObject<Lambertian>(white);
+            Material glass = allocator.newObject<Dielectric>(totalWhite, totalWhite, 1, 1.5);
+            Material metal = allocator.newObject<Mirror>();
 
             std::shared_ptr<Medium> airMedium = nullptr;
 
@@ -371,7 +372,7 @@ namespace RENDER_NAMESPACE {
 
             // walls
             std::vector<std::shared_ptr<Geometry>> leftWall =
-                    testLeftWall(lambertLeft, airMedium, airMedium);
+                    testLeftWall(lambertLeft, airMedium, airMedium, allocator);
             objects.insert(objects.end(), leftWall.begin(), leftWall.end());
 
             std::vector<std::shared_ptr<Geometry>> rightWall =
@@ -444,7 +445,7 @@ namespace RENDER_NAMESPACE {
         }
 
 
-        std::shared_ptr<Scene> Scene::innerSceneWithPointLight() {
+        std::shared_ptr<Scene> Scene::innerSceneWithPointLight(MemoryAllocator &allocator) {
             // For testing
             // albedos
             // total white
@@ -485,13 +486,13 @@ namespace RENDER_NAMESPACE {
             lightSpectrum.b(Float(180.0) / 255.0 * lightIntensity);
 
             // lambertian materials
-            std::shared_ptr<Material> lambertLeft = std::make_shared<Lambertian>(red);
-            std::shared_ptr<Material> lambertRight = std::make_shared<Lambertian>(green);
-            std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, totalWhite, 1, 1.5);
-            std::shared_ptr<Material> metal = std::make_shared<Mirror>();
+            Material lambertLeft = allocator.newObject<Lambertian>(red);
+            Material lambertRight = allocator.newObject<Lambertian>(green);
+            Material lambertBottom = allocator.newObject<Lambertian>(white);
+            Material lambertTop = allocator.newObject<Lambertian>(white);
+            Material lambertFront = allocator.newObject<Lambertian>(white);
+            Material glass = allocator.newObject<Dielectric>(totalWhite, totalWhite, 1, 1.5);
+            Material metal = allocator.newObject<Mirror>();
 
 //            std::shared_ptr<Medium> airMedium = testAirMedium();
             std::shared_ptr<Medium> airMedium = nullptr;
@@ -501,7 +502,7 @@ namespace RENDER_NAMESPACE {
 
             // walls
             std::vector<std::shared_ptr<Geometry>> leftWall =
-                    testLeftWall(lambertLeft, airMedium, airMedium);
+                    testLeftWall(lambertLeft, airMedium, airMedium, allocator);
             objects.insert(objects.end(), leftWall.begin(), leftWall.end());
 
             std::vector<std::shared_ptr<Geometry>> rightWall =
@@ -550,7 +551,7 @@ namespace RENDER_NAMESPACE {
             return scene;
         }
 
-        std::shared_ptr<Scene> Scene::innerSceneBunnyWithPointLight() {
+        std::shared_ptr<Scene> Scene::innerSceneBunnyWithPointLight(MemoryAllocator &allocator) {
             // For testing
             // albedos
             // total white
@@ -591,13 +592,13 @@ namespace RENDER_NAMESPACE {
             lightSpectrum.b(Float(180.0) / 255.0 * lightIntensity);
 
             // lambertian materials
-            std::shared_ptr<Material> lambertLeft = std::make_shared<Lambertian>(red);
-            std::shared_ptr<Material> lambertRight = std::make_shared<Lambertian>(green);
-            std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, totalWhite, 1, 1.5);
-            std::shared_ptr<Material> metal = std::make_shared<Mirror>();
+            Material lambertLeft = allocator.newObject<Lambertian>(red);
+            Material lambertRight = allocator.newObject<Lambertian>(green);
+            Material lambertBottom = allocator.newObject<Lambertian>(white);
+            Material lambertTop = allocator.newObject<Lambertian>(white);
+            Material lambertFront = allocator.newObject<Lambertian>(white);
+            Material glass = allocator.newObject<Dielectric>(totalWhite, totalWhite, 1, 1.5);
+            Material metal = allocator.newObject<Mirror>();
 
 //            std::shared_ptr<Medium> airMedium = testAirMedium();
             std::shared_ptr<Medium> airMedium = nullptr;
@@ -607,7 +608,7 @@ namespace RENDER_NAMESPACE {
 
             // walls
             std::vector<std::shared_ptr<Geometry>> leftWall =
-                    testLeftWall(lambertLeft, airMedium, airMedium);
+                    testLeftWall(lambertLeft, airMedium, airMedium, allocator);
             objects.insert(objects.end(), leftWall.begin(), leftWall.end());
 
             std::vector<std::shared_ptr<Geometry>> rightWall =
@@ -720,13 +721,13 @@ namespace RENDER_NAMESPACE {
             lightSpectrum.b(Float(180.0) / 255.0 * lightIntensity);
 
             // lambertian materials
-            std::shared_ptr<Material> lambertLeft = std::make_shared<Lambertian>(red);
-            std::shared_ptr<Material> lambertRight = std::make_shared<Lambertian>(green);
-            std::shared_ptr<Material> lambertBottom = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> lambertTop = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> lambertFront = std::make_shared<Lambertian>(white);
-            std::shared_ptr<Material> glass = std::make_shared<Dielectric>(totalWhite, 1.5);
-            std::shared_ptr<Material> metal = std::make_shared<Metal>();
+            Material lambertLeft = allocator.newObject<Lambertian>(red);
+            Material lambertRight = allocator.newObject<Lambertian>(green);
+            Material lambertBottom = allocator.newObject<Lambertian>(white);
+            Material lambertTop = allocator.newObject<Lambertian>(white);
+            Material lambertFront = allocator.newObject<Lambertian>(white);
+            Material glass = allocator.newObject<Dielectric>(totalWhite, 1.5);
+            Material metal = std::make_shared<Metal>();
 
             // medium
             Spectrum sigmaA(0);
@@ -751,7 +752,7 @@ namespace RENDER_NAMESPACE {
             Spectrum mft(0.01);
             Float g = 0.0f;
             Float theta = 1.33f;
-            std::shared_ptr<Material> subsurfaceMaterial = std::make_shared<SubsurfaceMaterial>(albedoEff, mft, g, theta);
+            Material subsurfaceMaterial = std::make_shared<SubsurfaceMaterial>(albedoEff, mft, g, theta);
 
             // load model
 //            std::shared_ptr<Intersectable> bunny = testBunny(lambertFront, bunnyMedium, airMedium, nullptr);

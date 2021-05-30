@@ -5,6 +5,7 @@
 #include <kaguya/Config.h>
 #include <kaguya/core/light/Light.h>
 #include <kaguya/core/light/AreaLight.h>
+#include <kaguya/core/bsdf/BSDF.h>
 #include <kaguya/sampler/SamplerFactory.hpp>
 #include <kaguya/tracer/pm/SPPMTracer.h>
 #include <kaguya/parallel/AtomicFloat.h>
@@ -15,6 +16,7 @@ namespace RENDER_NAMESPACE {
 
         using core::Light;
         using core::AreaLight;
+        using core::bsdf::BSDF;
         using namespace parallel;
         using core::bsdf::BXDFType;
 
@@ -85,7 +87,9 @@ namespace RENDER_NAMESPACE {
                                    (p.z * 83492791)) % hashSize;
         }
 
-        SPPMTracer::SPPMTracer() {}
+        SPPMTracer::SPPMTracer() {
+            _globalAllocator = new MemoryAllocator();
+        }
 
         void SPPMTracer::render() {
             _gamma = Config::Tracer::radiusDecay;
@@ -132,9 +136,9 @@ namespace RENDER_NAMESPACE {
                         int endCol = (std::min)(startCol + Config::Parallel::tileSize - 1, width - 1);
 
                         MemoryAllocator &allocator = memoryAllocatorPerThread[threadIdx];
-                        Sampler sampler = sampler::SamplerFactory::newSampler(nIterations);
                         for (int row = startRow; row <= endRow; row++) {
                             for (int col = startCol; col <= endCol; col++) {
+                                Sampler sampler = sampler::SamplerFactory::newSampler(nIterations, allocator);
                                 sampler.forPixel(Point2I(row, col));
                                 sampler.setSampleIndex(iter);
 
@@ -204,18 +208,22 @@ namespace RENDER_NAMESPACE {
                                         assert(si.bsdf != nullptr);
 
                                         // Sample from direct light
-                                        if (si.bsdf->allIncludeOf(BXDFType(BXDFType::BSDF_ALL & (~BXDFType::BSDF_SPECULAR)))) {
+                                        if (si.bsdf->allIncludeOf(
+                                                BXDFType(BXDFType::BSDF_ALL & (~BXDFType::BSDF_SPECULAR)))) {
                                             pixel.Ld += beta * sampleDirectLight(_scene, si, &sampler);
                                         }
 
                                         // Judge visible point
                                         bool isDiffuse = si.bsdf->allIncludeOf(BXDFType(BXDFType::BSDF_DIFFUSE
                                                                                         | BXDFType::BSDF_REFLECTION
-                                                                                        | BXDFType::BSDF_TRANSMISSION)) > 0;
+                                                                                        |
+                                                                                        BXDFType::BSDF_TRANSMISSION)) >
+                                                         0;
 
                                         bool isGlossy = si.bsdf->allIncludeOf(BXDFType(BXDFType::BSDF_GLOSSY
                                                                                        | BXDFType::BSDF_REFLECTION
-                                                                                       | BXDFType::BSDF_TRANSMISSION)) > 0;
+                                                                                       | BXDFType::BSDF_TRANSMISSION)) >
+                                                        0;
 
                                         Vector3F wo = -cameraRay.getDirection();
                                         if (isDiffuse || (isGlossy && (_maxDepth - 1 == bounce))) {
@@ -256,7 +264,6 @@ namespace RENDER_NAMESPACE {
                                 }
                             }
                         }
-                        delete sampler.ptr();
                     };
                     parallel::parallelFor2D(cameraPassFunc, Point2I(nTileX, nTileY));
                 }
@@ -331,11 +338,11 @@ namespace RENDER_NAMESPACE {
 
                 /* Trace photons */
                 {
-                    Sampler haltonSampler = sampler::SamplerFactory::newSimpleHalton(
-                            nIterations * _shootPhotonsPerIter);
                     std::vector<MemoryAllocator> photonMemoryArena(renderCores());
                     auto tracePhotonFunc = [&](const int idxPhoton) {
                         MemoryAllocator &photonAllocator = photonMemoryArena[threadIdx];
+                        Sampler haltonSampler = sampler::SamplerFactory::newSimpleHalton(
+                                nIterations * _shootPhotonsPerIter, photonAllocator);
                         haltonSampler.setSampleIndex(iter * _shootPhotonsPerIter + idxPhoton);
 
                         // Uniform sample light
@@ -413,7 +420,8 @@ namespace RENDER_NAMESPACE {
                             Vector3F wi;
                             Float samplePdf = 0;
 
-                            Spectrum f = si.bsdf->sampleF(wo, &wi, &samplePdf, &haltonSampler, BXDFType::BSDF_ALL, nullptr);
+                            Spectrum f = si.bsdf->sampleF(wo, &wi, &samplePdf, &haltonSampler, BXDFType::BSDF_ALL,
+                                                          nullptr);
                             if (f.isBlack() || samplePdf == 0.) {
                                 break;
                             }
@@ -433,7 +441,6 @@ namespace RENDER_NAMESPACE {
 
                     };
                     parallelFor1D(tracePhotonFunc, _shootPhotonsPerIter, 125);
-                    delete haltonSampler.ptr();
                 }
 
                 /* Density estimation */

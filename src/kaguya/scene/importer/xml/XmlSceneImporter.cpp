@@ -95,7 +95,7 @@ namespace RENDER_NAMESPACE {
                 return ret;
             }
 
-            XmlSceneImporter::XmlSceneImporter() {
+            XmlSceneImporter::XmlSceneImporter(MemoryAllocator &allocator) : _allocator(allocator) {
                 _nodeTypeMap["mode"] = Tag_Mode;
                 _nodeTypeMap["scene"] = Tag_Scene;
 
@@ -285,8 +285,8 @@ namespace RENDER_NAMESPACE {
                 } else if (type == "twosided") {
                     ASSERT(!parseInfo.currentMaterial.nullable(),
                            "BSDF twosided should have {currentMaterial} attribute. ");
-                    material = parseInfo.currentMaterial;
-                    material->setTwoSided(true);
+                    material = (const Material) (parseInfo.currentMaterial);
+                    material.setTwoSided(true);
                 } else if (type == "coating") {
                 } else if (type == "coating") {
                     material = createCoatingMaterial(parseInfo);
@@ -297,13 +297,13 @@ namespace RENDER_NAMESPACE {
                 }
 
                 if (id == "") {
-                    parentInfo.currentMaterial = material;
+                    parentInfo.currentMaterial = (const Material) (material);
                 } else {
-                    _materialMap[id] = material;
+                    _materialMap[id] = (const Material) (material);
                 }
             }
 
-            Material::Ptr XmlSceneImporter::createRoughConductorMaterial(XmlParseInfo &info) {
+            const Material XmlSceneImporter::createRoughConductorMaterial(XmlParseInfo &info) {
                 // Roughness
                 Float alpha = 0.01;
                 if (info.attrExists("alpha")) {
@@ -327,19 +327,19 @@ namespace RENDER_NAMESPACE {
                 Texture<Spectrum>::Ptr texR = std::make_shared<ConstantTexture<Spectrum>>(R);
                 Texture<Spectrum>::Ptr texEta = std::make_shared<ConstantTexture<Spectrum>>(Eta);
                 Texture<Spectrum>::Ptr texK = std::make_shared<ConstantTexture<Spectrum>>(K);
-                return std::make_shared<Metal>(texAlpha, texEta, texR, texK, distributionType);
+                return _allocator.newObject<Metal>(texAlpha, texEta, texR, texK, distributionType);
             }
 
-            Material XmlSceneImporter::createGlassMaterial(XmlParseInfo &info) {
+            const Material XmlSceneImporter::createGlassMaterial(XmlParseInfo &info) {
                 Float extIOR = 1.;
                 Float intIOR = 1.5;
                 Texture<Spectrum>::Ptr texR = std::make_shared<ConstantTexture<Spectrum>>(1.0);
                 Texture<Spectrum>::Ptr texT = std::make_shared<ConstantTexture<Spectrum>>(1.0);
-                return std::make_shared<Dielectric>(texR, texT, extIOR, intIOR);
+                return _allocator.newObject<Dielectric>(texR, texT, extIOR, intIOR);
             }
 
-            Material::Ptr XmlSceneImporter::createPlasticMaterial(XmlParseInfo &info) {
-                Material::Ptr material = nullptr;
+            const Material XmlSceneImporter::createPlasticMaterial(XmlParseInfo &info) {
+                Material material;
                 auto intIORType = info.getType("intIOR");
                 auto extIORType = info.getType("extIOR");
                 ASSERT(intIORType == XmlAttrVal::Attr_Float && extIORType == XmlAttrVal::Attr_Float,
@@ -365,13 +365,13 @@ namespace RENDER_NAMESPACE {
                 Texture<Float>::Ptr etaI = std::make_shared<ConstantTexture<Float>>(extIOR);
                 Texture<Float>::Ptr etaT = std::make_shared<ConstantTexture<Float>>(intIOR);
 
-                material = std::make_shared<PlasticMaterial>(Kd, Ks, etaI, etaT, alpha);
+                material = _allocator.newObject<PlasticMaterial>(Kd, Ks, etaI, etaT, alpha);
                 return material;
             }
 
             // Rename method
-            Material::Ptr XmlSceneImporter::createCoatingMaterial(XmlParseInfo &info) {
-                Material::Ptr material = nullptr;
+            const Material XmlSceneImporter::createCoatingMaterial(XmlParseInfo &info) {
+                Material material;
 
                 ASSERT(info.attrExists("diffuseReflectance") &&
                        info.attrExists("specularReflectance") && info.attrExists("alpha"),
@@ -404,12 +404,12 @@ namespace RENDER_NAMESPACE {
                 auto alpha = info.getFloatValue("alpha", 0.1);
 
                 Texture<Float>::Ptr roughness = std::make_shared<ConstantTexture<Float>>(alpha);
-                material = std::make_shared<PatinaMaterial>(Kd, Ks, roughness);
+                material = _allocator.newObject<PatinaMaterial>(Kd, Ks, roughness);
                 return material;
             }
 
-            Material::Ptr XmlSceneImporter::createDielectricMaterial(XmlParseInfo &info) {
-                Material::Ptr material = nullptr;
+            const Material XmlSceneImporter::createDielectricMaterial(XmlParseInfo &info) {
+                Material material;
                 auto intIORType = info.getType("intIOR");
                 auto extIORType = info.getType("extIOR");
                 ASSERT(intIORType == XmlAttrVal::Attr_Float && extIORType == XmlAttrVal::Attr_Float,
@@ -423,27 +423,27 @@ namespace RENDER_NAMESPACE {
                 // 临时用 1.0 spectrum 代替
                 Texture<Spectrum>::Ptr texR = std::make_shared<ConstantTexture<Spectrum>>(1.0);
                 Texture<Spectrum>::Ptr texT = std::make_shared<ConstantTexture<Spectrum>>(1.0);
-                material = std::make_shared<Dielectric>(texR, texT, extIOR, intIOR, roughness);
+                material = _allocator.newObject<Dielectric>(texR, texT, extIOR, intIOR, roughness);
                 return material;
             }
 
-            Material::Ptr XmlSceneImporter::createDiffuseMaterial(XmlParseInfo &info) {
-                Material::Ptr material = nullptr;
+            const Material XmlSceneImporter::createDiffuseMaterial(XmlParseInfo &info) {
+                Material material;
 
                 if (!info.attrExists("reflectance")) {
                     // Create default diffuse material
                     Texture<Spectrum>::Ptr texture = std::make_shared<ConstantTexture<Spectrum>>(0.);
-                    material = std::make_shared<Lambertian>(texture);
+                    material = _allocator.newObject<Lambertian>(texture);
                 } else {
                     auto type = info.getType("reflectance");
                     if (type == XmlAttrVal::Attr_Spectrum) {
                         Spectrum albedo = info.getSpectrumValue("reflectance", 0);
                         Texture<Spectrum>::Ptr texture = std::make_shared<ConstantTexture<Spectrum>>(albedo);
-                        material = std::make_shared<Lambertian>(texture);
+                        material = _allocator.newObject<Lambertian>(texture);
                     } else if (type == XmlAttrVal::Attr_SpectrumTexture) {
                         Texture<Spectrum>::Ptr texture = info.getSpectrumTextureValue("reflectance", nullptr);
                         ASSERT(texture, "Texture can't be nullptr. ");
-                        material = std::make_shared<Lambertian>(texture);
+                        material = _allocator.newObject<Lambertian>(texture);
                     } else {
                         // TODO
                         ASSERT(type == XmlAttrVal::Attr_Spectrum, "Reflectance type not supported .");
@@ -452,8 +452,8 @@ namespace RENDER_NAMESPACE {
                 return material;
             }
 
-            Material::Ptr XmlSceneImporter::createMirrorMaterial(XmlParseInfo &info) {
-                return std::make_shared<Mirror>();
+            const Material XmlSceneImporter::createMirrorMaterial(XmlParseInfo &info) {
+                return _allocator.newObject<Mirror>();
             }
 
             std::shared_ptr<std::vector<Shape::Ptr>> XmlSceneImporter::createRectangleShape(XmlParseInfo &info) {
@@ -531,7 +531,7 @@ namespace RENDER_NAMESPACE {
                     ASSERT(false, "Only support rectangle shape for now");
                 }
 
-                Material::Ptr material = parseInfo.currentMaterial;
+                Material material = parseInfo.currentMaterial;
                 Medium::Ptr exteriorMedium = parseInfo.currentExteriorMedium;
                 Medium::Ptr interiorMedium = parseInfo.currentInteriorMedium;
 
@@ -564,7 +564,7 @@ namespace RENDER_NAMESPACE {
             void XmlSceneImporter::handleTagRef(pugi::xml_node &node, XmlParseInfo &parent) {
                 std::string id = node.attribute("id").value();
                 ASSERT(_materialMap.count(id) > 0, "Material " + id + " Not Exists.!");
-                parent.currentMaterial = _materialMap[id];
+                parent.currentMaterial = (const Material) (_materialMap[id]);
             }
 
             void XmlSceneImporter::handleTagRGB(pugi::xml_node &node, XmlParseInfo &parentParseInfo) {

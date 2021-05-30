@@ -24,7 +24,7 @@ namespace RENDER_NAMESPACE {
                 return false;
             }
 
-            RENDER_CPU_GPU bool isTwoSided() {
+            RENDER_CPU_GPU bool isTwoSided() const {
                 return _twoSided;
             }
 

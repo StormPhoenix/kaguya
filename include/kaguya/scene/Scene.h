@@ -46,35 +46,36 @@ namespace RENDER_NAMESPACE {
              */
 
             static std::vector<std::shared_ptr<Geometry>>
-            testLeftWall(const std::shared_ptr<Material> material,
+            testLeftWall(const Material material,
                          const std::shared_ptr<Medium> insideMedium,
-                         const std::shared_ptr<Medium> outsideMedium);
+                         const std::shared_ptr<Medium> outsideMedium,
+                         MemoryAllocator &allocator);
 
             static std::vector<std::shared_ptr<Geometry>>
-            testRightWall(const std::shared_ptr<Material> material,
+            testRightWall(const Material material,
                           const std::shared_ptr<Medium> insideMedium,
                           const std::shared_ptr<Medium> outsideMedium);
 
-            static std::vector<std::shared_ptr<Geometry>> testBottomWall(const std::shared_ptr<Material> material,
+            static std::vector<std::shared_ptr<Geometry>> testBottomWall(const Material material,
                                                                          const std::shared_ptr<Medium> insideMedium,
                                                                          const std::shared_ptr<Medium> outsideMedium);
 
-            static std::vector<std::shared_ptr<Geometry>> testTopWall(const std::shared_ptr<Material> material,
+            static std::vector<std::shared_ptr<Geometry>> testTopWall(const Material material,
                                                                       const std::shared_ptr<Medium> insideMedium,
                                                                       const std::shared_ptr<Medium> outsideMedium);
 
-            static std::vector<std::shared_ptr<Geometry>> testFrontWall(const std::shared_ptr<Material> material,
+            static std::vector<std::shared_ptr<Geometry>> testFrontWall(const Material material,
                                                                         const std::shared_ptr<Medium> insideMedium,
                                                                         const std::shared_ptr<Medium> outsideMedium);
 
             /*
-            static std::vector<std::shared_ptr<Geometry>> testBottomPlane(const std::shared_ptr<Material> material,
+            static std::vector<std::shared_ptr<Geometry>> testBottomPlane(const Material material,
                                                                           const std::shared_ptr<Medium> insideMedium,
                                                                           const std::shared_ptr<Medium> outsideMedium);
 
 
 
-            static std::shared_ptr<Aggregation> testSubsurfaceBunny(const std::shared_ptr<Material> material,
+            static std::shared_ptr<Aggregation> testSubsurfaceBunny(const Material material,
                                                           const std::shared_ptr<Medium> inside = nullptr,
                                                           const std::shared_ptr<Medium> outside = nullptr,
                                                           const std::shared_ptr<AreaLight> areaLight = nullptr);
@@ -88,15 +89,15 @@ namespace RENDER_NAMESPACE {
 
             static std::vector<std::shared_ptr<Geometry>>
             testTopAreaLight(const Spectrum spectrum, const std::shared_ptr<Medium> medium,
-                             std::vector<std::shared_ptr<Light>> &lights, const std::shared_ptr<Material> material);
+                             std::vector<std::shared_ptr<Light>> &lights, const Material material);
 
-//            static std::shared_ptr<Scene> sceneBunnySubsurfaceWithAreaLight();
+//            static std::shared_ptr<Scene> sceneBunnySubsurfaceWithAreaLight(MemoryAllocator &allocator);
 
-            static std::shared_ptr<Scene> innerSceneBunnyWithPointLight();
+            static std::shared_ptr<Scene> innerSceneBunnyWithPointLight(MemoryAllocator &allocator);
 
-            static std::shared_ptr<Scene> innerSceneWithAreaLight();
+            static std::shared_ptr<Scene> innerSceneWithAreaLight(MemoryAllocator &allocator);
 
-            static std::shared_ptr<Scene> innerSceneWithPointLight();
+            static std::shared_ptr<Scene> innerSceneWithPointLight(MemoryAllocator &allocator);
 
             /**
              * Intersect with scene，record the interaction

@@ -25,7 +25,7 @@ namespace RENDER_NAMESPACE {
             RENDER_CPU_GPU void evaluateBSDF(SurfaceInteraction &insect, MemoryAllocator &allocator,
                                              TransportMode mode = TransportMode::RADIANCE);
 
-            RENDER_CPU_GPU bool isTwoSided() {
+            RENDER_CPU_GPU bool isTwoSided() const {
                 return _twoSided;
             }
 

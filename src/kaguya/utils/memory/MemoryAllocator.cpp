@@ -71,6 +71,7 @@ namespace RENDER_NAMESPACE {
             for (auto iter = _availableBlocks.begin(); iter != _availableBlocks.end(); iter++) {
                 _resource->freeAlignedMemory(iter->second);
             }
+            delete _resource;
         }
     }
 }
