@@ -48,12 +48,12 @@ int main(int argc, char *argv[]) {
     if (sceneDir != "") {
         Config::inputSceneDirs.push_back(sceneDir);
     }
-#ifdef _RENDER_GPU_MODE_
+#ifdef __RENDER_GPU_MODE__
     else {
         Config::innerScenes.push_back(Scene::innerSceneWithAreaLight);
         Config::innerScenes.push_back(Scene::innerSceneBunnyWithPointLight);
     }
-#endif // _RENDER_GPU_MODE_
+#endif // __RENDER_GPU_MODE__
 
     if (Config::Parallel::tileSize <= 0) {
         Config::Parallel::tileSize = 50;

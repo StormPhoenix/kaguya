@@ -59,8 +59,8 @@ if (OptiX_FOUND)
     message(STATUS "Found OptiX")
 endif (OptiX_FOUND)
 
-option(START_CUDA "option for cuda" ON)
-#option(START_CUDA "option for cuda" OFF)
+#option(START_CUDA "option for cuda" ON)
+option(START_CUDA "option for cuda" OFF)
 
 set(RENDER_GPU_MODE_ENABLED false)
 if (CUDA_FOUND AND CUDA_FOUND AND START_CUDA)
@@ -76,7 +76,7 @@ if (CUDA_FOUND AND CUDA_FOUND AND START_CUDA)
     endif (BIN2C)
 
     set(RENDER_GPU_MODE_ENABLED true)
-    add_definitions(-D _RENDER_GPU_MODE_)
+    add_definitions(-D __RENDER_GPU_MODE__)
 
     message(STATUS "Compile in GPU Mode.")
 endif (CUDA_FOUND AND CUDA_FOUND AND START_CUDA)
@@ -91,14 +91,14 @@ set(RENDER_UTILS_SOURCES
         src/kaguya/utils/ObjLoader.cpp
         src/kaguya/utils/VisibilityTester.cpp)
 
-set(RENDER_SAMPLER_SOURCES
+set(RENDER_SAMPLER_SRCS
         #        src/kaguya/sampler/HaltonSampler.cpp
-        src/kaguya/sampler/RNG.cpp
+        include/kaguya/sampler/RNG.h
         src/kaguya/sampler/Sampler.cpp
         src/kaguya/sampler/IndependentSampler.cpp
         src/kaguya/sampler/SimpleHaltonSampler.cpp)
 
-set(RENDER_MATERIAL_SOURCES
+set(RENDER_MATERIAL_SRCS
         src/kaguya/material/Material.cpp
         src/kaguya/material/Lambertian.cpp
         src/kaguya/material/Dielectric.cpp
@@ -137,11 +137,12 @@ set(RENDER_SCENE_SOURCES
 set(RENDER_SCENE_HEADERS
         ${PROJECT_INCLUDE_DIRECTORY})
 
-set(RENDER_GPU_SOURCES "")
+set(RENDER_CPU_SRC "")
+set(RENDER_GPU_SRC "")
+
 if (RENDER_GPU_MODE_ENABLED)
-    set(RENDER_GPU_SOURCES
-            src/kaguya/utils/memory/CUDAResource.cpp
-            include/kaguya/utils/type_utils.h)
+    set(RENDER_GPU_SRC
+            src/kaguya/utils/memory/CUDAResource.cpp)
 
     set(RENDER_GPU_HEADERS
             ${CUDA_INCLUDE_DIRECTORY}
@@ -157,24 +158,17 @@ if (RENDER_GPU_MODE_ENABLED)
             ${OPTIX_INCLUDE_DIRECTORY})
 
     set_source_files_properties(
-            include/kaguya/sampler/RNG.h
-            src/kaguya/sampler/RNG.cpp
+            ${RENDER_SAMPLER_SRCS}
 
             include/kaguya/utils/TaggedPointer.h
 
             ${RENDER_MATERIAL_HEADERS}
-            ${RENDER_MATERIAL_SOURCES}
-
-            include/kaguya/sampler/Sampler.h
-            src/kaguya/sampler/Sampler.cpp
-
-            include/kaguya/sampler/IndependentSampler.h
-            src/kaguya/sampler/IndependentSampler.cpp
+            ${RENDER_MATERIAL_SRCS}
 
             PROPERTIES LANGUAGE CUDA)
 endif (RENDER_GPU_MODE_ENABLED)
 
-file(GLOB RENDER_SOURCES
+file(GLOB RENDER_SRCS
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/core/*.cpp
@@ -195,6 +189,16 @@ file(GLOB RENDER_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/src/kaguya/tracer/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/pugixml/*.cpp)
 
+if (RENDER_GPU_MODE_ENABLED)
+    set(RENDER_SRCS
+            ${RENDER_SRCS}
+            ${RENDER_GPU_SRC})
+else (RENDER_GPU_MODE_ENABLED)
+    set(RENDER_SRCS
+            ${RENDER_SRCS}
+            ${RENDER_CPU_SRC})
+endif (RENDER_GPU_MODE_ENABLED)
+
 add_library(render_scene_lib
         ${RENDER_SCENE_SOURCES})
 target_include_directories(render_scene_lib
@@ -202,7 +206,7 @@ target_include_directories(render_scene_lib
         ${RENDER_SCENE_HEADERS})
 
 add_library(render_sampler_lib
-        ${RENDER_SAMPLER_SOURCES})
+        ${RENDER_SAMPLER_SRCS})
 target_include_directories(render_sampler_lib
         PRIVATE
         ${PROJECT_INCLUDE_DIRECTORY})
@@ -214,15 +218,14 @@ target_include_directories(render_utils_lib
         ${PROJECT_INCLUDE_DIRECTORY})
 
 add_library(render_material_lib
-        ${RENDER_MATERIAL_SOURCES})
+        ${RENDER_MATERIAL_SRCS})
 target_include_directories(render_material_lib
         PRIVATE
         ${RENDER_MATERIAL_HEADERS}
         ${PROJECT_INCLUDE_DIRECTORY})
 
 add_executable(${PROJECT_NAME}
-        ${RENDER_SOURCES}
-        ${RENDER_GPU_SOURCES})
+        ${RENDER_SRCS})
 target_include_directories(${PROJECT_NAME}
         PRIVATE
         ${RENDER_GPU_HEADERS}

@@ -17,7 +17,6 @@
 #include <algorithm>
 
 #include <functional>
-#include <random>
 
 using Vector2d = glm::dvec2;
 using Vector2f = glm::vec2;
@@ -87,34 +86,51 @@ namespace RENDER_NAMESPACE {
     }
 
     namespace math {
+#ifdef __RENDER_GPU_MODE__
 
-#ifdef WINDOWS
-        const double doubleOneMinusEpsilon = 0.99999999999999989;
-        const float floatOneMinusEpsilon = 0.99999994;
-#else
-        const double doubleOneMinusEpsilon = 0x1.fffffffffffffp-1;
-        const float floatOneMinusEpsilon = 0x1.fffffep-1;
-#endif
+#define Infinity std::numeric_limits<Float>::infinity()
+#define Epsilon std::numeric_limits<Float>::epsilon() * 0.5f
+#define MaxFloat std::numeric_limits<Float>::max()
+
+#define doubleOneMinusEpsilon 0x1.fffffffffffffp-1
+#define floatOneMinusEpsilon float(0x1.fffffep-1)
 
 #if defined(_RENDER_DATA_DOUBLE_)
-        const Float ONE_MINUS_EPSILON = doubleOneMinusEpsilon;
+#define OneMinusEpsilon doubleOneMinusEpsilon
 #else
-        const Float ONE_MINUS_EPSILON = floatOneMinusEpsilon;
-#endif
+#define OneMinusEpsilon floatOneMinusEpsilon
+#endif // _RENDER_DATA_DOUBLE_
 
-#ifdef WINDOWS
-#define MAX_FLOAT std::numeric_limits<Float>::max()
 #else
-        constexpr Float MAX_FLOAT = std::numeric_limits<Float>::max();
-#endif
+        static constexpr Float Infinity = std::numeric_limits<Float>::infinity();
+        static constexpr Float Epsilon = std::numeric_limits<Float>::epsilon() * 0.5;
+        static constexpr Float MaxFloat = std::numeric_limits<Float>::max();
 
-        constexpr Float infinity = std::numeric_limits<Float>::infinity();
-        constexpr Float epsilon = std::numeric_limits<Float>::epsilon() * 0.5;
+        static constexpr double doubleOneMinusEpsilon = 0x1.fffffffffffffp-1;
+        static constexpr float floatOneMinusEpsilon = 0x1.fffffep-1;
+
+#if defined(_RENDER_DATA_DOUBLE_)
+        static constexpr double OneMinusEpsilon = doubleOneMinusEpsilon;
+#else
+        static constexpr float OneMinusEpsilon = floatOneMinusEpsilon;
+#endif // _RENDER_DATA_DOUBLE_
+
+#endif // __RENDER_GPU_MODE__
+
+#ifdef __RENDER_GPU_MODE__
+#define PI Float(3.14159265358979323846)
+#define INV_PI Float(0.31830988618379067154)
+#define INV_2PI Float(0.15915494309189533577)
+#define INV_4PI Float(0.07957747154594766788)
+#else
+        constexpr Float PI = 3.14159265358979323846;
+        constexpr Float INV_PI = 0.31830988618379067154;
+        constexpr Float INV_2PI = 0.15915494309189533577;
+        constexpr Float INV_4PI = 0.07957747154594766788;
+#endif // __RENDER_GPU_MODE__
+
         constexpr Float shadowEpsilon = 0.0001;
-        const double PI = 3.1415926535897932385;
-        const Float INV_PI = 1.0 / PI;
-        const Float INV_2PI = 1.0 / (2 * PI);
-        const Float INV_4PI = 1.0 / (4 * PI);
+
         const Float EPSILON = 10e-6f;
         const Float REFRACTION_INDEX_WATER = 1.0f;
 
@@ -162,33 +178,34 @@ namespace RENDER_NAMESPACE {
             Vector3F _max;
         };
 
-        inline Float degreesToRadians(double degrees) {
+        RENDER_CPU_GPU inline constexpr Float degreesToRadians(double degrees) {
             return degrees * PI / 180;
         }
 
-        inline Float distance(const Point3F &p1, const Point3F &p2) {
+        RENDER_CPU_GPU inline Float distance(const Point3F &p1, const Point3F &p2) {
             return (p2 - p1).length();
         }
 
-        inline Float distanceSquare(const Point3F &p1, const Point3F &p2) {
+        RENDER_CPU_GPU inline Float distanceSquare(const Point3F &p1, const Point3F &p2) {
             Float len = LENGTH(p2 - p1);
             return len * len;
         }
 
         /* [min, max] */
         template<typename T, typename U, typename V>
-        T clamp(T x, U min, V max) {
+        RENDER_CPU_GPU inline constexpr T clamp(T x, U min, V max) {
             if (x < min) return min;
             if (x > max) return max;
             return x;
         }
 
-        inline Float phaseFuncHG(Float cosTheta, Float g) {
+        RENDER_CPU_GPU inline Float phaseFuncHG(Float cosTheta, Float g) {
             Float denominator = 1 + g * g + 2 * g * cosTheta;
+            denominator = std::max(denominator, 0.f);
             return INV_4PI * (1 - g * g) / (denominator * std::sqrt(denominator));
         }
 
-        inline bool checkRange(Float num, Float min, Float max) {
+        RENDER_CPU_GPU inline constexpr bool checkRange(Float num, Float min, Float max) {
             return num >= min && num <= max;
         }
 
@@ -282,7 +299,7 @@ namespace RENDER_NAMESPACE {
         }
 
         inline Float gamma(int n) {
-            return (n * epsilon) / (1 - n * epsilon);
+            return (n * Epsilon) / (1 - n * Epsilon);
         }
 
         inline Float misWeight(int nSampleF, Float pdfF, int nSampleG, Float pdfG) {

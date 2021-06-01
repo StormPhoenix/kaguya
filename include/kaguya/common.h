@@ -5,6 +5,7 @@
 #ifndef KAGUYA_COMMON_H
 #define KAGUYA_COMMON_H
 
+#include <cassert>
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -20,7 +21,7 @@
 #endif
 
 // GPU mode
-#ifdef _RENDER_GPU_MODE_
+#ifdef __RENDER_GPU_MODE__
 #define GLM_FORCE_CUDA
 #define CUDA_VERSION 11000
 #define RENDER_CPU_GPU __host__ __device__
@@ -49,6 +50,9 @@ namespace fs = ghc::filesystem;
 
 namespace RENDER_NAMESPACE {
 
+#ifdef __RENDER_GPU_MODE__
+#define ASSERT(condition, description) assert(condition);
+#else
 #define ASSERT(condition, description) \
     do { \
         if (!(condition)) {                \
@@ -58,5 +62,6 @@ namespace RENDER_NAMESPACE {
         } \
     } while (0);
 }
+#endif
 
 #endif //KAGUYA_COMMON_H

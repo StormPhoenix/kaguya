@@ -59,11 +59,11 @@ namespace RENDER_NAMESPACE {
     bool Config::usingGPU = false;
 
     std::shared_ptr<Scene> Config::nextScene(MemoryAllocator &allocator) {
-#ifdef _RENDER_GPU_MODE_
+#ifdef __RENDER_GPU_MODE__
         if (usingGPU) {
 
         } else
-#endif // _RENDER_GPU_MODE_
+#endif // __RENDER_GPU_MODE__
         {
             sceneId++;
             std::shared_ptr<Scene> scene = nullptr;

@@ -5,6 +5,7 @@
 #ifndef KAGUYA_TAGGEDPOINTER_H
 #define KAGUYA_TAGGEDPOINTER_H
 
+#include <cassert>
 #include <kaguya/common.h>
 #include <kaguya/utils/type_utils.h>
 
@@ -80,13 +81,15 @@ namespace RENDER_NAMESPACE {
 
             template<typename T>
             RENDER_CPU_GPU T *cast() {
-                ASSERT(isType<T>(), "TaggedPointer type can not be cast. ");
+                assert(isType<T>());
+//                ASSERT(isType<T>(), "TaggedPointer type can not be cast. ");
                 return reinterpret_cast<T *>(ptr());
             }
 
             template<typename T>
             RENDER_CPU_GPU const T *cast() const {
-                ASSERT(isType<T>(), "TaggedPointer type can not be cast. ");
+                assert(isType<T>());
+//                ASSERT(isType<T>(), "TaggedPointer type can not be cast. ");
                 return reinterpret_cast<T *>(ptr());
             }
 

@@ -15,7 +15,7 @@ namespace RENDER_NAMESPACE {
 
             core::Spectrum IsotropicMedium::transmittance(const tracer::Ray &ray, Sampler *sampler) const {
                 // e^{-\sigma_t * dist}
-                return exp(-_sigma_t * std::min(ray.getStep() * LENGTH(ray.getDirection()), MAX_FLOAT));
+                return exp(-_sigma_t * std::min(ray.getStep() * LENGTH(ray.getDirection()), MaxFloat));
             }
 
             core::Spectrum
@@ -38,7 +38,7 @@ namespace RENDER_NAMESPACE {
                 }
 
                 // calculate transmittance
-                Spectrum T = exp(-_sigma_t * std::min(step, MAX_FLOAT) * LENGTH(ray.getDirection()));
+                Spectrum T = exp(-_sigma_t * std::min(step, MaxFloat) * LENGTH(ray.getDirection()));
 
                 // calculate pdf
                 Spectrum p = sampleMedium ? _sigma_t * T : T;

@@ -970,7 +970,7 @@ namespace RENDER_NAMESPACE {
                         invBaseN *= invBase;
                         n = next;
                     }
-                    return std::min(reversedDigits * invBaseN, ONE_MINUS_EPSILON);
+                    return std::min(reversedDigits * invBaseN, OneMinusEpsilon);
                 }
 
                 // TODO delete template specialized

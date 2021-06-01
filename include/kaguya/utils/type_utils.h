@@ -68,7 +68,7 @@ namespace RENDER_NAMESPACE {
             template<typename F, typename TP, typename... Ts>
             inline auto operator()(F func, TP tp, int index, TypePack<Ts...> types) {
                 if (index > 1) {
-                    using RestType = RemoveFirstType<TypePack<Ts...>>::type;
+                    using RestType = typename RemoveFirstType<TypePack<Ts...>>::type;
                     return EvaluateTpType<n - 1>()(func, tp, index - 1, RestType());
                 } else {
                     return EvaluateTpType<1>()(func, tp, index, types);

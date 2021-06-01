@@ -7,7 +7,7 @@
 
 #include <kaguya/common.h>
 
-#ifdef _RENDER_GPU_MODE_
+#ifdef ___RENDER_GPU_MODE___
 
 #include <cuda.h>
 #include <cuda_runtime_api.h>

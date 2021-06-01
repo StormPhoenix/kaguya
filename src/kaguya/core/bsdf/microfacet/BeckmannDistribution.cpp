@@ -61,12 +61,12 @@ namespace RENDER_NAMESPACE {
                     Float v = sampler->sample1D();
                     Float tanTheta2, phi;
                     if (_alphaX == _alphaZ) {
-                        Float logSample = std::log(1 - (u == 1. ? (u - epsilon) : u));
+                        Float logSample = std::log(1 - (u == 1. ? (u - Epsilon) : u));
                         ASSERT(!std::isinf(logSample), "BeckmannDistribution::sampleWh() Inf error. ");
                         tanTheta2 = -_alphaX * _alphaX * logSample;
                         phi = v * 2 * PI;
                     } else {
-                        Float logSample = std::log(1 - (u == 1. ? (u - epsilon) : u));
+                        Float logSample = std::log(1 - (u == 1. ? (u - Epsilon) : u));
                         ASSERT(!std::isinf(logSample), "BeckmannDistribution::sampleWh() Inf error. ");
                         phi = std::atan(_alphaZ / _alphaX *
                                         std::tan(2 * PI * v + 0.5f * PI));

@@ -15,11 +15,8 @@
 
 namespace RENDER_NAMESPACE {
     namespace core {
+        using namespace math;
 
-        /**
-         * 光谱基类
-         * @tparam SpectrumSample
-         */
         template<int SpectrumSamples>
         class SpectrumTemplate {
         public:
@@ -34,7 +31,7 @@ namespace RENDER_NAMESPACE {
                 for (int i = 0; i < SpectrumSamples; ++i) value[i] = s.value[i];
             }
 
-            SpectrumTemplate clamp(Float low = 0, Float high = math::infinity) const {
+            SpectrumTemplate clamp(Float low = 0, Float high = Infinity) const {
                 SpectrumTemplate ret;
                 for (int i = 0; i < SpectrumSamples; ++i)
                     ret.value[i] = math::clamp(value[i], low, high);
@@ -179,7 +176,7 @@ namespace RENDER_NAMESPACE {
                 return ret;
             }
 
-            SpectrumTemplate truncate(Float low = 0, Float high = math::infinity) const {
+            SpectrumTemplate truncate(Float low = 0, Float high = Infinity) const {
                 SpectrumTemplate ret;
                 for (int i = 0; i < SpectrumSamples; ++i)
                     ret.value[i] = math::clamp(value[i], low, high);

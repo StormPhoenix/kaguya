@@ -42,14 +42,14 @@ namespace RENDER_NAMESPACE {
         public:
             using TaggedPointer::TaggedPointer;
 
-            RENDER_CPU_GPU void evaluateBSDF(SurfaceInteraction &insect, MemoryAllocator &allocator,
+            RENDER_CPU_GPU inline void evaluateBSDF(SurfaceInteraction &insect, MemoryAllocator &allocator,
                                              TransportMode mode = TransportMode::RADIANCE);
 
-            RENDER_CPU_GPU bool isSpecular();
+            RENDER_CPU_GPU inline bool isSpecular();
 
-            RENDER_CPU_GPU bool isTwoSided() const ;
+            RENDER_CPU_GPU inline bool isTwoSided() const ;
 
-            RENDER_CPU_GPU void setTwoSided(bool twoSided);
+            RENDER_CPU_GPU inline void setTwoSided(bool twoSided);
         };
 
     }

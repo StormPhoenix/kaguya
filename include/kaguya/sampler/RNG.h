@@ -17,8 +17,7 @@
 
 namespace RENDER_NAMESPACE {
     namespace sampler {
-
-        using math::ONE_MINUS_EPSILON;
+        using namespace RENDER_NAMESPACE::math;
 
         class RNG {
         public:
@@ -82,12 +81,12 @@ namespace RENDER_NAMESPACE {
 
         template<>
         inline float RNG::uniform<float>() {
-            return std::min<float>(ONE_MINUS_EPSILON, uniform<uint32_t>() * 0x1p-32f);
+            return std::min<float>(OneMinusEpsilon, uniform<uint32_t>() * 0x1p-32f);
         }
 
         template<>
         inline double RNG::uniform<double>() {
-            return std::min<double>(ONE_MINUS_EPSILON, uniform<uint64_t>() * 0x1p-64);
+            return std::min<double>(OneMinusEpsilon, uniform<uint64_t>() * 0x1p-64);
         }
 
         inline void RNG::newSequence(uint64_t initState, uint64_t initSeq) {

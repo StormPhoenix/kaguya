@@ -16,22 +16,22 @@ namespace RENDER_NAMESPACE {
     namespace material {
         using core::SurfaceInteraction;
 
-        void Material::evaluateBSDF(SurfaceInteraction &insect, MemoryAllocator &allocator, TransportMode mode) {
+        inline void Material::evaluateBSDF(SurfaceInteraction &insect, MemoryAllocator &allocator, TransportMode mode) {
             auto func = [&](auto ptr) { return ptr->evaluateBSDF(insect, allocator, mode); };
             return proxyCall(func);
         }
 
-        bool Material::isSpecular() {
+        inline bool Material::isSpecular() {
             auto func = [&](auto ptr) { return ptr->isSpecular(); };
             return proxyCall(func);
         }
 
-        bool Material::isTwoSided() const {
+        inline bool Material::isTwoSided() const {
             auto func = [&](auto ptr) { return ptr->isTwoSided(); };
             return proxyCall(func);
         }
 
-        void Material::setTwoSided(bool twoSided) {
+        inline void Material::setTwoSided(bool twoSided) {
             auto func = [&](auto ptr) { return ptr->setTwoSided(twoSided); };
             return proxyCall(func);
         }

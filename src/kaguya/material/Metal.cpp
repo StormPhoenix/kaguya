@@ -34,21 +34,19 @@ namespace RENDER_NAMESPACE {
             const MicrofacetDistribution *distribution = nullptr;
             Float alpha = _alpha->evaluate(insect);
             if (_distributionType == "beckmann") {
-                distribution =  allocator.newObject<BeckmannDistribution>(alpha);
-            } else if (_distributionType == "ggx") {
-                distribution =  allocator.newObject<GGXDistribution>(alpha);
+                distribution = allocator.newObject<BeckmannDistribution>(alpha);
             } else {
-                ASSERT(false, "Unsupported microfacet normal distribution type. ");
+                distribution = allocator.newObject<GGXDistribution>(alpha);
             }
 
             // Build fresnel term
             const Spectrum etaT = _eta->evaluate(insect);
             const Spectrum K = _K->evaluate(insect);
-            const FresnelConductor *fresnel =  allocator.newObject<FresnelConductor>(Spectrum(1.), etaT, K);
+            const FresnelConductor *fresnel = allocator.newObject<FresnelConductor>(Spectrum(1.), etaT, K);
 
             Spectrum reflectance = _Ks->evaluate(insect);
-            insect.bsdf  =  allocator.newObject<BSDF>(insect);
-            insect.bsdf->addBXDF(  allocator.newObject<BXDFMicrofacetReflection>(reflectance, distribution, fresnel));
+            insect.bsdf = allocator.newObject<BSDF>(insect);
+            insect.bsdf->addBXDF(allocator.newObject<BXDFMicrofacetReflection>(reflectance, distribution, fresnel));
         }
     }
 }
